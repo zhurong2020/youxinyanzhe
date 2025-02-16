@@ -29,7 +29,7 @@ github_username:  zhurong2020 # GitHub 用户名
 
 # Minimal Mistakes settings (主题相关设置)
 minimal_mistakes_skin: default # 主题配色方案，可选：default, dark, air, contrast, dirt, neon, mint, etc.
-search: true # 启用站内搜索
+search: true # 启用站内搜索，需要提前设置
 
 # Build settings
 theme: minimal-mistakes-jekyll # 确保使用了该主题
