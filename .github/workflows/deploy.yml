@@ -15,7 +15,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.x  # Use a supported Ruby version
+          ruby-version: 3.3.7  # 使用明确的 Ruby 版本
           bundler-cache: true # 启用 Bundler 缓存
 
       - name: Build with Jekyll
