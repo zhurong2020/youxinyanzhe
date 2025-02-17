@@ -27,6 +27,9 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
+      - name: Install dependencies
+        run: bundle install --no-cache
+
       - name: Build with Jekyll
         run: bundle exec jekyll build --baseurl "${{ github.event.repository.name }}"
 
