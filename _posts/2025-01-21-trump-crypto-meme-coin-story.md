@@ -28,7 +28,7 @@ header:
     id: "tK-VQtfFWsc"  # YouTube 视频 ID
     provider: "youtube"  # 视频提供商
 
-breadcrumbs: true  # 启用面包屑导航
+breadcrumbs: False  # 启用面包屑导航
 
 toc: true  # 启用文章内目录
 toc_sticky: true  # 目录固定在侧边栏
