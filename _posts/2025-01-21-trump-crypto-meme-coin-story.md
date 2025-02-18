@@ -18,7 +18,7 @@ tags:
 
 excerpt: 这篇文章为新手投资者解读加密货币的种类与风险，分享普通人参与币圈的理性路径。
 
-classes: wide # 启用宽页面
+# classes: wide # 启用宽页面
 
 header:
   image: "https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/5580272a-a479-463b-24f4-4ffacc855800/public?format=auto&width=600&quality=75" # 使用 Cloudflare Images 转换 URL
