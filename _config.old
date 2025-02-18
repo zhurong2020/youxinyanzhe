@@ -1,0 +1,6 @@
+title: "aronghome.us.kg"  # 网站标题
+remote_theme: mmistakes/minimal-mistakes # 使用最新版本，删除@4.24.0
+plugins:
+  - jekyll-remote-theme # 启用 remote_theme
+  - jekyll-include-cache # 缓存 include 标签，提高构建速度
+url: "https://aronghome.us.kg"  # 绑定自定义域名
