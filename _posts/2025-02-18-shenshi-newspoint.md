@@ -1,11 +1,18 @@
 ---
-author: Rong Zhu
+# author: Rong Zhu
+layout: single
 author_profile: true
-breadcrumbs: true
-categories:
-- 思辨认知
-- 工具指南
+title: 2025年的世界更精彩，但如何避免信息茧房？从审视新闻观点开始
+
+toc: true
+toc_icon: list
+toc_label: 本页内容
+toc_sticky: true
+# breadcrumbs: true
 comments: true
+related: true
+share: true
+
 date: 2025-02-18 16:45:00 +0000
 excerpt: 2025年，信息爆炸时代，如何避免'信息茧房'？本文介绍AllSides和Ad Fontes Media两大工具，帮你科学审视新闻，培养理性的信息获取习惯，拥抱信息多元化。
 
@@ -20,9 +27,10 @@ header:
   overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/6ee1a0f4-f8ac-4db4-4edc-baaae2d12100/public
   teaser: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/6ee1a0f4-f8ac-4db4-4edc-baaae2d12100/public
 last_modified_at: '2025-03-04 15:36:27'
-layout: single
-related: true
-share: true
+
+categories:
+- 思辨认知
+- 工具指南
 tags:
 - 信息茧房
 - 媒体偏见
@@ -30,11 +38,6 @@ tags:
 - 新闻分析
 - AllSides
 - Ad Fontes Media
-title: 2025年的世界更精彩，但如何避免信息茧房？从审视新闻观点开始
-toc: true
-toc_icon: list
-toc_label: 本页内容
-toc_sticky: true
 ---
 
 ## **引言：信息时代，我们如何避免"信息茧房"？**
