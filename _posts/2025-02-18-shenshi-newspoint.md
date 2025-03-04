@@ -1,4 +1,6 @@
 ---
+layout: default
+
 author: Rong Zhu
 author_profile: true
 breadcrumbs: true
@@ -16,7 +18,6 @@ header:
   overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/b76046c9-143f-43b6-db85-95a44e1be800/public
   teaser: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/b76046c9-143f-43b6-db85-95a44e1be800/public
 last_modified_at: '2025-03-04 16:21:23'
-layout: default
 related: true
 share: true
 tags:
