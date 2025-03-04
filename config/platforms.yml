@@ -3,7 +3,8 @@ platforms:
   github_pages:
     enabled: true
     name: github_pages
-    author: 有心言者
+    domain: "arong.eu.org/youxinyanzhe"  # 添加域名配置
+    author: Rong Zhu
     polish_content: false      # 不需要润色
     analyze_content: true      # 需要分析分类和标签
     replace_images: true       # 需要替换图片
