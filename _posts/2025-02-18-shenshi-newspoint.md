@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: defaults
 
 author: Rong Zhu
 author_profile: true
