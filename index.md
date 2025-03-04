@@ -1,4 +1,4 @@
 ---
 layout: home
-title: 欢迎访问我的博客
+title: 欢迎访问我的新博客
 ---

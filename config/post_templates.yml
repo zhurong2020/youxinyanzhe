@@ -1,0 +1,55 @@
+# 文章模板配置
+front_matter:
+  default:
+    author_profile: true
+    breadcrumbs: true
+    comments: true
+    layout: single
+    related: true
+    share: true
+    toc: true
+    toc_icon: list
+    toc_label: 本页内容
+    toc_sticky: true
+
+# 文章分类
+categories:
+  人工智能:
+    - 最新发展
+    - 实用应用
+  学习成长:
+    - 终身学习
+    - 语言学习
+    - 投资教育
+    - 思辨认知
+  量化交易：
+    - 基础入门
+    - 策略开发
+    - 策略优化
+    - 实战经验
+    - 工具与技术
+  技术实践：
+    - 云服务
+    - 工具指南
+    - 应用部署
+  美国见闻：
+    - 日常生活
+    - 教育资源
+  智能理财：
+    - 基金投资
+    - 股票投资
+    - 自动交易
+  项目与创新：
+    - 创新项目
+    - 行业动态
+
+
+# 文章尾部
+footer:
+  github_pages: |
+
+    如果你觉得我的文章对你有帮助，可以[请我喝咖啡](https://www.buymeacoffee.com/zhurong052Q)
+
+    <a href="https://www.buymeacoffee.com/zhurong052Q" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+    > 💬 **发表评论**: 您需要有一个 GitHub 账号来发表评论。 

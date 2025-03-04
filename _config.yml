@@ -19,12 +19,12 @@ locale                   : "en-US"
 rtl                      : # true, false (default) # turns direction of the page into right to left for RTL languages
 title                    : "有心言者"
 title_separator          : "-"
-subtitle                 : "学习 进步 分享" # site tagline that appears below site title in masthead
+subtitle                 : "技术博客"
 name                     : "Rong Zhu"
-description              : "我的个人博客空间——一个致力于技术、创新和终身学习的小角落"
-url                      : "https://aronghome.us.kg" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
-baseurl                  : # the subpath of your site, e.g. "/blog"
-repository               : "zhurong2020/youxinyanzhe" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
+description              : "分享技术，记录生活"
+url                      : "https://arong.eu.org"  # 使用主域名
+baseurl                  : "/youxinyanzhe"    # 添加子路径
+repository               : "zhurong2020/youxinyanzhe"  # 更新为正确的仓库名
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 logo                     : # path of logo image to display in the masthead, e.g. "/assets/images/88x88.png"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
@@ -115,43 +115,38 @@ analytics:
 
 # Site Author
 author:
-  name             : "Rong Zhu"
-  avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "一个终身学习的践行者"
-  location         : "Jacksonville, FL"
-  email            : "zhurong0525@icloud.com"
+  name: "Rong Zhu"
+  bio: "一个终身学习的践行者"
+  location: "Jacksonville, FL"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
-      url: "mailto:zhurong0525@icloud.com"
+      url: "mailto:your.email@example.com"
     - label: "Website"
       icon: "fas fa-fw fa-link"
-      url: "https://zhurong.link"
+      url: "https://aronghome.us.kg"
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
-      url: "https://twitter.com/zhurong0525"
+      url: "https://twitter.com/your-username"
     - label: "Facebook"
       icon: "fab fa-fw fa-facebook-square"
-      url: "https://facebook.com/zhu.rong.520"
+      url: "https://facebook.com/your-username"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/zhurong2020"
-    - label: "Instagram"
-      icon: "fab fa-fw fa-instagram"
-      # url: "https://instagram.com/"
 
 # Site Footer
 footer:
   links:
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
-      # url:
+      url: "https://twitter.com/your-username"
     - label: "Facebook"
       icon: "fab fa-fw fa-facebook-square"
-      # url:
+      url: "https://facebook.com/your-username"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      # url:
+      url: "https://github.com/zhurong2020"
     - label: "GitLab"
       icon: "fab fa-fw fa-gitlab"
       # url:
@@ -228,7 +223,7 @@ sass:
 
 
 # Outputting
-permalink: /:categories/:title/
+permalink: /posts/:year/:month/:title/
 timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 
@@ -327,3 +322,13 @@ defaults:
       comments: true
       share: true
       related: true
+
+# Assets 配置
+  - scope:
+      path: "assets/images"
+    values:
+      image: true
+
+# 图片路径配置
+img_path: /assets/images
+favicon: /assets/images/favicon/favicon.ico
