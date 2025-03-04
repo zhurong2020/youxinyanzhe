@@ -1,0 +1,27 @@
+# 平台配置
+platforms:
+  github_pages:
+    enabled: true
+    name: github_pages
+    author: 有心言者
+    polish_content: false      # 不需要润色
+    analyze_content: true      # 需要分析分类和标签
+    replace_images: true       # 需要替换图片
+    append_footer: true        # 需要添加页脚
+
+  wechat:
+    enabled: true
+    name: wechat
+    author: 自定义公众号名
+    polish_content: true       # 需要润色
+    analyze_content: true      # 需要分析分类和标签
+    replace_images: true       # 需要替换图片
+    append_footer: false       # 不需要添加页脚
+
+  wordpress:
+    enabled: false
+    name: wordpress
+    type: rest_api
+    api_endpoint: https://your-site.com/wp-json/
+    polish_content: true
+    replace_images: true 

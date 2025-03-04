@@ -18,6 +18,19 @@ header:
 last_modified_at: 2025-02-16 12:00:00
 layout: single
 title: 2025年的世界更精彩，但如何避免信息茧房？从审视新闻观点开始
+breadcrumbs: true  # 启用面包屑导航
+
+toc: true  # 启用文章内目录
+toc_sticky: true  # 目录固定在侧边栏
+toc_label: "本页内容"
+toc_icon: "list"
+
+related: true  # 在文章底部显示相关内容
+
+share: true  # 显示社交分享按钮
+
+comments: true #显示评论
+
 ---
 
 ## **引言：信息时代，我们如何避免“信息茧房”？**

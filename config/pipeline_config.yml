@@ -1,0 +1,50 @@
+# 基础路径配置
+paths:
+  root: "."  # 项目根目录
+  drafts: "_drafts"
+  posts: "_posts"
+  images: "assets/images/posts"
+  output: "_output"
+  archive: "_drafts/archived"
+  logs: "logs/pipeline.log"
+  data: "_data"
+
+# 日志配置
+logging:
+  level: "INFO"  # INFO, DEBUG, WARNING, ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_mode: "a"  # a: append, w: overwrite
+  max_size: 10485760  # 10MB
+  backup_count: 5
+
+# 内容处理配置
+content_processing:
+  gemini:
+    model: "models/gemini-2.0-flash"  # 使用的模型名称
+    temperature: 0.7     # 生成的随机性 (0.0-1.0)
+    max_output_tokens: 2048  # 最大输出长度
+    top_p: 0.8          # 采样概率阈值
+    prompts:
+      polish: "请润色以下文章，保持原意，使表达更流畅..."
+      test: "请生成一篇技术博客文章..."
+
+# 发布平台配置
+platforms:
+  github_pages:
+    enabled: true
+    name: github_pages
+    domain: "arong.eu.org/youxinyanzhe"
+    author: 有心言者
+    polish_content: false
+    analyze_content: true
+    replace_images: true
+    append_footer: true
+
+# 导入其他配置
+imports:
+  - cloudflare_config.yml  # Cloudflare Images 配置
+  - gemini_config.yml      # AI 内容生成配置
+  - test_config.yml        # 测试相关配置
+  - post_templates.yml
+  - platforms.yml
+

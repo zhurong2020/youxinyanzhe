@@ -1,4 +1,73 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+.python-version
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+
+# 环境变量
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 日志
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 测试
+tests/test_data/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+
+# 输出目录
+_output/
+_data/image_mappings.yml
+
+# 归档目录
+_drafts/archived/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+*.swp
+.*.swp
+*~
+
+# Jekyll
 _site/
 .sass-cache/
 .jekyll-cache/
+.jekyll-metadata
+.jekyll-metadata
+vendor/
+.bundle/
+
+# IDE
 .idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+*.iml

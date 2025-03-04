@@ -1,0 +1,15 @@
+# 测试配置
+test_assets:
+  images:
+    dir: "tests/test_data/images"
+    sizes:
+      header: [800, 400]
+      content: [600, 300]
+  drafts:
+    dir: "tests/test_data/drafts"
+    template: "test-article.md"
+
+test_settings:
+  cleanup: true
+  log_level: "INFO"
+  timeout: 30 
