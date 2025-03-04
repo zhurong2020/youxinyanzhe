@@ -1,13 +1,8 @@
 ---
 layout: single
-
 author_profile: true
-breadcrumbs: true
-categories:
-- 学习成长
-- 美国见闻
-comments: true
 date: 2025-02-8 16:45:00 +0000
+title: 2025年的世界更精彩，但如何避免信息茧房？从审视新闻观点开始
 excerpt: 2025年，信息爆炸时代，如何避免'信息茧房'？本文介绍AllSides和Ad Fontes Media两大工具，帮你科学审视新闻，培养理性的信息获取习惯，拥抱信息多元化。
 header:
   image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/b76046c9-143f-43b6-db85-95a44e1be800/public
@@ -17,19 +12,23 @@ header:
   overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/b76046c9-143f-43b6-db85-95a44e1be800/public
   teaser: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/b76046c9-143f-43b6-db85-95a44e1be800/public
 last_modified_at: '2025-03-04 16:21:23'
+toc: true
+toc_icon: list
+toc_label: 本页内容
+toc_sticky: true
+comments: true
+
 related: true
 share: true
+categories:
+- 学习成长
+- 美国见闻
 tags:
 - 信息茧房
 - 媒体偏见
 - 独立思考
 - 信息过滤
 - 新闻评估
-title: 2025年的世界更精彩，但如何避免信息茧房？从审视新闻观点开始
-toc: true
-toc_icon: list
-toc_label: 本页内容
-toc_sticky: true
 ---
 
 ## **引言：信息时代，我们如何避免“信息茧房”？**
