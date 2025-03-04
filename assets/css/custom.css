@@ -1,0 +1,22 @@
+/* Custom CSS for Giscus */
+.giscus, .giscus-frame {
+  background-color: #ffffff !important;
+}
+
+.giscus-frame {
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+}
+
+/* Force light theme for Giscus */
+:root {
+  --giscus-theme: light;
+}
+
+/* Ensure Giscus container is properly styled */
+.giscus-comments {
+  margin-top: 2em;
+  background-color: #ffffff;
+  padding: 1em;
+  border-radius: 6px;
+} 

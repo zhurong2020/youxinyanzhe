@@ -19,7 +19,7 @@ locale                   : "en-US"
 rtl                      : # true, false (default) # turns direction of the page into right to left for RTL languages
 title                    : "有心言者"
 title_separator          : "-"
-subtitle                 : "技术博客"
+subtitle                 : "探索技术与思维的交汇点"
 name                     : "Rong Zhu"
 description              : "分享技术，记录生活"
 url                      : "https://arong.eu.org"  # 使用主域名
@@ -53,13 +53,13 @@ comments:
     category_id          : "DIC_kwDON7I-os4CnD6N" # Shown during giscus setup at https://giscus.app
     discussion_term      : "pathname" # "pathname" (default), "url", "title", "og:title"
     reactions_enabled    : "1" # '1' for enabled (default), '0' for disabled
-    theme                : "dark_dimmed" # "light" (default), "dark", "dark_dimmed", "transparent_dark", "preferred_color_scheme"
-    strict               : "0" # 1 for enabled, 0 for disabled (default)
+    theme                : "light_high_contrast" # "light" (default), "dark", "dark_dimmed", "transparent_dark", "preferred_color_scheme"
+    strict               : "1" # 1 for enabled, 0 for disabled (default)
     input_position       : "top" # "top", "bottom" # The comment input box will be placed above or below the comments
     emit_metadata        : "1" # 1 for enabled, 0 for disabled (default) # https://github.com/giscus/giscus/blob/main/ADVANCED-USAGE.md#imetadatamessage
     lang                 : "zh-CN" # "en" (default)
     loading              : "lazy"
-    environment          : "development"
+    environment          : "production"
     lazy                 : # true, false # Loading of the comments will be deferred until the user scrolls near the comments container.
   staticman:
     branch               : # "master"
@@ -115,22 +115,22 @@ analytics:
 
 # Site Author
 author:
-  name: "Rong Zhu"
+  name: "有心言者"
   bio: "一个终身学习的践行者"
   location: "Jacksonville, FL"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
-      url: "mailto:your.email@example.com"
+      url: "mailto:zhurong0525@gmail.com"
     - label: "Website"
       icon: "fas fa-fw fa-link"
-      url: "https://aronghome.us.kg"
+      url: "https://zhurong2020.github.io"
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
-      url: "https://twitter.com/your-username"
+      url: "https://twitter.com/zhurong0525"
     - label: "Facebook"
       icon: "fab fa-fw fa-facebook-square"
-      url: "https://facebook.com/your-username"
+      url: "https://facebook.com/zhu.rong.520"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/zhurong2020"
@@ -140,10 +140,10 @@ footer:
   links:
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
-      url: "https://twitter.com/your-username"
+      url: "https://twitter.com/zhurong0525"
     - label: "Facebook"
       icon: "fab fa-fw fa-facebook-square"
-      url: "https://facebook.com/your-username"
+      url: "https://facebook.com/zhu.rong.520"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/zhurong2020"
