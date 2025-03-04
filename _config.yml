@@ -116,7 +116,7 @@ analytics:
 # Site Author
 author:
   name: "Rong Zhu"
-  avatar: "assets/images/favicon/favicon.jpg"
+  avatar: "assets/images/favicon/favicon.ico"
   bio: "一个终身学习的践行者"
   location: "Jacksonville, FL"
   links:

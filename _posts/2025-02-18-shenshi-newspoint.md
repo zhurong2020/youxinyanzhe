@@ -1,6 +1,7 @@
 ---
-# author: Rong Zhu
+# layout: default
 layout: single
+# author: Rong Zhu
 author_profile: true
 title: 2025年的世界更精彩，但如何避免信息茧房？从审视新闻观点开始
 
