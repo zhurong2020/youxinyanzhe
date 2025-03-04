@@ -9,12 +9,10 @@ comments: true
 date: 2025-02-18 16:45:00 +0000
 excerpt: 2025年，信息爆炸时代，如何避免'信息茧房'？本文介绍AllSides和Ad Fontes Media两大工具，帮你科学审视新闻，培养理性的信息获取习惯，拥抱信息多元化。
 
-classes: wide
-
 header:
-  actions:
-  - label: 请我喝咖啡
-    url: https://www.buymeacoffee.com/zhurong052Q
+  # actions:
+  # - label: 请我喝咖啡
+    # url: https://www.buymeacoffee.com/zhurong052Q
   image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/6ee1a0f4-f8ac-4db4-4edc-baaae2d12100/public
   og_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/6ee1a0f4-f8ac-4db4-4edc-baaae2d12100/public
   overlay_color: '#333'
