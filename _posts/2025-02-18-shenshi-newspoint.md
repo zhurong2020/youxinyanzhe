@@ -2,9 +2,8 @@
 author: 有心言者
 author_profile: true
 date: 2025-02-18 16:45:00 +0000
-excerpt: '2025年，信息爆炸时代，如何避免"信息茧房"？本文介绍AllSides和Ad Fontes Media两大工具，帮你科学审视新闻，培养理性的信息获取习惯，拥抱信息多元化。
+excerpt: '2025年，信息爆炸时代，如何避免"信息茧房"？本文介绍AllSides和Ad Fontes Media两大工具，帮你科学审视新闻，培养理性的信息获取习惯，拥抱信息多元化。'
 
-  '
 header:
   actions:
   - label: 请我喝咖啡
@@ -24,11 +23,8 @@ toc: true  # 启用文章内目录
 toc_sticky: true  # 目录固定在侧边栏
 toc_label: "本页内容"
 toc_icon: "list"
-
 related: true  # 在文章底部显示相关内容
-
 share: true  # 显示社交分享按钮
-
 comments: true #显示评论
 
 ---
