@@ -1,4 +1,6 @@
 ---
+layout: single
+
 author_profile: true
 breadcrumbs: true
 categories:
@@ -15,7 +17,6 @@ header:
   overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/96a5679e-91d9-4f61-ce85-052c23760b00/public
   teaser: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/96a5679e-91d9-4f61-ce85-052c23760b00/public
 last_modified_at: '2025-03-04 16:45:22'
-layout: default
 related: true
 share: true
 tags:
