@@ -28,24 +28,27 @@ import argparse
 from .image_mapper import CloudflareImageMapper
 
 class ContentPipeline:
-    def __init__(self, config_path: str, verbose: bool = False):
-        # 设置logger
+    def __init__(self, config_path: str = "config/pipeline_config.yml", verbose: bool = False):
+        """初始化内容处理管道
+        Args:
+            config_path: 配置文件路径
+            verbose: 是否输出详细日志
+        """
         self.verbose = verbose
-        self.logger = setup_logger("ContentPipeline")
-        self.log("="*50)
-        self.log("内容处理流水线启动")
-        
-        # 确保加载环境变量
-        load_dotenv(override=True)
+        self.logger = logging.getLogger("ContentPipeline")
         
         # 初始化API状态
         self.api_available = True
         
         # 加载配置
         try:
+            # 加载主配置文件
             with open(config_path, 'r', encoding='utf-8') as f:
                 self.config = yaml.safe_load(f)
             self.logger.debug(f"加载配置文件: {config_path}")
+            
+            # 加载完整配置（包括导入的配置文件）
+            self.config = self._load_config()
             
             # 验证环境变量
             account_id = os.getenv('CLOUDFLARE_ACCOUNT_ID')
@@ -68,7 +71,20 @@ class ContentPipeline:
         self._setup_logging()
         
         # 加载模板和平台配置
-        self.templates = self.config.get('post_templates', {})
+        # 检查是否有post_templates键，如果没有但有front_matter键，则使用front_matter
+        if 'post_templates' in self.config:
+            self.templates = self.config['post_templates']
+        elif 'front_matter' in self.config:
+            self.templates = {'front_matter': self.config['front_matter']}
+            if 'categories' in self.config:
+                self.templates['categories'] = self.config['categories']
+            if 'footer' in self.config:
+                self.templates['footer'] = self.config['footer']
+            self.logger.debug("从配置中加载模板成功")
+        else:
+            self.templates = {}
+            self.logger.warning("未加载模板或模板为空")
+        
         self.platforms_config = self.config.get('platforms', {})
         
         # 设置API
@@ -252,7 +268,8 @@ class ContentPipeline:
             self.log("未加载模板或模板为空", level="warning")
             return
             
-        self.log(f"已加载模板: {list(self.templates.keys())}", level="info")
+        self.log(f"已加载模板: {list(self.templates.keys())}", level="debug")
+        self.log(f"模板内容: {self.templates}", level="debug")
         
         # 验证前端模板
         if 'front_matter' in self.templates:
@@ -266,6 +283,7 @@ class ContentPipeline:
                     self.log("⚠️ 目录设置未加载或未启用", level="warning")
             else:
                 self.log("⚠️ 未找到默认前端模板", level="warning")
+                self.log(f"可用的前端模板: {list(self.templates['front_matter'].keys())}", level="debug")
         else:
             self.log("⚠️ 未找到前端模板配置", level="warning")
             
@@ -599,21 +617,37 @@ class ContentPipeline:
                     post[key] = value
                     self.log(f"应用默认模板: {key}={value}", level="info")
             
+            # 添加或更新最后修改时间
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            post['last_modified_at'] = current_time
+            self.log(f"更新最后修改时间: {current_time}", level="info")
+            
+            # 确保作者信息正确
+            if platform_config.get('author', None):
+                post['author'] = platform_config.get('author')
+                self.log(f"设置作者: {post['author']}", level="info")
+            
+            # 确保author_profile设置为true
+            if 'author_profile' not in post or not post['author_profile']:
+                post['author_profile'] = True
+                self.log("启用作者资料显示", level="info")
+            
             # 先处理图片（如果需要）
             if platform_config.get('replace_images', True):
                 content_text = self._replace_images(content_text, images)
                 post = self._update_header_images(post, images)
             
             # 分析分类和标签（如果需要）
-            if platform_config.get('analyze_content', False):
-                if 'categories' not in post or 'tags' not in post:
-                    categories, tags = self._analyze_content_categories(content_text)
-                    if categories:
-                        post['categories'] = categories
-                        self.log(f"添加分类: {categories}", level="info")
-                    if tags:
-                        post['tags'] = tags
-                        self.log(f"添加标签: {tags}", level="info")
+            # 将analyze_content默认设为True，确保始终分析内容
+            if platform_config.get('analyze_content', True):
+                # 即使已有分类和标签，也重新分析以确保最新
+                categories, tags = self._analyze_content_categories(content_text)
+                if categories:
+                    post['categories'] = categories
+                    self.log(f"添加分类: {categories}", level="info")
+                if tags:
+                    post['tags'] = tags
+                    self.log(f"添加标签: {tags}", level="info")
             
             # 润色内容（如果需要）
             if platform_config.get('polish_content', True):
@@ -698,11 +732,29 @@ class ContentPipeline:
             # 跳过图片链接
             if text.startswith('!'):
                 return match.group(0)
+            # 跳过已经是HTML链接的情况
+            if '<a ' in text and '</a>' in text:
+                return match.group(0)
             # 转换为HTML链接，添加target="_blank"属性
-            return f'<a href="{url}" target="_blank">{text}</a>'
+            return f'<a href="{url}" target="_blank" rel="noopener noreferrer">{text}</a>'
         
         # 替换所有链接
         converted_content = re.sub(pattern, replace_link, content)
+        
+        # 也处理已经存在的HTML链接，但没有target="_blank"的情况
+        html_link_pattern = r'<a\s+(?![^>]*target="_blank")([^>]*)href="([^"]+)"([^>]*)>(.*?)</a>'
+        
+        def add_target_blank(match):
+            attrs_before = match.group(1)
+            url = match.group(2)
+            attrs_after = match.group(3)
+            text = match.group(4)
+            return f'<a {attrs_before}href="{url}"{attrs_after} target="_blank" rel="noopener noreferrer">{text}</a>'
+        
+        # 为现有HTML链接添加target="_blank"
+        converted_content = re.sub(html_link_pattern, add_target_blank, converted_content)
+        
+        self.log("✅ 已将所有链接设置为在新窗口打开", level="debug")
         return converted_content
 
     def _generate_blog_content(self, content: str, images: Dict[str, str], draft_path: Path) -> str:
@@ -1044,13 +1096,45 @@ class ContentPipeline:
         categories = []
         available_cats = self._get_available_categories()
         
-        # 简单的关键词匹配
-        for main_cat, sub_cats in available_cats.items():
-            for sub_cat in sub_cats:
-                if sub_cat.lower() in content.lower():
+        if not available_cats:
+            self.log("❌ 无法获取可用分类", level="error")
+            return []
+            
+        # 将内容转为小写以进行不区分大小写的匹配
+        content_lower = content.lower()
+        
+        # 主分类关键词映射（增加更多关键词以提高匹配准确性）
+        category_keywords = {
+            "人工智能": ["ai", "人工智能", "机器学习", "深度学习", "神经网络", "大模型", "llm", "chatgpt", "gemini"],
+            "学习成长": ["学习", "成长", "教育", "知识", "技能", "思维", "认知", "思考", "阅读"],
+            "量化交易": ["量化", "交易", "策略", "投资", "股票", "期货", "金融", "市场", "回测"],
+            "技术实践": ["技术", "编程", "开发", "部署", "工具", "软件", "应用", "云服务", "代码"],
+            "美国见闻": ["美国", "留学", "海外", "国外", "见闻", "生活", "文化", "教育", "体验"],
+            "智能理财": ["理财", "投资", "基金", "股票", "资产", "财务", "金融", "收益", "风险"],
+            "项目与创新": ["项目", "创新", "创业", "产品", "设计", "方案", "解决方案", "创意", "发明"]
+        }
+        
+        # 先尝试使用关键词匹配
+        for main_cat, keywords in category_keywords.items():
+            for keyword in keywords:
+                if keyword in content_lower:
                     categories.append(main_cat)
                     break
         
+        # 如果没有匹配到关键词，尝试使用子分类匹配
+        if not categories:
+            for main_cat, sub_cats in available_cats.items():
+                for sub_cat in sub_cats:
+                    if sub_cat.lower() in content_lower:
+                        categories.append(main_cat)
+                        break
+        
+        # 如果仍然没有匹配到，返回默认分类
+        if not categories:
+            self.log("⚠️ 无法匹配到合适的分类，使用默认分类", level="warning")
+            return ["技术实践"]
+            
+        self.log(f"通过关键词匹配找到分类: {categories}", level="info")
         return list(set(categories))  # 去重
 
     def _analyze_content_categories(self, content: str) -> Tuple[List[str], List[str]]:
@@ -1058,6 +1142,11 @@ class ContentPipeline:
         try:
             # 获取可用分类
             available_cats = self._get_available_categories()
+            if not available_cats:
+                self.log("❌ 无法获取可用分类", level="error")
+                return [], []
+                
+            self.log(f"可用分类: {list(available_cats.keys())}", level="debug")
             
             # 构建 prompt
             prompt = f"""
@@ -1072,27 +1161,53 @@ class ContentPipeline:
             3. 生成3-5个相关标签
             4. 使用JSON格式返回结果，格式如下：
             {{
-                "categories": ["分类1", "分类2"],
-                "tags": ["标签1", "标签2", "标签3"]
+                "categories": ["主分类1", "主分类2"],
+                "tags": ["标签1", "标签2", "标签3", "标签4", "标签5"]
             }}
             
             文章内容：
-            {content[:2000]}  # 限制内容长度，避免token超限
+            {content[:3000]}  # 增加内容长度，提高分析准确性
             """
             
+            self.log("开始分析文章分类和标签...", level="info")
             response = self.model.generate_content(prompt)
+            
             if response:
                 try:
-                    result = json.loads(response.text)
-                    return result.get('categories', []), result.get('tags', [])
-                except json.JSONDecodeError:
-                    self.log("JSON解析失败，使用简单匹配", level="warning")
-                    return self._suggest_categories(content), []
+                    # 尝试解析JSON响应
+                    result_text = response.text.strip()
+                    # 如果响应不是以{开头，尝试提取JSON部分
+                    if not result_text.startswith('{'):
+                        json_start = result_text.find('{')
+                        json_end = result_text.rfind('}') + 1
+                        if json_start >= 0 and json_end > json_start:
+                            result_text = result_text[json_start:json_end]
+                    
+                    result = json.loads(result_text)
+                    categories = result.get('categories', [])
+                    tags = result.get('tags', [])
+                    
+                    self.log(f"✅ 分析完成，建议分类: {categories}", level="info")
+                    self.log(f"✅ 分析完成，建议标签: {tags}", level="info")
+                    
+                    return categories, tags
+                except json.JSONDecodeError as e:
+                    self.log(f"JSON解析失败: {str(e)}", level="warning")
+                    self.log(f"原始响应: {response.text[:200]}...", level="debug")
+                    # 失败时回退到简单匹配
+                    categories = self._suggest_categories(content)
+                    self.log(f"使用简单匹配的分类: {categories}", level="info")
+                    return categories, []
+            else:
+                self.log("❌ 模型未返回响应", level="error")
+                return self._suggest_categories(content), []
                 
         except Exception as e:
             self.log(f"分析文章分类时出错: {str(e)}", level="error")
             # 失败时回退到简单匹配
-            return self._suggest_categories(content), []
+            categories = self._suggest_categories(content)
+            self.log(f"使用简单匹配的分类: {categories}", level="info")
+            return categories, []
     
     def _replace_images(self, content: str, images: Dict[str, str]) -> str:
         """替换内容中的图片URL"""
