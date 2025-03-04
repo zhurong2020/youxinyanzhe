@@ -1,7 +1,6 @@
 ---
 layout: single
 
-author: Rong Zhu
 author_profile: true
 breadcrumbs: true
 categories:
