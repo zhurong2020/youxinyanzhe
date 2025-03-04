@@ -60,6 +60,25 @@ youxinyanzhe/
 - `.env`: 环境变量(API密钥等敏感信息)
 - `_data/image_mappings.yml`: 自动生成的图片 ID 映射文件
 
+## 内容处理流程
+
+1. 草稿处理
+   - 读取草稿文件
+   - 处理图片引用和上传
+   - 使用 AI 润色内容
+   - 生成多平台内容变体
+
+2. Frontmatter 处理
+   - 自动处理 YAML frontmatter
+   - 支持多种布局模板
+   - 注意：虽然 `layout: single` 不必严格位于 frontmatter 第一行，但为保持一致性，代码会尝试将其放在首位
+   - 自动添加和更新元数据（如最后修改时间）
+
+3. 发布流程
+   - 自动发布到 GitHub Pages
+   - 支持 WordPress 和微信公众号发布
+   - 发布后自动归档草稿
+
 ## 图片处理流程
 
 1. 图片上传
@@ -143,4 +162,10 @@ Rong Zhu
 
 - [Minimal Mistakes Jekyll Theme](https://mmistakes.github.io/minimal-mistakes/)
 - [Cloudflare Images](https://www.cloudflare.com/products/cloudflare-images/)
-- [Google Gemini](https://deepmind.google/technologies/gemini/) 
+- [Google Gemini](https://deepmind.google/technologies/gemini/)
+
+## 最近更新
+
+- 2025-03-04: 改进了 frontmatter 处理逻辑，使用 OrderedDict 确保字段顺序一致性
+- 2025-03-04: 修复了图片处理和上传流程中的问题
+- 2025-03-04: 优化了内容生成和发布流程 

@@ -622,15 +622,19 @@ class ContentPipeline:
             post['last_modified_at'] = current_time
             self.log(f"更新最后修改时间: {current_time}", level="info")
             
-            # 确保作者信息正确
-            if platform_config.get('author', None):
-                post['author'] = platform_config.get('author')
-                self.log(f"设置作者: {post['author']}", level="info")
-            
             # 确保author_profile设置为true
             if 'author_profile' not in post or not post['author_profile']:
                 post['author_profile'] = True
                 self.log("启用作者资料显示", level="info")
+            
+            # 如果author_profile为true，移除author字段以避免重复
+            if post.get('author_profile', False) and 'author' in post:
+                del post['author']
+                self.log("移除冗余的author字段", level="info")
+            # 如果需要设置作者信息且author_profile不存在，则设置author
+            elif platform_config.get('author', None) and not post.get('author_profile', False):
+                post['author'] = platform_config.get('author')
+                self.log(f"设置作者: {post['author']}", level="info")
             
             # 先处理图片（如果需要）
             if platform_config.get('replace_images', True):
@@ -671,14 +675,29 @@ class ContentPipeline:
                 else:
                     self.log(f"未找到平台 {platform} 的页脚模板", level="warning", force=True)
             
-            # 更新内容和作者
+            # 更新内容
             post.content = content_text
-            post['author'] = platform_config.get('author', post.get('author', ''))
             
             # 验证内容完整性
             result = frontmatter.dumps(post)
             if len(result) < len(content) * 0.9:  # 如果内容减少超过10%
                 self.log("⚠️ 警告：生成的内容可能不完整", level="warning", force=True)
+            
+            # 确保layout字段在frontmatter的第一行
+            if 'layout' in post:
+                # 使用OrderedDict确保layout字段在最前面
+                from collections import OrderedDict
+                ordered_post = OrderedDict()
+                ordered_post["layout"] = post["layout"]
+                
+                # 添加其他字段（除了layout和content）
+                for key, value in post.metadata.items():
+                    if key != 'layout':
+                        ordered_post[key] = value
+                
+                # 创建新的Post对象并设置内容
+                final_post = frontmatter.Post(post.content, **ordered_post)
+                result = frontmatter.dumps(final_post)
             
             return result
             
@@ -858,19 +877,45 @@ class ContentPipeline:
         try:
             publish_path = Path(self.config["paths"]["posts"]) / draft_path.name
             
-            # 检查内容是否以front matter开头
-            if not content.startswith('---'):
-                self.log("⚠️ 内容不是以front matter开头，尝试修复", level="warning")
-                try:
-                    post = frontmatter.loads(content)
-                    content = frontmatter.dumps(post)
-                    # 确保内容以front matter开头
-                    if not content.startswith('---'):
-                        self.log("❌ 无法修复front matter格式", level="error")
-                        return False
-                except Exception as e:
-                    self.log(f"❌ 解析front matter失败: {str(e)}", level="error")
+            # 始终解析并重新格式化frontmatter，确保layout字段在最前面
+            try:
+                post = frontmatter.loads(content)
+                
+                # 使用OrderedDict确保layout字段在最前面
+                if 'layout' in post:
+                    from collections import OrderedDict
+                    ordered_post = OrderedDict()
+                    ordered_post["layout"] = post["layout"]
+                    
+                    # 添加其他字段（除了layout和content）
+                    for key, value in post.metadata.items():
+                        if key != 'layout':
+                            ordered_post[key] = value
+                    
+                    # 创建新的Post对象并设置内容
+                    final_post = frontmatter.Post(post.content, **ordered_post)
+                    content = frontmatter.dumps(final_post)
+                else:
+                    # 如果没有layout字段，添加一个
+                    from collections import OrderedDict
+                    ordered_post = OrderedDict()
+                    ordered_post["layout"] = "single"
+                    
+                    # 添加其他字段
+                    for key, value in post.metadata.items():
+                        ordered_post[key] = value
+                    
+                    # 创建新的Post对象并设置内容
+                    final_post = frontmatter.Post(post.content, **ordered_post)
+                    content = frontmatter.dumps(final_post)
+                
+                # 确保内容以front matter开头
+                if not content.startswith('---'):
+                    self.log("❌ 无法修复front matter格式", level="error")
                     return False
+            except Exception as e:
+                self.log(f"❌ 解析front matter失败: {str(e)}", level="error")
+                return False
             
             # 保存文件
             with open(publish_path, 'w', encoding='utf-8') as f:
@@ -947,17 +992,17 @@ class ContentPipeline:
                     logging.debug(f"原始响应类型: {type(content)}")
                     logging.debug(f"原始响应内容: {content[:100]}...")
                     
-                    # 创建文章内容
-                    post = {
-                        "layout": "single",
-                        "title": "自动化测试实践：从CI到CD的最佳实践",
-                        "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S +0000"),
-                        "categories": ["技术"],
-                        "tags": ["自动化测试", "CI/CD", "DevOps"],
-                        "header": {
-                            "image": "/assets/images/posts/2025/02/test-post/header.webp",
-                            "overlay_filter": 0.5
-                        }
+                    # 使用OrderedDict确保layout字段在最前面
+                    from collections import OrderedDict
+                    post = OrderedDict()
+                    post["layout"] = "single"
+                    post["title"] = "自动化测试实践：从CI到CD的最佳实践"
+                    post["date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S +0000")
+                    post["categories"] = ["技术"]
+                    post["tags"] = ["自动化测试", "CI/CD", "DevOps"]
+                    post["header"] = {
+                        "image": "/assets/images/posts/2025/02/test-post/header.webp",
+                        "overlay_filter": 0.5
                     }
                     
                     # 先转换为字符串
