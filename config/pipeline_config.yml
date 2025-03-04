@@ -28,23 +28,11 @@ content_processing:
       polish: "请润色以下文章，保持原意，使表达更流畅..."
       test: "请生成一篇技术博客文章..."
 
-# 发布平台配置
-platforms:
-  github_pages:
-    enabled: true
-    name: github_pages
-    domain: "arong.eu.org/youxinyanzhe"
-    author: 有心言者
-    polish_content: false
-    analyze_content: true
-    replace_images: true
-    append_footer: true
-
 # 导入其他配置
 imports:
   - cloudflare_config.yml  # Cloudflare Images 配置
   - gemini_config.yml      # AI 内容生成配置
   - test_config.yml        # 测试相关配置
   - post_templates.yml
-  - platforms.yml
+  - platforms.yml          # 平台配置在这里导入
 
