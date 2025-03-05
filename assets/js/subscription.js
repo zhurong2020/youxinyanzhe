@@ -7,8 +7,21 @@ document.addEventListener('DOMContentLoaded', function() {
   const subscriptionForm = document.querySelector('.subscription-form');
   
   if (subscriptionForm) {
+    // 检查表单配置
+    const formAction = subscriptionForm.getAttribute('action');
+    if (formAction.includes('YOUR_FORM_ID')) {
+      console.warn('请替换Formspree表单ID: 您需要在Formspree创建一个表单，并用获得的ID替换YOUR_FORM_ID');
+      showMessage('订阅功能尚未完全配置，请联系网站管理员', 'warning');
+    }
+    
     subscriptionForm.addEventListener('submit', function(e) {
       e.preventDefault();
+      
+      // 如果表单未配置，显示提示信息
+      if (formAction.includes('YOUR_FORM_ID')) {
+        showMessage('订阅功能尚未完全配置，请联系网站管理员', 'warning');
+        return;
+      }
       
       const emailInput = this.querySelector('input[type="email"]');
       const email = emailInput.value.trim();
@@ -18,8 +31,11 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
-      // 这里可以替换为实际的API端点
-      const formAction = this.getAttribute('action');
+      // 显示加载状态
+      const submitButton = this.querySelector('button[type="submit"]');
+      const originalButtonText = submitButton.textContent;
+      submitButton.textContent = '提交中...';
+      submitButton.disabled = true;
       
       // 创建一个FormData对象
       const formData = new FormData();
@@ -34,10 +50,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       })
       .then(response => {
+        // 恢复按钮状态
+        submitButton.textContent = originalButtonText;
+        submitButton.disabled = false;
+        
         if (response.ok) {
           return response.json();
         }
-        throw new Error('网络响应出错');
+        throw new Error('网络响应出错 (状态码: ' + response.status + ')');
       })
       .then(data => {
         // 清空输入框
@@ -45,10 +65,23 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 显示成功消息
         showMessage('订阅成功！感谢您的关注。', 'success');
+        
+        // 如果设置了重定向，3秒后跳转
+        const nextUrl = subscriptionForm.querySelector('input[name="_next"]');
+        if (nextUrl && nextUrl.value) {
+          setTimeout(() => {
+            window.location.href = nextUrl.value;
+          }, 2000);
+        }
       })
       .catch(error => {
         console.error('Error:', error);
-        showMessage('订阅失败，请稍后再试。', 'error');
+        // 恢复按钮状态
+        submitButton.textContent = originalButtonText;
+        submitButton.disabled = false;
+        
+        // 显示详细错误信息
+        showMessage('订阅失败: ' + error.message + '。请检查Formspree配置或稍后再试。', 'error');
       });
     });
   }
@@ -71,12 +104,12 @@ document.addEventListener('DOMContentLoaded', function() {
     messageElement.textContent = message;
     messageElement.className = `subscription-message ${type}`;
     
-    // 3秒后自动隐藏消息
+    // 5秒后自动隐藏消息
     setTimeout(() => {
       messageElement.style.opacity = '0';
       setTimeout(() => {
         messageElement.remove();
       }, 300);
-    }, 3000);
+    }, 5000);
   }
 }); 

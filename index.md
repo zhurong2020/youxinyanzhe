@@ -65,11 +65,13 @@ feature_row:
   {% endif %}
 </div>
 
-<div class="page__footer-follow">
+<div style="clear: both; margin-top: 3em;"></div>
+
+<div class="subscription-container" style="margin-top: 3em; padding-top: 2em; border-top: 1px solid #eaeaea;">
   <div class="subscribe-section" style="text-align: center; padding: 2em 0; background-color: #f3f6f6; margin: 2em 0; border-radius: 5px;">
     <h2 style="margin-bottom: 0.5em;">订阅更新</h2>
     <p style="margin-bottom: 1.5em;">输入您的邮箱地址，获取最新文章和独家内容的通知。</p>
-    <form action="https://formspree.io/f/xleqnvgw" method="POST" class="subscription-form" style="max-width: 500px; margin: 0 auto;">
+    <form action="https://formspree.io/f/xpwqvvop" method="POST" class="subscription-form" style="max-width: 500px; margin: 0 auto;">
       <div style="display: flex; justify-content: center;">
         <input type="email" name="email" placeholder="您的邮箱地址" required style="padding: 10px; width: 60%; border: 1px solid #ddd; border-radius: 4px 0 0 4px; font-size: 16px;">
         <button type="submit" class="btn btn--primary" style="border-radius: 0 4px 4px 0; margin: 0;">订阅</button>
