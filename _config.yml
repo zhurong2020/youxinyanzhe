@@ -159,10 +159,10 @@ footer:
       # url:
     - label: "隐私政策"
       icon: "fas fa-fw fa-user-shield"
-      url: /privacy/
+      url: "/privacy/"
     - label: "条款"
       icon: "fas fa-fw fa-file-contract"
-      url: /terms/
+      url: "/terms/"
 
 # Navigation
 # Main navigation menu
