@@ -1,0 +1,94 @@
+/**
+ * 订阅表单样式
+ */
+
+/* 订阅区域样式 */
+.subscribe-section {
+  text-align: center;
+  padding: 2em 0;
+  background-color: #f3f6f6;
+  margin: 2em 0;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.subscribe-section h2 {
+  margin-bottom: 0.5em;
+  color: #333;
+  font-size: 1.75em;
+}
+
+.subscribe-section p {
+  margin-bottom: 1.5em;
+  color: #666;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 表单样式 */
+.subscription-form {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.subscription-form input[type="email"] {
+  padding: 10px;
+  width: 60%;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.subscription-form input[type="email"]:focus {
+  border-color: #6f777d;
+}
+
+.subscription-form button {
+  border-radius: 0 4px 4px 0;
+  margin: 0;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .subscription-form {
+    width: 90%;
+  }
+  
+  .subscription-form input[type="email"] {
+    width: 65%;
+  }
+  
+  .subscription-form button {
+    width: 35%;
+    padding: 10px 5px;
+  }
+}
+
+/* 消息样式 */
+.subscription-message {
+  margin-top: 1em;
+  padding: 10px;
+  border-radius: 4px;
+  transition: opacity 0.3s;
+  opacity: 1;
+  font-weight: 500;
+}
+
+.subscription-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.subscription-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+} 
