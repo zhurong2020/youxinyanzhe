@@ -37,6 +37,17 @@ feature_row:
 
 {% include feature_row id="intro" type="center" %}
 
+<style>
+.feature__item p {
+  text-align: center !important;
+  margin-top: 2em !important;
+}
+.feature__item p a.btn.btn--primary {
+  display: table !important;
+  margin: 0 auto !important;
+}
+</style>
+
 {% include feature_row %}
 
 <div class="latest-posts">
