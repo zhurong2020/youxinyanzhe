@@ -1,23 +1,17 @@
 ---
-title: "感谢订阅"
-layout: single
 permalink: /thanks/
-author_profile: true
+title: "感谢您的订阅"
+layout: single
+author_profile: false
 ---
 
-## 订阅成功！
-
-感谢您订阅"有心言者"博客的更新通知。
-
-我们将定期向您发送最新文章和独家内容的通知，让您第一时间了解博客的更新。
-
-### 接下来您可以：
-
-- [浏览最新文章]({{ site.baseurl }}/posts/)
-- [查看云生活系列]({{ site.baseurl }}/categories/云生活/)
-- [探索量化投资内容]({{ site.baseurl }}/categories/量化投资/)
-- [阅读技术心得]({{ site.baseurl }}/categories/心得/)
-
-如有任何问题或建议，欢迎随时与我们联系。
-
-<a href="{{ site.baseurl }}/" class="btn btn--primary">返回首页</a> 
+<div style="text-align: center; padding: 3em 0;">
+  <i class="fas fa-check-circle" style="font-size: 4em; color: #4CAF50; margin-bottom: 0.5em;"></i>
+  <h1>感谢您的订阅！</h1>
+  <p>您已成功订阅"有心言者"博客的更新通知。</p>
+  <p>我们会定期向您发送最新文章和独家内容的通知。</p>
+  <div style="margin: 2em 0;">
+    <a href="{{ site.baseurl }}/" class="btn btn--primary">返回首页</a>
+    <a href="{{ site.baseurl }}/posts/" class="btn btn--info">浏览文章</a>
+  </div>
+</div> 
