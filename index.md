@@ -29,7 +29,7 @@ feature_row:
   - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/25b4d7c3-4f8e-4b62-5b9e-9fe1a6c10200/public?format=auto&width=600&quality=75
     alt: "技术与阅读心得"
     title: "技术与阅读心得"
-    excerpt: "分享技术实践经验、工具使用技巧以及读书笔记。记录思考的火花，启发创新的灵感。"
+    excerpt: "分享技术实践经验、工具使用技巧以及读书笔记。记录思考的火花，启发创新的灵感。让知识转化为实践的力量。"
     url: "/categories/心得/"
     btn_label: "了解更多"
     btn_class: "btn--primary"
@@ -51,12 +51,14 @@ feature_row:
   </div>
 </div>
 
+<div style="clear: both; margin-top: 3em;"></div>
+
 <div class="featured-post">
   <h2 class="archive__subtitle">精选推荐</h2>
-  {% assign featured_posts = site.tags.featured | default: site.posts | slice: 0, 3 %}
+  {% assign featured_posts = site.tags.featured | default: site.posts | slice: 0, 2 %}
   {% if featured_posts.size > 0 %}
     <div class="grid__wrapper">
-      {% for post in featured_posts limit:3 %}
+      {% for post in featured_posts limit:2 %}
         {% include archive-single.html type="grid" %}
       {% endfor %}
     </div>
