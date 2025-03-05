@@ -1,10 +1,10 @@
 # 文章模板配置
 front_matter:
   default:
+    layout: single
     author_profile: true
     breadcrumbs: true
     comments: true
-    layout: single
     related: true
     share: true
     toc: true

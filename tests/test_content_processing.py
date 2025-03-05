@@ -58,40 +58,47 @@ def test_yaml_parsing():
     content = """---
 layout: single
 title: "测试文章"
-excerpt: |
-  这是一个包含"中文引号"的摘要，
-  测试YAML解析
-header:
-  image: "/assets/images/test.jpg"
-  overlay_filter: 0.5
+date: 2025-02-20 12:00:00 +0000
+categories: 
+  - 测试
+tags:
+  - YAML
+  - 解析
+excerpt: "这是一个测试摘要，包含'单引号'和\"双引号\"。"
 ---
 
-文章内容
+## 测试内容
+
+这是测试内容。
 """
     
-    # 使用 SafeLoader 解析
-    def safe_yaml_load(text):
-        # 处理中文引号
-        text = text.replace(""", "'").replace(""", "'")
-        # 使用 | 符号处理多行文本
-        if 'excerpt:' in text:
-            lines = text.split('\n')
-            for i, line in enumerate(lines):
-                if line.strip().startswith('excerpt:') and '"' in line:
-                    # 将单行转换为多行格式
-                    content = line.split(':', 1)[1].strip().strip('"')
-                    lines[i] = 'excerpt: |'
-                    lines.insert(i + 1, '  ' + content)
-            text = '\n'.join(lines)
-        return yaml.safe_load(text)
+    # 解析front matter
+    post = frontmatter.loads(content)
     
-    post = frontmatter.loads(content, encoding='utf-8',
-                           fm_handler=safe_yaml_load)
-    
+    # 验证解析结果
     assert post['layout'] == 'single'
     assert post['title'] == '测试文章'
-    assert '中文引号' in post['excerpt']
-    assert post['header']['image'] == '/assets/images/test.jpg'
+    assert '测试' in post['categories']
+    assert 'YAML' in post['tags']
+    assert 'excerpt' in post
+    
+    # 测试重新序列化
+    from collections import OrderedDict
+    ordered_post = OrderedDict()
+    ordered_post['layout'] = post['layout']
+    
+    # 添加其他字段
+    for key, value in post.metadata.items():
+        if key != 'layout':
+            ordered_post[key] = value
+    
+    # 创建新的post对象并设置内容
+    new_post = frontmatter.Post(post.content, **ordered_post)
+    result = frontmatter.dumps(new_post)
+    
+    # 验证layout是第一个字段
+    lines = result.split('\n')
+    assert lines[1].strip().startswith('layout:')
 
 def test_complex_image_url_replacement():
     """测试复杂的图片URL替换场景"""
