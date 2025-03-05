@@ -6,10 +6,13 @@ import subprocess
 import shutil
 import frontmatter
 import json
+import time
+import uuid
+import tempfile
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.console import Console
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional, Tuple, Any, Union, Set
 from datetime import datetime
 import google.generativeai as genai
 from google.generativeai import GenerationConfig, GenerativeModel  # 更新导入
@@ -23,6 +26,7 @@ from google.generativeai.types import (
 )
 from scripts import setup_logger
 import argparse
+import requests
 
 # 导入本地模块
 from .image_mapper import CloudflareImageMapper
@@ -1030,64 +1034,163 @@ class ContentPipeline:
         """处理文章中的图片"""
         # 获取文章中的本地图片
         local_images = {}
-        with open(post_path, 'r', encoding='utf-8') as f:
-            content = f.read()
+        temp_dir = None
+        
+        try:
+            # 创建临时目录用于存储下载的图片
+            temp_dir = Path(tempfile.mkdtemp())
+            self.log(f"创建临时目录用于存储下载的图片: {temp_dir}", level="debug")
             
-            # 尝试解析 front matter
-            try:
-                # 从front matter中提取图片
-                post = frontmatter.loads(content)
-            except Exception as e:
-                self.log(f"⚠️ 解析 front matter 失败: {str(e)}", level="warning")
-                # 尝试修复 front matter
-                content = self._fix_frontmatter_quotes(content)
+            with open(post_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                
+                # 尝试解析 front matter
                 try:
+                    # 从front matter中提取图片
                     post = frontmatter.loads(content)
                 except Exception as e:
-                    self.log(f"❌ 修复后仍无法解析 front matter: {str(e)}", level="error")
-                    return {}
-            
-            if 'header' in post:
-                for img_field in ['image', 'og_image', 'overlay_image', 'teaser']:
-                    if img_field in post['header']:
-                        img_path = post['header'][img_field]
-                        if img_path and img_path.startswith('/assets/images/'):
-                            name = Path(img_path).name
-                            full_path = Path.cwd() / img_path.lstrip('/')
-                            if full_path.exists():
-                                local_images[name] = full_path
-                                self.log(f"找到头图: {name}", level="debug")
-                            else:
-                                self.log(f"头图不存在: {img_path}", level="warning")
-            
-            # 查找markdown图片语法
-            for match in re.finditer(r'!\[.*?\]\((.*?)\)', content):
-                img_path = match.group(1)
-                # 跳过已经是Cloudflare URL的图片
-                if img_path.startswith('https://imagedelivery.net'):
-                    self.log(f"跳过已有的Cloudflare图片: {img_path}", level="debug")
-                    continue
-                    
-                if img_path.startswith('/assets/images/'):
-                    name = Path(img_path).name
-                    # 获取图片的完整路径
-                    full_path = Path.cwd() / img_path.lstrip('/')
-                    
-                    if full_path.exists():
-                        local_images[name] = full_path
-                        self.log(f"找到正文图片: {name}", level="debug")
-                    else:
-                        self.log(f"正文图片不存在: {img_path}", level="warning")
+                    self.log(f"⚠️ 解析 front matter 失败: {str(e)}", level="warning")
+                    # 尝试修复 front matter
+                    content = self._fix_frontmatter_quotes(content)
+                    try:
+                        post = frontmatter.loads(content)
+                    except Exception as e:
+                        self.log(f"❌ 修复后仍无法解析 front matter: {str(e)}", level="error")
+                        return {}
                 
-        if not local_images:
-            self.log("没有找到任何有效的图片", level="warning")
+                if 'header' in post:
+                    for img_field in ['image', 'og_image', 'overlay_image', 'teaser']:
+                        if img_field in post['header']:
+                            img_path = post['header'][img_field]
+                            if not img_path:
+                                continue
+                                
+                            # 处理OneDrive链接
+                            if '1drv.ms' in img_path or 'onedrive.live.com' in img_path:
+                                try:
+                                    self.log(f"发现OneDrive头图: {img_field} = {img_path}", level="info")
+                                    img_name = self._download_onedrive_image(img_path, temp_dir)
+                                    if img_name:
+                                        local_images[img_name] = temp_dir / img_name
+                                        self.log(f"成功下载OneDrive头图: {img_name}", level="info")
+                                except Exception as e:
+                                    self.log(f"下载OneDrive头图失败: {str(e)}", level="error")
+                            # 处理本地图片
+                            elif img_path.startswith('/assets/images/'):
+                                name = Path(img_path).name
+                                full_path = Path.cwd() / img_path.lstrip('/')
+                                if full_path.exists():
+                                    local_images[name] = full_path
+                                    self.log(f"找到头图: {name}", level="debug")
+                                else:
+                                    self.log(f"头图不存在: {img_path}", level="warning")
+                
+                # 查找markdown图片语法
+                for match in re.finditer(r'!\[.*?\]\((.*?)\)', content):
+                    img_path = match.group(1)
+                    # 跳过已经是Cloudflare URL的图片
+                    if img_path.startswith('https://imagedelivery.net'):
+                        self.log(f"跳过已有的Cloudflare图片: {img_path}", level="debug")
+                        continue
+                    
+                    # 处理OneDrive链接
+                    if '1drv.ms' in img_path or 'onedrive.live.com' in img_path:
+                        try:
+                            self.log(f"发现OneDrive正文图片: {img_path}", level="info")
+                            img_name = self._download_onedrive_image(img_path, temp_dir)
+                            if img_name:
+                                local_images[img_name] = temp_dir / img_name
+                                self.log(f"成功下载OneDrive正文图片: {img_name}", level="info")
+                        except Exception as e:
+                            self.log(f"下载OneDrive正文图片失败: {str(e)}", level="error")
+                    # 处理本地图片
+                    elif img_path.startswith('/assets/images/'):
+                        name = Path(img_path).name
+                        # 获取图片的完整路径
+                        full_path = Path.cwd() / img_path.lstrip('/')
+                        
+                        if full_path.exists():
+                            local_images[name] = full_path
+                            self.log(f"找到正文图片: {name}", level="debug")
+                        else:
+                            self.log(f"正文图片不存在: {img_path}", level="warning")
+            
+            if not local_images:
+                self.log("没有找到任何有效的图片", level="warning")
+                return {}
+            
+            # 上传到Cloudflare并获取映射
+            self.log(f"开始处理 {len(local_images)} 张图片", level="info")
+            image_mappings = self.image_mapper.map_images(local_images)
+            self.log(f"图片处理完成，共 {len(image_mappings)} 张", level="info")
+            return image_mappings
+        
+        except Exception as e:
+            self.log(f"处理文章图片时出错: {str(e)}", level="error")
             return {}
         
-        # 上传到Cloudflare并获取映射
-        self.log(f"开始处理 {len(local_images)} 张图片", level="info")
-        image_mappings = self.image_mapper.map_images(local_images)
-        self.log(f"图片处理完成，共 {len(image_mappings)} 张", level="info")
-        return image_mappings
+        finally:
+            # 清理临时目录
+            if temp_dir and temp_dir.exists():
+                try:
+                    import shutil
+                    shutil.rmtree(temp_dir)
+                    self.log(f"清理临时目录: {temp_dir}", level="debug")
+                except Exception as e:
+                    self.log(f"清理临时目录失败: {str(e)}", level="warning")
+    
+    def _download_onedrive_image(self, url: str, temp_dir: Path) -> Optional[str]:
+        """下载OneDrive图片
+        
+        Args:
+            url: OneDrive图片URL
+            temp_dir: 临时目录
+            
+        Returns:
+            成功返回图片文件名，失败返回None
+        """
+        try:
+            # 从URL中提取文件名
+            if '?' in url:
+                # 处理带参数的URL
+                base_url = url.split('?')[0]
+                file_name = base_url.split('/')[-1]
+            else:
+                file_name = url.split('/')[-1]
+            
+            # 如果没有有效的文件名，生成一个随机文件名
+            if not file_name or file_name == '' or len(file_name) < 3:
+                file_name = f"onedrive_image_{uuid.uuid4().hex[:8]}.jpg"
+            
+            # 确保文件名有扩展名
+            if '.' not in file_name:
+                file_name = f"{file_name}.jpg"
+            
+            self.log(f"下载OneDrive图片: {url} -> {file_name}", level="debug")
+            
+            # 下载图片
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+            response = requests.get(url, headers=headers, stream=True, timeout=30)
+            
+            if response.status_code == 200:
+                # 保存图片
+                file_path = temp_dir / file_name
+                with open(file_path, 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+            
+                self.log(f"图片下载成功: {file_path}", level="debug")
+                return file_name
+            else:
+                self.log(f"下载图片失败，状态码: {response.status_code}", level="error")
+                return None
+            
+        except Exception as e:
+            self.log(f"下载图片时出错: {str(e)}", level="error")
+            return None
 
     def _setup_site_url(self):
         """设置站点URL"""
@@ -1275,6 +1378,12 @@ class ContentPipeline:
                 f'!\\[([^\\]]*)\\]\\({re.escape(local_name)}\\)'                           # 仅文件名
             ]
             
+            # 添加OneDrive链接的匹配模式
+            onedrive_patterns = [
+                r'!\[(.*?)\]\((https?://1drv\.ms/[^)]+)\)',                               # 1drv.ms链接
+                r'!\[(.*?)\]\((https?://onedrive\.live\.com/embed\?[^)]+)\)'              # onedrive.live.com链接
+            ]
+            
             # 检查这个特定图片是否已经有Cloudflare URL，避免重复替换
             cloudflare_pattern = f'!\\[([^\\]]*)\\]\\({re.escape(cloudflare_url)}\\)'
             if re.search(cloudflare_pattern, content):
@@ -1282,12 +1391,27 @@ class ContentPipeline:
                 continue
             
             replaced_this_image = False
+            
+            # 处理标准路径
             for pattern in patterns:
                 matches = re.findall(pattern, content)
                 if matches:
                     content = re.sub(pattern, f'![\\1]({cloudflare_url})', content)
                     replaced_count += len(matches)
                     replaced_this_image = True
+            
+            # 处理OneDrive链接
+            for pattern in onedrive_patterns:
+                for match in re.finditer(pattern, content):
+                    alt_text = match.group(1)
+                    onedrive_url = match.group(2)
+                    
+                    # 只替换与当前处理的图片名称相关的OneDrive链接
+                    if local_name in onedrive_url or self._is_same_onedrive_image(onedrive_url, local_name):
+                        content = content.replace(match.group(0), f'![{alt_text}]({cloudflare_url})')
+                        replaced_count += 1
+                        replaced_this_image = True
+                        self.log(f"替换OneDrive图片链接: {onedrive_url} -> {cloudflare_url}", level="debug")
             
             if replaced_this_image:
                 self.log(f"✅ 替换图片URL: {local_name} -> {cloudflare_url}", level="info")
@@ -1297,6 +1421,21 @@ class ContentPipeline:
         else:
             self.log("没有找到需要替换的图片引用", level="warning")
         return content
+
+    def _is_same_onedrive_image(self, onedrive_url: str, image_name: str) -> bool:
+        """判断OneDrive URL是否对应指定的图片名称
+        
+        简单的启发式方法，通过检查URL中是否包含图片名称的部分来判断
+        """
+        # 去除扩展名
+        name_without_ext = image_name.split('.')[0]
+        
+        # 如果图片名称是随机生成的，则无法确定对应关系
+        if name_without_ext.startswith('onedrive_image_'):
+            return False
+        
+        # 检查URL中是否包含图片名称的部分
+        return name_without_ext.lower() in onedrive_url.lower()
 
     def _update_header_images(self, post: dict, images: Dict[str, str]) -> dict:
         """更新文章头部的图片URL"""
@@ -1315,24 +1454,42 @@ class ContentPipeline:
                 if not img_path:
                     continue
                 
-                img_name = Path(img_path).name
+                # 检查是否已经是Cloudflare URL
+                if img_path.startswith("https://imagedelivery.net"):
+                    self.log(f"⚠️ 头图 {img_field} 已是Cloudflare URL，跳过替换", level="debug")
+                    continue
                 
-                if img_name in images:
-                    # 检查是否已经是Cloudflare URL
-                    if img_path.startswith("https://imagedelivery.net"):
-                        self.log(f"⚠️ 头图 {img_field} 已是Cloudflare URL，跳过替换", level="debug")
-                        continue
+                # 处理OneDrive链接
+                if '1drv.ms' in img_path or 'onedrive.live.com' in img_path:
+                    # 查找对应的已上传图片
+                    for img_name, cloudflare_id in images.items():
+                        # 尝试匹配OneDrive链接和上传的图片
+                        if self._is_same_onedrive_image(img_path, img_name):
+                            # 确保不重复添加前缀
+                            if cloudflare_id.startswith("https://imagedelivery.net"):
+                                cloudflare_url = cloudflare_id
+                            else:
+                                cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
+                            
+                            post['header'][img_field] = cloudflare_url
+                            updated_count += 1
+                            self.log(f"✅ 更新OneDrive头图: {img_field} = {img_path} -> {cloudflare_url}", level="info")
+                            break
+                # 处理本地图片
+                else:
+                    img_name = Path(img_path).name
                     
-                    # 确保不重复添加前缀
-                    cloudflare_id = images[img_name]
-                    if cloudflare_id.startswith("https://imagedelivery.net"):
-                        cloudflare_url = cloudflare_id
-                    else:
-                        cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
-                    
-                    post['header'][img_field] = cloudflare_url
-                    updated_count += 1
-                    self.log(f"✅ 更新头图: {img_field} = {img_name} -> {cloudflare_url}", level="info")
+                    if img_name in images:
+                        # 确保不重复添加前缀
+                        cloudflare_id = images[img_name]
+                        if cloudflare_id.startswith("https://imagedelivery.net"):
+                            cloudflare_url = cloudflare_id
+                        else:
+                            cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
+                            
+                        post['header'][img_field] = cloudflare_url
+                        updated_count += 1
+                        self.log(f"✅ 更新头图: {img_field} = {img_name} -> {cloudflare_url}", level="info")
         
         if updated_count > 0:
             self.log(f"总共更新了 {updated_count} 处头部图片", level="info")
