@@ -53,7 +53,7 @@ feature_row:
 
 <div class="featured-post">
   <h2 class="archive__subtitle">精选推荐</h2>
-  {% assign featured_posts = site.tags.featured | sort: 'date' | reverse %}
+  {% assign featured_posts = site.tags.featured | default: site.posts %}
   {% if featured_posts.size > 0 %}
     <div class="grid__wrapper">
       {% for post in featured_posts limit:3 %}
