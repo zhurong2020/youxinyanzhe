@@ -6,7 +6,7 @@ categories:
 - 技术实践
 comments: true
 date: 2024-03-06 19:55:00 +0000
-excerpt: Prompt 是你给 AI 的指令，精准的Prompt才能让AI明白你的要求。
+excerpt: Prompt 是你给 AI 的指令，精准的 Prompt 才能让 AI 明白你的要求。
 header:
   overlay_filter: 0.5
   overlay_image: assets/images/202403/prompt-engineering1200.png
