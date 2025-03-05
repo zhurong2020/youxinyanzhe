@@ -65,11 +65,11 @@ feature_row:
 <div class="latest-posts">
   <h2 class="archive__subtitle">最新文章</h2>
   <div class="grid__wrapper">
-    {% for post in site.posts limit:6 %}
+    {% for post in site.posts limit:8 %}
       {% include archive-single.html type="grid" %}
     {% endfor %}
   </div>
-  {% if site.posts.size > 6 %}
+  {% if site.posts.size > 8 %}
   <div class="view-more-btn">
     <a href="{{ site.baseurl }}/posts/" class="btn btn--primary">查看更多文章</a>
   </div>
