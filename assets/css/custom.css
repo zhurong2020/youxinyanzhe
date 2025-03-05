@@ -19,4 +19,36 @@
   background-color: #ffffff;
   padding: 1em;
   border-radius: 6px;
+}
+
+/* Custom styles for feature boxes */
+.feature__item {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.archive__item {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.archive__item-excerpt {
+  flex-grow: 1;
+  min-height: 4.5em; /* Approximately 3 lines of text */
+}
+
+.feature__item .btn {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+/* Subscription form improvements */
+.subscription-form input[type="email"] {
+  height: 40px;
+}
+
+.subscription-form .btn {
+  height: 40px;
 } 
