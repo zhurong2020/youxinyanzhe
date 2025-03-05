@@ -40,10 +40,35 @@
   min-height: 4.5em; /* Approximately 3 lines of text */
 }
 
+/* Center the button and adjust vertical position */
 .feature__item .btn {
-  align-self: center;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  display: inline-block;
+}
+
+/* Ensure the button wrapper is centered */
+.feature__item .archive__item-teaser + .archive__item-body .btn--primary,
+.feature__item .archive__item-body .btn--primary {
+  display: block;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Add a wrapper div for the button to ensure proper centering */
+.feature__wrapper .feature__item {
+  position: relative;
+  padding-bottom: 2em;
+}
+
+.feature__wrapper .feature__item .btn {
+  position: relative;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* Subscription form improvements */
