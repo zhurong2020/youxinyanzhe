@@ -4,7 +4,7 @@ title: "有心言者"
 header:
   overlay_color: "#000"
   overlay_filter: "0.5"
-  overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/dfa9d2a3-3054-46d8-241e-717209aaf600/wide
+  overlay_image: https://arong.eu.org/youxinyanzhe/cdn-cgi/image/width=1920,quality=85,fit=scale-down/https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/dfa9d2a3-3054-46d8-241e-717209aaf600/wide
   actions:
     - label: "浏览全部文章"
       url: "/posts/"
@@ -12,21 +12,21 @@ excerpt: "探索云技术、量化投资与生活思考的交汇点"
 intro: 
   - excerpt: '分享云技术应用、量化投资策略和个人成长心得，让技术真正为生活赋能。'
 feature_row:
-  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/c553d355-9a2e-4753-4a47-9009b7cab200/medium
+  - image_path: https://arong.eu.org/youxinyanzhe/cdn-cgi/image/width=600,quality=85/https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/c553d355-9a2e-4753-4a47-9009b7cab200/medium
     alt: "普通人云生活系列"
     title: "普通人云生活系列"
     excerpt: "利用云技术让普通人提高效率，享受数字化生活的便利。从域名注册、网站搭建到云服务应用的全方位指南。"
     url: "/categories/云生活/"
     btn_label: "了解更多"
     btn_class: "btn--primary"
-  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/e35cd10a-83b4-4939-ecb6-35edeb1a2d00/medium
+  - image_path: https://arong.eu.org/youxinyanzhe/cdn-cgi/image/width=600,quality=85/https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/e35cd10a-83b4-4939-ecb6-35edeb1a2d00/medium
     alt: "量化投资系列"
     title: "量化投资系列"
     excerpt: "探索量化交易平台、算法策略开发与自动化投资工具。让数据驱动决策，实现更科学的投资方法。"
     url: "/categories/量化投资/"
     btn_label: "了解更多"
     btn_class: "btn--primary"
-  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/25b4d7c3-4f8e-4b62-5b9e-9fe1a6c10200/medium
+  - image_path: https://arong.eu.org/youxinyanzhe/cdn-cgi/image/width=600,quality=85/https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/25b4d7c3-4f8e-4b62-5b9e-9fe1a6c10200/medium
     alt: "技术与阅读心得"
     title: "技术与阅读心得"
     excerpt: "分享技术实践经验、工具使用技巧以及读书笔记。记录思考的火花，启发创新的灵感。"
@@ -53,7 +53,7 @@ feature_row:
 
 <div class="featured-post">
   <h2 class="archive__subtitle">精选推荐</h2>
-  {% assign featured_posts = site.tags.featured | default: site.posts %}
+  {% assign featured_posts = site.tags.featured | default: site.posts | slice: 0, 3 %}
   {% if featured_posts.size > 0 %}
     <div class="grid__wrapper">
       {% for post in featured_posts limit:3 %}

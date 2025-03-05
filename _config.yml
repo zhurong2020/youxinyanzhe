@@ -28,9 +28,9 @@ repository               : "zhurong2020/youxinyanzhe"  # 更新为正确的仓�
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 logo                     : # path of logo image to display in the masthead, e.g. "/assets/images/88x88.png"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
-breadcrumbs              : # true, false (default)
+breadcrumbs              : true # true, false (default)
 words_per_minute         : 200
-enable_copy_code_button  : # true, false (default)
+enable_copy_code_button  : true # true, false (default)
 copyright                : "Rong Zhu 2025" # "copyright" name, defaults to site.title
 copyright_url            : # "copyright" URL, defaults to site.url
 comments:
@@ -158,6 +158,28 @@ footer:
       icon: "fab fa-fw fa-instagram"
       # url:
 
+# 添加导航菜单
+# 主导航菜单
+main:
+  - title: "所有文章"
+    url: /posts/
+  - title: "分类"
+    url: /categories/
+  - title: "云生活"
+    url: /categories/云生活/
+  - title: "量化投资"
+    url: /categories/量化投资/
+  - title: "技术心得"
+    url: /categories/心得/
+  - title: "关于"
+    url: /about/
+
+# 页脚导航菜单
+footer:
+  - title: "隐私政策"
+    url: /privacy/
+  - title: "条款"
+    url: /terms/
 
 # Reading Files
 include:
