@@ -46,6 +46,18 @@ feature_row:
   display: table !important;
   margin: 0 auto !important;
 }
+
+/* 新增样式 */
+.view-more-btn {
+  text-align: center;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  clear: both;
+}
+.view-more-btn .btn {
+  padding: 0.75em 1.5em;
+  font-size: 1.1em;
+}
 </style>
 
 {% include feature_row %}
@@ -58,7 +70,7 @@ feature_row:
     {% endfor %}
   </div>
   {% if site.posts.size > 6 %}
-  <div class="text-center">
+  <div class="view-more-btn">
     <a href="{{ site.baseurl }}/posts/" class="btn btn--primary">查看更多文章</a>
   </div>
   {% endif %}
