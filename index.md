@@ -46,9 +46,11 @@ feature_row:
       {% include archive-single.html type="grid" %}
     {% endfor %}
   </div>
+  {% if site.posts.size > 6 %}
   <div class="text-center">
     <a href="{{ site.baseurl }}/posts/" class="btn btn--primary">查看更多文章</a>
   </div>
+  {% endif %}
 </div>
 
 <div style="clear: both; margin-top: 3em;"></div>
