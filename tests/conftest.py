@@ -101,30 +101,30 @@ def test_assets(test_config):
 @pytest.fixture(scope="session")
 def test_draft(test_assets):
     """创建测试文章"""
+    logger.info("📝 创建测试文章...")
+    
+    # 测试文章内容
     content = """
-# 测试文章：图片上传和内容处理
+## 测试文章
 
-这是一篇测试文章，用于验证图片上传和内容处理流程。
+这是一篇测试文章，用于测试图片上传和内容处理功能。
 
-![测试图片](/assets/images/posts/2025/02/test-post/test.webp)
+![测试图片](/assets/images/posts/2025/02/test-post/header.webp)
 
-## 测试章节
-
-这是一个测试章节。
-
-![测试头图](/assets/images/posts/2025/02/test-post/header.webp)
+另一张图片：![图片2](/assets/images/posts/2025/02/test-post/image2.png)
 """
     
-    post = {
-        "layout": "single",
-        "title": "测试文章：图片上传和内容处理",
-        "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S +0000"),
-        "categories": ["测试"],
-        "tags": ["图片处理", "Cloudflare"],
-        "header": {
-            "image": "/assets/images/posts/2025/02/test-post/header.webp",
-            "overlay_filter": 0.5
-        }
+    # 使用OrderedDict确保layout字段在最前面
+    from collections import OrderedDict
+    post = OrderedDict()
+    post["layout"] = "single"
+    post["title"] = "测试文章：图片上传和内容处理"
+    post["date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S +0000")
+    post["categories"] = ["测试"]
+    post["tags"] = ["图片处理", "Cloudflare"]
+    post["header"] = {
+        "image": "/assets/images/posts/2025/02/test-post/header.webp",
+        "overlay_filter": 0.5
     }
     
     # 创建文章

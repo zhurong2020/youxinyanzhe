@@ -3,7 +3,6 @@ layout: single
 title: "当政治大咖遇上加密江湖：$TRUMP 背后的币圈故事"
 date: 2025-01-21 16:45:00 +0000
 last_modified_at: 2025-02-16 12:00:00  # 最后修改时间
-author: "有心言者"  # 作者
 author_profile: true #显示作者信息
 
 categories:
