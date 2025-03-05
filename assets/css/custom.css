@@ -40,35 +40,40 @@
   min-height: 4.5em; /* Approximately 3 lines of text */
 }
 
-/* Center the button and adjust vertical position */
-.feature__item .btn {
-  margin-top: 1.5em;
-  margin-bottom: 0.5em;
-  margin-left: auto;
-  margin-right: auto;
-  display: inline-block;
+/* Target the p tag containing the button */
+.feature__item p,
+.archive__item-body p,
+.feature__wrapper .feature__item p {
+  text-align: center !important;
+  margin-top: 2em !important;
+  width: 100% !important;
+  display: block !important;
 }
 
-/* Ensure the button wrapper is centered */
-.feature__item .archive__item-teaser + .archive__item-body .btn--primary,
-.feature__item .archive__item-body .btn--primary {
-  display: block;
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
+/* Direct targeting of the button in the feature item */
+.feature__item p a.btn.btn--primary,
+.archive__item-body p a.btn.btn--primary,
+.feature__wrapper .feature__item p a.btn.btn--primary,
+a.btn.btn--primary {
+  display: table !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 1.5em !important;
+  margin-bottom: 0.5em !important;
+  float: none !important;
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
 }
 
-/* Add a wrapper div for the button to ensure proper centering */
-.feature__wrapper .feature__item {
-  position: relative;
-  padding-bottom: 2em;
-}
-
-.feature__wrapper .feature__item .btn {
-  position: relative;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+/* Force center alignment for all buttons in feature items */
+.feature__wrapper .feature__item a.btn,
+.btn.btn--primary {
+  display: table !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 2em !important;
+  float: none !important;
 }
 
 /* Subscription form improvements */
