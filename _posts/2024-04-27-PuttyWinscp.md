@@ -5,7 +5,7 @@ categories:
 - 技术实践
 comments: true
 date: 2024-04-27 16:45:00 +0000
-excerpt: Putty 和 WinSCP 是最重要的二个工具，帮助 Windows 用户实现远程登录 VPS 和文件传输，本文介绍这两个工具的介绍、下载、安装和配套使用案例
+excerpt: Putty 和 WinSCP 是使用VPS时最重要的二个工具，本文介绍这两个工具的介绍、下载、安装和配套使用案例。
 header:
   overlay_filter: 0.5
   overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/ad82ce33-b9f3-4dd7-fe15-8e5df7091e00/public
