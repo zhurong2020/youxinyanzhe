@@ -1150,46 +1150,74 @@ class ContentPipeline:
             成功返回图片文件名，失败返回None
         """
         try:
-            # 从URL中提取文件名
-            if '?' in url:
-                # 处理带参数的URL
-                base_url = url.split('?')[0]
-                file_name = base_url.split('/')[-1]
-            else:
-                file_name = url.split('/')[-1]
+            self.log(f"下载OneDrive图片: {url}", level="info")
             
-            # 如果没有有效的文件名，生成一个随机文件名
-            if not file_name or file_name == '' or len(file_name) < 3:
-                file_name = f"onedrive_image_{uuid.uuid4().hex[:8]}.jpg"
+            # 提取OneDrive URL中的唯一标识符
+            unique_id = None
+            if 'onedrive.live.com' in url and 'resid=' in url:
+                # 例如：https://onedrive.live.com/embed?resid=5644DAB129AFDA10%2169891&authkey=%21AFppTKcu8cfS2Eo&width=660
+                resid_match = re.search(r'resid=([^&]+)', url)
+                if resid_match:
+                    resid = resid_match.group(1)
+                    # 解码URL编码的字符
+                    import urllib.parse
+                    resid = urllib.parse.unquote(resid)
+                    self.log(f"从URL中提取的resid: {resid}", level="debug")
+                    
+                    # 提取resid中的数字部分作为唯一标识符
+                    id_match = re.search(r'([0-9]+)$', resid)
+                    if id_match:
+                        unique_id = id_match.group(1)
+                        self.log(f"从resid中提取的唯一标识符: {unique_id}", level="debug")
             
-            # 确保文件名有扩展名
-            if '.' not in file_name:
-                file_name = f"{file_name}.jpg"
-            
-            self.log(f"下载OneDrive图片: {url} -> {file_name}", level="debug")
+            # 如果无法从URL中提取唯一标识符，则使用URL的哈希值
+            if not unique_id:
+                import hashlib
+                unique_id = hashlib.md5(url.encode()).hexdigest()[:5]
+                self.log(f"使用URL哈希值作为唯一标识符: {unique_id}", level="debug")
             
             # 下载图片
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            }
-            response = requests.get(url, headers=headers, stream=True, timeout=30)
+            response = requests.get(url, stream=True)
+            response.raise_for_status()
             
-            if response.status_code == 200:
-                # 保存图片
-                file_path = temp_dir / file_name
-                with open(file_path, 'wb') as f:
-                    for chunk in response.iter_content(chunk_size=8192):
-                        if chunk:
-                            f.write(chunk)
+            # 确定图片格式
+            content_type = response.headers.get('content-type', '')
+            self.log(f"图片Content-Type: {content_type}", level="debug")
+            extension = self._get_extension_from_content_type(content_type)
             
-                self.log(f"图片下载成功: {file_path}", level="debug")
-                return file_name
-            else:
-                self.log(f"下载图片失败，状态码: {response.status_code}", level="error")
-                return None
+            if not extension and 'content-disposition' in response.headers:
+                # 尝试从Content-Disposition头中提取文件名
+                cd = response.headers['content-disposition']
+                self.log(f"Content-Disposition: {cd}", level="debug")
+                filename_match = re.search(r'filename="?([^";]+)"?', cd)
+                if filename_match:
+                    orig_filename = filename_match.group(1)
+                    _, extension = os.path.splitext(orig_filename)
+                    extension = extension.lstrip('.')
+                    self.log(f"从Content-Disposition提取的扩展名: {extension}", level="debug")
             
+            # 如果仍然无法确定扩展名，则根据内容进行判断
+            if not extension:
+                import imghdr
+                img_data = response.content
+                img_type = imghdr.what(None, h=img_data)
+                extension = img_type if img_type else 'jpg'  # 默认使用jpg
+                self.log(f"从内容判断的图片类型: {extension}", level="debug")
+            
+            # 构建输出文件名
+            output_filename = f"onedrive_{unique_id}.{extension}"
+            output_path = temp_dir / output_filename
+            
+            # 保存图片
+            with open(output_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            
+            self.log(f"✅ 图片下载成功: {url} -> {output_filename}", level="info")
+            return output_filename
         except Exception as e:
-            self.log(f"下载图片时出错: {str(e)}", level="error")
+            self.log(f"❌ 下载OneDrive图片失败: {str(e)}", level="error")
+            self.log("错误详情:", level="debug", exc_info=True)
             return None
 
     def _setup_site_url(self):
@@ -1364,7 +1392,119 @@ class ContentPipeline:
             return content
         
         replaced_count = 0
+        processed_onedrive_urls = {}  # 用于跟踪已处理的OneDrive URL
+        
+        # 首先处理OneDrive链接，确保每个不同的OneDrive URL都获得唯一的Cloudflare URL
+        # 添加OneDrive链接的匹配模式
+        onedrive_patterns = [
+            r'!\[(.*?)\]\((https?://1drv\.ms/[^)]+)\)',                               # 1drv.ms链接
+            r'!\[(.*?)\]\((https?://onedrive\.live\.com/embed\?[^)]+)\)',             # onedrive.live.com链接
+            r'<img\s+src="(https?://onedrive\.live\.com/embed\?[^"]+)".*?alt="([^"]*)".*?>'  # HTML格式的img标签
+        ]
+        
+        # 记录所有图片映射，用于调试
+        self.log(f"图片映射列表:", level="debug")
+        for img_name, cloudflare_id in images.items():
+            self.log(f"  {img_name} -> {cloudflare_id}", level="debug")
+        
+        # 处理OneDrive链接
+        for pattern in onedrive_patterns:
+            # 使用正则表达式查找所有匹配项
+            matches = list(re.finditer(pattern, content))
+            self.log(f"找到 {len(matches)} 个匹配 OneDrive 链接模式: {pattern}", level="debug")
+            
+            # 从后向前替换，避免替换过程中改变字符串位置
+            for match in reversed(matches):
+                # 根据模式类型提取不同的信息
+                if pattern.startswith(r'<img'):
+                    # HTML格式的img标签
+                    onedrive_url = match.group(1)
+                    alt_text = match.group(2)
+                    self.log(f"处理HTML格式的OneDrive图片: URL={onedrive_url}, alt={alt_text}", level="debug")
+                else:
+                    # Markdown格式的链接
+                    alt_text = match.group(1)
+                    onedrive_url = match.group(2)
+                
+                self.log(f"处理OneDrive链接: {onedrive_url}", level="debug")
+                
+                # 检查这个OneDrive URL是否已经处理过
+                if onedrive_url in processed_onedrive_urls:
+                    cloudflare_url = processed_onedrive_urls[onedrive_url]
+                    self.log(f"使用已处理的OneDrive图片映射: {onedrive_url} -> {cloudflare_url}", level="debug")
+                else:
+                    # 查找对应的已上传图片
+                    found_match = False
+                    for img_name, cloudflare_id in images.items():
+                        # 尝试匹配OneDrive链接和上传的图片
+                        if self._is_same_onedrive_image(onedrive_url, img_name):
+                            # 确保不重复添加前缀
+                            if cloudflare_id.startswith("https://imagedelivery.net"):
+                                cloudflare_url = cloudflare_id
+                            else:
+                                cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
+                            
+                            processed_onedrive_urls[onedrive_url] = cloudflare_url
+                            self.log(f"✅ 找到OneDrive图片映射: {onedrive_url} -> {cloudflare_url} (通过 {img_name})", level="info")
+                            found_match = True
+                            break
+                    
+                    if not found_match:
+                        # 为这个OneDrive URL下载图片并获取Cloudflare URL
+                        try:
+                            with tempfile.TemporaryDirectory() as temp_dir:
+                                temp_dir_path = Path(temp_dir)
+                                self.log(f"处理新的OneDrive图片: {onedrive_url}", level="info")
+                                img_name = self._download_onedrive_image(onedrive_url, temp_dir_path)
+                                if img_name:
+                                    local_images = {img_name: temp_dir_path / img_name}
+                                    image_mappings = self.image_mapper.map_images(local_images)
+                                    if image_mappings and img_name in image_mappings:
+                                        cloudflare_id = image_mappings[img_name]
+                                        # 确保不重复添加前缀
+                                        if cloudflare_id.startswith("https://imagedelivery.net"):
+                                            cloudflare_url = cloudflare_id
+                                        else:
+                                            cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
+                                        processed_onedrive_urls[onedrive_url] = cloudflare_url
+                                        self.log(f"✅ 新的OneDrive图片映射: {onedrive_url} -> {cloudflare_url}", level="info")
+                                    else:
+                                        self.log(f"❌ 无法为OneDrive图片创建映射: {onedrive_url}", level="error")
+                                        continue
+                                else:
+                                    self.log(f"❌ 无法下载OneDrive图片: {onedrive_url}", level="error")
+                                    continue
+                        except Exception as e:
+                            self.log(f"处理OneDrive图片时出错: {str(e)}", level="error")
+                            continue
+                
+                # 替换OneDrive链接为Cloudflare链接
+                # 使用精确的位置替换，而不是全局替换
+                start, end = match.span(0)
+                
+                # 根据模式类型生成不同的替换文本
+                if pattern.startswith(r'<img'):
+                    # 提取原始标签中的其他属性
+                    original_tag = match.group(0)
+                    # 保留原始标签中除了src以外的所有属性
+                    attrs_pattern = r'<img\s+[^>]*?src="[^"]*"([^>]*)>'
+                    attrs_match = re.search(attrs_pattern, original_tag)
+                    other_attrs = attrs_match.group(1) if attrs_match else ""
+                    
+                    new_text = f'<img src="{cloudflare_url}" alt="{alt_text}"{other_attrs}>'
+                else:
+                    new_text = f'![{alt_text}]({cloudflare_url})'
+                
+                content = content[:start] + new_text + content[end:]
+                replaced_count += 1
+                self.log(f"替换OneDrive图片链接: {onedrive_url} -> {cloudflare_url}", level="debug")
+        
+        # 然后处理本地图片
         for local_name, cloudflare_id in images.items():
+            # 跳过OneDrive图片，因为它们已经在上面处理过了
+            if local_name.startswith('onedrive_'):
+                continue
+                
             # 确保不重复添加前缀，检查cloudflare_id是否已经是完整URL
             if cloudflare_id.startswith("https://imagedelivery.net"):
                 cloudflare_url = cloudflare_id
@@ -1378,12 +1518,6 @@ class ContentPipeline:
                 f'!\\[([^\\]]*)\\]\\({re.escape(local_name)}\\)'                           # 仅文件名
             ]
             
-            # 添加OneDrive链接的匹配模式
-            onedrive_patterns = [
-                r'!\[(.*?)\]\((https?://1drv\.ms/[^)]+)\)',                               # 1drv.ms链接
-                r'!\[(.*?)\]\((https?://onedrive\.live\.com/embed\?[^)]+)\)'              # onedrive.live.com链接
-            ]
-            
             # 检查这个特定图片是否已经有Cloudflare URL，避免重复替换
             cloudflare_pattern = f'!\\[([^\\]]*)\\]\\({re.escape(cloudflare_url)}\\)'
             if re.search(cloudflare_pattern, content):
@@ -1394,24 +1528,17 @@ class ContentPipeline:
             
             # 处理标准路径
             for pattern in patterns:
-                matches = re.findall(pattern, content)
+                # 使用finditer而不是findall，以便获取匹配的位置
+                matches = list(re.finditer(pattern, content))
                 if matches:
-                    content = re.sub(pattern, f'![\\1]({cloudflare_url})', content)
-                    replaced_count += len(matches)
-                    replaced_this_image = True
-            
-            # 处理OneDrive链接
-            for pattern in onedrive_patterns:
-                for match in re.finditer(pattern, content):
-                    alt_text = match.group(1)
-                    onedrive_url = match.group(2)
-                    
-                    # 只替换与当前处理的图片名称相关的OneDrive链接
-                    if local_name in onedrive_url or self._is_same_onedrive_image(onedrive_url, local_name):
-                        content = content.replace(match.group(0), f'![{alt_text}]({cloudflare_url})')
+                    # 从后向前替换，避免替换过程中改变字符串位置
+                    for match in reversed(matches):
+                        alt_text = match.group(1)
+                        start, end = match.span(0)
+                        new_text = f'![{alt_text}]({cloudflare_url})'
+                        content = content[:start] + new_text + content[end:]
                         replaced_count += 1
                         replaced_this_image = True
-                        self.log(f"替换OneDrive图片链接: {onedrive_url} -> {cloudflare_url}", level="debug")
             
             if replaced_this_image:
                 self.log(f"✅ 替换图片URL: {local_name} -> {cloudflare_url}", level="info")
@@ -1425,17 +1552,64 @@ class ContentPipeline:
     def _is_same_onedrive_image(self, onedrive_url: str, image_name: str) -> bool:
         """判断OneDrive URL是否对应指定的图片名称
         
-        简单的启发式方法，通过检查URL中是否包含图片名称的部分来判断
+        通过比较OneDrive URL中的resid参数和图片名称中的唯一标识符来判断
         """
-        # 去除扩展名
-        name_without_ext = image_name.split('.')[0]
-        
-        # 如果图片名称是随机生成的，则无法确定对应关系
-        if name_without_ext.startswith('onedrive_image_'):
+        # 如果图片名称不是以onedrive_开头，则无法确定对应关系
+        if not image_name.startswith('onedrive_'):
+            self.log(f"图片名称不是以onedrive_开头: {image_name}", level="debug")
             return False
         
-        # 检查URL中是否包含图片名称的部分
-        return name_without_ext.lower() in onedrive_url.lower()
+        # 从图片名称中提取唯一标识符
+        # 格式：onedrive_UNIQUEID.extension
+        match = re.match(r'onedrive_([^.]+)\.', image_name)
+        if not match:
+            self.log(f"无法从图片名称中提取唯一标识符: {image_name}", level="debug")
+            return False
+        
+        image_unique_id = match.group(1)
+        self.log(f"比较OneDrive URL和图片: URL={onedrive_url}, 图片名称={image_name}, 唯一ID={image_unique_id}", level="debug")
+        
+        # 从OneDrive URL中提取resid参数
+        if 'onedrive.live.com' in onedrive_url and 'resid=' in onedrive_url:
+            resid_match = re.search(r'resid=([^&]+)', onedrive_url)
+            if resid_match:
+                resid = resid_match.group(1)
+                # 解码URL编码的字符
+                import urllib.parse
+                resid = urllib.parse.unquote(resid)
+                
+                self.log(f"从OneDrive URL中提取的resid: {resid}", level="debug")
+                
+                # 检查resid中是否包含图片名称中的唯一标识符
+                if image_unique_id in resid:
+                    self.log(f"✅ 匹配成功: 唯一ID {image_unique_id} 在resid {resid} 中找到", level="debug")
+                    return True
+                
+                # 提取resid中的数字部分
+                id_match = re.search(r'([0-9]+)$', resid)
+                if id_match:
+                    resid_number = id_match.group(1)
+                    self.log(f"从resid中提取的数字部分: {resid_number}", level="debug")
+                    if resid_number == image_unique_id:
+                        self.log(f"✅ 匹配成功: resid的数字部分 {resid_number} 与唯一ID {image_unique_id} 相同", level="debug")
+                        return True
+        
+        # 如果无法从URL中提取resid，则使用URL的哈希值进行比较
+        if len(image_unique_id) == 5:  # 基于URL的哈希值长度为5
+            import hashlib
+            url_hash = hashlib.md5(onedrive_url.encode()).hexdigest()[:5]
+            self.log(f"URL哈希值: {url_hash}, 唯一ID: {image_unique_id}", level="debug")
+            if url_hash == image_unique_id:
+                self.log(f"✅ 匹配成功: URL哈希值 {url_hash} 与唯一ID {image_unique_id} 相同", level="debug")
+                return True
+        
+        # 如果以上方法都无法确定对应关系，则使用简单的字符串匹配
+        result = image_unique_id.lower() in onedrive_url.lower()
+        if result:
+            self.log(f"✅ 匹配成功: 唯一ID {image_unique_id} 在URL {onedrive_url} 中找到", level="debug")
+        else:
+            self.log(f"❌ 匹配失败: 唯一ID {image_unique_id} 在URL {onedrive_url} 中未找到", level="debug")
+        return result
 
     def _update_header_images(self, post: dict, images: Dict[str, str]) -> dict:
         """更新文章头部的图片URL"""
@@ -1462,6 +1636,7 @@ class ContentPipeline:
                 # 处理OneDrive链接
                 if '1drv.ms' in img_path or 'onedrive.live.com' in img_path:
                     # 查找对应的已上传图片
+                    found_match = False
                     for img_name, cloudflare_id in images.items():
                         # 尝试匹配OneDrive链接和上传的图片
                         if self._is_same_onedrive_image(img_path, img_name):
@@ -1474,7 +1649,11 @@ class ContentPipeline:
                             post['header'][img_field] = cloudflare_url
                             updated_count += 1
                             self.log(f"✅ 更新OneDrive头图: {img_field} = {img_path} -> {cloudflare_url}", level="info")
+                            found_match = True
                             break
+                    
+                    if not found_match:
+                        self.log(f"⚠️ 未找到匹配的OneDrive头图: {img_field} = {img_path}", level="warning")
                 # 处理本地图片
                 else:
                     img_name = Path(img_path).name
@@ -1494,6 +1673,43 @@ class ContentPipeline:
         if updated_count > 0:
             self.log(f"总共更新了 {updated_count} 处头部图片", level="info")
         return post
+
+    def _get_extension_from_content_type(self, content_type: str) -> Optional[str]:
+        """从Content-Type头中提取文件扩展名
+        
+        Args:
+            content_type: Content-Type头的值
+            
+        Returns:
+            文件扩展名，如果无法确定则返回None
+        """
+        content_type = content_type.lower()
+        if 'image/' not in content_type:
+            return None
+            
+        # 常见的MIME类型映射
+        mime_to_ext = {
+            'image/jpeg': 'jpg',
+            'image/jpg': 'jpg',
+            'image/png': 'png',
+            'image/gif': 'gif',
+            'image/webp': 'webp',
+            'image/svg+xml': 'svg',
+            'image/bmp': 'bmp',
+            'image/tiff': 'tiff'
+        }
+        
+        for mime, ext in mime_to_ext.items():
+            if mime in content_type:
+                return ext
+                
+        # 如果没有匹配的MIME类型，尝试从content-type中提取子类型
+        if '/' in content_type:
+            subtype = content_type.split('/')[-1].split(';')[0].strip()
+            if subtype and subtype != 'octet-stream':
+                return subtype
+                
+        return None
 
 def main():
     parser = argparse.ArgumentParser(description="内容处理流水线")

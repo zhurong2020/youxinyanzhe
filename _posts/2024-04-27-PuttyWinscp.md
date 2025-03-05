@@ -6,7 +6,7 @@ categories:
 - 云服务
 comments: true
 date: 2024-04-27 16:45:00 +0000
-excerpt: Putty 和 WinSCP 是最重要的二个工具，帮助 Windows 用户实现远程登录 VPS 和文件传输，本文介绍这两个工具的介绍、下载、安装和配套使用案例
+excerpt: Putty 和 WinSCP 是远程登录VPS最重要的二个工具，本文介绍这两个工具的介绍、下载、安装和配套使用案例
 header:
   overlay_filter: 0.5
   overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/09dcfb9b-8b95-406a-231f-cf9d93970c00/public
@@ -80,7 +80,7 @@ PuTTY 是一款适用于 Windows 的 SSH 和 Telnet 客户端，是远程服务�
 
 **自动登录设置：** 学习如何在 PuTTY 中保存会话，提高效率。
 
-![putty自动东路](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/f724bbef-8e9b-4ace-005e-b48863c90e00/public)
+![putty自动登录](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/f724bbef-8e9b-4ace-005e-b48863c90e00/public)
 
 文末提供了 PuTTY 的帮助文档。
 
