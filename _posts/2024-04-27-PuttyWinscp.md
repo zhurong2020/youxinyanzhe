@@ -33,7 +33,6 @@ PuTTY 和 WinSCP 是管理 VPS 的两款必备工具，它们能帮助 Windows �
 
 <!-- more -->
 
-@[toc]
 
 ### 引言
 

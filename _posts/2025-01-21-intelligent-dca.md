@@ -6,7 +6,7 @@ categories:
 - 量化交易
 comments: true
 date: 2025-01-21 16:45:00 +0000
-excerpt: 定投是一种广受欢迎的投资策略，通过Moomoo量化工具我们可以实现特定美股定投策略
+excerpt: 定投是一种广受欢迎的投资策略，通过Moomoo量化工具我们可以实现特定美股定投策略。
 header:
   overlay_filter: 0.5
   overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/0519b9b8-813b-4949-7c7f-a0098cc8ed00/public

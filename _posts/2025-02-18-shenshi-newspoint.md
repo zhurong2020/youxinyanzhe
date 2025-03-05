@@ -8,7 +8,7 @@ categories:
 - 日常生活
 comments: true
 date: 2025-02-8 16:45:00 +0000
-excerpt: 2025年，信息爆炸时代，如何避免'信息茧房'？本文介绍AllSides和Ad Fontes Media两大工具，帮你科学审视新闻，培养理性的信息获取习惯，拥抱信息多元化。
+excerpt: 2025年，信息爆炸时代，如何避免'信息茧房'？本文介绍AllSides和Ad Fontes Media两大工具，帮你科学审视新闻。
 header:
   image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/cd69e80c-296d-4fa3-5943-83702a60bc00/public
   og_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/cd69e80c-296d-4fa3-5943-83702a60bc00/public
