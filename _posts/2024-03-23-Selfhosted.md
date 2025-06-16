@@ -6,7 +6,7 @@ categories:
 - 项目与创新
 comments: true
 date: 2024-03-24 19:55:00 +0000
-excerpt: 通过自托管Github上的开源项目，每个人都可以轻松构建属于自己的数字王国。
+excerpt: 通过选择并自托管 Github 上的开源项目，每个人都可以轻松构建属于自己的数字王国。
 header:
   overlay_filter: 0.5
   overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/839f39f3-8c2f-4a1d-534b-722ab5e4fc00/public

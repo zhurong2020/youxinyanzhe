@@ -6,7 +6,7 @@ categories:
 - 云服务
 comments: true
 date: 2024-04-18 16:45:00 +0000
-excerpt: 云主机是开启云端生活的基础，本文主要介绍 VPS 以及如何购买 RackNerd VPS。
+excerpt: 云主机是开启云端生活的基础设施，本文主要介绍其概念以及如何在RackNerd购买VPS。
 header:
   overlay_filter: 0.5
   overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/e5a26a76-7146-460d-d201-fa9a067b7900/public
