@@ -114,6 +114,16 @@ a.btn.btn--primary {
   margin-bottom: 2em;
   justify-items: stretch;
   align-items: stretch;
+  width: 100%; /* 确保网格占据全宽 */
+}
+
+/* 确保最新文章和精选推荐区块与上方特色区块宽度一致 */
+.latest-posts,
+.featured-post {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
 }
 
 /* 文章卡片样式 */
