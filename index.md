@@ -37,39 +37,18 @@ feature_row:
 
 {% include feature_row id="intro" type="center" %}
 
-<style>
-.feature__item p {
-  text-align: center !important;
-  margin-top: 2em !important;
-}
-.feature__item p a.btn.btn--primary {
-  display: table !important;
-  margin: 0 auto !important;
-}
-
-/* 新增样式 */
-.view-more-btn {
-  text-align: center;
-  margin-top: 2em;
-  margin-bottom: 2em;
-  clear: both;
-}
-.view-more-btn .btn {
-  padding: 0.75em 1.5em;
-  font-size: 1.1em;
-}
-</style>
+<!-- 样式已移至custom.css文件 -->
 
 {% include feature_row %}
 
 <div class="latest-posts">
   <h2 class="archive__subtitle">最新文章</h2>
   <div class="grid__wrapper">
-    {% for post in site.posts limit:5 %}
+    {% for post in site.posts limit:6 %}
       {% include archive-single.html type="grid" %}
     {% endfor %}
   </div>
-  {% if site.posts.size > 5 %}
+  {% if site.posts.size > 6 %}
   <div class="view-more-btn">
     <a href="{{ site.baseurl }}/posts/" class="btn btn--primary">查看更多文章</a>
   </div>
@@ -80,14 +59,14 @@ feature_row:
 
 <div class="featured-post">
   <h2 class="archive__subtitle">精选推荐</h2>
-  {% assign featured_posts = site.tags.featured | default: site.posts | slice: 0, 5 %}
+  {% assign featured_posts = site.tags.featured | default: site.posts | slice: 0, 6 %}
   {% if featured_posts.size > 0 %}
     <div class="grid__wrapper">
-      {% for post in featured_posts limit:5 %}
+      {% for post in featured_posts limit:6 %}
         {% include archive-single.html type="grid" %}
       {% endfor %}
     </div>
-    {% if featured_posts.size > 5 %}
+    {% if featured_posts.size > 6 %}
     <div class="view-more-btn">
       <a href="{{ site.baseurl }}/tags/featured/" class="btn btn--primary">查看更多文章</a>
     </div>

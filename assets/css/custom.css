@@ -109,15 +109,21 @@ a.btn.btn--primary {
 /* 确保文章网格布局正确 */
 .grid__wrapper {
   display: grid;
-  grid-template-columns: 1fr; /* 单列行式 */
+  grid-template-columns: repeat(3, 1fr); /* 三列网格布局 */
   gap: 1.2em;
   margin-bottom: 2em;
   justify-items: stretch;
   align-items: start;
 }
 
+@media (max-width: 1200px) {
+  .grid__wrapper {
+    grid-template-columns: repeat(2, 1fr); /* 中等屏幕显示两列 */
+  }
+}
+
 @media (max-width: 700px) {
   .grid__wrapper {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* 小屏幕显示单列 */
   }
 }
