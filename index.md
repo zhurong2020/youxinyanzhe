@@ -65,11 +65,11 @@ feature_row:
 <div class="latest-posts">
   <h2 class="archive__subtitle">最新文章</h2>
   <div class="grid__wrapper">
-    {% for post in site.posts limit:6 %}
+    {% for post in site.posts limit:5 %}
       {% include archive-single.html type="grid" %}
     {% endfor %}
   </div>
-  {% if site.posts.size > 6 %}
+  {% if site.posts.size > 5 %}
   <div class="view-more-btn">
     <a href="{{ site.baseurl }}/posts/" class="btn btn--primary">查看更多文章</a>
   </div>
@@ -80,13 +80,18 @@ feature_row:
 
 <div class="featured-post">
   <h2 class="archive__subtitle">精选推荐</h2>
-  {% assign featured_posts = site.tags.featured | default: site.posts | slice: 0, 2 %}
+  {% assign featured_posts = site.tags.featured | default: site.posts | slice: 0, 5 %}
   {% if featured_posts.size > 0 %}
     <div class="grid__wrapper">
-      {% for post in featured_posts limit:2 %}
+      {% for post in featured_posts limit:5 %}
         {% include archive-single.html type="grid" %}
       {% endfor %}
     </div>
+    {% if featured_posts.size > 5 %}
+    <div class="view-more-btn">
+      <a href="{{ site.baseurl }}/tags/featured/" class="btn btn--primary">查看更多文章</a>
+    </div>
+    {% endif %}
   {% else %}
     <p><em>敬请期待精选内容...</em></p>
   {% endif %}
