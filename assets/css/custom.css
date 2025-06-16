@@ -109,17 +109,11 @@ a.btn.btn--primary {
 /* 确保文章网格布局正确 */
 .grid__wrapper {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 固定为三列 */
-  gap: 1.2em; /* 缩小间距 */
+  grid-template-columns: 1fr; /* 单列行式 */
+  gap: 1.2em;
   margin-bottom: 2em;
   justify-items: stretch;
   align-items: start;
-}
-
-@media (max-width: 1024px) {
-  .grid__wrapper {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 @media (max-width: 700px) {
