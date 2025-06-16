@@ -6,7 +6,7 @@ categories:
 - 云服务
 comments: true
 date: 2024-04-27 16:45:00 +0000
-excerpt: Putty 和 WinSCP 是远程登录VPS最重要的二个工具，本文介绍这两个工具的介绍、下载、安装和配套使用案例
+excerpt: Putty 和 WinSCP 是远程登录VPS最重要的二个工具，本文介绍这两个工具的介绍、下载、安装和配套使用案例。
 header:
   overlay_filter: 0.5
   overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/09dcfb9b-8b95-406a-231f-cf9d93970c00/public

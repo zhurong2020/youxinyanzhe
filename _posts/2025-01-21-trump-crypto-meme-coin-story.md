@@ -15,9 +15,8 @@ tags:
   - 区块链
   - 投资策略
 
-excerpt: 这篇文章为新手投资者解读加密货币的种类与风险，分享普通人参与币圈的理性路径。
+excerpt: 加密币是什么？有哪些主流品种？川普币是骗局吗？本文普及加密币基础，分享普通人参与币圈的理性路径。
 
-# classes: wide # 启用宽页面
 
 header:
   image: "https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/5580272a-a479-463b-24f4-4ffacc855800/public?format=auto&width=600&quality=75" # 使用 Cloudflare Images 转换 URL
@@ -30,8 +29,6 @@ header:
     - label: "请我喝咖啡"
       url: "https://www.buymeacoffee.com/zhurong052Q"
 
-#sidebar: # 侧边栏设置，如果使用 _data/navigation.yml 设置导航，则不需要
-#  nav: "mydocs" # 引用 _data/navigation.yml 中的 "mydocs" 导航菜单
 
 breadcrumbs: true  # 启用面包屑导航
 

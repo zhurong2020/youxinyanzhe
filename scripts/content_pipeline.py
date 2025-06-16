@@ -1385,58 +1385,47 @@ class ContentPipeline:
             self.log(f"使用简单匹配的分类: {categories}", level="info")
             return categories, []
     
-    def _replace_images(self, content: str, images: Dict[str, str]) -> str:
-        """替换内容中的图片URL"""
+    def _replace_images(self, content: str, images: Dict[str, str], temp_dir_path: Path) -> str:
+        """替换文章中的图片链接为Cloudflare链接"""
         if not images:
-            self.log("没有图片需要替换", level="warning")
+            self.log("⚠️ 没有有效的图片需要替换", level="warning")
             return content
-        
-        replaced_count = 0
-        processed_onedrive_urls = {}  # 用于跟踪已处理的OneDrive URL
-        
-        # 首先处理OneDrive链接，确保每个不同的OneDrive URL都获得唯一的Cloudflare URL
-        # 添加OneDrive链接的匹配模式
+            
+        # 首先处理OneDrive图片
+        # 定义OneDrive链接的匹配模式
         onedrive_patterns = [
-            r'!\[(.*?)\]\((https?://1drv\.ms/[^)]+)\)',                               # 1drv.ms链接
-            r'!\[(.*?)\]\((https?://onedrive\.live\.com/embed\?[^)]+)\)',             # onedrive.live.com链接
-            r'<img\s+src="(https?://onedrive\.live\.com/embed\?[^"]+)".*?alt="([^"]*)".*?>'  # HTML格式的img标签
+            r'!\[([^\]]*)\]\((https?://onedrive\.live\.com/[^)]+)\)',  # Markdown格式
+            r'<img\s+src="(https?://onedrive\.live\.com/[^"]+)".*?(?:alt="([^"]*)")?.*?>'  # HTML格式
         ]
         
-        # 记录所有图片映射，用于调试
-        self.log(f"图片映射列表:", level="debug")
-        for img_name, cloudflare_id in images.items():
-            self.log(f"  {img_name} -> {cloudflare_id}", level="debug")
+        # 记录已处理的OneDrive URL，避免重复处理
+        processed_urls = {}
+        total_replacements = 0
         
         # 处理OneDrive链接
         for pattern in onedrive_patterns:
-            # 使用正则表达式查找所有匹配项
-            matches = list(re.finditer(pattern, content))
-            self.log(f"找到 {len(matches)} 个匹配 OneDrive 链接模式: {pattern}", level="debug")
+            matches = re.finditer(pattern, content)
+            match_count = 0
             
-            # 从后向前替换，避免替换过程中改变字符串位置
-            for match in reversed(matches):
-                # 根据模式类型提取不同的信息
-                if pattern.startswith(r'<img'):
-                    # HTML格式的img标签
+            for match in matches:
+                match_count += 1
+                if 'src=' in pattern:  # HTML格式
                     onedrive_url = match.group(1)
-                    alt_text = match.group(2)
-                    self.log(f"处理HTML格式的OneDrive图片: URL={onedrive_url}, alt={alt_text}", level="debug")
-                else:
-                    # Markdown格式的链接
+                    alt_text = match.group(2) if match.lastindex >= 2 else ""
+                else:  # Markdown格式
                     alt_text = match.group(1)
                     onedrive_url = match.group(2)
                 
-                self.log(f"处理OneDrive链接: {onedrive_url}", level="debug")
+                self.log(f"找到OneDrive链接: {onedrive_url}", level="debug")
                 
-                # 检查这个OneDrive URL是否已经处理过
-                if onedrive_url in processed_onedrive_urls:
-                    cloudflare_url = processed_onedrive_urls[onedrive_url]
-                    self.log(f"使用已处理的OneDrive图片映射: {onedrive_url} -> {cloudflare_url}", level="debug")
+                # 检查是否已经处理过这个URL
+                if onedrive_url in processed_urls:
+                    cloudflare_url = processed_urls[onedrive_url]
+                    self.log(f"使用已处理的URL: {onedrive_url} -> {cloudflare_url}", level="debug")
                 else:
-                    # 查找对应的已上传图片
+                    # 查找是否有匹配的已上传图片
                     found_match = False
                     for img_name, cloudflare_id in images.items():
-                        # 尝试匹配OneDrive链接和上传的图片
                         if self._is_same_onedrive_image(onedrive_url, img_name):
                             # 确保不重复添加前缀
                             if cloudflare_id.startswith("https://imagedelivery.net"):
@@ -1444,59 +1433,39 @@ class ContentPipeline:
                             else:
                                 cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
                             
-                            processed_onedrive_urls[onedrive_url] = cloudflare_url
-                            self.log(f"✅ 找到OneDrive图片映射: {onedrive_url} -> {cloudflare_url} (通过 {img_name})", level="info")
+                            processed_urls[onedrive_url] = cloudflare_url
                             found_match = True
+                            self.log(f"✅ 找到匹配的已上传图片: {img_name} -> {cloudflare_url}", level="debug")
                             break
                     
+                    # 如果没有找到匹配的已上传图片，则下载并上传
                     if not found_match:
-                        # 为这个OneDrive URL下载图片并获取Cloudflare URL
-                        try:
-                            with tempfile.TemporaryDirectory() as temp_dir:
-                                temp_dir_path = Path(temp_dir)
-                                self.log(f"处理新的OneDrive图片: {onedrive_url}", level="info")
-                                img_name = self._download_onedrive_image(onedrive_url, temp_dir_path)
-                                if img_name:
-                                    local_images = {img_name: temp_dir_path / img_name}
-                                    image_mappings = self.image_mapper.map_images(local_images)
-                                    if image_mappings and img_name in image_mappings:
-                                        cloudflare_id = image_mappings[img_name]
-                                        # 确保不重复添加前缀
-                                        if cloudflare_id.startswith("https://imagedelivery.net"):
-                                            cloudflare_url = cloudflare_id
-                                        else:
-                                            cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
-                                        processed_onedrive_urls[onedrive_url] = cloudflare_url
-                                        self.log(f"✅ 新的OneDrive图片映射: {onedrive_url} -> {cloudflare_url}", level="info")
-                                    else:
-                                        self.log(f"❌ 无法为OneDrive图片创建映射: {onedrive_url}", level="error")
-                                        continue
-                                else:
-                                    self.log(f"❌ 无法下载OneDrive图片: {onedrive_url}", level="error")
-                                    continue
-                        except Exception as e:
-                            self.log(f"处理OneDrive图片时出错: {str(e)}", level="error")
+                        self.log(f"⚠️ 未找到匹配的已上传图片，尝试下载: {onedrive_url}", level="debug")
+                        img_name = self._download_onedrive_image(onedrive_url, temp_dir_path)
+                        if img_name:
+                            img_path = temp_dir_path / img_name
+                            cloudflare_id = self._upload_to_cloudflare(img_path)
+                            if cloudflare_id:
+                                cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
+                                processed_urls[onedrive_url] = cloudflare_url
+                                self.log(f"✅ 下载并上传成功: {onedrive_url} -> {cloudflare_url}", level="debug")
+                            else:
+                                self.log(f"❌ 上传到Cloudflare失败: {img_name}", level="error")
+                                continue
+                        else:
+                            self.log(f"❌ 下载OneDrive图片失败: {onedrive_url}", level="error")
                             continue
                 
-                # 替换OneDrive链接为Cloudflare链接
-                # 使用精确的位置替换，而不是全局替换
-                start, end = match.span(0)
+                # 替换内容中的OneDrive链接
+                if 'src=' in pattern:  # HTML格式
+                    replacement = f'<img src="{cloudflare_url}" alt="{alt_text}">'
+                else:  # Markdown格式
+                    replacement = f'![{alt_text}]({cloudflare_url})'
                 
-                # 根据模式类型生成不同的替换文本
-                if pattern.startswith(r'<img'):
-                    # 提取原始标签中的其他属性
-                    original_tag = match.group(0)
-                    # 保留原始标签中除了src以外的所有属性
-                    attrs_pattern = r'<img\s+[^>]*?src="[^"]*"([^>]*)>'
-                    attrs_match = re.search(attrs_pattern, original_tag)
-                    other_attrs = attrs_match.group(1) if attrs_match else ""
-                    
-                    new_text = f'<img src="{cloudflare_url}" alt="{alt_text}"{other_attrs}>'
-                else:
-                    new_text = f'![{alt_text}]({cloudflare_url})'
-                
-                content = content[:start] + new_text + content[end:]
-                replaced_count += 1
+                # 使用精确位置替换，避免全局替换可能导致的问题
+                start, end = match.span()
+                content = content[:start] + replacement + content[end:]
+                total_replacements += 1
                 self.log(f"替换OneDrive图片链接: {onedrive_url} -> {cloudflare_url}", level="debug")
         
         # 然后处理本地图片
@@ -1528,25 +1497,26 @@ class ContentPipeline:
             
             # 处理标准路径
             for pattern in patterns:
-                # 使用finditer而不是findall，以便获取匹配的位置
-                matches = list(re.finditer(pattern, content))
-                if matches:
-                    # 从后向前替换，避免替换过程中改变字符串位置
-                    for match in reversed(matches):
-                        alt_text = match.group(1)
-                        start, end = match.span(0)
-                        new_text = f'![{alt_text}]({cloudflare_url})'
-                        content = content[:start] + new_text + content[end:]
-                        replaced_count += 1
-                        replaced_this_image = True
+                matches = re.finditer(pattern, content)
+                for match in matches:
+                    alt_text = match.group(1)
+                    replacement = f'![{alt_text}]({cloudflare_url})'
+                    
+                    # 使用精确位置替换，避免全局替换可能导致的问题
+                    start, end = match.span()
+                    content = content[:start] + replacement + content[end:]
+                    replaced_this_image = True
+                    total_replacements += 1
             
             if replaced_this_image:
-                self.log(f"✅ 替换图片URL: {local_name} -> {cloudflare_url}", level="info")
+                self.log(f"替换本地图片: {local_name} -> {cloudflare_url}", level="debug")
         
-        if replaced_count > 0:
-            self.log(f"总共替换了 {replaced_count} 处图片引用", level="info")
+        # 记录总替换数量
+        if total_replacements > 0:
+            self.log(f"✅ 总共替换了 {total_replacements} 个图片引用", level="info")
         else:
-            self.log("没有找到需要替换的图片引用", level="warning")
+            self.log("⚠️ 未找到需要替换的图片引用", level="warning")
+            
         return content
 
     def _is_same_onedrive_image(self, onedrive_url: str, image_name: str) -> bool:
