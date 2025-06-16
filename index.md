@@ -59,16 +59,20 @@ feature_row:
 
 <div class="featured-post">
   <h2 class="archive__subtitle">精选推荐</h2>
-  {% assign featured_posts = site.tags.featured | default: site.posts | slice: 0, 6 %}
+  {% assign featured_posts = site.tags.featured | default: site.categories.量化投资 | default: site.posts | slice: 6, 6 %}
   {% if featured_posts.size > 0 %}
     <div class="grid__wrapper">
       {% for post in featured_posts limit:6 %}
         {% include archive-single.html type="grid" %}
       {% endfor %}
     </div>
-    {% if featured_posts.size > 6 %}
+    {% if site.tags.featured.size > 6 %}
     <div class="view-more-btn">
-      <a href="{{ site.baseurl }}/tags/featured/" class="btn btn--primary">查看更多文章</a>
+      <a href="{{ site.baseurl }}/tags/featured/" class="btn btn--primary">查看更多精选</a>
+    </div>
+    {% elsif site.categories.量化投资.size > 6 %}
+    <div class="view-more-btn">
+      <a href="{{ site.baseurl }}/categories/量化投资/" class="btn btn--primary">查看更多量化投资文章</a>
     </div>
     {% endif %}
   {% else %}
