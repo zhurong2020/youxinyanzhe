@@ -191,15 +191,15 @@ class ContentPipeline:
             try:
                 models = genai.list_models()
                 model_names = [model.name for model in models]
-                self.log(f"可用模型: {model_names}", level="info", force=True)
+                # self.log(f"可用模型: {model_names}", level="info", force=True)
                 
                 # 优先选择 Gemini 2.0 Flash 模型，然后是 Pro 模型
                 preferred_models = [
                     # 根据用户需求，优先使用 Flash 模型
+                    "models/gemini-2.5-flash",
+                    "models/gemini-2.5-pro",
                     "models/gemini-2.0-flash",
-                    "models/gemini-2.0-pro",
-                    "models/gemini-1.5-flash",
-                    "models/gemini-1.5-pro"
+                    "models/gemini-2.0-pro"
                 ]
                 
                 # 查找最佳匹配模型
@@ -1697,12 +1697,11 @@ class ContentPipeline:
         return None
 
 def main():
-    parser = argparse.ArgumentParser(description="内容处理流水线")
-    parser.add_argument("--config", type=str, help="配置文件路径")
-    parser.add_argument("--verbose", action="store_true", help="启用详细日志")
-    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', type=str, default='config/pipeline_config.yml', help='Path to config file')
+    parser.add_argument('--verbose', action='store_true', help='Enable verbose logging')
     args = parser.parse_args()
-    
+
     pipeline = ContentPipeline(args.config, args.verbose)
     
     # 选择操作
