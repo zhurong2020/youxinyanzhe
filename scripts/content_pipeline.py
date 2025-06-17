@@ -62,6 +62,11 @@ class ContentPipeline:
             if not all([account_id, account_hash, api_token]):
                 raise ValueError("❌ Cloudflare 环境变量未正确设置")
             
+            # 类型断言，确保类型检查通过
+            account_id = str(account_id)
+            account_hash = str(account_hash)
+            api_token = str(api_token)
+
             # 初始化Cloudflare Images客户端
             self.image_mapper = CloudflareImageMapper(
                 account_id=account_id,
@@ -405,16 +410,19 @@ class ContentPipeline:
                 
                 # 2. 处理图片
                 task = progress.add_task("🖼️ 处理文章图片...", total=None)
+                # 处理图片并创建临时目录
+                temp_dir = Path(tempfile.mkdtemp())
                 image_mappings = self.process_post_images(draft_path)
                 
                 if image_mappings:
                     # 替换正文中的图片链接
-                    content = self._replace_images(content, image_mappings)
-                    
+                    content = self._replace_images(content, image_mappings, temp_dir)
                     # 更新front matter中的图片链接
-                    post = self._update_header_images(post, image_mappings)
-                    
+                    post_dict = dict(post)
+                    post_dict['content'] = post.content
+                    post_dict = self._update_header_images(post_dict, image_mappings)
                     # 重新生成带有更新后图片链接的内容
+                    post = frontmatter.Post(post_dict.pop('content', ''), **post_dict)
                     content = frontmatter.dumps(post)
                     self.log("✅ 图片链接替换完成", level="info")
                 else:
@@ -642,8 +650,12 @@ class ContentPipeline:
             
             # 先处理图片（如果需要）
             if platform_config.get('replace_images', True):
-                content_text = self._replace_images(content_text, images)
-                post = self._update_header_images(post, images)
+                content_text = self._replace_images(content_text, images, draft_path.parent)
+                post_dict = dict(post)
+                post_dict['content'] = post.content
+                post_dict = self._update_header_images(post_dict, images)
+                # Update the Post object with the possibly updated header
+                post = frontmatter.Post(post_dict.pop('content', ''), **post_dict)
             
             # 分析分类和标签（如果需要）
             # 将analyze_content默认设为True，确保始终分析内容
@@ -1198,10 +1210,10 @@ class ContentPipeline:
             
             # 如果仍然无法确定扩展名，则根据内容进行判断
             if not extension:
-                import imghdr
+                import filetype
                 img_data = response.content
-                img_type = imghdr.what(None, h=img_data)
-                extension = img_type if img_type else 'jpg'  # 默认使用jpg
+                kind = filetype.guess(img_data)
+                extension = kind.extension if kind else 'jpg'  # 默认使用jpg
                 self.log(f"从内容判断的图片类型: {extension}", level="debug")
             
             # 构建输出文件名
@@ -1217,7 +1229,7 @@ class ContentPipeline:
             return output_filename
         except Exception as e:
             self.log(f"❌ 下载OneDrive图片失败: {str(e)}", level="error")
-            self.log("错误详情:", level="debug", exc_info=True)
+            self.log("错误详情:", level="debug")
             return None
 
     def _setup_site_url(self):
@@ -1411,7 +1423,7 @@ class ContentPipeline:
                 match_count += 1
                 if 'src=' in pattern:  # HTML格式
                     onedrive_url = match.group(1)
-                    alt_text = match.group(2) if match.lastindex >= 2 else ""
+                    alt_text = match.group(2) if (match.lastindex is not None and match.lastindex >= 2) else ""
                 else:  # Markdown格式
                     alt_text = match.group(1)
                     onedrive_url = match.group(2)
@@ -1438,13 +1450,13 @@ class ContentPipeline:
                             self.log(f"✅ 找到匹配的已上传图片: {img_name} -> {cloudflare_url}", level="debug")
                             break
                     
-                    # 如果没有找到匹配的已上传图片，则下载并上传
+                    # 如果没有找到匹配的模型，使用任何可用的 Gemini 模型
                     if not found_match:
                         self.log(f"⚠️ 未找到匹配的已上传图片，尝试下载: {onedrive_url}", level="debug")
                         img_name = self._download_onedrive_image(onedrive_url, temp_dir_path)
                         if img_name:
                             img_path = temp_dir_path / img_name
-                            cloudflare_id = self._upload_to_cloudflare(img_path)
+                            cloudflare_id = self.image_mapper.upload_image(img_path)
                             if cloudflare_id:
                                 cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
                                 processed_urls[onedrive_url] = cloudflare_url
@@ -1457,6 +1469,10 @@ class ContentPipeline:
                             continue
                 
                 # 替换内容中的OneDrive链接
+                cloudflare_url = processed_urls.get(onedrive_url)
+                if not cloudflare_url:
+                    self.log(f"⚠️ 未能获取Cloudflare URL，跳过替换: {onedrive_url}", level="warning")
+                    continue
                 if 'src=' in pattern:  # HTML格式
                     replacement = f'<img src="{cloudflare_url}" alt="{alt_text}">'
                 else:  # Markdown格式
@@ -1506,7 +1522,6 @@ class ContentPipeline:
                     start, end = match.span()
                     content = content[:start] + replacement + content[end:]
                     replaced_this_image = True
-                    total_replacements += 1
             
             if replaced_this_image:
                 self.log(f"替换本地图片: {local_name} -> {cloudflare_url}", level="debug")
@@ -1707,6 +1722,7 @@ def main():
         draft = pipeline.generate_test_content()
         if not draft:
             print("生成测试文章失败")
+           
             return
     else:
         print("无效的选择")
@@ -1726,4 +1742,4 @@ def main():
         print("⚠️ 处理未完全成功，请检查日志")
 
 if __name__ == "__main__":
-    main() 
+    main()
