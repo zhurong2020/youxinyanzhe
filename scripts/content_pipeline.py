@@ -421,7 +421,29 @@ class ContentPipeline:
                     post_dict = dict(post)
                     post_dict['content'] = post.content
                     post_dict = self._update_header_images(post_dict, image_mappings)
-                    # 重新生成带有更新后图片链接的内容
+
+                    # 校验并补全必要字段
+                    if 'header' not in post_dict or 'image' not in post_dict['header']:
+                        # 自动提取正文第一张图片作为头图
+                        match = re.search(r'!\[[^\]]*\]\(([^)]+)\)', post_dict['content'])
+                        if not match:
+                            match = re.search(r'<img\s+src=["\']([^"\']+)["\']', post_dict['content'])
+                        if match:
+                            img_url = match.group(1)
+                            if 'header' not in post_dict:
+                                post_dict['header'] = {}
+                            post_dict['header']['image'] = img_url
+                            self.log(f"⚠️ 草稿缺少头图，已自动使用正文第一张图片作为头图: {img_url}", level="warning")
+                        else:
+                            self.log("⚠️ 草稿缺少头图（header.image），主页将无法显示插图", level="warning")
+                    if 'excerpt' not in post_dict or not post_dict['excerpt']:
+                        self.log("⚠️ 草稿缺少摘要（excerpt），主页将无法显示摘要", level="warning")
+                    allowed_layouts = ['single', 'post']
+                    if 'layout' not in post_dict or post_dict['layout'] not in allowed_layouts:
+                        post_dict['layout'] = 'single'
+                        self.log("⚠️ layout 字段缺失或错误，已自动修正为 'single'", level="warning")
+
+                    # 重新生成带有更新后图片链接和补全字段的内容
                     post = frontmatter.Post(post_dict.pop('content', ''), **post_dict)
                     content = frontmatter.dumps(post)
                     self.log("✅ 图片链接替换完成", level="info")
