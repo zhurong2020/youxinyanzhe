@@ -26,6 +26,7 @@ tags:
 - 批判性思维
 - 信息素养
 - 美国社会
+- featured
 title: 2025年的世界更精彩，避免信息茧房从审视新闻观点开始
 toc: true
 toc_icon: list

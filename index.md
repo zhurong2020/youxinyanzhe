@@ -72,7 +72,7 @@ feature_row:
     </div>
     {% elsif site.categories.量化投资.size > 6 %}
     <div class="view-more-btn">
-      <a href="{{ site.baseurl }}/categories/量化投资/" class="btn btn--primary">查看更多量化投资文章</a>
+      <a href="{{ site.baseurl }}/categories/量化投资/" class="btn btn--primary">查看更多量化</a>
     </div>
     {% endif %}
   {% else %}
