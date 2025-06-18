@@ -25,9 +25,9 @@ header:
   overlay_color: "#333"  # 头部颜色叠加
   teaser: "https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/5580272a-a479-463b-24f4-4ffacc855800/public?format=auto&width=600&quality=75" # 可选，设置展示略缩图
   og_image: "https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/5580272a-a479-463b-24f4-4ffacc855800/public?format=auto&width=600&quality=75" # 用于社交分享的图片
-  actions: # 添加 "call to action" 按钮
-    - label: "请我喝咖啡"
-      url: "https://www.buymeacoffee.com/zhurong052Q"
+  # actions: # 添加 "call to action" 按钮
+    # - label: "请我喝咖啡"
+      # url: "https://www.buymeacoffee.com/zhurong052Q"
 
 
 breadcrumbs: true  # 启用面包屑导航
