@@ -120,8 +120,9 @@ toc_sticky: true
 
 ## 参考链接及资源
 
-*   美国劳工部：https://www.bls.gov/
-*   美国经济分析局：https://www.bea.gov/
+*   美国劳工部：[https://www.bls.gov/](https://www.bls.gov/)
+*   美国经济分析局：[https://www.bea.gov/](https://www.bea.gov/)
+*   标普全球官网：[https://www.spglobal.com/en](https://www.spglobal.com/en)
 *   [2025年6月11日发布的CPI](https://pan.baidu.com/s/1_7gZBAgrc-RoMUbyIoOufA?pwd=yaj2)
 *   [2025年6月27日发布的PCE数据](https://pan.baidu.com/s/1p0WcUtmt09cBGqKXpeq-xA?pwd=ifqf)
 *   [2023 consumer expenditures](https://pan.baidu.com/s/1_HtA5xfzRR05RifnT6nc-A?pwd=f7te)
