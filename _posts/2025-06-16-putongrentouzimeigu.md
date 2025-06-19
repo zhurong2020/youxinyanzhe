@@ -8,12 +8,12 @@ comments: true
 date: 2025-06-16 16:45:00 +0000     
 excerpt: 本文作者分析了美国生活成本现状，探讨了美股投资作为普通人实现财务自由的重要途径。
 header:
-  image: https://1drv.ms/i/c/5644dab129afda10/IQQXkGs4bnYKR7qf9qNCPx3rATQ2dnODqKSYrU4MlUFpQgU?width=660
-  og_image: https://1drv.ms/i/c/5644dab129afda10/IQQXkGs4bnYKR7qf9qNCPx3rATQ2dnODqKSYrU4MlUFpQgU?width=660
+  image: https://1drv.ms/u/c/5644dab129afda10/IQQ8nPSSwRlXQYYhGUO-IdIbAbiml6HWCvwdtGu1PedR8Ls?width=1024
+  og_image: https://1drv.ms/u/c/5644dab129afda10/IQQ8nPSSwRlXQYYhGUO-IdIbAbiml6HWCvwdtGu1PedR8Ls?width=1024
   overlay_color: '#333'
   overlay_filter: 0.5
-  overlay_image: https://1drv.ms/i/c/5644dab129afda10/IQQXkGs4bnYKR7qf9qNCPx3rATQ2dnODqKSYrU4MlUFpQgU?width=660
-  teaser: https://1drv.ms/i/c/5644dab129afda10/IQQXkGs4bnYKR7qf9qNCPx3rATQ2dnODqKSYrU4MlUFpQgU?width=660
+  overlay_image: https://1drv.ms/u/c/5644dab129afda10/IQQ8nPSSwRlXQYYhGUO-IdIbAbiml6HWCvwdtGu1PedR8Ls?width=1024
+  teaser: https://1drv.ms/u/c/5644dab129afda10/IQQ8nPSSwRlXQYYhGUO-IdIbAbiml6HWCvwdtGu1PedR8Ls?width=1024
 last_modified_at: '2025-06-17 21:57:08'
 layout: single
 related: true
@@ -37,7 +37,7 @@ toc_sticky: true
 
 移居美国后，面对高昂的生活成本，我开始重新审视和探索财富增值的新途径。正是在这一过程中，我逐步认识到美股投资不仅是一个现实可行的选项，更是普通人实现财务自由的有力工具。本文将结合我的亲身经历、具体数据和实用建议，希望能为同样在投资道路上探索的你提供一些有价值的参考。
 
-![思考如何投资](https://1drv.ms/i/c/5644dab129afda10/IQQXkGs4bnYKR7qf9qNCPx3rATQ2dnODqKSYrU4MlUFpQgU?width=660)
+![思考如何投资](https://1drv.ms/u/c/5644dab129afda10/IQQ8nPSSwRlXQYYhGUO-IdIbAbiml6HWCvwdtGu1PedR8Ls?width=1024)
 
 ## 1. 从银行到美国：人生的新篇章
 
