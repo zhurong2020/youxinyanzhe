@@ -10,12 +10,12 @@ comments: true
 date: 2025-02-8 16:45:00 +0000
 excerpt: 2025年，信息爆炸时代，如何避免'信息茧房'？本文介绍两大媒体偏见评估工具，帮你科学审视新闻。
 header:
-  image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/cd69e80c-296d-4fa3-5943-83702a60bc00/public
-  og_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/cd69e80c-296d-4fa3-5943-83702a60bc00/public
+  image: https://1drv.ms/u/c/5644dab129afda10/IQTW4xroKj7uT6C8dqzA5UjKAbfh3BqPDLnkDDXmP6g0soI?width=1024
+  og_image: https://1drv.ms/u/c/5644dab129afda10/IQTW4xroKj7uT6C8dqzA5UjKAbfh3BqPDLnkDDXmP6g0soI?width=1024
   overlay_color: '#333'
   overlay_filter: 0.5
-  overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/cd69e80c-296d-4fa3-5943-83702a60bc00/public
-  teaser: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/cd69e80c-296d-4fa3-5943-83702a60bc00/public
+  overlay_image: https://1drv.ms/u/c/5644dab129afda10/IQTW4xroKj7uT6C8dqzA5UjKAbfh3BqPDLnkDDXmP6g0soI?width=1024
+  teaser: https://1drv.ms/u/c/5644dab129afda10/IQTW4xroKj7uT6C8dqzA5UjKAbfh3BqPDLnkDDXmP6g0soI?width=1024
 last_modified_at: '2025-03-04 17:25:21'
 layout: single
 related: true
@@ -40,7 +40,7 @@ toc_sticky: true
 
 这些事件引发我们的思考。例如，川普当选前，为何有人坚信他不可能获胜？左派媒体CBS在2025年2月9日发布的最新民调显示，川普的支持率高达53%（远高于其第一任期），且70%的美国人认为他正在兑现竞选承诺。如果此时你仍持反对意见并深信不疑，是否遗漏了重要信息，或者出现了“过度自信偏差”甚至“虚假优越感”？简而言之，你是否陷入了“信息茧房”？
 
-![trump-approval-opinion-poll-2025-2-9](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/412f524b-56ab-4981-4236-421df274f000/public)
+![trump-approval-opinion-poll-2025-2-9](https://1drv.ms/i/c/5644dab129afda10/IQSJ_afxB1XrSo_lMB709l8HAXe1_unsK6bx6SpEP-3s_2U?width=660)
 
 想了解2025年2月9日[川普支持率民调](https://www.cbsnews.com/news/trump-approval-opinion-poll-2025-2-9/)的完整内容，请访问该链接。
 
@@ -48,7 +48,7 @@ toc_sticky: true
 
 美国政府新成立的DOGE近期揭露了许多令人难以置信的美国社会问题。例如，2月17日查出，美国有2000万100岁以上的老人仍在领取退休金，其中年龄最大者高达360岁。
 
-![doge-social security](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/42251604-49e8-4140-04b2-636a19806700/public)
+![doge-social security](https://1drv.ms/i/c/5644dab129afda10/IQR1MnGS7UM5TKVTMCq8ck11AdgSg_AHwSbCCH8csMQ_S5w?height=660)
 
 尽管对马斯克和DOGE的质疑声不断，但不可否认的是，他们确实在很大程度上揭露了美国政府及社会的诸多问题。建议感兴趣的读者直接访问DOGE的官网或X账号以获取更多信息。该网站目前每天都会更新DOGE部门的最新进展。
 
@@ -56,7 +56,7 @@ toc_sticky: true
 
 如何避免陷入“信息茧房”？最重要的是**建立多元的信息获取渠道**，让自己接触到不同立场、不同角度的新闻报道。本文将介绍两个有助于审视新闻信息的工具，帮助我们筛选更可靠、更客观的报道，减少被片面观点误导的风险。
 
-![info-bubble](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/ee7085b5-01d1-48be-d9b0-a799a9050800/public)
+![info-bubble](https://1drv.ms/i/c/5644dab129afda10/IQRL3yRaD1QIT6ddpP5SNy9CAex_LUL0DVvI3bvxToimRiU?width=660)
 <!-- more -->
 
 ---
@@ -75,7 +75,7 @@ toc_sticky: true
 - **削弱独立思考能力**：信息选择性接收，使个体无法辨别事实与偏见。
 
 ---
-![zhengzhipuxi1](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/ccf5e72e-acf1-4205-a435-c4c8b493f100/public)
+![zhengzhipuxi1](https://1drv.ms/u/c/5644dab129afda10/IQS4ACz1fqLwSrDhIpYOjpTHARH1YQtvBP3Dgnc3zUDJnzI?width=660)
 
 ## **第二部分：如何科学审视新闻？**
 
@@ -90,7 +90,7 @@ toc_sticky: true
   - **AllSides**：[https://www.allsides.com/media-bias/media-bias-chart](https://www.allsides.com/media-bias/media-bias-chart)
   - **Ad Fontes Media**：[https://adfontesmedia.com/gallery/](https://adfontesmedia.com/gallery/)
 
-![the-media-bias-chart](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/2a18c754-8e79-4902-e780-a66616f21c00/public)
+![the-media-bias-chart](https://1drv.ms/i/c/5644dab129afda10/IQT65dDm1_PlTJKjqlidWVRGASW3i58mjAhjvYrvY0UceVU?width=660)
 ---
 
 ## **第三部分：如何使用AllSides和Ad Fontes Media？**
@@ -107,7 +107,7 @@ toc_sticky: true
   - 访问**交互式媒体偏见图**：[https://app.adfontesmedia.com/chart/interactive](https://app.adfontesmedia.com/chart/interactive)。
   - 通过筛选，找到更可靠、更中立的新闻来源，避免受到极端立场媒体的误导。
 
-![ad-fontes-media](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/2132fee1-172b-4cbf-94c7-221beb323c00/public)
+![ad-fontes-media](https://1drv.ms/i/c/5644dab129afda10/IQSWizFmQ4mSSZ1eSQuB386WAZqPDGDkeKUnAORKac0BOdI?height=660)
 
 ### **3. 媒体也在变化，关注最新版本**
 
@@ -123,7 +123,7 @@ toc_sticky: true
 - 刻意关注自己不熟悉或不同立场的新闻来源，培养批判性思维。
   例如，以下是 "ad fontes media" 当前版本中中间偏左的媒体。查看你平时是否常看这些媒体，如果是，可以考虑也关注一下中间偏右的媒体，反之亦然。
 
-![media-bias-middlenleft](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/e63278d6-bfba-49c3-c9aa-733d10e73a00/public)
+![media-bias-middlenleft](https://1drv.ms/i/c/5644dab129afda10/IQSpYpRGGixQQ71SN72BRltQAWcamnhQUvVMa-RbtGRyBBw?width=660)
 还需关注媒体在纵向坐标轴上的位置，因为纵向坐标轴代表可信度。如果可信度很低，例如属于 "Contain Inaccurate/Fabricated Info" 类，那么无论该媒体偏向哪个立场，都可能存在偏见，需要谨慎对待。
 
 实时查询网址：[https://app.adfontesmedia.com/chart/interactive](https://app.adfontesmedia.com/chart/interactive)
@@ -136,7 +136,7 @@ toc_sticky: true
 
 - 社交媒体推送的新闻往往迎合用户偏好，应多使用**独立新闻网站**，而非仅依赖社交媒体。
 
-![zhengzhipuxi2](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/8942133b-c14a-41df-181e-10de1c23de00/public)
+![zhengzhipuxi2](https://1drv.ms/u/c/5644dab129afda10/IQQKy_hi5MkrQZEn9je914brAUuc59ueMkt0L0e--LRl8t8?width=660)
 
 ### **4. 获取一手资料，避免被剪辑误导**
 
