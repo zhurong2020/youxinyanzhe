@@ -165,7 +165,7 @@ a.btn.btn--primary {
 
 /* 文章图片容器 */
 .grid__item .archive__item-teaser {
-  height: 220px; /* 增加图片高度 */
+  height: 350px; /* 增加图片高度到350px */
   overflow: hidden;
   margin-bottom: 1em;
   display: flex;
@@ -178,10 +178,8 @@ a.btn.btn--primary {
 .grid__item .archive__item-teaser img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* 确保图片填满容器并保持比例 */
   transition: transform 0.3s ease;
-  max-width: 90%;
-  height: auto;
   display: block;
   margin: 0 auto;
 }
