@@ -8,12 +8,12 @@ comments: true
 date: 2025-06-16 16:45:00 +0000     
 excerpt: 本文作者分析了美国生活成本现状，探讨了美股投资作为普通人实现财务自由的重要途径。
 header:
-  image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/266ee2ab-215a-4cb3-f501-845f1f77b200/public
-  og_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/266ee2ab-215a-4cb3-f501-845f1f77b200/public
+  image: https://1drv.ms/i/c/5644dab129afda10/IQQXkGs4bnYKR7qf9qNCPx3rATQ2dnODqKSYrU4MlUFpQgU?width=660
+  og_image: https://1drv.ms/i/c/5644dab129afda10/IQQXkGs4bnYKR7qf9qNCPx3rATQ2dnODqKSYrU4MlUFpQgU?width=660
   overlay_color: '#333'
   overlay_filter: 0.5
-  overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/266ee2ab-215a-4cb3-f501-845f1f77b200/public
-  teaser: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/266ee2ab-215a-4cb3-f501-845f1f77b200/public
+  overlay_image: https://1drv.ms/i/c/5644dab129afda10/IQQXkGs4bnYKR7qf9qNCPx3rATQ2dnODqKSYrU4MlUFpQgU?width=660
+  teaser: https://1drv.ms/i/c/5644dab129afda10/IQQXkGs4bnYKR7qf9qNCPx3rATQ2dnODqKSYrU4MlUFpQgU?width=660
 last_modified_at: '2025-06-17 21:57:08'
 layout: single
 related: true
@@ -120,18 +120,15 @@ toc_sticky: true
 
 ## 参考链接及资源
 
-### 官方数据
 *   美国劳工部：https://www.bls.gov/
 *   美国经济分析局：https://www.bea.gov/
 *   [2025年6月11日发布的CPI](https://pan.baidu.com/s/1_7gZBAgrc-RoMUbyIoOufA?pwd=yaj2)
 *   [2025年6月27日发布的PCE数据](https://pan.baidu.com/s/1p0WcUtmt09cBGqKXpeq-xA?pwd=ifqf)
 *   [2023 consumer expenditures](https://pan.baidu.com/s/1_HtA5xfzRR05RifnT6nc-A?pwd=f7te)
 
-### 行业报告
 *   [2025-2031年中国网络视听行业市场深度分析及投资战略咨询报告（大纲）](https://pan.baidu.com/s/1byib4G9YkQj5oLptho6InQ?pwd=mejs)
 *   [第55次中国互联网络发展状况统计报告](https://pan.baidu.com/s/1XgKXEcJosY3hIFafywceYQ?pwd=k4jh)
 
-### 推荐书籍
 点击至京东购买[聪明的投资者（第4版）](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BATEJK1olXwQLUF5dAUwQBF8IGloTVAYBUlheCkMQAl9MRANLAjZbERscSkAJHTdNTwcKBlMdBgABFksWAmkBG1gTWwUAXFlcFxJSXzI4SwkcAXhGVjs_XS1lfhN1XjJOD3FeElJROEonAG4IGF4VXAMBXW5tCEwnQgEIGVgQVQcDV25cOEsRB24JGlgXXg4BVlhtD0seM28KHFgVWg4FUl0zVHsnM2w4HFscSQBwFQxJDjknM284GGsVXAYDXV5bCUoQC3MIGV4WVQceVFhZCUoWAG8LE1kQXDYAVV9ZAXsn3eGcfihiNgR1Ml0ATzFgV2tgH4WbyRdwJF5ZCU0GMzAKRD5yBgBpFxskCxVuSmZwRixiVVVXKDBfQwJcWRdDWVpWIQBfBwEDfx8nBl8IHVsXbQ)
 
 

@@ -1,8 +1,0 @@
-fix: Enhance post template handling and improve Giscus comments display
-
-- Fix YAML syntax in post_templates.yml by properly quoting category names with special characters
-- Update content pipeline to properly load and apply templates to posts
-- Add custom CSS to ensure Giscus comments display correctly in light theme
-- Improve template testing with better validation and error handling
-- Update subtitle to "Exploring the Intersection of Technology and Thought"
-- Ensure links open in new windows and author information displays correctly 
