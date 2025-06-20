@@ -9,8 +9,8 @@ date: 2024-03-24 19:55:00 +0000
 excerpt: 通过选择并自托管 Github 上的开源项目，每个人都可以轻松构建属于自己的数字王国。
 header:
   overlay_filter: 0.5
-  overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/839f39f3-8c2f-4a1d-534b-722ab5e4fc00/public
-  teaser: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/839f39f3-8c2f-4a1d-534b-722ab5e4fc00/public
+  overlay_image: https://1drv.ms/i/c/5644dab129afda10/IQQ0ztdjHbyeQKm03itFJCnjAbC10MzaoXQ8VeYa-MruTdM?width=660
+  teaser: https://1drv.ms/i/c/5644dab129afda10/IQQ0ztdjHbyeQKm03itFJCnjAbC10MzaoXQ8VeYa-MruTdM?width=660
 last_modified_at: '2025-03-05 11:39:46'
 layout: single
 related: true
@@ -38,7 +38,7 @@ GitHub 是全球领先的代码托管平台和软件开发者社区。截至 202
 
 简单来说，GitHub 就像一个代码仓库，用户可以上传自己的代码，供他人查看、下载和使用，这就是开源。GitHub 不仅是开源项目的聚集地，也是技术交流和合作的重要平台。在这里，开源不仅仅是一个项目，更是一种精神，推动着全球范围内的技术共享和创新。
 
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/733c7e19-9e9a-4fa2-54de-29bd7d5c7100/public" alt="github logo" alt="github logo" width="657" height="369" />
+![github](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWjhABAAAAAB2RCnS80sV4wYA?width=657&height=369)
 
 ### 开源项目：技术共享的圣地
 
@@ -50,19 +50,22 @@ GitHub 上汇集了各种开源项目，从简单的脚本到复杂的操作系�
 
 自托管不仅是一种技术选择，更是一种数字生活方式的体现。它强调个人数据主权、隐私保护，以及对技术的深入理解和掌控能力。例如，Nextcloud 允许用户搭建私有云存储服务，而 Gitea 则提供了一个轻量级的代码托管解决方案。这些工具都能帮助你更好地控制自己的数据和服务。
 
+从下图中，我们可以看到日常使用FAANGS和自托管之间的区别，我们这个系列主要讨论最后一种使用VPS的自托管方式。
+
+![自托管](https://1drv.ms/i/c/5644dab129afda10/IQQAt8atCr3fRIdPU9B2lCPPARoF_4TkZ1mBwu5fJeimMj4)
+
 ## 自托管开源项目的优势
 
-选择自托管开源项目，意味着你将拥有数据和服务的完全控制权，并能根据自身需求进行个性化配置。你每年只需支付 VPS 和域名的费用，就能享受随时随地的便利和高度个性化的数字体验。
+选择自托管开源项目，意味着你将拥有数据和服务的完全控制权，并能根据自身需求进行个性化配置。你每年只需支付 VPS 和域名的费用（刚开始你也可以搜索并使用免费资源），就能享受随时随地的便利和高度个性化的数字体验。
 
-具体操作如下：首先，购买网络托管服务公司的 VPS（虚拟专用服务器）；然后，购买域名注册服务公司提供的域名，例如 ABC.xyz；最后，在 VPS 上部署开源项目并进行配置，通过域名访问。如此一来，每年只需支付 VPS 和域名的费用，便可获得随时随地的便利和高度个性化的数字体验。
+具体操作如下：首先，购买网络托管服务公司的 VPS（虚拟专用服务器），例如可以在 [Racknerd](https://my.racknerd.com/aff.php?aff=7454) 选择一台每年[10.96美元的VPS](https://my.racknerd.com/aff.php?aff=7454&pid=912)；然后，购买域名注册服务公司提供的域名，例如可以在[Namesilo](https://www.namesilo.com/?rid=8e1f221hr)花1.88美元购买一个例如 ABC.xyz的域名；最后，在 VPS 上部署开源项目并完成相关配置，这样世界各地的用户就可以通过域名访问你的应用了。当然，刚开始，你可能需要让自己和家人能够顺利使用。如此一来，每年只需支付 VPS 和域名的费用，便可获得随时随地的便利和高度个性化的数字体验。
 
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/2fad7531-5ee4-40fb-ad09-3e4332772f00/public" alt="opensource adv" alt="opensource adv" width="660" height="auto" />
 
-下面将简要介绍 Cloudreve 私有云存储、Trilium 个人笔记系统、Jellyfin 家庭影音服务器、NextChat 共享 LLM 等应用的功能。具体的开源项目链接请参考文末。如果你对这些可自托管的开源项目感兴趣，希望获得更详细的安装步骤，请继续关注我们后续的文章。
+下面简要介绍几个可以部署在 VPS 上的开源应用。有 Cloudreve-私有云存储、Trilium-个人笔记系统、Jellyfin-家庭影音服务器、NextChat-共享 LLM 应用。具体的开源项目链接请参考文末。如果你对这些可自托管的开源项目感兴趣，希望获得更详细的安装步骤，请继续关注我们后续的文章。
 
 ### 通过 Cloudreve 实现私有云存储
 
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/81e98647-5185-4bc1-1599-5a5c7d4f3d00/public" alt="Cloudreve" alt="Cloudreve" width="660" height="auto" />
+![cloudreve](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWkhABAAAAAENDRKObZ8mnQzQ?width=660)
 
 使用开源程序 Cloudreve，你可以完全替代某度云盘的功能，不仅能享受完全带宽的下载速度，也无需支付每月订阅费用。
 
@@ -84,7 +87,7 @@ GitHub 上汇集了各种开源项目，从简单的脚本到复杂的操作系�
 
 ### 通过 Trilium 实现个人笔记系统
 
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/144693bc-43d2-458c-6081-eb7492104100/public" alt="Trilium" alt="Trilium" width="660" height="auto" />
+![trilium](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWmxABAAAAAFNG1KbHDKcNFmo?width=660)
 
 部署 Trilium 个人笔记应用后，你基本可以替代某象笔记，再也不用受到无处不在的广告的骚扰，也不必因为促销，就将账户使用期限延长到 2030 年。
 
@@ -107,7 +110,7 @@ GitHub 上汇集了各种开源项目，从简单的脚本到复杂的操作系�
 
 ### 使用 NextChat 共享 LLM
 
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/dc02f882-bab1-40e0-afb7-7d7696101b00/public" alt="NextChat" alt="NextChat" width="660" height="auto" />
+![nextchat](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWlRABAAAAAASfS7lEgLXGmbw?width=660)
 
 对于想要使用 ChatGPT 和 Gemini 的中国国内用户，部署开源应用 NextChat 并配置好相关环境变量后，就可以直接在中国国内使用 ChatGPT 或 Gemini，并且还可以与朋友分享。
 
@@ -127,7 +130,7 @@ GitHub 上汇集了各种开源项目，从简单的脚本到复杂的操作系�
 
 ### 安装 Jellyfin，实现家庭的影音服务器
 
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/89270019-08a4-47ff-73cd-cb3ed2dfee00/public" alt="Jellyfin" alt="Jellyfin" width="660" height="auto" />
+![jellyfin](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWlBABAAAAAKhaUh0xYmeqHOc?width=660)
 
 - 完全免费和开源，你可以自由使用、修改和分发
 - 不含任何广告和跟踪程序，您可以完全控制自己的媒体数据
@@ -154,7 +157,7 @@ GitHub 上汇集了各种开源项目，从简单的脚本到复杂的操作系�
 - trilium 个人笔记：个人知识管理应用程序，适合注重灵活性和隐私的用户。
 - webmin 服务器监控：可以帮助用户高效管理各种 Linux/Unix 系统，非常适合初学者和服务器管理人员。
 - wordpress 个人网站：适合个人、企业和组织快速搭建和管理网站的免费网站搭建平台。
-- xray 及 3x-ui 代理服务器：帮助用户突破网络限制、保护网络隐私的网络代理核心框架。
+- xray 服务器：帮助用户获取更多科研信息、保护网络隐私的网络代理核心框架。
 
 [点击此处可以查看部分应用截图和介绍](https://zhurong2020.github.io/post/yun-duan-sheng-huo-chu-ti-yan-da-zao-zhuan-shu-de-duo-gong-neng-jia-ting-fu-wu-qi/)
 
@@ -182,7 +185,7 @@ GitHub 上汇集了各种开源项目，从简单的脚本到复杂的操作系�
 
 ## 参考链接和演示网址
 
-为了让你能更直观地体验这些自托管服务，你可以使用以下演示网址：
+为了让你能更直观地体验这些自托管服务，你可以使用以下演示网址体验部分应用：
 
 - [Jellyfin Demo](https://demo.jellyfin.org/stable/web/#/home.html)
 - [NextChat Demo](https://app.nextchat.dev/)
