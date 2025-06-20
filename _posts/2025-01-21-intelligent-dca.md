@@ -8,10 +8,11 @@ comments: true
 date: 2025-01-21 16:45:00 +0000
 excerpt: 定投是一种广受欢迎的理财投资策略，通过Moomoo量化工具我们可以实现特定美股的定投策略。
 header:
+  image: "https://1drv.ms/i/c/5644dab129afda10/IQTvUxT8X1KNQLwuJ8y78S9kAacEobu7COu_Q4YzfU8LkRU?width=660"
   overlay_filter: 0.5
-  overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/0519b9b8-813b-4949-7c7f-a0098cc8ed00/public
-  teaser: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/0519b9b8-813b-4949-7c7f-a0098cc8ed00/public
-last_modified_at: '2025-03-05 07:49:50'
+  overlay_image: https://1drv.ms/i/c/5644dab129afda10/IQTvUxT8X1KNQLwuJ8y78S9kAacEobu7COu_Q4YzfU8LkRU?width=660
+  teaser: https://1drv.ms/i/c/5644dab129afda10/IQTvUxT8X1KNQLwuJ8y78S9kAacEobu7COu_Q4YzfU8LkRU?width=660
+last_modified_at: '2025-06-20 07:01:50'
 layout: single
 related: true
 share: true
@@ -32,7 +33,6 @@ toc_sticky: true
 
 <!-- more -->
 
-@[toc]
 
 > **免责声明：** 本文仅供学习交流，不构成任何投资建议。作者并非专业人士，请务必谨慎对待量化交易的风险，并结合个人风险承受能力做出投资决策。
 
@@ -48,7 +48,7 @@ toc_sticky: true
 
 更重要的是，Moomoo 量化功能不仅支持简单的定投，还能与其他策略灵活组合，适用于美股市场中的任何标的，提供了更为广泛的投资机会。
 
-![Moomoo中可用的标的](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/24f172a5-99de-48ff-e4dc-7f30b777d900/public)
+![Moomoo中可用的标的](https://1drv.ms/i/c/5644dab129afda10/IQSE5cgAl_JSTqaQTW2nLvvOAXzUSdT9gy_HVzwKQGrDUYo?width=660)
 
 ---
 
@@ -68,7 +68,7 @@ toc_sticky: true
 
 下图是 Moomoo 中美股分板块的个股热力图，你能找到多少家熟悉的公司呢？（图中的英文缩写为股票代码）
 
-![分板块的个股热力图](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/d2063e58-c0f6-4ca5-18eb-d98f254b2000/public)
+![分板块的个股热力图](https://1drv.ms/i/c/5644dab129afda10/IQTDVC-t4zekQbeYCDpnEZtvAbXhwJItfG4k1NnersUqkdE?width=660)
 
 ## 为什么选择 Moomoo？
 
@@ -94,7 +94,7 @@ Moomoo 致力于打造一个"让每个人都能轻松投资的世界"。它不�
 
 4. 获得 100 多个全球奖项，深受投资者信赖。
 
-![Moomoo品牌介绍](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/5ccd9c5d-a05e-4212-5506-a5f71b3b7f00/public)
+![Moomoo品牌介绍](https://1drv.ms/i/c/5644dab129afda10/IQR7s3s86rDrRp704PNdFH_nAUYL_6k-U9OuZ7U_hxaZwbs?width=660)
 
 ---
 
@@ -106,11 +106,11 @@ Moomoo 致力于打造一个"让每个人都能轻松投资的世界"。它不�
 
 - 开设支持量化交易的 Moomoo 账户。通过[此链接开户](https://j.moomoo.com/01priX)，可享受多项福利。
 
-![Moomoo新开户专属好礼](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/386e607b-dfef-4cdb-1720-4ac67557f500/public)
+![Moomoo新开户专属好礼](https://1drv.ms/i/c/5644dab129afda10/IQSRtwCVMbFoQ559G39BFuC8AZPPp79L-8r5YgkVnxfTb30?width=660)
 
 - [安装 Moomoo 客户端](https://www.moomoo.com/us/hans/download)并配置量化工具，熟悉基本操作。
 
-![Moomoo客户端分平台下载](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/ffb400d4-62ab-4279-27c4-fd3f8b5c4200/public)
+![Moomoo客户端分平台下载](https://1drv.ms/i/c/5644dab129afda10/IQQWCbgjEKhwSo8uXuG_e7geARY13Iwb20YlN9aWHgEkMO4?width=660)
 
 请选择适合自己的客户端。请注意，量化策略相关功能只能在电脑端使用。
 
@@ -141,7 +141,7 @@ Moomoo 致力于打造一个"让每个人都能轻松投资的世界"。它不�
 
 在准备好现成的定投策略后，日常操作主要包括以下几个步骤：
 
-![智能定投日常流程](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/30b4784a-ca86-4c23-3e0d-ff0d01819700/public)
+![智能定投日常流程](https://1drv.ms/i/c/5644dab129afda10/IQRGMiuSoOI-SYEqSY5puVa1ATllSjuEWIZG7OFhYerMAPw?width=660)
 
 #### 启动 Moomoo 软件
 
@@ -176,7 +176,7 @@ Moomoo 致力于打造一个"让每个人都能轻松投资的世界"。它不�
 
 有了这个策略，你需要做的就是定期打开电脑端的 Moomoo 软件，并在量化功能中启动定投策略。如果你希望实现全自动定投，请继续关注我们的《量化交易机器人》系列文章，我们将介绍如何基于 VPS 实现 7*24 小时无人值守的机器人交易。
 
-![可以使用VPS进行量化交易](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/b2cc01d3-7e71-49fa-3963-4749c1e68c00/public)
+![可以使用VPS进行量化交易](https://1drv.ms/u/c/5644dab129afda10/IQRodauYnp_eT6m7RWKdhyhjAV28knIC-0w2QypGdxTwPaE?height=660)
 
 **提示：** 本文所述的定投策略是 Moomoo 量化功能的一种尝试。熟悉此方法后，可将其推广至任何在 Moomoo 中可交易的标的。
 
@@ -196,18 +196,18 @@ Moomoo 致力于打造一个"让每个人都能轻松投资的世界"。它不�
 
 以下截图展示了按照此定投策略回测一年的收益情况。可以看到，一年投资 8000 美元，年化策略收益为 2%：
 
-![DCA-ABR-8K-WEEK](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/0f5850c2-ddfb-4f53-23ca-5b20d9ab2200/public)
+![DCA-ABR-8K-WEEK](https://1drv.ms/i/c/5644dab129afda10/IQTfnlBhkRY9Q4oTDWYpEMA3AdsYEwqt9mBFHq8NHhyXxPc?width=660)
 
 如果资金充足，还可以考虑按天定投。同样投资 8000 美元，年化策略收益可达 8.73%：
 
-![DCA-ABR-8K-DAY](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/a5b1157f-388f-49b8-5fa6-e075e3f3b100/public)
+![DCA-ABR-8K-DAY](https://1drv.ms/i/c/5644dab129afda10/IQTgx_D1p8HSQYWDnOq3uctKAUZ21kUSlWTkLPvLlt7Vp-g?width=660)
 
 通过定投美股 ABR，我们可以享受稳定的股息收入，并在价格回撤时加仓，为未来的资本增长奠定基础。
 
 当然，你也可以尝试修改策略参数，看看不同的标的和不同的参数设置会带来怎样的效果。
 这里有一个极端案例的截图，你能看出是如何定投的吗？答案在文末供你参考。
 
-![DCA-TSLA-200K-DAY](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/953dc4c6-c505-49d9-9b08-2bfdba982300/public)
+![DCA-TSLA-200K-DAY](https://1drv.ms/i/c/5644dab129afda10/IQQGq-kFFkyoRJGpf51kHZ9nAV8QrEzpVqdU9AoG4Np4RWA?width=660)
 
 ---
 
@@ -235,7 +235,7 @@ Moomoo 致力于打造一个"让每个人都能轻松投资的世界"。它不�
 
 在 AI 的帮助下，可以自行修改量化策略，加入止盈止损或其他风控机制，构建更完善的资金管理体系，从而控制风险并进一步提高收益。当然，如果自行修改量化策略存在困难，也可以将量化策略与手动操作相结合，实现更好的风险控制。
 
-![利用AI进行量化策略设计实现](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/d32624e8-d847-4b6b-9ef2-a865168f0200/public)
+![利用AI进行量化策略设计实现](https://1drv.ms/i/c/5644dab129afda10/IQQDmvCF4-v_QpfDUL4rFezgAY6vlZmHR2ql5WAxSQzlsbw?width=660)
 
 欢迎在评论区分享策略修改和风险控制经验，让更多投资者受益。
 
@@ -255,7 +255,7 @@ Moomoo 致力于打造一个"让每个人都能轻松投资的世界"。它不�
 
 量化交易是一个不断学习、改进和提高的过程。希望这篇文章能为你的投资之路提供启发！
 
-![使用量化交易走向财富之路](https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/17724869-42b1-466e-325e-b8e2517bbc00/public)
+![使用量化交易走向财富之路](https://1drv.ms/i/c/5644dab129afda10/IQR5Y9el4ZSHRK3veVLHJ1O2ARLTolvWqO7-EhrKzrM31ug?width=660)
 
 附件：
 
