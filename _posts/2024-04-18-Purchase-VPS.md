@@ -9,9 +9,9 @@ date: 2024-04-18 16:45:00 +0000
 excerpt: 云主机是开启云端生活的基础设施，本文主要介绍其概念以及如何在RackNerd购买VPS。
 header:
   overlay_filter: 0.5
-  overlay_image: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/e5a26a76-7146-460d-d201-fa9a067b7900/public
-  teaser: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/e5a26a76-7146-460d-d201-fa9a067b7900/public
-last_modified_at: '2025-03-05 11:08:57'
+  overlay_image: https://1drv.ms/i/c/5644dab129afda10/IQQQ2q8psdpEIIBWixABAAAAAUSduQ3pBsC8IxuwJNnvW98?width=1024
+  teaser: https://1drv.ms/i/c/5644dab129afda10/IQQQ2q8psdpEIIBWixABAAAAAUSduQ3pBsC8IxuwJNnvW98?width=1024
+last_modified_at: '2025-06-20 11:00:00'
 layout: single
 related: true
 share: true
@@ -33,7 +33,7 @@ toc_sticky: true
 
 在这个数字化和网络化日益深入的时代，掌握关键技术已成为现代人的一项重要能力。《云端生活入门：从小白到网络达人》系列文章，将带您逐步进入技术世界。我们将从基本概念入手，让您了解云端生活的原理，并通过实践操作，完成个人网站搭建、安装开源应用、定制家庭云等功能。
 
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/49ff8b5d-7284-4f1f-1b41-f663fe5f7000/public" alt="云生活" alt="云生活" width="660" height="auto" />
+![云端生活](https://1drv.ms/u/c/5644dab129afda10/UQQQ2q8psdpEIIBWghABAAAAACQqWwcwo_DyaCs?height=660)
 
 本系列文章将涵盖以下主题：
 
@@ -51,7 +51,7 @@ toc_sticky: true
 
 本系列文章旨在通过现代技术，帮助您实现“云端生活”。 这意味着您可以在一台24小时在线的服务器上，安装并运行各种开源程序，并通过网络随时随地访问这些服务。我们常说的主机服务商，例如国外的谷歌、亚马逊、微软，以及国内的阿里、腾讯、华为等，就是提供这类主机服务的公司。
 
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/5fa2308f-d867-4f06-94d6-ee937659d300/public" alt="主机" alt="主机" width="660" height="auto" />
+![主机服务商云机房](https://1drv.ms/u/c/5644dab129afda10/UQQQ2q8psdpEIIBWgxABAAAAABY9nJwQ4mFitvo?height=660)
 
 ### 主机服务及 VPS
 
@@ -67,73 +67,73 @@ RackNerd 是一家成立于 2019 年的主机服务商，以其高性能、低�
 
 ### 入门 VPS 配置推荐
 
-年付 10.99 美元的 VPS，适合初学者和基础用户：
+以下是根据不同需求推荐的三款高性价比 RackNerd KVM VPS 套餐，均为年付价格，非常实惠。
 
-[年付 10.99 美元的 VPS 套餐](https://my.racknerd.com/aff.php?aff=7454&pid=838)。
+| 套餐名称 | vCPU | 内存 | SSD 存储 | 月流量 | 价格 (年付) | 购买链接 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **入门之选** <br> 适合初学者和基础用户 | 1 核 | 1 GB | 20 GB | 2 TB | **$10.96** | [**点击购买**](https://my.racknerd.com/aff.php?aff=7454&pid=912) |
+| **建站优选** <br> 适合搭建网站或开源应用 | 3 核 | 3.5 GB | 60 GB | 5 TB | **$29.89** | [**点击购买**](https://my.racknerd.com/aff.php?aff=7454&pid=914) |
+| **性能之选** <br> 适合家庭云盘或游戏私服 | 4 核 | 5 GB | 100 GB | 10 TB | **$54.99** | [**点击购买**](https://my.racknerd.com/aff.php?aff=7454&pid=915) |
 
-年付 23.88 美元的 VPS，适合需要搭建个人网站或探索开源应用的用户：
+---
 
-[年付 23.88 美元的 VPS 套餐](https://my.racknerd.com/aff.php?aff=7454&pid=840)。
+### 温馨提示
 
-年付 37.38 美元的 VPS，适合有更高性能需求的用户，例如搭建家庭云盘、影音系统或游戏私服：
+💡 如果点击上方链接后，页面提示 **“Out of Stock”** 或 **“Sold Out”**，这说明该特价套餐已暂时售罄。RackNerd 的优惠活动经常更新，您可以访问其 [**主页**](https://my.racknerd.com/aff.php?aff=7454) 查看当前正在进行的其他优惠活动。
 
-[年付 37.38 美元的 VPS 套餐](https://my.racknerd.com/aff.php?aff=7454&pid=829)。
+## 购买 VPS 过程
 
-## 购买 VPS 过程（实际操作步骤）
+1. **选择套餐：** 首先确定您的需求，然后选择适合自己的套餐，这里以我在2023年购买的$23.88的套餐为例：
 
-1. **选择套餐：** 首先确定您的需求，然后选择下方适合自己的套餐：
+请注意，如果您选择的是其它套餐或者其他服务商提供的 VPS，以下步骤仅供参考。
 
-[10.99 美元套餐](https://my.racknerd.com/aff.php?aff=7454&pid=838)
+点击购买链接，将跳转到 Racknerd 的购物车页面。如果您想使用中文，可以在 View Cart 按钮旁边选择“中文”，或者使用浏览器的翻译功能。后续介绍将以英文界面为主，如果阅读英文有困难，请自行摸索是否有中文界面或使用浏览器翻译功能进行调整。
 
-[23.88 美元套餐](https://my.racknerd.com/aff.php?aff=7454&pid=840)
+2. **确认配置：** 如果您想跟随本系列文章，一步一步完成多个家庭应用的搭建，建议至少选择内存2G以上的套餐。点击链接后，应该会看到类似这样的画面：
 
-[37.38 美元套餐](https://my.racknerd.com/aff.php?aff=7454&pid=829)
+![vps conf](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWeBABAAAAAERnB9d1Fj51XRE?width=660)
 
-请注意，如果您选择的是其他服务商提供的 VPS，本系列文章内容仅供参考。
-
-点击上述链接，将跳转到 Racknerd 的购物车页面。如果您想使用中文，可以在 View Cart 按钮旁边选择“中文”，或者使用浏览器的翻译功能。后续介绍将以英文界面为主，如果阅读英文有困难，请自行摸索是否有中文界面或使用浏览器翻译功能进行调整。
-
-2. **确认配置：** 如果您想跟随本系列文章，一步一步完成多个家庭应用的搭建，建议至少选择 23.88 美元的套餐（预算充足请随意）。点击链接后，应该会看到类似这样的画面：
-
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/d7bb78e5-03de-4dd2-0bd7-baa19f627000/public" alt="rn 23.88套餐" alt="rn 23.88套餐" width="672" height="512" />
-
-这就是您选择的 VPS 的基本配置，包括 2 核 CPU、2.5G 内存、38G SSD 硬盘、6000G 月带宽、1G 连接速度以及 1 个 IPv4 公网 IP 地址。 此外，还包含用于管理 VPS 的控制面板，并允许选择全球多个数据中心。付费周期为年付 23.88 美元。
+这个截图列出了您选择的 VPS 的基本配置，包括 2 核 CPU、2.5G 内存、38G SSD 硬盘、6000G 月带宽、1G 连接速度以及 1 个 IPv4 公网 IP 地址。 此外，还包含用于管理 VPS 的控制面板，并允许选择全球多个数据中心。付费周期为年付 23.88 美元。
 
 如果您想调整部分参数（包括硬件配置），下面的画面提供了可选参数：
 
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/dc519293-14a4-41fd-e053-64e19f8fdf00/public" alt="rn 23.88套餐可调参数" alt="rn 23.88套餐可调参数" width="660" height="auto" />
+![可选参数](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWeRABAAAAAHpUXvHhEiJri8o?width=660)
 
 如果您是中国大陆的用户，建议只调整 Operating System（操作系统）和 Location（机房位置）这两个参数。 Operating System 选择 Ubuntu 22.04 64 Bit，Location 选择 San Jose CA。查看一下 Order Summary，合计金额应该还是 23.88 美元。点击 Continue，进入确认页面：
 
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/31fe1806-fdb7-4c67-32c9-da8496661300/public" alt="rn 23.88套餐价格确认" alt="rn 23.88套餐价格确认" width="660" height="auto" />
+![确认页面](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWehABAAAAAEiX0TN_1fWZO6Y?width=660)
 
 3. **填写个人信息：** 点击绿色的 Checkout 按钮，填入个人信息。 注意页面中已经有 China 相关选项，您可以填写自己的真实地址。
 
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/302c61b5-c1ae-48c0-876d-d3a8080c6a00/public" alt="rn 23.88套餐个人信息" alt="rn 23.88套餐个人信息" width="660" height="auto" />
+![填写个人信息](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWexABAAAAAM-9-N_LC5iYB7Y?width=660)
 
 4. **付款：** 在 Payment Details（付款）中，选择您喜欢的付款方式，包括支付宝和银联卡。
 
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/8963dced-6504-4ad7-951d-94cdaecd1000/public" alt="rn 23.88套餐支付方式" alt="rn 23.88套餐支付方式" width="256" height="auto" />
+![](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWfBABAAAAAMvAFGXQR9HsDsU?width=946&height=363)
 
 最后，勾选 "I have read and agree to the Terms of Service" 并点击 "Complete Order" 即可。
 
 5. **查收邮件：** 之后您会收到多封 RackNerd 发来的欢迎邮件，其中会告知您如何登录自己的账户、如何获得支持、订单支付情况和发票等信息。 特别注意一封名为 "KVM VPS Login Information" 的邮件，请务必保存其中的 root password。
 
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/ae8bef6e-aa75-4ee5-61b8-f4e6d2fc1b00/public" alt="rn 套餐购买后查收邮件" alt="rn 套餐购买后查收邮件" width="602" height="550" />
+![确认邮件](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWfRABAAAAAGLUlL290GCeduY?width=602&height=550)
 
 至此，购买 VPS 的步骤就完成了！ 您已经拥有一台完全可控、可以 24 小时访问的服务器。 后续我们将探讨如何管理这台 VPS，并利用免费的开源项目，完成私有云存储、家庭影院、代理服务器、共享 ChatGPT 等各种实用功能。 这样，您就能构建一个 7*24 小时可用的、家庭或小范围的私有云端服务。 下面是一些使用这台 VPS 搭建的应用示例：
 
-使用开源项目 Cloudreve，免费搭建私有化云存储方案：
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/dcbcba08-d8b2-440c-03c0-49af09453600/public" alt="vps上的私有化存储" alt="vps上的私有化存储" width="660" height="auto" />
+使用开源项目 Cloudreve，搭建免费的私有化云存储方案：
 
-使用开源项目 Trilium，免费搭建个人笔记（知识库）系统：
-<<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/9e9a3c7c-7c17-40a5-1d75-9232c970e500/public" alt="vps上的个人笔记" alt="vps上的个人笔记" width="660" height="auto" />>
+![cloudreve](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWkhABAAAAAENDRKObZ8mnQzQ?width=660)
 
-使用开源项目 NextChat，免费搭建共享 ChatGPT 或 Gemini：
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/8bcbf576-709a-42da-97b8-af436faa8e00/public" alt="vps上的共享ChatGPT" alt="vps上的共享ChatGPT" width="660" height="auto" />
+使用开源项目 Trilium，搭建免费的个人笔记（知识库）系统：
 
-使用开源项目 Jellyfin，免费搭建家庭影音系统：
-<img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/e3b178d7-1f81-4c9f-1926-893da3466b00/public" alt="vps上的家庭影音" alt="vps上的家庭影音" width="660" height="auto" />
+![trilium](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWgBABAAAAABbCG9Mx5P0ezD0?width=660)
+
+使用开源项目 NextChat，搭建免费的共享 LLM，可使用ChatGPT 或 Gemini等模型：
+
+![nextchat](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWgRABAAAAAHEM9bf9PGrkDp4?width=660)
+
+使用开源项目 Jellyfin，搭建免费的家庭影音系统：
+
+![jellyfin](https://1drv.ms/i/c/5644dab129afda10/UQQQ2q8psdpEIIBWlBABAAAAAKhaUh0xYmeqHOc?width=660)
 
 今天，我们完成了对主机、主机服务商和 VPS 的初步认识，并通过 RackNerd 网站完成了用户注册购买的流程。
 
