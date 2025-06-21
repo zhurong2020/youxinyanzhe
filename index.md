@@ -20,10 +20,10 @@ feature_row:
     btn_label: "了解更多"
     btn_class: "btn--primary"
   - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/e35cd10a-83b4-4939-ecb6-35edeb1a2d00/public?format=auto&width=600&quality=75
-    alt: "量化投资系列"
-    title: "量化投资系列"
+    alt: "量化交易系列"
+    title: "量化交易系列"
     excerpt: "探索量化交易平台、算法策略开发与自动化投资工具。让数据驱动决策，实现更科学的投资方法。分享实用的量化分析技术与工具。"
-    url: "/categories/量化投资/"
+    url: "/categories/量化交易/"
     btn_label: "了解更多"
     btn_class: "btn--primary"
   - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/25b4d7c3-4f8e-4b62-5b9e-9fe1a6c10200/public?format=auto&width=600&quality=75
@@ -59,7 +59,7 @@ feature_row:
 
 <div class="featured-post">
   <h2 class="archive__subtitle">精选推荐</h2>
-  {% assign featured_posts = site.tags.featured | default: site.categories.量化投资 | default: site.posts | slice: 6, 6 %}
+  {% assign featured_posts = site.tags.featured | default: site.categories.量化交易 | default: site.posts | slice: 0, 6 %}
   {% if featured_posts.size > 0 %}
     <div class="grid__wrapper">
       {% for post in featured_posts limit:6 %}
@@ -70,9 +70,9 @@ feature_row:
     <div class="view-more-btn">
       <a href="{{ site.baseurl }}/tags/featured/" class="btn btn--primary">查看更多精选</a>
     </div>
-    {% elsif site.categories.量化投资.size > 6 %}
+    {% elsif site.categories.量化交易.size > 6 %}
     <div class="view-more-btn">
-      <a href="{{ site.baseurl }}/categories/量化投资/" class="btn btn--primary">查看更多量化</a>
+      <a href="{{ site.baseurl }}/categories/量化交易/" class="btn btn--primary">查看更多量化</a>
     </div>
     {% endif %}
   {% else %}
