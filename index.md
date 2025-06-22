@@ -85,16 +85,42 @@ feature_row:
 <div class="subscription-container" style="margin-top: 3em; padding-top: 2em; border-top: 1px solid #eaeaea;">
   <div class="subscribe-section" style="text-align: center; padding: 2em 0; background-color: #f3f6f6; margin: 2em 0; border-radius: 5px;">
     <h2 style="margin-bottom: 0.5em;">订阅更新</h2>
-    <p style="margin-bottom: 1.5em;">输入您的邮箱地址，获取最新文章和独家内容的通知。</p>
-    <form action="https://formspree.io/f/xpwqvvop" method="POST" class="subscription-form" style="max-width: 500px; margin: 0 auto;">
-      <div style="display: flex; justify-content: center; max-width: 400px; margin: 0 auto;">
-        <input type="email" name="email" placeholder="您的邮箱地址" required style="padding: 10px; width: 70%; border: 1px solid #ddd; border-radius: 4px 0 0 4px; font-size: 16px; line-height: 20px; height: 42px; margin: 0; vertical-align: middle; box-sizing: border-box;">
-        <button type="submit" class="btn btn--primary" style="border-radius: 0 4px 4px 0; margin: 0; padding: 10px 15px; line-height: 20px; height: 42px; vertical-align: middle; box-sizing: border-box;">订阅</button>
-      </div>
-      <input type="hidden" name="_subject" value="新订阅 - 有心言者">
-      <input type="hidden" name="_next" value="https://zhurong2020.github.io/youxinyanzhe/thanks/">
-    </form>
-
-    <p style="font-size: 0.8em; margin-top: 1em; color: #666;">我们尊重您的隐私，绝不会分享您的邮箱地址。</p>
+    <p style="margin-bottom: 1.5em;">选择您喜欢的方式获取最新文章和独家内容的通知。</p>
+    
+    <!-- 选项1: RSS订阅 -->
+    <div style="margin-bottom: 2em;">
+      <h3 style="font-size: 1.2em; margin-bottom: 0.5em;">选项1: RSS订阅（推荐）</h3>
+      <p style="margin-bottom: 1em;">使用RSS阅读器自动获取更新通知，无需等待邮件。</p>
+      <a href="{{ site.baseurl }}/feed.xml" class="btn btn--success" style="margin-right: 10px;">
+        <i class="fas fa-rss"></i> 订阅RSS
+      </a>
+      <a href="https://feedly.com/i/subscription/feed/{{ site.url }}{{ site.baseurl }}/feed.xml" class="btn btn--info" target="_blank" style="margin-right: 10px;">
+        通过Feedly订阅
+      </a>
+      <a href="https://www.inoreader.com/?add_feed={{ site.url }}{{ site.baseurl }}/feed.xml" class="btn btn--info" target="_blank">
+        通过Inoreader订阅
+      </a>
+    </div>
+    
+    <!-- 选项2: 邮件订阅 -->
+    <div>
+      <h3 style="font-size: 1.2em; margin-bottom: 0.5em;">选项2: 邮件订阅</h3>
+      <p style="margin-bottom: 1em;">输入您的邮箱地址，我们会在发布重要内容时通知您。</p>
+      <form action="https://formspree.io/f/xpwqvvop" method="POST" class="subscription-form" style="max-width: 500px; margin: 0 auto;">
+        <table style="width: 100%; max-width: 400px; margin: 0 auto; border-collapse: collapse;">
+          <tr>
+            <td style="width: 70%; padding: 0;">
+              <input type="email" name="email" placeholder="您的邮箱地址" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-right: none; border-radius: 4px 0 0 4px; font-size: 16px; height: 42px; box-sizing: border-box; margin: 0; display: block;">
+            </td>
+            <td style="width: 30%; padding: 0;">
+              <button type="submit" class="btn btn--primary" style="width: 100%; border-radius: 0 4px 4px 0; margin: 0; padding: 10px 15px; height: 42px; box-sizing: border-box; display: block;">订阅</button>
+            </td>
+          </tr>
+        </table>
+        <input type="hidden" name="_subject" value="新订阅 - 有心言者">
+        <input type="hidden" name="_next" value="https://zhurong2020.github.io/youxinyanzhe/thanks/">
+      </form>
+      <p style="font-size: 0.8em; margin-top: 1em; color: #666;">我们尊重您的隐私，绝不会分享您的邮箱地址。邮件通知仅用于重要更新。</p>
+    </div>
   </div>
 </div>
