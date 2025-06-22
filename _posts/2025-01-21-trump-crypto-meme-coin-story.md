@@ -2,8 +2,8 @@
 layout: single
 title: "当政治大咖遇上加密江湖：$TRUMP 背后的币圈故事"
 date: 2025-01-21 16:45:00 +0000
-last_modified_at: 2025-02-16 12:00:00  # 最后修改时间
-author_profile: true #显示作者信息
+last_modified_at: 2025-02-16 12:00:00
+author_profile: true
 
 categories:
   - 智能理财
@@ -19,8 +19,8 @@ excerpt: 加密币是什么？有哪些主流品种？川普币是骗局吗？�
 
 
 header:
-  image: "https://1drv.ms/u/c/5644dab129afda10/IQTaH2BYCbhaS7Lxwzu-L7bIAbfjdwCCk1EKUMW8z14B9AM?width=660" # 使用 Cloudflare Images 转换 URL
-  overlay_image: "https://1drv.ms/u/c/5644dab129afda10/IQTaH2BYCbhaS7Lxwzu-L7bIAbfjdwCCk1EKUMW8z14B9AM?width=660" # 使用 Cloudflare Images 转换 URL
+  image: "https://1drv.ms/u/c/5644dab129afda10/IQTaH2BYCbhaS7Lxwzu-L7bIAbfjdwCCk1EKUMW8z14B9AM?width=660"
+  overlay_image: "https://1drv.ms/u/c/5644dab129afda10/IQTaH2BYCbhaS7Lxwzu-L7bIAbfjdwCCk1EKUMW8z14B9AM?width=660"
   overlay_filter: 0.5 # 可选，设置header图片滤镜透明度，范围0.0-1.0
   overlay_color: "#333"  # 头部颜色叠加
   teaser: "https://1drv.ms/u/c/5644dab129afda10/IQTaH2BYCbhaS7Lxwzu-L7bIAbfjdwCCk1EKUMW8z14B9AM?width=660" # 可选，设置展示略缩图
