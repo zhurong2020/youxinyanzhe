@@ -88,7 +88,7 @@ feature_row:
     <p style="margin-bottom: 1.5em;">选择您喜欢的方式获取最新文章和独家内容的通知。</p>
     
     <!-- 选项1: RSS订阅 -->
-    <div style="margin-bottom: 2em;">
+    <div class="rss-buttons">
       <h3 style="font-size: 1.2em; margin-bottom: 0.5em;">选项1: RSS订阅（推荐）</h3>
       <p style="margin-bottom: 1em;">使用RSS阅读器自动获取更新通知，无需等待邮件。</p>
       <a href="{{ site.baseurl }}/feed.xml" class="btn btn--success" style="margin-right: 10px;">
