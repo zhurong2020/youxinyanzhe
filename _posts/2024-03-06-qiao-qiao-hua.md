@@ -9,8 +9,8 @@ date: 2024-03-06 19:55:00 +0000
 excerpt: 只有好问题才可能获得 AI 更精准的解答，本文教你掌握向 AI 提问的方法。
 header:
   overlay_filter: 0.5
-  overlay_image: assets/images/202403/prompt-engineering1200.png
-  teaser: assets/images/202403/prompt-engineering1200.png
+  overlay_image: https://1drv.ms/u/c/5644dab129afda10/IQQqVXv_ftWjTJ_u2tshl_B2AdoiggqkT347wrHCdbDBnS0?width=1200&height=300
+  teaser: https://1drv.ms/u/c/5644dab129afda10/IQQqVXv_ftWjTJ_u2tshl_B2AdoiggqkT347wrHCdbDBnS0?width=1200&height=300
 last_modified_at: '2025-03-05 11:52:21'
 layout: single
 related: true
