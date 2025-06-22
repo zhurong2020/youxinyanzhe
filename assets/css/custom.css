@@ -279,7 +279,7 @@ a.btn.btn--primary {
 
 .subscription-form td {
     padding: 0;
-    vertical-align: top; /* Explicitly set vertical alignment */
+    vertical-align: middle; /* 将 top 改为 middle */
 }
 
 .subscription-form td:first-child {
