@@ -87,14 +87,14 @@ feature_row:
     <h2 style="margin-bottom: 0.5em;">订阅更新</h2>
     <p style="margin-bottom: 1.5em;">输入您的邮箱地址，获取最新文章和独家内容的通知。</p>
     <form action="https://formspree.io/f/xpwqvvop" method="POST" class="subscription-form" style="max-width: 500px; margin: 0 auto;">
-      <div style="display: flex; justify-content: center; align-items: center; max-width: 400px; margin: 0 auto;">
-        <input type="email" name="email" placeholder="您的邮箱地址" required style="padding: 10px; width: 70%; border: 1px solid #ddd; border-radius: 4px 0 0 4px; font-size: 16px; height: 40px; box-sizing: border-box;">
-        <button type="submit" class="btn btn--primary" style="border-radius: 0 4px 4px 0; margin: 0; flex-shrink: 0; height: 40px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">订阅</button>
+      <div style="display: flex; justify-content: center; max-width: 400px; margin: 0 auto;">
+        <input type="email" name="email" placeholder="您的邮箱地址" required style="padding: 10px; width: 70%; border: 1px solid #ddd; border-radius: 4px 0 0 4px; font-size: 16px; line-height: 20px; height: 42px; margin: 0; vertical-align: middle; box-sizing: border-box;">
+        <button type="submit" class="btn btn--primary" style="border-radius: 0 4px 4px 0; margin: 0; padding: 10px 15px; line-height: 20px; height: 42px; vertical-align: middle; box-sizing: border-box;">订阅</button>
       </div>
       <input type="hidden" name="_subject" value="新订阅 - 有心言者">
       <input type="hidden" name="_next" value="https://zhurong2020.github.io/youxinyanzhe/thanks/">
-      <!-- <input type="hidden" name="_next" value="https://arong.eu.org/youxinyanzhe/thanks/"> -->
     </form>
+
     <p style="font-size: 0.8em; margin-top: 1em; color: #666;">我们尊重您的隐私，绝不会分享您的邮箱地址。</p>
   </div>
 </div>
