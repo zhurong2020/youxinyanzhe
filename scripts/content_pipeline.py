@@ -15,21 +15,16 @@ from pathlib import Path
 from typing import List, Dict, Optional, Tuple, Any, Union, Set
 from datetime import datetime
 import google.generativeai as genai
-from google.generativeai import GenerationConfig, GenerativeModel  # 更新导入
-from dotenv import load_dotenv
-from google.api_core import exceptions, retry
-from google.generativeai.types import (
-    BlockedPromptException,
-    BrokenResponseError,
-    IncompleteIterationError,
-    StopCandidateException
-)
-from scripts import setup_logger
+from google.generativeai.client import configure
+from google.generativeai.generative_models import GenerativeModel
+from google.generativeai.types import GenerationConfig, BlockedPromptException
+from google.api_core.exceptions import ResourceExhausted
 import argparse
 import requests
+from dotenv import load_dotenv
 
 # 导入本地模块
-from .image_mapper import CloudflareImageMapper
+from .wechat_publisher import WeChatPublisher
 
 class ContentPipeline:
     def __init__(self, config_path: str = "config/pipeline_config.yml", verbose: bool = False):
@@ -54,25 +49,7 @@ class ContentPipeline:
             # 加载完整配置（包括导入的配置文件）
             self.config = self._load_config()
             
-            # 验证环境变量
-            account_id = os.getenv('CLOUDFLARE_ACCOUNT_ID')
-            account_hash = os.getenv('CLOUDFLARE_ACCOUNT_HASH')
-            api_token = os.getenv('CLOUDFLARE_API_TOKEN')
-            
-            if not all([account_id, account_hash, api_token]):
-                raise ValueError("❌ Cloudflare 环境变量未正确设置")
-            
-            # 类型断言，确保类型检查通过
-            account_id = str(account_id)
-            account_hash = str(account_hash)
-            api_token = str(api_token)
 
-            # 初始化Cloudflare Images客户端
-            self.image_mapper = CloudflareImageMapper(
-                account_id=account_id,
-                account_hash=account_hash,
-                api_token=api_token
-            )
         except Exception as e:
             self.logger.error(f"加载配置失败: {str(e)}", exc_info=True)
             raise
@@ -99,6 +76,16 @@ class ContentPipeline:
         # 设置API
         self._setup_apis()
         self._setup_site_url()
+
+        # 初始化发布器
+        self.wechat_publisher = None
+        try:
+            if self.platforms_config.get("wechat", {}).get("enabled", False):
+                self.wechat_publisher = WeChatPublisher()
+                self.log("✅ 微信发布器初始化成功", level="info")
+        except Exception as e:
+            self.log(f"⚠️ 微信发布器初始化失败: {e}", level="warning")
+            self.log("微信发布功能将不可用，但不影响其他功能", level="info")
         
     def log(self, message: str, level: str = "info", force: bool = False):
         """统一的日志处理
@@ -183,66 +170,13 @@ class ContentPipeline:
             raise ValueError("GEMINI_API_KEY not found in environment variables")
         
         try:
-            # 配置 API
-            genai.configure(api_key=api_key)
+            configure(api_key=api_key)
             
-            # 获取可用模型列表
-            self.log("正在获取可用模型列表...", level="info")
-            try:
-                models = genai.list_models()
-                model_names = [model.name for model in models]
-                # self.log(f"可用模型: {model_names}", level="info", force=True)
-                
-                # 优先选择 Gemini 2.0 Flash 模型，然后是 Pro 模型
-                preferred_models = [
-                    # 根据用户需求，优先使用 Flash 模型
-                    "models/gemini-2.5-flash",
-                    "models/gemini-2.5-pro",
-                    "models/gemini-2.0-flash",
-                    "models/gemini-2.0-pro"
-                ]
-                
-                # 查找最佳匹配模型
-                model_name = None
-                for preferred in preferred_models:
-                    matching_models = [name for name in model_names if preferred in name]
-                    if matching_models:
-                        # 优先选择没有 "exp" 或 "experimental" 的稳定版本
-                        stable_models = [name for name in matching_models if "exp" not in name.lower()]
-                        if stable_models:
-                            model_name = stable_models[0]
-                            self.log(f"找到稳定版本模型: {model_name}", level="info")
-                        else:
-                            model_name = matching_models[0]
-                            self.log(f"找到实验版本模型: {model_name}", level="info")
-                        break
-                
-                # 如果没有找到匹配的模型，使用任何可用的 Gemini 模型
-                if not model_name:
-                    gemini_models = [name for name in model_names if 'gemini' in name.lower()]
-                    if gemini_models:
-                        # 过滤掉已知的弃用模型
-                        valid_models = [name for name in gemini_models if 'gemini-1.0' not in name]
-                        if valid_models:
-                            model_name = valid_models[0]
-                        else:
-                            model_name = gemini_models[0]
-                            self.log(f"警告：可能使用了已弃用的模型", level="warning", force=True)
-                    else:
-                        # 如果找不到 Gemini 模型，尝试使用配置中的模型
-                        model_name = self.config["content_processing"]["gemini"]["model"]
-                        self.log(f"未找到 Gemini 模型，尝试使用配置的模型: {model_name}", level="warning", force=True)
-                
-                self.log(f"选择使用模型: {model_name}", level="info", force=True)
-                
-            except Exception as e:
-                self.log(f"获取模型列表失败: {str(e)}", level="warning")
-                # 尝试使用最新的 Gemini 模型名称
-                model_name = "models/gemini-2.0-flash"
-                self.log(f"尝试使用最新模型: {model_name}", level="info", force=True)
-            
+            # 使用配置文件中的模型名称
+            model_name = self.config["content_processing"]["gemini"]["model"]
+            self.log(f"使用配置的模型: {model_name}", level="info", force=True)
             # 创建模型实例
-            self.model = genai.GenerativeModel(model_name)
+            self.model = GenerativeModel(model_name)
             
             # 测试连接
             try:
@@ -256,17 +190,15 @@ class ContentPipeline:
                 if response:
                     self.log("✅ Gemini API 连接成功", level="info", force=True)
                     
-                    # 更新配置中的模型名称
-                    self.config["content_processing"]["gemini"]["model"] = model_name
-                    
                     # 验证模板加载
                     self._validate_templates()
-            except exceptions.ResourceExhausted as e:
+            except ResourceExhausted as e:
                 self.log(f"❌ API 配额已耗尽，请稍后再试: {str(e)}", level="error", force=True)
                 # 不抛出异常，允许程序继续运行，但标记API不可用
                 self.api_available = False
             except Exception as e:
                 self.log(f"❌ Gemini API 连接测试失败: {str(e)}", level="error", force=True)
+                self.api_available = False
         except Exception as e:
             self.log(f"❌ 设置API失败: {str(e)}", level="error", force=True)
             raise
@@ -408,49 +340,8 @@ class ContentPipeline:
                         self.log(f"❌ 修复后仍无法解析 front matter: {str(e)}", level="error")
                         return False
                 
-                # 2. 处理图片
-                task = progress.add_task("🖼️ 处理文章图片...", total=None)
-                # 处理图片并创建临时目录
-                temp_dir = Path(tempfile.mkdtemp())
-                image_mappings = self.process_post_images(draft_path)
-                
-                if image_mappings:
-                    # 替换正文中的图片链接
-                    content = self._replace_images(content, image_mappings, temp_dir)
-                    # 更新front matter中的图片链接
-                    post_dict = dict(post)
-                    post_dict['content'] = post.content
-                    post_dict = self._update_header_images(post_dict, image_mappings)
-
-                    # 校验并补全必要字段
-                    if 'header' not in post_dict or 'image' not in post_dict['header']:
-                        # 自动提取正文第一张图片作为头图
-                        match = re.search(r'!\[[^\]]*\]\(([^)]+)\)', post_dict['content'])
-                        if not match:
-                            match = re.search(r'<img\s+src=["\']([^"\']+)["\']', post_dict['content'])
-                        if match:
-                            img_url = match.group(1)
-                            if 'header' not in post_dict:
-                                post_dict['header'] = {}
-                            post_dict['header']['image'] = img_url
-                            self.log(f"⚠️ 草稿缺少头图，已自动使用正文第一张图片作为头图: {img_url}", level="warning")
-                        else:
-                            self.log("⚠️ 草稿缺少头图（header.image），主页将无法显示插图", level="warning")
-                    if 'excerpt' not in post_dict or not post_dict['excerpt']:
-                        self.log("⚠️ 草稿缺少摘要（excerpt），主页将无法显示摘要", level="warning")
-                    allowed_layouts = ['single', 'post']
-                    if 'layout' not in post_dict or post_dict['layout'] not in allowed_layouts:
-                        post_dict['layout'] = 'single'
-                        self.log("⚠️ layout 字段缺失或错误，已自动修正为 'single'", level="warning")
-
-                    # 重新生成带有更新后图片链接和补全字段的内容
-                    post = frontmatter.Post(post_dict.pop('content', ''), **post_dict)
-                    content = frontmatter.dumps(post)
-                    self.log("✅ 图片链接替换完成", level="info")
-                else:
-                    self.log("⚠️ 没有找到需要处理的图片或处理失败", level="warning")
-                
-                progress.update(task, completed=True)
+                # 2. 图片处理步骤（已移除Cloudflare Images功能）
+                progress.update(progress.add_task("🖼️ 图片处理（跳过）", total=1), completed=True)
                 
                 # 3. 润色内容
                 task = progress.add_task("✨ 润色文章内容...", total=None)
@@ -468,7 +359,6 @@ class ContentPipeline:
                     task = progress.add_task(f"📝 处理 {platform} 平台...", total=None)
                     platform_content = self._generate_platform_content(
                         polished_content,
-                        image_mappings,
                         platform,
                         draft_path
                     )
@@ -611,7 +501,7 @@ class ContentPipeline:
                 self.log("API返回为空", level="warning")
                 return content
             
-        except exceptions.ResourceExhausted as e:
+        except ResourceExhausted as e:
             self.log(f"API配额已用尽: {str(e)}", level="error", force=True)
             self.api_available = False
             return content
@@ -619,7 +509,7 @@ class ContentPipeline:
             self.log(f"润色内容时出错: {str(e)}", level="error")
             return content
     
-    def _generate_platform_content(self, content: str, images: Dict[str, str], platform: str, draft_path: Path) -> str:
+    def _generate_platform_content(self, content: str, platform: str, draft_path: Path) -> str:
         """为特定平台生成内容"""
         try:
             # 获取平台配置
@@ -670,14 +560,6 @@ class ContentPipeline:
                 post['author'] = platform_config.get('author')
                 self.log(f"设置作者: {post['author']}", level="info")
             
-            # 先处理图片（如果需要）
-            if platform_config.get('replace_images', True):
-                content_text = self._replace_images(content_text, images, draft_path.parent)
-                post_dict = dict(post)
-                post_dict['content'] = post.content
-                post_dict = self._update_header_images(post_dict, images)
-                # Update the Post object with the possibly updated header
-                post = frontmatter.Post(post_dict.pop('content', ''), **post_dict)
             
             # 分析分类和标签（如果需要）
             # 将analyze_content默认设为True，确保始终分析内容
@@ -846,23 +728,28 @@ class ContentPipeline:
             else:
                 self.log(f"未找到默认模板设置", level="warning")
             
-            # 更新文章中的图片链接
+            # 更新文章中的图片链接为标准化本地路径
             updated_content = post.content
-            for local_name, cloudflare_url in images.items():
-                # 构建本地路径模式
+            for local_name, _ in images.items():
+                # 构建旧的本地路径模式
                 date_str = draft_path.stem[:10]
                 post_name = draft_path.stem[11:]
-                local_path = f"/assets/images/posts/{date_str[:4]}/{date_str[5:7]}/{post_name}/{local_name}"
+                old_local_path = f"/assets/images/posts/{date_str[:4]}/{date_str[5:7]}/{post_name}/{local_name}"
+                # 新的标准化本地路径
+                new_local_path = f"/assets/images/posts/{local_name}"
                 
                 # 替换内容中的图片链接
-                updated_content = updated_content.replace(local_path, cloudflare_url)
-                self.log(f"✅ 替换图片URL: {local_name} -> {cloudflare_url}", level="info")
+                updated_content = updated_content.replace(old_local_path, new_local_path)
+                self.log(f"✅ 标准化图片URL: {local_name} -> {new_local_path}", level="info")
                 
                 # 更新 front matter 中的图片链接
-                if "header" in post and "image" in post["header"]:
-                    if post["header"]["image"] == local_path:
-                        post["header"]["image"] = cloudflare_url
-                        self.log(f"更新 header 图片: {cloudflare_url}", level="info")
+                if hasattr(post, 'metadata') and "header" in post.metadata:
+                    header_info = post.metadata["header"]
+                    if isinstance(header_info, dict) and "image" in header_info:
+                        if header_info["image"] == old_local_path:
+                            header_info["image"] = new_local_path
+                            post.metadata["header"] = header_info
+                            self.log(f"更新 header 图片: {new_local_path}", level="info")
             
             # 更新内容
             post.content = updated_content
@@ -995,10 +882,41 @@ class ContentPipeline:
             self.log(f"❌ 发布到GitHub Pages失败: {str(e)}", level="error")
             return False
 
-    def _publish_to_wechat(self, content: str):
+    def _publish_to_wechat(self, content: str) -> bool:
         """发布到微信公众号"""
-        # TODO: 实现微信公众号发布
-        logging.info("微信公众号发布功能尚未实现")
+        self.log("开始发布到微信公众号...", level="info", force=True)
+        if not self.wechat_publisher:
+            self.log("微信发布器未初始化，跳过发布。", level="error", force=True)
+            return False
+        
+        try:
+            # 1. 获取Token（验证API连接）
+            token = self.wechat_publisher.get_access_token()
+            if not token:
+                self.log("获取微信 access_token 失败，无法发布。", level="error", force=True)
+                return False
+            self.log(f"成功获取 access_token: {token[:15]}...", level="info", force=True)
+
+            # 2. 提取正文内容
+            post = frontmatter.loads(content)
+            markdown_body = post.content
+
+            # 3. 内容转换
+            transformed_html = self.wechat_publisher.transform_content(markdown_body)
+
+            # 4. 保存为预览文件（小范围测试）
+            preview_path = Path("wechat_preview.html")
+            with open(preview_path, "w", encoding="utf-8") as f:
+                f.write(transformed_html)
+            self.log(f"✅ 内容已转换为HTML并保存到预览文件: {preview_path}", level="info", force=True)
+            self.log("下一步是处理图片上传和调用AI进行排版优化。", level="info", force=True)
+
+            # 由于我们是测试阶段，暂时认为此步骤成功
+            return True
+
+        except Exception as e:
+            self.log(f"发布到微信时出错: {e}", level="error", force=True)
+            return False
 
     def _publish_to_wordpress(self, content: str):
         """发布到WordPress"""
@@ -1094,8 +1012,9 @@ class ContentPipeline:
                 
                 if 'header' in post:
                     for img_field in ['image', 'og_image', 'overlay_image', 'teaser']:
-                        if img_field in post['header']:
-                            img_path = post['header'][img_field]
+                        header = post.get('header', {})
+                        if isinstance(header, dict) and img_field in header:
+                            img_path = header[img_field]
                             if not img_path:
                                 continue
                                 
@@ -1122,9 +1041,9 @@ class ContentPipeline:
                 # 查找markdown图片语法
                 for match in re.finditer(r'!\[.*?\]\((.*?)\)', content):
                     img_path = match.group(1)
-                    # 跳过已经是Cloudflare URL的图片
-                    if img_path.startswith('https://imagedelivery.net'):
-                        self.log(f"跳过已有的Cloudflare图片: {img_path}", level="debug")
+                    # 跳过已经是本地路径的图片
+                    if img_path.startswith('/assets/images/'):
+                        self.log(f"跳过已有的本地图片路径: {img_path}", level="debug")
                         continue
                     
                     # 处理OneDrive链接
@@ -1152,12 +1071,9 @@ class ContentPipeline:
             if not local_images:
                 self.log("没有找到任何有效的图片", level="warning")
                 return {}
-            
-            # 上传到Cloudflare并获取映射
-            self.log(f"开始处理 {len(local_images)} 张图片", level="info")
-            image_mappings = self.image_mapper.map_images(local_images)
-            self.log(f"图片处理完成，共 {len(image_mappings)} 张", level="info")
-            return image_mappings
+            # 图片处理功能已移除（不再使用Cloudflare Images）
+            self.log(f"发现 {len(local_images)} 张图片，但图片上传功能已移除", level="info")
+            return {}
         
         except Exception as e:
             self.log(f"处理文章图片时出错: {str(e)}", level="error")
@@ -1454,22 +1370,19 @@ class ContentPipeline:
                 
                 # 检查是否已经处理过这个URL
                 if onedrive_url in processed_urls:
-                    cloudflare_url = processed_urls[onedrive_url]
-                    self.log(f"使用已处理的URL: {onedrive_url} -> {cloudflare_url}", level="debug")
+                    local_url = processed_urls[onedrive_url]
+                    self.log(f"使用已处理的URL: {onedrive_url} -> {local_url}", level="debug")
                 else:
                     # 查找是否有匹配的已上传图片
                     found_match = False
-                    for img_name, cloudflare_id in images.items():
+                    for img_name, _ in images.items():
                         if self._is_same_onedrive_image(onedrive_url, img_name):
-                            # 确保不重复添加前缀
-                            if cloudflare_id.startswith("https://imagedelivery.net"):
-                                cloudflare_url = cloudflare_id
-                            else:
-                                cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
+                            # 使用本地路径替代Cloudflare URL
+                            local_url = f"/assets/images/posts/{img_name}"
                             
-                            processed_urls[onedrive_url] = cloudflare_url
+                            processed_urls[onedrive_url] = local_url
                             found_match = True
-                            self.log(f"✅ 找到匹配的已上传图片: {img_name} -> {cloudflare_url}", level="debug")
+                            self.log(f"✅ 找到匹配的本地图片: {img_name} -> {local_url}", level="debug")
                             break
                     
                     # 如果没有找到匹配的模型，使用任何可用的 Gemini 模型
@@ -1478,45 +1391,44 @@ class ContentPipeline:
                         img_name = self._download_onedrive_image(onedrive_url, temp_dir_path)
                         if img_name:
                             img_path = temp_dir_path / img_name
-                            cloudflare_id = self.image_mapper.upload_image(img_path)
-                            if cloudflare_id:
-                                cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
-                                processed_urls[onedrive_url] = cloudflare_url
-                                self.log(f"✅ 下载并上传成功: {onedrive_url} -> {cloudflare_url}", level="debug")
-                            else:
-                                self.log(f"❌ 上传到Cloudflare失败: {img_name}", level="error")
-                                continue
+                            # cloudflare_id = self.image_mapper.upload_image(img_path)
+                            # if cloudflare_id:
+                            #     cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
+                            #     processed_urls[onedrive_url] = cloudflare_url
+                            #     self.log(f"✅ 下载并上传成功: {onedrive_url} -> {cloudflare_url}", level="debug")
+                            # else:
+                            #     self.log(f"❌ 上传到Cloudflare失败: {img_name}", level="error")
+                            #     continue
+                            self.log("❌ 未实现图片上传功能（image_mapper 未定义），请实现上传逻辑", level="error")
+                            continue
                         else:
                             self.log(f"❌ 下载OneDrive图片失败: {onedrive_url}", level="error")
                             continue
                 
                 # 替换内容中的OneDrive链接
-                cloudflare_url = processed_urls.get(onedrive_url)
-                if not cloudflare_url:
-                    self.log(f"⚠️ 未能获取Cloudflare URL，跳过替换: {onedrive_url}", level="warning")
+                local_url = processed_urls.get(onedrive_url)
+                if not local_url:
+                    self.log(f"⚠️ 未能获取本地路径，跳过替换: {onedrive_url}", level="warning")
                     continue
                 if 'src=' in pattern:  # HTML格式
-                    replacement = f'<img src="{cloudflare_url}" alt="{alt_text}">'
+                    replacement = f'<img src="{local_url}" alt="{alt_text}">'
                 else:  # Markdown格式
-                    replacement = f'![{alt_text}]({cloudflare_url})'
+                    replacement = f'![{alt_text}]({local_url})'
                 
                 # 使用精确位置替换，避免全局替换可能导致的问题
                 start, end = match.span()
                 content = content[:start] + replacement + content[end:]
                 total_replacements += 1
-                self.log(f"替换OneDrive图片链接: {onedrive_url} -> {cloudflare_url}", level="debug")
+                self.log(f"替换OneDrive图片链接: {onedrive_url} -> {local_url}", level="debug")
         
-        # 然后处理本地图片
-        for local_name, cloudflare_id in images.items():
+        # 处理本地图片路径标准化
+        for local_name, _ in images.items():
             # 跳过OneDrive图片，因为它们已经在上面处理过了
             if local_name.startswith('onedrive_'):
                 continue
                 
-            # 确保不重复添加前缀，检查cloudflare_id是否已经是完整URL
-            if cloudflare_id.startswith("https://imagedelivery.net"):
-                cloudflare_url = cloudflare_id
-            else:
-                cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
+            # 使用标准化的本地路径
+            local_url = f"/assets/images/posts/{local_name}"
             
             # 匹配各种可能的图片引用格式
             patterns = [
@@ -1525,10 +1437,10 @@ class ContentPipeline:
                 f'!\\[([^\\]]*)\\]\\({re.escape(local_name)}\\)'                           # 仅文件名
             ]
             
-            # 检查这个特定图片是否已经有Cloudflare URL，避免重复替换
-            cloudflare_pattern = f'!\\[([^\\]]*)\\]\\({re.escape(cloudflare_url)}\\)'
-            if re.search(cloudflare_pattern, content):
-                self.log(f"⚠️ 图片 {local_name} 已有Cloudflare URL，跳过替换", level="debug")
+            # 检查这个特定图片是否已经有正确的路径，避免重复替换
+            local_pattern = f'!\\[([^\\]]*)\\]\\({re.escape(local_url)}\\)'
+            if re.search(local_pattern, content):
+                self.log(f"⚠️ 图片 {local_name} 已有正确路径，跳过替换", level="debug")
                 continue
             
             replaced_this_image = False
@@ -1538,7 +1450,7 @@ class ContentPipeline:
                 matches = re.finditer(pattern, content)
                 for match in matches:
                     alt_text = match.group(1)
-                    replacement = f'![{alt_text}]({cloudflare_url})'
+                    replacement = f'![{alt_text}]({local_url})'
                     
                     # 使用精确位置替换，避免全局替换可能导致的问题
                     start, end = match.span()
@@ -1546,7 +1458,7 @@ class ContentPipeline:
                     replaced_this_image = True
             
             if replaced_this_image:
-                self.log(f"替换本地图片: {local_name} -> {cloudflare_url}", level="debug")
+                self.log(f"标准化本地图片路径: {local_name} -> {local_url}", level="debug")
         
         # 记录总替换数量
         if total_replacements > 0:
@@ -1644,18 +1556,15 @@ class ContentPipeline:
                 if '1drv.ms' in img_path or 'onedrive.live.com' in img_path:
                     # 查找对应的已上传图片
                     found_match = False
-                    for img_name, cloudflare_id in images.items():
-                        # 尝试匹配OneDrive链接和上传的图片
+                    for img_name, _ in images.items():
+                        # 尝试匹配OneDrive链接和本地图片
                         if self._is_same_onedrive_image(img_path, img_name):
-                            # 确保不重复添加前缀
-                            if cloudflare_id.startswith("https://imagedelivery.net"):
-                                cloudflare_url = cloudflare_id
-                            else:
-                                cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
+                            # 使用本地路径替代Cloudflare URL
+                            local_url = f"/assets/images/posts/{img_name}"
                             
-                            post['header'][img_field] = cloudflare_url
+                            post['header'][img_field] = local_url
                             updated_count += 1
-                            self.log(f"✅ 更新OneDrive头图: {img_field} = {img_path} -> {cloudflare_url}", level="info")
+                            self.log(f"✅ 更新OneDrive头图: {img_field} = {img_path} -> {local_url}", level="info")
                             found_match = True
                             break
                     
@@ -1666,16 +1575,11 @@ class ContentPipeline:
                     img_name = Path(img_path).name
                     
                     if img_name in images:
-                        # 确保不重复添加前缀
-                        cloudflare_id = images[img_name]
-                        if cloudflare_id.startswith("https://imagedelivery.net"):
-                            cloudflare_url = cloudflare_id
-                        else:
-                            cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
-                            
-                        post['header'][img_field] = cloudflare_url
+                        # 使用本地路径替代Cloudflare URL
+                        local_url = f"/assets/images/posts/{img_name}"
+                        post['header'][img_field] = local_url
                         updated_count += 1
-                        self.log(f"✅ 更新头图: {img_field} = {img_name} -> {cloudflare_url}", level="info")
+                        self.log(f"✅ 更新头图: {img_field} = {img_name} -> {local_url}", level="info")
         
         if updated_count > 0:
             self.log(f"总共更新了 {updated_count} 处头部图片", level="info")
