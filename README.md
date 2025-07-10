@@ -19,24 +19,36 @@
 ```
 youxinyanzhe/
 ├── assets/                 # 静态资源
-│   └── images/
+│   ├── css/               # 样式文件
+│   ├── js/                # JavaScript文件  
+│   └── images/            # 图片资源
 │       ├── favicon/       # 网站图标
 │       └── posts/         # 文章图片
-├── scripts/                # 主要功能脚本
+├── scripts/                # 核心功能模块
 │   ├── __init__.py
-│   └── content_pipeline.py # 内容处理流水线
+│   ├── content_pipeline.py # 内容处理流水线
+│   ├── update_post.py     # 文章更新工具
+│   └── wechat_publisher.py # 微信发布器
 ├── tests/                  # 测试代码
 │   ├── __init__.py
 │   ├── conftest.py        # 测试配置和fixtures
-│   ├── test_content_pipeline.py
-│   └── test_gemini.py
+│   ├── run_tests.py       # 测试运行器
+│   ├── test_*.py          # 各功能测试文件
+│   ├── test_image_fix.py  # 图片修复测试
+│   ├── test_onedrive_fix.py # OneDrive修复测试
+│   └── test_templates.py  # 模板测试
 ├── config/                 # 配置文件
 │   ├── pipeline_config.yml    # 主配置
 │   ├── gemini_config.yml      # AI模型配置
+│   ├── platforms.yml         # 平台发布配置
+│   ├── post_templates.yml    # 文章模板
 │   └── test_config.yml        # 测试配置
 ├── _drafts/               # 文章草稿
 ├── _posts/                # 已发布文章
+├── _pages/                # 静态页面
+├── _includes/             # Jekyll包含文件
 ├── .env.example          # 环境变量示例
+├── CLAUDE.md             # Claude Code协作约定
 └── _config.yml            # Jekyll配置
 ```
 
@@ -124,7 +136,11 @@ python scripts/content_pipeline.py process
 
 3. 运行测试:
 ```bash
+# 使用pytest直接运行
 pytest
+
+# 或使用项目测试运行器
+python tests/run_tests.py
 ```
 
 ## 开发指南
