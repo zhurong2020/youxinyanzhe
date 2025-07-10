@@ -30,7 +30,6 @@ content_processing:
 
 # 导入其他配置
 imports:
-  - cloudflare_config.yml  # Cloudflare Images 配置
   - gemini_config.yml      # AI 内容生成配置
   - test_config.yml        # 测试相关配置
   - post_templates.yml
