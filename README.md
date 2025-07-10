@@ -4,12 +4,6 @@
 
 ## 功能特性
 
-- 🖼️ 图片处理
-  - 自动上传到 Cloudflare Images
-  - 生成优化的图片变体
-  - 自动维护图片 ID 映射关系
-  - 支持图片变体和 CDN 分发
-
 - 📝 内容处理
   - 使用 Google Gemini 生成内容
   - 自动润色和格式化
@@ -30,21 +24,16 @@ youxinyanzhe/
 │       └── posts/         # 文章图片
 ├── scripts/                # 主要功能脚本
 │   ├── __init__.py
-│   ├── content_pipeline.py # 内容处理流水线
-│   └── image_mapper.py     # Cloudflare 图片处理和映射管理
+│   └── content_pipeline.py # 内容处理流水线
 ├── tests/                  # 测试代码
 │   ├── __init__.py
 │   ├── conftest.py        # 测试配置和fixtures
-│   ├── test_cloudflare.py
 │   ├── test_content_pipeline.py
 │   └── test_gemini.py
 ├── config/                 # 配置文件
 │   ├── pipeline_config.yml    # 主配置
-│   ├── cloudflare_config.yml  # Cloudflare Images 配置（API、变体、映射）
 │   ├── gemini_config.yml      # AI模型配置
 │   └── test_config.yml        # 测试配置
-├── _data/                  # 数据文件
-│   └── image_mappings.yml  # Cloudflare 图片 ID 映射关系
 ├── _drafts/               # 文章草稿
 ├── _posts/                # 已发布文章
 ├── .env.example          # 环境变量示例
@@ -55,16 +44,13 @@ youxinyanzhe/
 
 - `_config.yml`: Jekyll 站点配置
 - `config/pipeline_config.yml`: 内容处理流程配置
-- `config/cloudflare_config.yml`: Cloudflare Images 配置（API、变体、映射）
 - `config/gemini_config.yml`: AI 内容生成配置
 - `.env`: 环境变量(API密钥等敏感信息)
-- `_data/image_mappings.yml`: 自动生成的图片 ID 映射文件
 
 ## 内容处理流程
 
 1. 草稿处理
    - 读取草稿文件
-   - 处理图片引用和上传
    - 使用 AI 润色内容
    - 生成多平台内容变体
 
@@ -79,22 +65,7 @@ youxinyanzhe/
    - 支持 WordPress 和微信公众号发布
    - 发布后自动归档草稿
 
-## 图片处理流程
 
-1. 图片上传
-   - 检测文章中的图片引用
-   - 自动上传到 Cloudflare Images
-   - 生成并保存图片 ID 映射
-
-2. 映射管理
-   - 自动维护 `image_mappings.yml`
-   - 按年/月/文章组织映射关系
-   - 避免重复上传相同图片
-
-3. 图片引用
-   - 自动替换文章中的图片链接
-   - 支持不同的图片变体
-   - 使用 Cloudflare CDN 加速
 
 ## 推荐图片尺寸
 
@@ -191,7 +162,6 @@ Rong Zhu
 ## 致谢
 
 - [Minimal Mistakes Jekyll Theme](https://mmistakes.github.io/minimal-mistakes/)
-- [Cloudflare Images](https://www.cloudflare.com/products/cloudflare-images/)
 - [Google Gemini](https://deepmind.google/technologies/gemini/)
 
 ## 最近更新
