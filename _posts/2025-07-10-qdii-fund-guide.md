@@ -9,7 +9,11 @@ date: 2025-07-10 15:00:00 +0000
 excerpt: 继《为何普通人应该现在就开始投资美股》后，本文详细介绍如何通过QDII基金，让中国投资者轻松参与全球市场，分享经济增长红利。
 header:
   image: https://1drv.ms/i/c/5644dab129afda10/IQQe0ONpY3jpRoOEKoFC4CKeAc_Fr4MHIhnfJhoGSCW0dT8
+  og_image: https://1drv.ms/i/c/5644dab129afda10/IQQe0ONpY3jpRoOEKoFC4CKeAc_Fr4MHIhnfJhoGSCW0dT8
+  overlay_color: '#333'
   overlay_filter: 0.5
+  overlay_image: https://1drv.ms/i/c/5644dab129afda10/IQQe0ONpY3jpRoOEKoFC4CKeAc_Fr4MHIhnfJhoGSCW0dT8
+  teaser: https://1drv.ms/i/c/5644dab129afda10/IQQe0ONpY3jpRoOEKoFC4CKeAc_Fr4MHIhnfJhoGSCW0dT8
 last_modified_at: '2025-07-10 19:52:00'
 layout: single
 related: true
@@ -72,8 +76,10 @@ QDII（Qualified Domestic Institutional Investor，合格境内机构投资者�
 
 **推荐的标普500 QDII基金**：
 
-- 博时标普500ETF联接(A类：050025) - 博时基金规模较大，运营稳定。
-- 易方达标普500指数(110011) - 易方达基金管理规模领先，风控严格。
+- **博时标普500ETF联接(A类：050025)** - 场外基金，直接在支付宝、天天基金等平台购买，起投金额低
+- **博时标普500ETF(513500)** - 场内基金，在股票账户交易，可实时买卖
+
+> **场内外基金简介**：场外基金通过基金公司或代销平台购买，申赎按净值计价；场内基金在证券交易所交易，价格实时波动。两者跟踪同一指数，但交易方式不同。对于场内外基金的详细区别，我们将在下篇文章中专门说明。
 
 ### 纳斯达克100：科技创新的聚集地
 
@@ -87,8 +93,8 @@ QDII（Qualified Domestic Institutional Investor，合格境内机构投资者�
 
 **推荐的纳指100 QDII基金**：
 
-- 国泰纳斯达克100指数(160213) - 国泰基金是老牌基金公司，QDII产品线丰富。
-- 华宝美国消费指数(162415) - 华宝基金在海外投资方面经验丰富。
+- **国泰纳斯达克100ETF联接(A类：160213)** - 场外基金，适合定投，操作简便
+- **国泰纳斯达克100ETF(513100)** - 场内基金，股票账户交易，流动性好
 
 > **重要提醒**：由于QDII基金受到外汇管制和投资额度限制，建议优先选择大型基金公司的产品，这些公司通常有更充足的QDII额度，能够保证正常的申购和赎回。
 
@@ -169,7 +175,10 @@ QDII基金为我们提供了一个简单的选择：用小钱参与全球市场�
 
 投资如同编写代码，最佳实践往往最简单。
 
+[点击这里到京东购买《金钱心理学》](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BASoJK1olXwIEVFxdAE8SBV8IHl0UXQcGVW4ZVxNJXF9RXh5UHw0cSgYYXBcIWDoXSQVJQwYHUl9dCU8WHDZNRwYlXlxhA1wCaxFydgl6fkFuPw4GVy1bTkcbM244GFoVXgMCVVteAXsnA2g4STXN67Da8e9B3OGY1uefK1olXQAGV1tZD00UAW0BG2sSXQ8yVFxaC0sQC2gOGDVJbTYyV25aCEIDBR1JSU8TLzYyVG5eOEsWA24BG1oWWgQCSF5eDkMRAXMIHV8WWAIFU1ZbAEwWM20JGl8cbTbc2e4-fD5TcBhfEixCOW51Fysn1sanEhNsH1sUWBcyUwIuVC8VYwteZQxtPnZWU1ZcSDNsaAljdVlcD11QISYVSh1teWhUfhhPWTYHZF5bCEkn)
+
 ![走向财富自由](https://1drv.ms/i/c/5644dab129afda10/IQTmdG2DNvKRRLScaSOGVJxsAeEZtodQrh6jPPuVfybto5Y?width=660)
+
 
 ---
 
