@@ -357,19 +357,30 @@ class ContentPipeline:
                 
                 for platform in platforms:
                     task = progress.add_task(f"📝 处理 {platform} 平台...", total=None)
-                    platform_content = self._generate_platform_content(
-                        polished_content,
-                        platform,
-                        draft_path
-                    )
-                    
-                    # 验证内容完整性
-                    if len(platform_content) < len(polished_content) * 0.9:
-                        self.log(f"❌ {platform}平台内容可能不完整", level="error", force=True)
+                    try:
+                        platform_content = self._generate_platform_content(
+                            polished_content,
+                            platform,
+                            draft_path
+                        )
+                        
+                        # 验证内容完整性
+                        if len(platform_content) < len(polished_content) * 0.9:
+                            self.log(f"❌ {platform}平台内容可能不完整", level="error", force=True)
+                            platform_success[platform] = False
+                        else:
+                            platform_contents[platform] = platform_content
+                            platform_success[platform] = True
+                    except ValueError as e:
+                        # 处理必需字段验证失败
+                        self.log(f"❌ {platform}平台处理失败: {str(e)}", level="error", force=True)
                         platform_success[platform] = False
-                    else:
-                        platform_contents[platform] = platform_content
-                        platform_success[platform] = True
+                        all_success = False
+                    except Exception as e:
+                        # 处理其他错误
+                        self.log(f"❌ {platform}平台处理出错: {str(e)}", level="error", force=True)
+                        platform_success[platform] = False
+                        all_success = False
                     
                     progress.update(task, completed=True)
                 
@@ -509,6 +520,73 @@ class ContentPipeline:
             self.log(f"润色内容时出错: {str(e)}", level="error")
             return content
     
+    def _validate_required_fields(self, post: frontmatter.Post) -> Tuple[bool, List[str]]:
+        """验证必需字段是否存在
+        
+        Args:
+            post: frontmatter.Post对象
+            
+        Returns:
+            Tuple[bool, List[str]]: (是否通过验证, 缺失的字段列表)
+        """
+        required_fields = ['title', 'date', 'header']
+        missing_fields = []
+        
+        for field in required_fields:
+            if field not in post or not post[field]:
+                missing_fields.append(field)
+        
+        return len(missing_fields) == 0, missing_fields
+
+    def _generate_excerpt(self, content: str) -> str:
+        """生成文章摘要
+        
+        Args:
+            content: 文章内容
+            
+        Returns:
+            str: 生成的摘要
+        """
+        try:
+            if not self.api_available:
+                self.log("API不可用，无法生成摘要", level="warning")
+                return ""
+            
+            # 构建提示词
+            prompt = f"""
+请为以下文章生成一个50字左右的摘要，要求：
+1. 准确概括文章主要内容
+2. 语言简洁明了
+3. 吸引读者阅读
+4. 字数控制在50字左右
+
+文章内容：
+{content[:2000]}  # 只取前2000字符避免过长
+"""
+            
+            # 调用API生成摘要
+            model = GenerativeModel(self.config['content_processing']['gemini']['model'])
+            response = model.generate_content(
+                prompt,
+                generation_config=GenerationConfig(
+                    temperature=0.7,
+                    max_output_tokens=200,  # 摘要不需要太长
+                    top_p=0.8,
+                )
+            )
+            
+            if response and response.text:
+                excerpt = response.text.strip()
+                self.log(f"生成摘要: {excerpt}", level="info")
+                return excerpt
+            else:
+                self.log("API未返回摘要", level="warning")
+                return ""
+                
+        except Exception as e:
+            self.log(f"生成摘要时出错: {str(e)}", level="error")
+            return ""
+
     def _generate_platform_content(self, content: str, platform: str, draft_path: Path) -> str:
         """为特定平台生成内容"""
         try:
@@ -528,30 +606,42 @@ class ContentPipeline:
                     self.log(f"❌ 修复后仍无法解析 front matter: {str(e)}", level="error")
                     return content
             
+            # 验证必需字段
+            is_valid, missing_fields = self._validate_required_fields(post)
+            if not is_valid:
+                self.log(f"❌ 草稿缺少必需字段: {', '.join(missing_fields)}", level="error", force=True)
+                self.log(f"必需字段包括: title, date, header", level="error", force=True)
+                raise ValueError(f"缺少必需字段: {', '.join(missing_fields)}")
+            
             # 确保内容完整性
             if not post.content:
                 self.log("❌ 文章内容为空", level="error", force=True)
                 return content
             content_text = post.content
             
-            # 应用默认模板
+            # 应用默认模板（强制覆盖自动生成字段）
             default_template = self.templates.get('front_matter', {}).get('default', {})
             for key, value in default_template.items():
-                if key not in post:
-                    post[key] = value
-                    self.log(f"应用默认模板: {key}={value}", level="info")
+                post[key] = value  # 强制覆盖，不检查是否存在
+                self.log(f"应用默认模板: {key}={value}", level="info")
             
             # 添加或更新最后修改时间
             current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             post['last_modified_at'] = current_time
             self.log(f"更新最后修改时间: {current_time}", level="info")
             
-            # 确保author_profile设置为true
-            if 'author_profile' not in post or not post['author_profile']:
-                post['author_profile'] = True
-                self.log("启用作者资料显示", level="info")
+            # 智能处理excerpt字段
+            if 'excerpt' not in post or not post['excerpt']:
+                generated_excerpt = self._generate_excerpt(content_text)
+                if generated_excerpt:
+                    post['excerpt'] = generated_excerpt
+                    self.log(f"生成文章摘要: {generated_excerpt}", level="info")
+                else:
+                    self.log("未能生成摘要", level="warning")
+            else:
+                self.log(f"保留现有摘要: {post['excerpt'][:50]}...", level="info")
             
-            # 如果author_profile为true，移除author字段以避免重复
+            # 处理author字段（如果author_profile为true，移除author字段以避免重复）
             if post.get('author_profile', False) and 'author' in post:
                 del post['author']
                 self.log("移除冗余的author字段", level="info")
@@ -562,16 +652,21 @@ class ContentPipeline:
             
             
             # 分析分类和标签（如果需要）
-            # 将analyze_content默认设为True，确保始终分析内容
             if platform_config.get('analyze_content', True):
-                # 即使已有分类和标签，也重新分析以确保最新
+                # 分析内容获取分类和标签
                 categories, tags = self._analyze_content_categories(content_text)
+                
+                # 始终更新分类
                 if categories:
                     post['categories'] = categories
                     self.log(f"添加分类: {categories}", level="info")
-                if tags:
+                
+                # 仅在没有tags时才添加AI生成的tags
+                if tags and ('tags' not in post or not post['tags']):
                     post['tags'] = tags
                     self.log(f"添加标签: {tags}", level="info")
+                elif 'tags' in post and post['tags']:
+                    self.log(f"保留现有标签: {post['tags']}", level="info")
             
             # 润色内容（如果需要）
             if platform_config.get('polish_content', True):
@@ -717,16 +812,20 @@ class ContentPipeline:
                 self.log("❌ 文章内容为空", level="error", force=True)
                 return content
             
-            # 应用默认模板
+            # 应用默认模板（强制覆盖自动生成字段）
             default_template = self.templates.get('front_matter', {}).get('default', {})
             if default_template:
                 for key, value in default_template.items():
-                    if key not in post:
-                        post[key] = value
-                        self.log(f"应用默认模板: {key}={value}", level="info")
+                    post[key] = value  # 强制覆盖，不检查是否存在
+                    self.log(f"应用默认模板: {key}={value}", level="info")
                 self.log(f"已应用默认模板设置", level="info")
             else:
                 self.log(f"未找到默认模板设置", level="warning")
+            
+            # 添加或更新最后修改时间
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            post['last_modified_at'] = current_time
+            self.log(f"更新最后修改时间: {current_time}", level="info")
             
             # 更新文章中的图片链接为标准化本地路径
             updated_content = post.content
