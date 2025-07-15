@@ -314,9 +314,12 @@ a.btn.btn--primary {
   box-sizing: border-box;
   display: block;
   line-height: 1.4; /* 添加行高与输入框保持一致 */
-  vertical-align: top; /* 确保按钮垂直对齐 */
+  vertical-align: top !important; /* 确保按钮垂直对齐 */
   border: 1px solid #52adc8; /* 确保边框与输入框高度一致 */
   font-size: 16px; /* 确保字体大小与输入框一致 */
+  position: relative !important;
+  top: 0 !important;
+  bottom: auto !important;
 }
 
 /* 强制重置任何可能影响对齐的样式 */
@@ -326,6 +329,17 @@ a.btn.btn--primary {
   transform: none !important;
   position: relative !important;
   top: 0 !important;
+}
+
+/* 修复表格行的垂直对齐问题 */
+.subscription-form tr {
+  vertical-align: top !important;
+}
+
+/* 确保表格单元格和其内容都使用相同的对齐方式 */
+.subscription-form td,
+.subscription-form td * {
+  vertical-align: top !important;
 }
 
 @media (max-width: 1200px) {
