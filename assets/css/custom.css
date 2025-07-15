@@ -279,7 +279,7 @@ a.btn.btn--primary {
 
 .subscription-form td {
     padding: 0;
-    vertical-align: middle; /* 将 top 改为 middle */
+    vertical-align: top; /* 使用 top 对齐确保基线一致 */
 }
 
 .subscription-form td:first-child {
@@ -302,16 +302,30 @@ a.btn.btn--primary {
   box-sizing: border-box;
   margin: 0;
   display: block;
+  line-height: 1.4; /* 添加行高确保文字垂直居中 */
 }
 
 .subscription-form button[type="submit"] {
   width: 100%;
   border-radius: 0 4px 4px 0;
-  margin: 0;
+  margin: 0 !important; /* 添加 !important 确保不被主题样式覆盖 */
   padding: 10px 15px;
   height: 42px;
   box-sizing: border-box;
   display: block;
+  line-height: 1.4; /* 添加行高与输入框保持一致 */
+  vertical-align: top; /* 确保按钮垂直对齐 */
+  border: 1px solid #52adc8; /* 确保边框与输入框高度一致 */
+  font-size: 16px; /* 确保字体大小与输入框一致 */
+}
+
+/* 强制重置任何可能影响对齐的样式 */
+.subscription-form .btn.btn--primary {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  transform: none !important;
+  position: relative !important;
+  top: 0 !important;
 }
 
 @media (max-width: 1200px) {
