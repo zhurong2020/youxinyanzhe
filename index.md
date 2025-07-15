@@ -106,17 +106,11 @@ feature_row:
     <div>
       <h3 style="font-size: 1.2em; margin-bottom: 0.5em;">选项2: 邮件订阅</h3>
       <p style="margin-bottom: 1em;">输入您的邮箱地址，我们会在发布重要内容时通知您。</p>
-      <form action="https://formspree.io/f/xpwqvvop" method="POST" class="subscription-form" style="max-width: 500px; margin: 0 auto;">
-        <table style="width: 100%; max-width: 400px; margin: 0 auto; border-collapse: collapse;">
-          <tr style="vertical-align: top;">
-            <td style="width: 70%; padding: 0; vertical-align: top;">
-              <input type="email" name="email" placeholder="您的邮箱地址" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-right: none; border-radius: 4px 0 0 4px; font-size: 16px; height: 42px; box-sizing: border-box; margin: 0; display: block; vertical-align: top;">
-            </td>
-            <td style="width: 30%; padding: 0; vertical-align: top;">
-              <button type="submit" class="btn btn--primary" style="width: 100%; border-radius: 0 4px 4px 0; margin: 0; padding: 10px 15px; height: 42px; box-sizing: border-box; display: block; vertical-align: top; position: relative; top: 0;">订阅</button>
-            </td>
-          </tr>
-        </table>
+      <form action="https://formspree.io/f/xpwqvvop" method="POST" class="subscription-form-flex" style="max-width: 400px; margin: 0 auto;">
+        <div class="form-flex-container">
+          <input type="email" name="email" placeholder="您的邮箱地址" required class="email-input">
+          <button type="submit" class="btn btn--primary subscribe-btn">订阅</button>
+        </div>
         <input type="hidden" name="_subject" value="新订阅 - 有心言者">
         <input type="hidden" name="_next" value="https://zhurong2020.github.io/youxinyanzhe/thanks/">
       </form>
