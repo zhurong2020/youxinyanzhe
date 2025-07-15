@@ -280,6 +280,59 @@ class ContentPipeline:
             except ValueError:
                 print("请输入有效的数字")
     
+    def list_published_posts(self) -> List[Path]:
+        """列出已发布的文章"""
+        posts_dir = Path(self.config["paths"]["posts"])
+        if not posts_dir.exists():
+            return []
+        
+        posts = []
+        for file in posts_dir.glob("*.md"):
+            if file.is_file():
+                posts.append(file)
+        
+        return sorted(posts, key=lambda x: x.stat().st_mtime, reverse=True)
+    
+    def select_published_post(self) -> Optional[Path]:
+        """让用户选择要重新发布的已发布文章"""
+        posts = self.list_published_posts()
+        if not posts:
+            print("没有找到已发布的文章")
+            return None
+            
+        print("\n可用的已发布文章：")
+        for i, post in enumerate(posts, 1):
+            print(f"{i}. {post.name}")
+            
+        while True:
+            try:
+                choice = int(input("\n请选择要重新发布的文章 (输入序号): "))
+                if 1 <= choice <= len(posts):
+                    return posts[choice-1]
+                print("无效的选择")
+            except ValueError:
+                print("请输入有效的数字")
+    
+    def copy_post_to_draft(self, post_path: Path) -> Optional[Path]:
+        """将已发布文章复制到草稿目录"""
+        try:
+            drafts_dir = Path(self.config["paths"]["drafts"])
+            drafts_dir.mkdir(exist_ok=True)
+            
+            # 创建新的草稿文件名
+            draft_name = f"republish-{post_path.name}"
+            draft_path = drafts_dir / draft_name
+            
+            # 复制文件
+            shutil.copy2(post_path, draft_path)
+            self.log(f"已将文章复制到草稿: {draft_path}", level="info", force=True)
+            
+            return draft_path
+            
+        except Exception as e:
+            self.log(f"复制文章到草稿失败: {str(e)}", level="error", force=True)
+            return None
+    
     def select_platforms(self) -> List[str]:
         """让用户选择发布平台"""
         available_platforms = [name for name, config in self.config["platforms"].items() 
@@ -1732,9 +1785,10 @@ def main():
     # 选择操作
     print("\n请选择操作：")
     print("1. 处理现有草稿")
-    print("2. 生成测试文章")
+    print("2. 重新发布已发布文章")
+    print("3. 生成测试文章")
     
-    choice = input("\n请输入选项 (1/2): ").strip()
+    choice = input("\n请输入选项 (1/2/3): ").strip()
     
     if choice == "1":
         # 处理现有草稿
@@ -1742,11 +1796,18 @@ def main():
         if not draft:
             return
     elif choice == "2":
+        # 重新发布已发布文章
+        post = pipeline.select_published_post()
+        if not post:
+            return
+        draft = pipeline.copy_post_to_draft(post)
+        if not draft:
+            return
+    elif choice == "3":
         # 生成测试文章
         draft = pipeline.generate_test_content()
         if not draft:
             print("生成测试文章失败")
-           
             return
     else:
         print("无效的选择")

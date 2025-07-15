@@ -30,9 +30,10 @@ def main():
     # 选择操作
     print("\n请选择操作：")
     print("1. 处理现有草稿")
-    print("2. 生成测试文章")
+    print("2. 重新发布已发布文章")
+    print("3. 生成测试文章")
     
-    choice = input("\n请输入选项 (1/2): ").strip()
+    choice = input("\n请输入选项 (1/2/3): ").strip()
     
     if choice == "1":
         # 处理现有草稿
@@ -41,6 +42,16 @@ def main():
             print("没有找到草稿文件或选择无效")
             return
     elif choice == "2":
+        # 重新发布已发布文章
+        post = pipeline.select_published_post()
+        if not post:
+            print("没有找到已发布文章或选择无效")
+            return
+        draft = pipeline.copy_post_to_draft(post)
+        if not draft:
+            print("复制文章到草稿失败")
+            return
+    elif choice == "3":
         # 生成测试文章
         draft = pipeline.generate_test_content()
         if not draft:
