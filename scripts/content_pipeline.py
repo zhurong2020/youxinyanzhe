@@ -24,7 +24,10 @@ import requests
 from dotenv import load_dotenv
 
 # 导入本地模块
-from .wechat_publisher import WechatPublisher
+try:
+    from .wechat_publisher import WechatPublisher
+except ImportError:
+    from wechat_publisher import WechatPublisher
 
 class PublishingStatusManager:
     """发布状态管理器"""
