@@ -26,6 +26,96 @@ from dotenv import load_dotenv
 # 导入本地模块
 from .wechat_publisher import WeChatPublisher
 
+class PublishingStatusManager:
+    """发布状态管理器"""
+    
+    def __init__(self, drafts_dir: Path):
+        self.drafts_dir = Path(drafts_dir)
+        self.status_dir = self.drafts_dir / ".publishing"
+        self.status_dir.mkdir(exist_ok=True)
+        
+    def get_status_file_path(self, article_name: str) -> Path:
+        """获取文章状态文件路径"""
+        # 移除文件扩展名
+        article_name = article_name.replace('.md', '')
+        return self.status_dir / f"{article_name}.yml"
+    
+    def get_published_platforms(self, article_name: str) -> List[str]:
+        """获取文章已发布的平台列表"""
+        status_file = self.get_status_file_path(article_name)
+        
+        if not status_file.exists():
+            return []
+            
+        try:
+            with open(status_file, 'r', encoding='utf-8') as f:
+                status_data = yaml.safe_load(f) or {}
+            return status_data.get('published_platforms', [])
+        except Exception:
+            return []
+    
+    def update_published_platforms(self, article_name: str, platforms: List[str]):
+        """更新文章的发布平台列表"""
+        status_file = self.get_status_file_path(article_name)
+        
+        # 读取现有状态
+        status_data = {}
+        if status_file.exists():
+            try:
+                with open(status_file, 'r', encoding='utf-8') as f:
+                    status_data = yaml.safe_load(f) or {}
+            except Exception:
+                status_data = {}
+        
+        # 更新发布平台列表（合并，避免重复）
+        existing_platforms = set(status_data.get('published_platforms', []))
+        new_platforms = set(platforms)
+        all_platforms = list(existing_platforms.union(new_platforms))
+        
+        # 更新状态数据
+        status_data.update({
+            'article_name': article_name,
+            'published_platforms': all_platforms,
+            'last_updated': datetime.now().isoformat(),
+            'total_publications': len(all_platforms)
+        })
+        
+        # 保存状态文件
+        try:
+            with open(status_file, 'w', encoding='utf-8') as f:
+                yaml.safe_dump(status_data, f, default_flow_style=False, 
+                             allow_unicode=True, sort_keys=False)
+        except Exception as e:
+            logging.error(f"保存发布状态失败: {e}")
+    
+    def get_available_platforms(self, article_name: str, all_platforms: List[str]) -> List[str]:
+        """获取文章可发布的平台列表（排除已发布的）"""
+        published_platforms = set(self.get_published_platforms(article_name))
+        available_platforms = [p for p in all_platforms if p not in published_platforms]
+        return available_platforms
+    
+    def initialize_legacy_post_status(self, posts_dir: Path):
+        """初始化存量已发布文档的状态"""
+        if not posts_dir.exists():
+            return
+            
+        legacy_count = 0
+        for post_file in posts_dir.glob("*.md"):
+            article_name = post_file.stem
+            
+            # 检查是否已有状态文件
+            if self.get_status_file_path(article_name).exists():
+                continue
+                
+            # 为存量文档创建状态记录（默认已在github_pages发布）
+            self.update_published_platforms(article_name, ['github_pages'])
+            legacy_count += 1
+            
+        if legacy_count > 0:
+            logging.info(f"已为 {legacy_count} 个存量文档初始化发布状态")
+        
+        return legacy_count
+
 class ContentPipeline:
     def __init__(self, config_path: str = "config/pipeline_config.yml", verbose: bool = False):
         """初始化内容处理管道
@@ -48,6 +138,14 @@ class ContentPipeline:
             
             # 加载完整配置（包括导入的配置文件）
             self.config = self._load_config()
+            
+            # 初始化发布状态管理器
+            drafts_dir = Path(self.config["paths"]["drafts"])
+            self.status_manager = PublishingStatusManager(drafts_dir)
+            
+            # 初始化存量文档状态
+            posts_dir = Path(self.config["paths"]["posts"])
+            self.status_manager.initialize_legacy_post_status(posts_dir)
             
 
         except Exception as e:
@@ -314,33 +412,114 @@ class ContentPipeline:
                 print("请输入有效的数字")
     
     def copy_post_to_draft(self, post_path: Path) -> Optional[Path]:
-        """将已发布文章复制到草稿目录"""
+        """将已发布文章作为源文件复制到草稿目录（如果不存在）"""
         try:
             drafts_dir = Path(self.config["paths"]["drafts"])
             drafts_dir.mkdir(exist_ok=True)
             
-            # 创建新的草稿文件名
-            draft_name = f"republish-{post_path.name}"
-            draft_path = drafts_dir / draft_name
+            # 检查是否已有同名草稿（源文件）
+            original_draft_path = drafts_dir / post_path.name
             
-            # 复制文件
-            shutil.copy2(post_path, draft_path)
-            self.log(f"已将文章复制到草稿: {draft_path}", level="info", force=True)
-            
-            return draft_path
+            if original_draft_path.exists():
+                # 如果草稿已存在，直接使用草稿作为源文件
+                self.log(f"使用现有草稿作为源文件: {original_draft_path}", level="info", force=True)
+                return original_draft_path
+            else:
+                # 如果草稿不存在，从已发布文章创建源文件
+                # 需要清理发布时添加的内容，恢复为源文件格式
+                source_content = self._convert_published_to_source(post_path)
+                
+                with open(original_draft_path, 'w', encoding='utf-8') as f:
+                    f.write(source_content)
+                
+                self.log(f"已从发布文章创建源文件: {original_draft_path}", level="info", force=True)
+                return original_draft_path
             
         except Exception as e:
-            self.log(f"复制文章到草稿失败: {str(e)}", level="error", force=True)
+            self.log(f"处理文章源文件失败: {str(e)}", level="error", force=True)
             return None
     
-    def select_platforms(self) -> List[str]:
-        """让用户选择发布平台"""
-        available_platforms = [name for name, config in self.config["platforms"].items() 
-                            if config.get("enabled", False)]
+    def _convert_published_to_source(self, post_path: Path) -> str:
+        """将已发布文章转换回源文件格式"""
+        try:
+            with open(post_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # 解析front matter
+            post = frontmatter.loads(content)
+            
+            # 移除发布时自动添加的字段
+            auto_generated_fields = [
+                'layout', 'author_profile', 'breadcrumbs', 'comments', 
+                'related', 'share', 'toc', 'toc_icon', 'toc_label', 
+                'toc_sticky', 'last_modified_at'
+            ]
+            
+            for field in auto_generated_fields:
+                if field in post.metadata:
+                    del post.metadata[field]
+            
+            # 移除页脚内容（从最后一个 "---" 开始的部分）
+            content_lines = post.content.split('\n')
+            footer_start = -1
+            
+            # 从后往前查找页脚分隔符
+            for i in range(len(content_lines) - 1, -1, -1):
+                if content_lines[i].strip() == '---' and i < len(content_lines) - 5:
+                    # 检查后面几行是否包含页脚特征（如"学习分享声明"或"请我喝咖啡"）
+                    footer_section = '\n'.join(content_lines[i:])
+                    if any(keyword in footer_section for keyword in 
+                          ['学习分享声明', '请我喝咖啡', 'Buy Me A Coffee', '发表评论']):
+                        footer_start = i
+                        break
+            
+            if footer_start > 0:
+                post.content = '\n'.join(content_lines[:footer_start]).rstrip()
+            
+            # 重新组装为source格式
+            return frontmatter.dumps(post)
+            
+        except Exception as e:
+            self.log(f"转换发布文章为源文件失败: {str(e)}", level="warning")
+            # 如果转换失败，返回原内容
+            with open(post_path, 'r', encoding='utf-8') as f:
+                return f.read()
+    
+    def select_platforms(self, draft_path: Optional[Path] = None) -> List[str]:
+        """让用户选择发布平台，支持基于发布状态的过滤"""
+        all_platforms = [name for name, config in self.config["platforms"].items() 
+                        if config.get("enabled", False)]
         
-        print("\n可用的发布平台：")
-        for i, platform in enumerate(available_platforms, 1):
-            print(f"{i}. {platform}")
+        if draft_path:
+            # 获取文章名称
+            article_name = draft_path.stem
+            
+            # 获取已发布平台和可用平台
+            published_platforms = self.status_manager.get_published_platforms(article_name)
+            available_platforms = self.status_manager.get_available_platforms(article_name, all_platforms)
+            
+            if published_platforms:
+                print(f"\n文章 '{article_name}' 已发布平台: {', '.join(published_platforms)}")
+            
+            if not available_platforms:
+                print("该文章已在所有启用的平台发布")
+                return []
+                
+            print("\n可选的发布平台：")
+            for i, platform in enumerate(available_platforms, 1):
+                print(f"{i}. {platform}")
+                
+            platform_list = available_platforms
+        else:
+            # 新文章，显示所有可用平台
+            print("\n可用的发布平台：")
+            for i, platform in enumerate(all_platforms, 1):
+                print(f"{i}. {platform}")
+                
+            platform_list = all_platforms
+            
+        if not platform_list:
+            return []
             
         selections = input("\n请选择发布平台 (多个平台用逗号分隔): ").split(",")
         selected_platforms = []
@@ -348,10 +527,12 @@ class ContentPipeline:
         for sel in selections:
             try:
                 idx = int(sel.strip()) - 1
-                if 0 <= idx < len(available_platforms):
-                    selected_platforms.append(available_platforms[idx])
+                if 0 <= idx < len(platform_list):
+                    selected_platforms.append(platform_list[idx])
+                else:
+                    print(f"无效选择: {sel}")
             except ValueError:
-                continue
+                print(f"无效输入: {sel}")
                 
         return selected_platforms
     
@@ -455,13 +636,29 @@ class ContentPipeline:
                 # 检查所有平台是否都成功
                 all_success = all_success and all(platform_success.values())
                 
-                # 6. 归档草稿
-                if all_success:
+                # 6. 更新发布状态
+                successful_platforms = [platform for platform, success in platform_success.items() if success]
+                if successful_platforms:
+                    task = progress.add_task("📊 更新发布状态...", total=None)
+                    article_name = draft_path.stem
+                    self.status_manager.update_published_platforms(article_name, successful_platforms)
+                    self.log(f"已更新发布状态: {successful_platforms}", level="info", force=True)
+                    progress.update(task, completed=True)
+                
+                # 7. 归档草稿（仅当首次发布且全部成功时）
+                published_platforms = self.status_manager.get_published_platforms(draft_path.stem)
+                all_enabled_platforms = [name for name, config in self.config["platforms"].items() 
+                                        if config.get("enabled", False)]
+                
+                # 如果已在所有启用平台发布，则归档草稿
+                if set(published_platforms) >= set(all_enabled_platforms):
                     task = progress.add_task("📦 归档草稿...", total=None)
                     self._archive_draft(draft_path)
                     progress.update(task, completed=True)
-                else:
+                elif not all_success:
                     self.log("⚠️ 处理未完全成功，跳过归档步骤", level="warning", force=True)
+                else:
+                    self.log("⚠️ 文章未在所有平台发布，保留草稿用于后续发布", level="info", force=True)
                 
             return all_success
             
@@ -1814,7 +2011,7 @@ def main():
         return
         
     # 选择发布平台
-    platforms = pipeline.select_platforms()
+    platforms = pipeline.select_platforms(draft)
     if not platforms:
         print("未选择任何发布平台")
         return
