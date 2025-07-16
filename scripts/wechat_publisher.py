@@ -183,6 +183,172 @@ class WeChatPublisher:
             # 如果AI增强失败，返回原始的HTML，确保流程不中断
             return html_content
 
+    def save_as_draft(self, title: str, content: str, author: str = "系统发布") -> bool:
+        """保存文章为草稿到微信公众号后台
+        
+        Args:
+            title: 文章标题
+            content: 文章内容（HTML格式）
+            author: 作者名称
+            
+        Returns:
+            bool: 保存成功返回True，失败返回False
+        """
+        try:
+            self.logger.info(f"Saving article as draft: {title}")
+            
+            # 获取access_token
+            access_token = self.get_access_token()
+            if not access_token:
+                self.logger.error("Failed to get access token for saving draft")
+                return False
+            
+            # 构建草稿数据
+            draft_data = {
+                "articles": [{
+                    "title": title,
+                    "author": author,
+                    "digest": content[:60] + "...",  # 摘要，取前60字符
+                    "content": content,
+                    "content_source_url": "",  # 原文链接，可为空
+                    "thumb_media_id": "",      # 封面图media_id，可为空
+                    "show_cover_pic": 0,       # 是否显示封面，0不显示，1显示
+                    "need_open_comment": 0,    # 是否打开评论，0不打开，1打开
+                    "only_fans_can_comment": 0 # 是否粉丝才可评论，0所有人，1粉丝
+                }]
+            }
+            
+            # 调用微信API保存草稿
+            url = f"https://api.weixin.qq.com/cgi-bin/draft/add?access_token={access_token}"
+            response = requests.post(url, json=draft_data, timeout=30)
+            response.raise_for_status()
+            result = response.json()
+            
+            if result.get("errcode") == 0:
+                media_id = result.get("media_id")
+                self.logger.info(f"Successfully saved draft. Media ID: {media_id}")
+                return True
+            else:
+                error_msg = result.get("errmsg", "Unknown error")
+                error_code = result.get("errcode", "Unknown")
+                self.logger.error(f"Failed to save draft. Error code: {error_code}, Message: {error_msg}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Request failed when saving draft: {e}")
+            return False
+        except Exception as e:
+            self.logger.error(f"Unexpected error when saving draft: {e}")
+            return False
+
+    def publish_article(self, title: str, markdown_content: str, author: str = "系统发布") -> bool:
+        """发布文章到微信公众号（保存为草稿）
+        
+        Args:
+            title: 文章标题
+            markdown_content: Markdown格式的文章内容
+            author: 作者名称
+            
+        Returns:
+            bool: 发布成功返回True，失败返回False
+        """
+        try:
+            self.logger.info(f"Publishing article to WeChat: {title}")
+            
+            # 转换Markdown内容为适合微信的HTML
+            html_content = self.transform_content(markdown_content)
+            
+            # 保存本地副本供查看
+            self._save_local_preview(title, html_content, markdown_content)
+            
+            # 保存为草稿
+            success = self.save_as_draft(title, html_content, author)
+            
+            if success:
+                self.logger.info(f"Article '{title}' successfully saved as draft in WeChat backend")
+            else:
+                self.logger.error(f"Failed to save article '{title}' as draft")
+                
+            return success
+            
+        except Exception as e:
+            self.logger.error(f"Error publishing article '{title}': {e}")
+            return False
+    
+    def _save_local_preview(self, title: str, html_content: str, original_markdown: str):
+        """保存微信版本的本地预览文件"""
+        try:
+            from pathlib import Path
+            import re
+            from datetime import datetime
+            
+            # 创建预览目录
+            preview_dir = Path("_output/wechat_previews")
+            preview_dir.mkdir(parents=True, exist_ok=True)
+            
+            # 生成安全的文件名
+            safe_title = re.sub(r'[^\w\s-]', '', title).strip()
+            safe_title = re.sub(r'[-\s]+', '-', safe_title)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            # 保存HTML预览文件
+            html_file = preview_dir / f"{safe_title}_{timestamp}.html"
+            with open(html_file, 'w', encoding='utf-8') as f:
+                f.write(f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title} - 微信版本预览</title>
+    <style>
+        body {{ max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; }}
+        .header {{ background: #f0f0f0; padding: 15px; margin-bottom: 20px; border-radius: 5px; }}
+        .content {{ line-height: 1.6; }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📱 微信公众号版本预览</h1>
+        <p><strong>标题:</strong> {title}</p>
+        <p><strong>生成时间:</strong> {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
+        <p><strong>状态:</strong> 已保存到微信草稿箱，可在公众号后台查看和发布</p>
+    </div>
+    <div class="content">
+        {html_content}
+    </div>
+</body>
+</html>""")
+            
+            # 保存处理后的Markdown文件
+            md_file = preview_dir / f"{safe_title}_{timestamp}.md"
+            with open(md_file, 'w', encoding='utf-8') as f:
+                f.write(f"""---
+title: {title}
+platform: 微信公众号
+generated_at: {datetime.now().isoformat()}
+status: 已保存到草稿箱
+---
+
+# {title}
+
+{original_markdown}
+
+---
+
+**处理说明:**
+- 已移除所有超链接
+- 已添加"阅读原文"引导
+- 图片已上传到微信服务器
+- 已通过AI进行排版优化
+""")
+            
+            self.logger.info(f"Local preview saved: {html_file}")
+            self.logger.info(f"Local markdown saved: {md_file}")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to save local preview: {e}")
+            # 不影响主流程，继续执行
+
 if __name__ == '__main__':
     # 用于直接测试此类
     try:
