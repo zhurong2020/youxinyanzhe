@@ -24,7 +24,7 @@ import requests
 from dotenv import load_dotenv
 
 # 导入本地模块
-from .wechat_publisher import WeChatPublisher
+from .wechat_publisher import WechatPublisher
 
 class PublishingStatusManager:
     """发布状态管理器"""
@@ -125,6 +125,7 @@ class ContentPipeline:
         """
         self.verbose = verbose
         self.logger = logging.getLogger("ContentPipeline")
+        self.project_root = Path(__file__).parent.parent
         
         # 初始化API状态
         self.api_available = True
@@ -179,7 +180,8 @@ class ContentPipeline:
         self.wechat_publisher = None
         try:
             if self.platforms_config.get("wechat", {}).get("enabled", False):
-                self.wechat_publisher = WeChatPublisher()
+                # Pass the initialized Gemini model to the publisher
+                self.wechat_publisher = WechatPublisher(gemini_model=self.model)
                 self.log("✅ 微信发布器初始化成功", level="info")
         except Exception as e:
             self.log(f"⚠️ 微信发布器初始化失败: {e}", level="warning")
@@ -1248,41 +1250,48 @@ class ContentPipeline:
             return False
 
     def _publish_to_wechat(self, content: str) -> bool:
-        """发布到微信公众号（保存为草稿）"""
-        self.log("开始发布到微信公众号...", level="info", force=True)
+        """发布到微信公众号，根据配置决定是API发布还是生成指南。"""
+        self.log("开始处理微信公众号发布...", level="info", force=True)
         if not self.wechat_publisher:
             self.log("微信发布器未初始化，跳过发布。", level="error", force=True)
             return False
-        
-        try:
-            # 1. 解析文章内容
-            post = frontmatter.loads(content)
-            title = str(post.metadata.get('title', '无标题'))
-            markdown_body = post.content
-            
-            if not title or title == '无标题':
-                self.log("文章标题为空或未设置，跳过发布", level="error", force=True)
-                return False
-                
-            self.log(f"准备发布文章: {title}", level="info", force=True)
 
-            # 2. 调用发布方法（实际上是保存为草稿）
-            success = self.wechat_publisher.publish_article(
-                title=title, 
-                markdown_content=markdown_body,
-                author="博客系统"
-            )
-            
-            if success:
-                self.log(f"✅ 文章 '{title}' 已保存到微信公众号草稿箱", level="info", force=True)
-                self.log("您可以在微信公众号后台查看草稿并安排发布时间", level="info", force=True)
+        try:
+            post = frontmatter.loads(content)
+            platform_config = self.platforms_config.get("wechat", {})
+            publish_mode = platform_config.get("publish_mode", "guide")  # 默认为 guide 模式
+
+            self.log(f"微信发布模式: {publish_mode.upper()}", level="info", force=True)
+
+            if publish_mode == "api":
+                # API模式：直接发布到草稿箱
+                media_id = self.wechat_publisher.publish_to_draft(
+                    project_root=self.project_root,
+                    front_matter=post.metadata,
+                    markdown_content=post.content
+                )
+                if media_id:
+                    self.log(f"✅ 成功创建微信草稿，Media ID: {media_id}", force=True)
+                    return True
+                else:
+                    self.log("❌ 通过API创建微信草稿失败。", level="error", force=True)
+                    return False
             else:
-                self.log(f"❌ 文章 '{title}' 保存到微信草稿箱失败", level="error", force=True)
-                
-            return success
+                # Guide模式：生成手动发布指南
+                success = self.wechat_publisher.generate_guide_file(
+                    project_root=self.project_root,
+                    front_matter=post.metadata,
+                    markdown_content=post.content
+                )
+                if success:
+                    self.log("✅ 成功生成微信发布指南文件。", force=True)
+                else:
+                    self.log("❌ 生成微信发布指南文件失败。", level="error", force=True)
+                return success
 
         except Exception as e:
-            self.log(f"发布到微信时出错: {e}", level="error", force=True)
+            self.log(f"发布到微信时发生未知错误: {e}", level="error", force=True)
+            self.logger.debug("错误详情:", exc_info=True)
             return False
 
     def _publish_to_wordpress(self, content: str):

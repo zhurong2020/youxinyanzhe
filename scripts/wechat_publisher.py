@@ -6,555 +6,321 @@ import logging
 import re
 import markdown2
 import hashlib
-from typing import Optional, Dict
+from typing import Optional, Dict, Any, TYPE_CHECKING
 from pathlib import Path
 from dotenv import load_dotenv
 
-class WeChatPublisher:
-    def __init__(self):
-        """初始化微信发布器"""
+if TYPE_CHECKING:
+    from google.generativeai.generative_models import GenerativeModel
+
+class WeChatApiUsageTracker:
+    """Tracks WeChat API usage to prevent exceeding daily limits."""
+    def __init__(self, cache_dir: Path):
+        self.usage_file = cache_dir / "wechat_api_usage.json"
+        self.usage_data = self._load_usage()
+        self._reset_if_new_day()
+
+    def _load_usage(self) -> Dict[str, Any]:
+        if not self.usage_file.exists():
+            return {"date": time.strftime("%Y-%m-%d"), "calls": {}}
+        try:
+            with open(self.usage_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError):
+            return {"date": time.strftime("%Y-%m-%d"), "calls": {}}
+
+    def _save_usage(self):
+        try:
+            with open(self.usage_file, 'w', encoding='utf-8') as f:
+                json.dump(self.usage_data, f, indent=2)
+        except IOError as e:
+            logging.error(f"Failed to save API usage data: {e}")
+
+    def _reset_if_new_day(self):
+        today = time.strftime("%Y-%m-%d")
+        if self.usage_data.get("date") != today:
+            self.usage_data = {"date": today, "calls": {}}
+            self._save_usage()
+            logging.info("New day detected, resetting WeChat API usage stats.")
+
+    def check_limit(self, api_name: str, limit: int) -> bool:
+        """Check if the API call would exceed the limit."""
+        count = self.usage_data["calls"].get(api_name, 0)
+        if count >= limit:
+            logging.error(f"API call to '{api_name}' aborted. Daily limit of {limit} reached.")
+            return False
+        if count >= limit * 0.95:
+            logging.warning(f"API '{api_name}' usage ({count}/{limit}) is approaching daily limit.")
+        return True
+
+    def increment(self, api_name: str):
+        """Increment the call count for a specific API."""
+        self.usage_data["calls"][api_name] = self.usage_data["calls"].get(api_name, 0) + 1
+        self._save_usage()
+
+class WechatPublisher:
+    """
+    Handles all interactions with the WeChat Official Account API.
+    """
+    API_LIMITS = {
+        "token": 2000,
+        "add_material": 1000,
+        "uploadimg": 1000,
+        "add_news": 1000,
+    }
+
+    def __init__(self, gemini_model):
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.model = gemini_model
+
         load_dotenv()
         self.app_id = os.getenv("WECHAT_APPID")
         self.app_secret = os.getenv("WECHAT_APPSECRET")
         if not self.app_id or not self.app_secret:
-            raise ValueError("WECHAT_APPID and WECHAT_APPSECRET must be set in .env file")
-        self.access_token = None
-        self.token_expires_at = 0
-        self.logger = logging.getLogger("WeChatPublisher")
+            raise ValueError("WECHAT_APPID and WECHAT_APPSECRET must be set in .env file.")
+
+        project_root = Path(__file__).parent.parent
+        self.api_base_url = "https://api.weixin.qq.com/cgi-bin"
+        self.access_token: Optional[str] = None
+        self.token_expires_at: int = 0
         
-        # 图片缓存系统
-        self.cache_dir = Path("_output/wechat_image_cache")
-        self.cache_dir.mkdir(parents=True, exist_ok=True)
-        self.cache_file = self.cache_dir / "image_cache.json"
+        cache_dir = project_root / "_output/wechat_image_cache"
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        self.cache_file = cache_dir / "image_cache.json"
         self.image_cache = self._load_image_cache()
+        self.api_tracker = WeChatApiUsageTracker(cache_dir)
 
-    def get_access_token(self, force_refresh: bool = False) -> str:
-        """获取或刷新 access_token"""
-        if self.access_token and time.time() < self.token_expires_at and not force_refresh:
-            self.logger.info("Using cached access_token.")
+    def _get_access_token(self) -> Optional[str]:
+        if self.access_token and time.time() < self.token_expires_at:
             return self.access_token
-
-        self.logger.info("Requesting new access_token...")
-        url = f"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={self.app_id}&secret={self.app_secret}"
         
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
-            data = response.json()
-
-            if "access_token" in data:
-                self.access_token = data["access_token"]
-                self.token_expires_at = time.time() + data.get("expires_in", 7200) - 300
-                self.logger.info("Successfully obtained new access_token.")
-                return self.access_token
-            else:
-                error_msg = data.get("errmsg", "Unknown error")
-                self.logger.error(f"Failed to get access_token: {error_msg}")
-                raise Exception(f"WeChat API Error: {error_msg}")
-
-        except requests.exceptions.RequestException as e:
-            self.logger.error(f"Request to get access_token failed: {e}")
-            raise
-
-    def transform_content(self, markdown_text: str) -> str:
-        """将Markdown内容转换为微信公众号文章格式
-
-        Args:
-            markdown_text: 文章的Markdown原文.
-
-        Returns:
-            转换和处理后的HTML字符串.
-        """
-        self.logger.info("Transforming content for WeChat...")
-
-        # 1. Markdown to HTML
-        # 使用markdown2并启用一些推荐的扩展
-        html = markdown2.markdown(markdown_text, extras=["tables", "fenced-code-blocks", "footnotes", "cuddled-lists"])
-
-        # 2. 移除所有<a>标签，但保留标签内的文本
-        # 使用正则表达式将 <a ...>...</a> 替换为其内部的文本
-        html = re.sub(r'<a[^>]*>(.*?)</a>', r'\1', html)
-        self.logger.info("Removed all hyperlinks from content.")
-
-        # 3. 添加“阅读原文”引导
-        read_more_text = "<p>--</p><p>请点击文末的阅读原文查看完整文档</p>"
-        html += read_more_text
-        self.logger.info("Appended 'Read More' notice.")
-
-        # 先进行AI优化，再处理图片，避免上传不需要的图片
-        html = self.enhance_html_with_ai(html)
-        
-        # 在AI优化后再处理图片，只上传最终需要的图片
-        html = self.process_images(html)
-
-        return html
-
-    def process_images(self, html_content: str) -> str:
-        """处理HTML内容中的图片，将其上传到微信并替换链接"""
-        self.logger.info("Processing images in HTML content...")
-        img_urls = re.findall(r'<img src="(https?://1drv\.ms/[^\s"]+)"', html_content)
-        if not img_urls:
-            self.logger.info("No OneDrive images found to process.")
-            return html_content
-
-        # 去重，避免重复上传
-        unique_urls = sorted(list(set(img_urls)))
-        self.logger.info(f"Found {len(unique_urls)} unique image(s) to upload.")
-
-        url_map = {}
-        for url in unique_urls:
-            wechat_url = self._upload_image_from_url(url)
-            if wechat_url:
-                url_map[url] = wechat_url
-        
-        self.logger.info("Replacing image URLs in HTML...")
-        for onedrive_url, wechat_url in url_map.items():
-            html_content = html_content.replace(onedrive_url, wechat_url)
-        
-        self.logger.info("Image processing complete.")
-        return html_content
-
-    def _upload_image_from_url(self, image_url: str) -> Optional[str]:
-        """从URL下载图片并上传到微信服务器，支持缓存机制"""
-        try:
-            self.logger.info(f"Downloading image from: {image_url}")
-            response = requests.get(image_url, timeout=20)
-            response.raise_for_status()
-            image_data = response.content
-            content_type = response.headers.get('content-type', 'image/jpeg')
-
-            # 检查缓存
-            cached_url = self._get_cached_image_url(image_url, image_data)
-            if cached_url:
-                return cached_url
-
-            # 获取access_token
-            access_token = self.get_access_token()
-            if not access_token:
-                return None
-
-            # 上传到微信
-            upload_url = f"https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token={access_token}"
-            files = {'media': ('image.jpg', image_data, content_type)}
-            
-            self.logger.info(f"Uploading image to WeChat...")
-            upload_response = requests.post(upload_url, files=files, timeout=30)
-            upload_response.raise_for_status()
-            upload_data = upload_response.json()
-
-            if "url" in upload_data:
-                wechat_url = upload_data["url"]
-                self.logger.info(f"Successfully uploaded image. WeChat URL: {wechat_url}")
-                # 缓存映射关系
-                self._cache_image_mapping(image_url, wechat_url, image_data)
-                return wechat_url
-            else:
-                error_msg = upload_data.get("errmsg", "Unknown upload error")
-                self.logger.error(f"Failed to upload image to WeChat: {error_msg}")
-                return None
-
-        except requests.exceptions.RequestException as e:
-            self.logger.error(f"Failed to download or upload image from {image_url}: {e}")
+        if not self.api_tracker.check_limit("token", self.API_LIMITS["token"]):
             return None
 
-    def enhance_html_with_ai(self, html_content: str) -> str:
-        """使用Gemini API对HTML内容进行排版和风格优化"""
-        self.logger.info("Enhancing HTML with AI for better layout...")
+        self.logger.info("Requesting new access_token from WeChat API...")
+        url = f"{self.api_base_url}/token?grant_type=client_credential&appid={self.app_id}&secret={self.app_secret}"
         try:
-            # 获取Gemini模型，这里假设ContentPipeline已经初始化了模型
-            # 在实际应用中，可能需要通过参数传入或更优雅地获取
-            from scripts.content_pipeline import ContentPipeline
-            gemini_model = ContentPipeline().model
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            if "access_token" in data:
+                self.api_tracker.increment("token")
+                self.access_token = data["access_token"]
+                self.token_expires_at = time.time() + data.get("expires_in", 7200) - 300
+                return self.access_token
+            else:
+                self.logger.error(f"Failed to get access_token: {data.get('errmsg', 'Unknown error')}")
+                return None
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Request for access_token failed: {e}")
+            return None
 
-            # 构建一个专门为微信排版优化的Prompt
-            prompt = f"""
-            You are an expert in WeChat article formatting. Your task is to refine the following HTML to make it more readable and engaging on mobile devices. You must follow these rules strictly:
-            1.  Do NOT change, add, or remove any text content. Your task is to format, not rewrite.
-            2.  Do NOT change any `<img>` tags or their `src` attributes.
-            3.  Add relevant Emojis: Insert a single, appropriate emoji at the beginning of each heading (`<h1>`, `<h2>`, `<h3>`). For example, `<h2>...` becomes `<h2>✨ ...</h2>`.
-            4.  Inject mobile-friendly inline CSS: Add `style` attributes to HTML tags. For example:
-                -   For `<p>`: `style="margin: 1.2em 0; line-height: 1.8; font-size: 16px;"`
-                -   For `<h2>`: `style="font-size: 1.5em; margin-top: 2em; margin-bottom: 1em; border-bottom: 2px solid #f2f2f2; padding-bottom: 0.3em;"`
-                -   For `<h3>`: `style="font-size: 1.2em; margin-top: 1.8em; margin-bottom: 1em;"`
-                -   For `<ul>` or `<ol>`: `style="padding-left: 20px;"`
-                -   For `<li>`: `style="margin-bottom: 0.8em;"`
-            5.  Ensure all text content is wrapped in appropriate tags like `<p>` or `<li>`. Do not leave raw text outside of tags.
-            6.  Return ONLY the modified, clean HTML body content. Do not include `<html>`, `<head>`, `<body>` tags or any explanations.
-            7.  Do NOT generate empty tags like `<h2>{{}}</h2>` or `<p>{{}}</p>`. If you encounter malformed content, skip it.
-            8.  Do NOT include markdown code block markers like ```html or ``` in your output.
+    def _transform_for_wechat(self, markdown_content: str) -> str:
+        """Transforms markdown content into WeChat-ready HTML."""
+        self.logger.info("Starting full content transformation for WeChat...")
 
-            Here is the HTML content to process:
-            ---
-            {html_content}
-            """
+        # 1. AI-powered content summarization and rewriting
+        self.logger.info("Step 1: Rewriting and summarizing content with AI...")
+        summarize_prompt = f"""Please rewrite and summarize the following article to be about 800-1000 words, making it more engaging for a WeChat audience. Focus on the core ideas, use shorter paragraphs, and maintain the original tone. Do not add any titles or headers.
 
-            # 调用Gemini API
-            response = gemini_model.generate_content(prompt)
-            enhanced_html = response.text.strip()
-            
-            self.logger.info("Successfully enhanced HTML with AI.")
-            return enhanced_html
+---
 
+{markdown_content}"""
+        try:
+            response = self.model.generate_content(summarize_prompt)
+            rewritten_md = response.text
+            self.logger.info("Content successfully rewritten by AI.")
         except Exception as e:
-            self.logger.error(f"Failed to enhance HTML with AI: {e}")
-            # 如果AI增强失败，返回原始的HTML，确保流程不中断
-            return html_content
-    
+            self.logger.error(f"AI content summarization failed: {e}. Using original content.")
+            rewritten_md = markdown_content
+
+        # 2. Convert to HTML
+        html = markdown2.markdown(rewritten_md, extras=["tables", "fenced-code-blocks", "footnotes"])
+
+        # 3. AI-powered layout and formatting
+        self.logger.info("Step 2: Formatting HTML for WeChat with AI...")
+        format_prompt = f"""You are an expert in WeChat article formatting. Your task is to refine the following HTML to make it more readable and engaging on mobile devices. You must follow these rules strictly:
+1.  Do NOT change, add, or remove any text content. Your task is to format, not rewrite.
+2.  Do NOT change any `<img>` tags or their `src` attributes.
+3.  Add relevant Emojis: Insert a single, appropriate emoji at the beginning of each heading (`<h1>`, `<h2>`, `<h3>`). For example, `<h2>...` becomes `<h2>✨ ...</h2>`.
+4.  Inject mobile-friendly inline CSS: Add `style` attributes to HTML tags. For example:
+    -   For `<p>`: `style="margin: 1.2em 0; line-height: 1.8; font-size: 16px;"`
+    -   For `<h2>`: `style="font-size: 1.5em; margin-top: 2em; margin-bottom: 1em; border-bottom: 2px solid #f2f2f2; padding-bottom: 0.3em;"`
+    -   For `<h3>`: `style="font-size: 1.2em; margin-top: 1.8em; margin-bottom: 1em;"`
+    -   For `<ul>` or `<ol>`: `style="padding-left: 20px;"`
+    -   For `<li>`: `style="margin-bottom: 0.8em;"`
+5.  Remove all hyperlink `<a>` tags but keep the link text. For example, `<a href=... >text</a>` becomes `text`.
+6.  Return ONLY the modified, clean HTML body content. Do not include `<html>`, `<head>`, `<body>` tags or any explanations.
+
+Here is the HTML content to process:
+---
+{html}"""
+        try:
+            response = self.model.generate_content(format_prompt)
+            formatted_html = response.text
+            self.logger.info("HTML successfully formatted by AI.")
+        except Exception as e:
+            self.logger.error(f"AI formatting failed: {e}. Proceeding with basic HTML and removing links manually.")
+            # Fallback to manual link removal if AI fails
+            formatted_html = re.sub(r'<a[^>]*>(.*?)</a>', r'\1', html)
+
+        # 4. Append "Read More" notice
+        self.logger.info("Step 3: Appending 'Read More' notice.")
+        read_more_notice = "<p style='text-align: center; color: #888; margin-top: 40px;'>- - -</p>" + "<p style='text-align: center; color: #888;'>因篇幅限制，更多技术细节和完整代码，<br>请点击文末的\"阅读原文\"在我的博客上查看。</p>"
+        final_html = formatted_html + read_more_notice
+
+        return final_html
+
+    def _upload_content_image(self, image_path: Path) -> Optional[str]:
+        if not image_path.exists(): return None
+        with open(image_path, 'rb') as f: image_data = f.read()
+        cached_url = self._get_cached_image_url(str(image_path), image_data)
+        if cached_url: return cached_url
+        if not self.api_tracker.check_limit("uploadimg", self.API_LIMITS["uploadimg"]): return None
+        access_token = self._get_access_token()
+        if not access_token: return None
+        url = f"{self.api_base_url}/media/uploadimg?access_token={access_token}"
+        files = {'media': (image_path.name, image_data)}
+        try:
+            response = requests.post(url, files=files, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            if "url" in data:
+                self.api_tracker.increment("uploadimg")
+                wechat_url = data["url"]
+                self._cache_image_mapping(str(image_path), wechat_url, image_data)
+                return wechat_url
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Request to upload content image failed: {e}")
+        return None
+
+    def _upload_thumb_media(self, image_path: Path) -> Optional[str]:
+        if not image_path.exists(): return None
+        if not self.api_tracker.check_limit("add_material", self.API_LIMITS["add_material"]): return None
+        access_token = self._get_access_token()
+        if not access_token: return None
+        url = f"{self.api_base_url}/material/add_material?access_token={access_token}&type=thumb"
+        files = {'media': (image_path.name, open(image_path, 'rb'))}
+        try:
+            response = requests.post(url, files=files, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            if "media_id" in data:
+                self.api_tracker.increment("add_material")
+                return data["media_id"]
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Request to upload thumbnail failed: {e}")
+        return None
+
+    def _process_html_images(self, html: str, project_root: Path) -> str:
+        self.logger.info("Step 4: Processing and uploading images from HTML content...")
+        img_pattern = re.compile(r'<img src="([^"]+)"')
+        def replace_src(match):
+            original_src = match.group(1)
+            if original_src.startswith(('http', '//', 'data:')): return match.group(0)
+            image_path = (project_root / original_src).resolve()
+            wechat_url = self._upload_content_image(image_path)
+            if wechat_url: return f'<img src="{wechat_url}"'
+            return ""
+        return img_pattern.sub(replace_src, html)
+
+    def publish_to_draft(self, project_root: Path, front_matter: Dict[str, Any], markdown_content: str) -> Optional[str]:
+        self.logger.info(f"Starting API publish process for: {front_matter.get('title', 'Untitled')}")
+        cover_image_path_str = front_matter.get("image", {}).get("path")
+        if not cover_image_path_str: return None
+        cover_image_path = (project_root / cover_image_path_str).resolve()
+        thumb_media_id = self._upload_thumb_media(cover_image_path)
+        if not thumb_media_id: return None
+
+        final_html = self._transform_for_wechat(markdown_content)
+        final_html = self._process_html_images(final_html, project_root)
+
+        article = {
+            "title": front_matter.get("title", "Untitled"),
+            "author": front_matter.get("author", ""),
+            "digest": front_matter.get("excerpt", "")[:120],
+            "content": final_html,
+            "content_source_url": "",
+            "thumb_media_id": thumb_media_id,
+            "need_open_comment": 1,
+            "only_fans_can_comment": 0
+        }
+        
+        if not self.api_tracker.check_limit("add_news", self.API_LIMITS["add_news"]): return None
+        access_token = self._get_access_token()
+        if not access_token: return None
+        url = f"{self.api_base_url}/material/add_news?access_token={access_token}"
+        payload = {"articles": [article]}
+        try:
+            response = requests.post(url, data=json.dumps(payload, ensure_ascii=False).encode('utf-8'), timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            if "media_id" in data:
+                self.api_tracker.increment("add_news")
+                self.logger.info(f"✅ Successfully created draft! Media ID: {data['media_id']}")
+                return data["media_id"]
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Request to create draft failed: {e}")
+        return None
+
+    def generate_guide_file(self, project_root: Path, front_matter: Dict[str, Any], markdown_content: str) -> bool:
+        self.logger.info(f"Generating manual guide file for: {front_matter.get('title', 'Untitled')}")
+        guide_dir = project_root / "_output/wechat_guides"
+        guide_dir.mkdir(parents=True, exist_ok=True)
+        safe_title = re.sub(r'[^\w\s-]', '', front_matter.get('title', 'draft')).strip()
+        safe_title = re.sub(r'[-\s]+', '-', safe_title)
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        guide_file = guide_dir / f"{safe_title}_{timestamp}_guide.md"
+
+        final_html = self._transform_for_wechat(markdown_content)
+        final_html = self._process_html_images(final_html, project_root)
+
+        guide_text = f"""# WeChat Publication Guide
+- **Title**: {front_matter.get('title', 'N/A')}
+- **Author**: {front_matter.get('author', 'N/A')}
+- **Cover Image**: `{front_matter.get("image", {}).get("path", "N/A")}`
+- **HTML Content**: See below
+```html
+{final_html}
+```"""
+        try:
+            with open(guide_file, 'w', encoding='utf-8') as f: f.write(guide_text)
+            self.logger.info(f"✅ Successfully generated guide file: {guide_file}")
+            return True
+        except IOError as e:
+            self.logger.error(f"Failed to write guide file: {e}")
+            return False
+
     def _load_image_cache(self) -> Dict[str, dict]:
-        """加载图片缓存映射"""
+        if not self.cache_file.exists(): return {}
         try:
-            if self.cache_file.exists():
-                with open(self.cache_file, 'r', encoding='utf-8') as f:
-                    return json.load(f)
-        except Exception as e:
-            self.logger.warning(f"Failed to load image cache: {e}")
-        return {}
-    
+            with open(self.cache_file, 'r', encoding='utf-8') as f: return json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            self.logger.warning(f"Could not load image cache file: {e}")
+            return {}
+
     def _save_image_cache(self):
-        """保存图片缓存映射"""
         try:
             with open(self.cache_file, 'w', encoding='utf-8') as f:
                 json.dump(self.image_cache, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            self.logger.error(f"Failed to save image cache: {e}")
-    
+        except IOError as e: self.logger.error(f"Failed to save image cache: {e}")
+
     def _get_image_hash(self, image_data: bytes) -> str:
-        """计算图片数据的MD5哈希值"""
         return hashlib.md5(image_data).hexdigest()
-    
-    def _get_cached_image_url(self, onedrive_url: str, image_data: bytes) -> Optional[str]:
-        """检查图片是否已缓存，返回微信URL"""
+
+    def _get_cached_image_url(self, image_key: str, image_data: bytes) -> Optional[str]:
         image_hash = self._get_image_hash(image_data)
-        
-        # 检查是否有相同内容的图片已上传
-        for cached_url, cached_info in self.image_cache.items():
-            if isinstance(cached_info, dict) and cached_info.get('hash') == image_hash:
-                self.logger.info(f"Found cached image for {onedrive_url}: {cached_info['wechat_url']}")
-                return cached_info['wechat_url']
-        
+        cached_entry = self.image_cache.get(image_key)
+        if cached_entry and cached_entry.get('hash') == image_hash:
+            return cached_entry['wechat_url']
+        for key, value in self.image_cache.items():
+            if value.get('hash') == image_hash: return value['wechat_url']
         return None
-    
-    def _cache_image_mapping(self, onedrive_url: str, wechat_url: str, image_data: bytes):
-        """缓存图片映射关系"""
-        image_hash = self._get_image_hash(image_data)
-        self.image_cache[onedrive_url] = {
+
+    def _cache_image_mapping(self, image_key: str, wechat_url: str, image_data: bytes):
+        self.image_cache[image_key] = {
             'wechat_url': wechat_url,
-            'hash': image_hash,
+            'hash': self._get_image_hash(image_data),
             'upload_time': time.time()
         }
         self._save_image_cache()
-
-    def save_as_draft(self, title: str, content: str, author: str = "系统发布") -> bool:
-        """保存文章为草稿到微信公众号后台
-        
-        由于微信API限制，此方法现在只生成本地预览文件
-        用户需要手动在微信公众平台后台创建文章
-        
-        Args:
-            title: 文章标题
-            content: 文章内容（HTML格式）
-            author: 作者名称
-            
-        Returns:
-            bool: 始终返回True（生成预览文件成功）
-        """
-        try:
-            self.logger.info(f"Preparing WeChat content for: {title}")
-            
-            # 清理HTML内容，移除可能导致问题的元素
-            cleaned_content = self._clean_html_for_wechat(content)
-            
-            # 生成发布指导信息
-            guide_info = self._generate_publish_guide(title, cleaned_content, author)
-            
-            # 保存指导信息到文件
-            self._save_publish_guide(title, guide_info)
-            
-            self.logger.info(f"✅ WeChat content prepared successfully for: {title}")
-            self.logger.info("📋 请查看 _output/wechat_guides/ 目录中的发布指导文件")
-            self.logger.info("🔗 在微信公众平台后台手动创建文章：https://mp.weixin.qq.com/")
-            
-            return True
-                
-        except Exception as e:
-            self.logger.error(f"Error preparing WeChat content for '{title}': {e}")
-            return False
-
-    def _clean_html_for_wechat(self, html_content: str) -> str:
-        """清理HTML内容，移除可能导致微信API错误的元素"""
-        import re
-        
-        # 移除可能的媒体ID引用
-        html_content = re.sub(r'media_id\s*=\s*["\'][^"\']*["\']', '', html_content)
-        
-        # 移除完整的HTML文档结构（如果存在）
-        # 提取<body>标签内的内容，如果没有<body>标签则保持原样
-        body_match = re.search(r'<body[^>]*>(.*?)</body>', html_content, re.DOTALL | re.IGNORECASE)
-        if body_match:
-            html_content = body_match.group(1)
-        
-        # 移除可能存在的<div class="content">包装
-        content_match = re.search(r'<div class="content"[^>]*>(.*?)</div>', html_content, re.DOTALL | re.IGNORECASE)
-        if content_match:
-            html_content = content_match.group(1)
-        
-        # 移除不支持的HTML标签
-        unsupported_tags = ['script', 'style', 'meta', 'link', 'iframe', 'embed', 'object', 'html', 'head', 'title']
-        for tag in unsupported_tags:
-            html_content = re.sub(f'<{tag}[^>]*>.*?</{tag}>', '', html_content, flags=re.DOTALL | re.IGNORECASE)
-            html_content = re.sub(f'<{tag}[^>]*/?>', '', html_content, flags=re.IGNORECASE)
-        
-        # 移除<hr>分隔线（微信可能不支持）
-        html_content = re.sub(r'<hr[^>]*/?>', '', html_content, flags=re.IGNORECASE)
-        
-        # 确保图片URL格式正确
-        html_content = re.sub(r'<img\s+([^>]*?)src\s*=\s*["\']([^"\']*)["\']([^>]*?)>', 
-                            lambda m: f'<img {m.group(1)}src="{m.group(2)}" {m.group(3)}>' if m.group(2).startswith('http') else '',
-                            html_content)
-        
-        # 移除空的img标签
-        html_content = re.sub(r'<img[^>]*src\s*=\s*["\']["\'][^>]*>', '', html_content)
-        
-        # 清理多余的空白字符
-        html_content = re.sub(r'\n\s*\n', '\n', html_content)
-        
-        return html_content.strip()
-
-    def _extract_digest(self, html_content: str) -> str:
-        """从HTML内容中提取摘要"""
-        import re
-        
-        # 移除HTML标签，提取纯文本
-        text = re.sub(r'<[^>]+>', '', html_content)
-        # 移除多余的空白字符
-        text = re.sub(r'\s+', ' ', text).strip()
-        
-        # 取前60个字符作为摘要
-        digest = text[:60]
-        if len(text) > 60:
-            digest += "..."
-        
-        return digest
-
-    def _generate_publish_guide(self, title: str, content: str, author: str) -> dict:
-        """生成发布指导信息"""
-        return {
-            "title": title,
-            "author": author,
-            "digest": self._extract_digest(content),
-            "content": content,
-            "instructions": [
-                "1. 登录微信公众平台：https://mp.weixin.qq.com/",
-                "2. 点击左侧菜单 → 素材管理 → 新建图文素材",
-                "3. 填写标题、作者、摘要等信息",
-                "4. 将下方的HTML内容复制到正文编辑器中",
-                "5. 上传封面图片（可选）",
-                "6. 保存并发布或保存为草稿"
-            ],
-            "html_content": content,
-            "tips": [
-                "💡 HTML内容已经过优化，可以直接粘贴到微信编辑器",
-                "📱 图片URL已经是微信服务器地址，无需重新上传",
-                "🔗 所有外部链接已被移除，符合微信公众号规范",
-                "✨ 内容已针对手机阅读进行了格式优化"
-            ]
-        }
-
-    def _save_publish_guide(self, title: str, guide_info: dict):
-        """保存发布指导文件"""
-        try:
-            from pathlib import Path
-            import re
-            from datetime import datetime
-            
-            # 创建指导文件目录
-            guide_dir = Path("_output/wechat_guides")
-            guide_dir.mkdir(parents=True, exist_ok=True)
-            
-            # 生成安全的文件名
-            safe_title = re.sub(r'[^\w\s-]', '', title).strip()
-            safe_title = re.sub(r'[-\s]+', '-', safe_title)
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            
-            # 保存指导文件
-            guide_file = guide_dir / f"{safe_title}_{timestamp}_guide.md"
-            
-            with open(guide_file, 'w', encoding='utf-8') as f:
-                f.write(f"""# 微信公众号发布指导
-
-## 📝 文章信息
-- **标题**: {guide_info['title']}
-- **作者**: {guide_info['author']}
-- **摘要**: {guide_info['digest']}
-- **生成时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-## 📋 发布步骤
-""")
-                for instruction in guide_info['instructions']:
-                    f.write(f"{instruction}\n")
-                
-                f.write(f"""
-## 💡 使用提示
-""")
-                for tip in guide_info['tips']:
-                    f.write(f"{tip}\n")
-                
-                f.write(f"""
-## 📄 HTML内容
-请复制以下HTML内容到微信公众号编辑器中：
-
-```html
-{guide_info['html_content']}
-```
-
-## 🔗 相关链接
-- 微信公众平台：https://mp.weixin.qq.com/
-- 素材管理：https://mp.weixin.qq.com/cgi-bin/appmsg?t=media/appmsg_edit_v2&action=edit&type=10
-
-## 📝 使用说明
-1. 复制上方HTML内容到剪贴板
-2. 在微信公众号编辑器中切换到HTML模式
-3. 粘贴HTML内容
-4. 切换回可视化编辑模式进行最终调整
-""")
-            
-            # 同时保存纯HTML文件方便复制
-            html_file = guide_dir / f"{safe_title}_{timestamp}_content.html"
-            with open(html_file, 'w', encoding='utf-8') as f:
-                f.write(guide_info['html_content'])
-            
-            self.logger.info(f"📋 发布指导文件已保存: {guide_file}")
-            self.logger.info(f"📄 HTML内容文件已保存: {html_file}")
-            
-        except Exception as e:
-            self.logger.error(f"Failed to save publish guide: {e}")
-
-    def publish_article(self, title: str, markdown_content: str, author: str = "系统发布") -> bool:
-        """发布文章到微信公众号（保存为草稿）
-        
-        Args:
-            title: 文章标题
-            markdown_content: Markdown格式的文章内容
-            author: 作者名称
-            
-        Returns:
-            bool: 发布成功返回True，失败返回False
-        """
-        try:
-            self.logger.info(f"Publishing article to WeChat: {title}")
-            
-            # 转换Markdown内容为适合微信的HTML
-            html_content = self.transform_content(markdown_content)
-            
-            # 保存发布指导（替代草稿API）
-            success = self.save_as_draft(title, html_content, author)
-            
-            if success:
-                self.logger.info(f"Article '{title}' successfully prepared for WeChat publishing")
-            else:
-                self.logger.error(f"Failed to prepare article '{title}' for WeChat publishing")
-                
-            return success
-            
-        except Exception as e:
-            self.logger.error(f"Error publishing article '{title}': {e}")
-            return False
-    
-    def _save_local_preview(self, title: str, html_content: str, original_markdown: str):
-        """保存微信版本的本地预览文件"""
-        try:
-            from pathlib import Path
-            import re
-            from datetime import datetime
-            
-            # 创建预览目录
-            preview_dir = Path("_output/wechat_previews")
-            preview_dir.mkdir(parents=True, exist_ok=True)
-            
-            # 生成安全的文件名
-            safe_title = re.sub(r'[^\w\s-]', '', title).strip()
-            safe_title = re.sub(r'[-\s]+', '-', safe_title)
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            
-            # 保存HTML预览文件
-            html_file = preview_dir / f"{safe_title}_{timestamp}.html"
-            with open(html_file, 'w', encoding='utf-8') as f:
-                f.write(f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title} - 微信版本预览</title>
-    <style>
-        body {{ max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; }}
-        .header {{ background: #f0f0f0; padding: 15px; margin-bottom: 20px; border-radius: 5px; }}
-        .content {{ line-height: 1.6; }}
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>📱 微信公众号版本预览</h1>
-        <p><strong>标题:</strong> {title}</p>
-        <p><strong>生成时间:</strong> {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
-        <p><strong>状态:</strong> 已保存到微信草稿箱，可在公众号后台查看和发布</p>
-    </div>
-    <div class="content">
-        {html_content}
-    </div>
-</body>
-</html>""")
-            
-            # 保存处理后的Markdown文件
-            md_file = preview_dir / f"{safe_title}_{timestamp}.md"
-            with open(md_file, 'w', encoding='utf-8') as f:
-                f.write(f"""---
-title: {title}
-platform: 微信公众号
-generated_at: {datetime.now().isoformat()}
-status: 已保存到草稿箱
----
-
-# {title}
-
-{original_markdown}
-
----
-
-**处理说明:**
-- 已移除所有超链接
-- 已添加"阅读原文"引导
-- 图片已上传到微信服务器
-- 已通过AI进行排版优化
-""")
-            
-            self.logger.info(f"Local preview saved: {html_file}")
-            self.logger.info(f"Local markdown saved: {md_file}")
-            
-        except Exception as e:
-            self.logger.error(f"Failed to save local preview: {e}")
-            # 不影响主流程，继续执行
-
-if __name__ == '__main__':
-    # 用于直接测试此类
-    try:
-        publisher = WeChatPublisher()
-        token = publisher.get_access_token()
-        print(f"Successfully got access token: {token[:10]}...")
-
-        # 测试内容转换
-        test_md = """# 测试标题
-
-这是一个段落，包含一个[链接](http://example.com)，我们会移除它。
-
-- 列表1
-- 列表2
-"""
-        transformed_html = publisher.transform_content(test_md)
-        print("\n--- Transformed HTML ---")
-        print(transformed_html)
-        with open("wechat_preview.html", "w", encoding="utf-8") as f:
-            f.write(transformed_html)
-        print("\nPreview saved to wechat_preview.html")
-
-    except (ValueError, Exception) as e:
-        print(f"An error occurred: {e}")
