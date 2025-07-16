@@ -628,9 +628,11 @@ class ContentPipeline:
                         publish_success = self._publish_to_github_pages(draft_path, content)
                         platform_success[platform] = publish_success
                     elif platform == "wechat":
-                        self._publish_to_wechat(content)
+                        publish_success = self._publish_to_wechat(content)
+                        platform_success[platform] = publish_success
                     elif platform == "wordpress":
-                        self._publish_to_wordpress(content)
+                        publish_success = self._publish_to_wordpress(content)
+                        platform_success[platform] = publish_success
                     progress.update(task, completed=True)
                 
                 # 检查所有平台是否都成功
