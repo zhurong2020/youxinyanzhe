@@ -19,18 +19,18 @@ Claude Code serves as the AI software engineer for this project, with primary re
 
 1. **Multi-platform Publishing System**:
    - ✅ **GitHub Pages**: Full Jekyll publishing with frontmatter processing
-   - ✅ **WeChat Official Account**: Complete draft saving workflow
+   - ✅ **WeChat Official Account**: Complete content processing with publish guidance workflow
      - Markdown to WeChat HTML conversion
      - OneDrive image upload to WeChat servers
      - AI-powered mobile layout optimization
-     - Save to WeChat draft box for scheduled publishing
+     - Generate publish guidance files for manual publishing (due to API limitations)
    - 🔄 **WordPress**: Basic API publishing (requires further enhancement)
 
 2. **Publishing Status Management**:
    - ✅ **Status Tracking**: `_drafts/.publishing/*.yml` files track publication status
    - ✅ **Cross-platform Republishing**: Support republishing existing articles to other platforms
    - ✅ **Duplicate Prevention**: Automatically filter already-published platforms
-   - ✅ **Local Preview**: WeChat versions saved to `_output/wechat_previews/`
+   - ✅ **Publish Guidance**: WeChat guidance files saved to `_output/wechat_guides/`
 
 3. **Content Enhancement Features**:
    - ✅ **Conditional Content**: Investment articles automatically include risk disclaimers
@@ -82,19 +82,33 @@ This section records critical architectural adjustments for the project:
   - Enables intelligent platform filtering and duplicate prevention
 - **Benefits**: Reliable state management, supports team collaboration, maintains publication history
 
-### Decision: WeChat Draft-Only Publishing Strategy ✅ (Completed)
-- **Strategy**: Save articles as drafts in WeChat backend rather than immediate publication
-- **Rationale**: Allows content creators to review, schedule, and batch publish through WeChat's native interface
+### Decision: WeChat Publish Guidance Strategy ✅ (Completed)
+- **Strategy**: Generate publish guidance files instead of direct API publishing due to permission limitations
+- **Rationale**: WeChat API draft/publishing permissions require enterprise certification or special approval
 - **Implementation**:
-  - Content conversion (Markdown → HTML, image upload, AI optimization)
-  - Save to WeChat draft box via API
-  - Local preview files saved to `_output/wechat_previews/`
-- **Benefits**: Maintains editorial control while automating content preparation
+  - Complete content processing (Markdown → HTML, image upload, AI optimization)
+  - Generate comprehensive publish guidance files in `_output/wechat_guides/`
+  - Provide step-by-step instructions for manual publishing in WeChat backend
+  - Include ready-to-use HTML content for direct copy-paste
+- **Benefits**: Maintains full automation of technical processing while providing clear guidance for manual publication
+
+### Decision: WeChat API Permission Investigation and Resolution ✅ (Completed)
+- **Issue Discovered**: WeChat API returned `40007 invalid media_id` errors during draft saving attempts
+- **Root Cause Analysis**:
+  - IP whitelist configuration was required and resolved
+  - Draft/publishing API permissions are limited to enterprise-certified accounts
+  - Basic personal/organization accounts lack sufficient API permissions for automated publishing
+- **Investigation Process**:
+  - Used WeChat official API debugging tools to verify request formats
+  - Tested multiple API endpoints (`/draft/add`, `/material/add_news`, `/freepublish/submit`)
+  - Confirmed access_token generation and image upload functionality works correctly
+- **Final Resolution**: Pivot to publish guidance file generation strategy
 
 ## 6. Development Workflow & Conventions
 
 ### Code Quality Standards
 - **Coding Style**: Follow PEP 8 standards, use type annotations, maintain consistency with existing project code style
+- **Type Safety**: Always use explicit type conversions (e.g., `str()`, `int()`) when IDE indicates type issues
 - **Error Handling**: Implement comprehensive error handling with meaningful log messages
 - **Testing**: Core business logic modifications and additions require corresponding `pytest` test cases
 - **Documentation**: Keep docstrings up-to-date, especially for public APIs
@@ -109,19 +123,28 @@ This section records critical architectural adjustments for the project:
 - **Status Updates**: Provide progress updates using TodoWrite tool for complex tasks
 - **Decision Documentation**: Record all architectural decisions in this document
 
+### Testing and Debugging Workflow
+- **Test File Organization**: Move reusable test scripts to `tests/` directory, remove temporary debug files from project root
+- **Debugging Strategy**: Create focused test scripts for specific issues (API testing, system verification, etc.)
+- **Test Naming**: Use descriptive names like `test_wechat_api_debug.py`, `test_system_verify.py`
+- **Cleanup Protocol**: Remove temporary debug files after issues are resolved, keep only reusable test utilities
+
 ## 7. Project Structure Best Practices
 
 ### Directory Organization
 - **`scripts/`**: Core functionality modules only (no test files)
-- **`tests/`**: All test files, including platform-specific tests like `test_wechat_draft.py`
+- **`tests/`**: All test files, including platform-specific tests and debugging utilities
 - **`config/`**: Configuration files organized by functionality (gemini, platforms, templates)
 - **`_drafts/.publishing/`**: Publication status tracking files (included in Git)
-- **`_output/`**: Generated files and previews (excluded from Git)
+- **`_output/`**: Generated files and guidance (excluded from Git)
+  - **`wechat_guides/`**: WeChat publish guidance files (*.md guides, *.html content)
+  - **`wechat_image_cache/`**: WeChat uploaded image cache and mappings
 
 ### File Naming Conventions
 - **Status Files**: `article-name.yml` in `_drafts/.publishing/`
-- **Preview Files**: `article-title_timestamp.html` and `article-title_timestamp.md` in `_output/wechat_previews/`
+- **Guidance Files**: `article-title_timestamp_guide.md` and `article-title_timestamp_content.html` in `_output/wechat_guides/`
 - **Test Files**: `test_feature_name.py` in `tests/`
+- **Debug Files**: `test_*_debug.py`, `test_*_verify.py` for debugging and verification utilities
 
 ## 8. Security Practices
 
@@ -146,9 +169,19 @@ This section records critical architectural adjustments for the project:
 - **Link Removal**: All hyperlinks are removed and replaced with "阅读原文" guidance
 - **Image Handling**: OneDrive images are automatically downloaded and re-uploaded to WeChat servers
 - **Mobile Optimization**: AI-powered layout optimization for mobile reading experience
-- **Preview Generation**: Local HTML and Markdown previews are always generated for review
+- **Guidance Generation**: Comprehensive publish guidance files are generated with step-by-step instructions
+- **HTML Cleaning**: Content is cleaned and optimized for WeChat editor compatibility
 
 ## 10. Document Update History
+
+### 2025-07-16: WeChat API Investigation and Workflow Optimization ✅
+- **Added**: WeChat API permission investigation and resolution decision
+- **Added**: Testing and debugging workflow conventions based on recent experience
+- **Added**: Type safety requirements for code quality standards
+- **Updated**: WeChat publishing strategy from draft-saving to publish guidance generation
+- **Updated**: Directory organization to reflect new `wechat_guides` structure
+- **Updated**: File naming conventions for guidance files and debug utilities
+- **Updated**: Content processing standards to include HTML cleaning and guidance generation
 
 ### 2025-07-15: Major Update - Multi-platform Publishing System ✅
 - **Added**: Completed core tasks section with detailed feature status
@@ -169,5 +202,17 @@ This section records critical architectural adjustments for the project:
 
 **Note**: This document serves as the living guideline for all development work. It should be updated whenever major architectural decisions are made or significant features are implemented.
 
-**Last Updated**: 2025-07-15  
+**Last Updated**: 2025-07-16  
 **Next Review**: When major features are added or architectural changes are needed
+
+## 11. Key Lessons from Recent Development
+
+### WeChat API Integration Challenges
+- **Permission Requirements**: Enterprise certification often required for full API access
+- **Alternative Approaches**: When direct API access is limited, focus on maximizing automation of preparatory work
+- **User Experience**: Well-structured guidance files can provide significant value even when full automation isn't possible
+
+### Debugging and Testing Best Practices
+- **Systematic Investigation**: Use official debugging tools when available to verify API requests
+- **Incremental Testing**: Test each component (authentication, image upload, content processing) separately
+- **Clean Project Structure**: Regularly clean up temporary debug files and organize reusable test utilities

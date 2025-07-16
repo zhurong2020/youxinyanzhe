@@ -368,10 +368,13 @@ class ContentPipeline:
         print("\n可用的草稿文件：")
         for i, draft in enumerate(drafts, 1):
             print(f"{i}. {draft.name}")
+        print("0. 退出")
             
         while True:
             try:
-                choice = int(input("\n请选择要处理的草稿 (输入序号): "))
+                choice = int(input("\n请选择要处理的草稿 (输入序号，0退出): "))
+                if choice == 0:
+                    return None
                 if 1 <= choice <= len(drafts):
                     return drafts[choice-1]
                 print("无效的选择")
@@ -401,10 +404,13 @@ class ContentPipeline:
         print("\n可用的已发布文章：")
         for i, post in enumerate(posts, 1):
             print(f"{i}. {post.name}")
+        print("0. 退出")
             
         while True:
             try:
-                choice = int(input("\n请选择要重新发布的文章 (输入序号): "))
+                choice = int(input("\n请选择要重新发布的文章 (输入序号，0退出): "))
+                if choice == 0:
+                    return None
                 if 1 <= choice <= len(posts):
                     return posts[choice-1]
                 print("无效的选择")
@@ -508,6 +514,7 @@ class ContentPipeline:
             print("\n可选的发布平台：")
             for i, platform in enumerate(available_platforms, 1):
                 print(f"{i}. {platform}")
+            print("0. 退出")
                 
             platform_list = available_platforms
         else:
@@ -515,20 +522,23 @@ class ContentPipeline:
             print("\n可用的发布平台：")
             for i, platform in enumerate(all_platforms, 1):
                 print(f"{i}. {platform}")
+            print("0. 退出")
                 
             platform_list = all_platforms
             
         if not platform_list:
             return []
             
-        selections = input("\n请选择发布平台 (多个平台用逗号分隔): ").split(",")
+        selections = input("\n请选择发布平台 (多个平台用逗号分隔，0退出): ").split(",")
         selected_platforms = []
         
         for sel in selections:
             try:
-                idx = int(sel.strip()) - 1
-                if 0 <= idx < len(platform_list):
-                    selected_platforms.append(platform_list[idx])
+                idx = int(sel.strip())
+                if idx == 0:
+                    return []  # 用户选择退出
+                elif 1 <= idx <= len(platform_list):
+                    selected_platforms.append(platform_list[idx - 1])
                 else:
                     print(f"无效选择: {sel}")
             except ValueError:
@@ -891,7 +901,11 @@ class ContentPipeline:
                 else:
                     self.log("未能生成摘要", level="warning")
             else:
-                self.log(f"保留现有摘要: {post['excerpt'][:50]}...", level="info")
+                excerpt_text = str(post.get('excerpt', ''))
+                if excerpt_text:
+                    self.log(f"保留现有摘要: {excerpt_text[:50]}...", level="info")
+                else:
+                    self.log("现有摘要为空", level="warning")
             
             # 处理author字段（如果author_profile为true，移除author字段以避免重复）
             if post.get('author_profile', False) and 'author' in post:
@@ -1243,9 +1257,13 @@ class ContentPipeline:
         try:
             # 1. 解析文章内容
             post = frontmatter.loads(content)
-            title = post.metadata.get('title', '无标题')
+            title = str(post.metadata.get('title', '无标题'))
             markdown_body = post.content
             
+            if not title or title == '无标题':
+                self.log("文章标题为空或未设置，跳过发布", level="error", force=True)
+                return False
+                
             self.log(f"准备发布文章: {title}", level="info", force=True)
 
             # 2. 调用发布方法（实际上是保存为草稿）
@@ -1543,8 +1561,8 @@ class ContentPipeline:
             # 尝试解析 front matter
             try:
                 post = frontmatter.loads(content)
-                # 检查必要的字段
-                required_fields = ['title', 'date', 'layout']
+                # 检查必要的字段（layout不是必须的，发布时会自动添加）
+                required_fields = ['title', 'date']
                 for field in required_fields:
                     if field not in post:
                         self.log(f"草稿缺少必要字段: {field}", level="warning")
