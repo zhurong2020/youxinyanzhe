@@ -16,7 +16,8 @@ This project is a personal blog built with Jekyll. It includes a sophisticated P
 *   **Configuration**: YAML files in `config/` directory (`pipeline_config.yml`, `platforms.yml`).
 *   **Dependencies**: `requirements.txt` (Python), `Gemfile` (Ruby/Jekyll).
 *   **Testing**: `pytest` framework (`tests/`, `pytest.ini`). Tests for WeChat API functionality are already in place.
-*   **Credentials**: Sensitive keys (e.g., for WeChat API) are managed in a `.env` file at the project root.
+*   **Credentials**: Sensitive keys (e.g., for WeChat API, Gemini API) are managed in a `.env` file at the project root.
+*   **AI Model**: `gemini-2.5-pro` is used for content processing, configured in `config/gemini_config.yml`.
 
 ## 3. Development Workflow
 
