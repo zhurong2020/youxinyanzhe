@@ -62,7 +62,7 @@ def main():
         return
     
     # 选择发布平台
-    platforms = pipeline.select_platforms()
+    platforms = pipeline.select_platforms(draft)
     if not platforms:
         print("未选择任何发布平台")
         return
