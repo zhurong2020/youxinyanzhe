@@ -66,7 +66,7 @@ class WechatPublisher:
         "token": 2000,
         "add_material": 1000,
         "uploadimg": 1000,
-        "add_news": 1000,
+        "draft_add": 1000,  # 新的草稿箱API
     }
 
     def __init__(self, gemini_model):
@@ -116,60 +116,75 @@ class WechatPublisher:
             return None
 
     def _transform_for_wechat(self, markdown_content: str) -> str:
-        """Transforms markdown content into WeChat-ready HTML."""
+        """Transforms markdown content into WeChat-ready plain text."""
         self.logger.info("Starting full content transformation for WeChat...")
 
         # 1. AI-powered content summarization and rewriting
         self.logger.info("Step 1: Rewriting and summarizing content with AI...")
-        summarize_prompt = f"""Please rewrite and summarize the following article to be about 800-1000 words, making it more engaging for a WeChat audience. Focus on the core ideas, use shorter paragraphs, and maintain the original tone. Do not add any titles or headers.
+        summarize_prompt = f"""Please rewrite and summarize the following article to be about 600-800 words, making it highly engaging for WeChat mobile reading. Focus on the core ideas and maintain the original tone.
+
+IMPORTANT FORMATTING RULES:
+1. Return ONLY plain text content - no HTML tags, no markdown syntax, no special formatting
+2. Use appropriate emojis (2-3 per major section) to enhance readability
+3. Structure paragraphs for mobile reading: 2-4 sentences per paragraph
+4. Avoid single-line paragraphs - combine related ideas into cohesive paragraphs
+5. Use natural transitions between paragraphs - no "---" or special separators
+6. Keep the content concise and punchy for WeChat's fast-paced reading style
+7. Use conversational tone with direct address to readers
 
 ---
 
 {markdown_content}"""
         try:
             response = self.model.generate_content(summarize_prompt)
-            rewritten_md = response.text
+            rewritten_content = response.text
             self.logger.info("Content successfully rewritten by AI.")
         except Exception as e:
             self.logger.error(f"AI content summarization failed: {e}. Using original content.")
-            rewritten_md = markdown_content
+            # Fallback: convert markdown to plain text
+            import html2text
+            h = html2text.HTML2Text()
+            h.ignore_links = True
+            h.ignore_images = True
+            rewritten_content = h.handle(markdown2.markdown(markdown_content))
 
-        # 2. Convert to HTML
-        html = markdown2.markdown(rewritten_md, extras=["tables", "fenced-code-blocks", "footnotes"])
+        # 2. AI-powered mobile optimization
+        self.logger.info("Step 2: Optimizing content for mobile reading...")
+        format_prompt = f"""You are an expert in WeChat mobile reading optimization. Your task is to polish the following content for the best WeChat reading experience. Follow these strict rules:
 
-        # 3. AI-powered layout and formatting
-        self.logger.info("Step 2: Formatting HTML for WeChat with AI...")
-        format_prompt = f"""You are an expert in WeChat article formatting. Your task is to refine the following HTML to make it more readable and engaging on mobile devices. You must follow these rules strictly:
-1.  Do NOT change, add, or remove any text content. Your task is to format, not rewrite.
-2.  Do NOT change any `<img>` tags or their `src` attributes.
-3.  Add relevant Emojis: Insert a single, appropriate emoji at the beginning of each heading (`<h1>`, `<h2>`, `<h3>`). For example, `<h2>...` becomes `<h2>✨ ...</h2>`.
-4.  Inject mobile-friendly inline CSS: Add `style` attributes to HTML tags. For example:
-    -   For `<p>`: `style="margin: 1.2em 0; line-height: 1.8; font-size: 16px;"`
-    -   For `<h2>`: `style="font-size: 1.5em; margin-top: 2em; margin-bottom: 1em; border-bottom: 2px solid #f2f2f2; padding-bottom: 0.3em;"`
-    -   For `<h3>`: `style="font-size: 1.2em; margin-top: 1.8em; margin-bottom: 1em;"`
-    -   For `<ul>` or `<ol>`: `style="padding-left: 20px;"`
-    -   For `<li>`: `style="margin-bottom: 0.8em;"`
-5.  Remove all hyperlink `<a>` tags but keep the link text. For example, `<a href=... >text</a>` becomes `text`.
-6.  Return ONLY the modified, clean HTML body content. Do not include `<html>`, `<head>`, `<body>` tags or any explanations.
+FORMATTING REQUIREMENTS:
+1. Keep content as PLAIN TEXT only - absolutely no HTML tags, no markdown syntax, no special symbols
+2. Use 3-5 relevant emojis throughout the entire article to enhance engagement
+3. Create natural paragraph flow: each paragraph should be 2-4 sentences, avoid single-sentence paragraphs
+4. Use smooth transitions between paragraphs - no artificial separators like "---" or bullets
+5. Maintain conversational and engaging tone with direct reader engagement
+6. Ensure total length is concise for mobile reading (aim for easy 2-3 minute read)
+7. Use line breaks sparingly - only between distinct topic shifts
+8. Make sure content flows naturally from one idea to the next
 
-Here is the HTML content to process:
+CONTENT GOALS:
+- Keep readers engaged throughout
+- Make complex ideas simple and relatable
+- Use examples and analogies where appropriate
+- End with a compelling conclusion or call-to-action
+
+Here is the content to optimize:
 ---
-{html}"""
+{rewritten_content}"""
         try:
             response = self.model.generate_content(format_prompt)
-            formatted_html = response.text
-            self.logger.info("HTML successfully formatted by AI.")
+            final_content = response.text
+            self.logger.info("Content successfully optimized by AI.")
         except Exception as e:
-            self.logger.error(f"AI formatting failed: {e}. Proceeding with basic HTML and removing links manually.")
-            # Fallback to manual link removal if AI fails
-            formatted_html = re.sub(r'<a[^>]*>(.*?)</a>', r'\1', html)
+            self.logger.error(f"AI optimization failed: {e}. Using rewritten content.")
+            final_content = rewritten_content
 
-        # 4. Append "Read More" notice
+        # 3. Append "Read More" notice
         self.logger.info("Step 3: Appending 'Read More' notice.")
-        read_more_notice = "<p style='text-align: center; color: #888; margin-top: 40px;'>- - -</p>" + "<p style='text-align: center; color: #888;'>因篇幅限制，更多技术细节和完整代码，<br>请点击文末的\"阅读原文\"在我的博客上查看。</p>"
-        final_html = formatted_html + read_more_notice
+        read_more_notice = "\n\n💡 因篇幅限制，更多详细内容和实用资源，请点击文末的\"阅读原文\"在我的博客上查看完整版本。"
+        final_content = final_content + read_more_notice
 
-        return final_html
+        return final_content
 
     def _upload_content_image(self, image_path: Path) -> Optional[str]:
         if not image_path.exists(): return None
@@ -194,6 +209,50 @@ Here is the HTML content to process:
             self.logger.error(f"Request to upload content image failed: {e}")
         return None
 
+    def _upload_content_image_from_url(self, image_url: str) -> Optional[str]:
+        """从OneDrive URL下载图片并上传到微信服务器"""
+        try:
+            self.logger.info(f"Downloading content image from: {image_url}")
+            response = requests.get(image_url, timeout=20)
+            response.raise_for_status()
+            image_data = response.content
+            
+            # 检查缓存
+            cached_url = self._get_cached_image_url(image_url, image_data)
+            if cached_url:
+                self.logger.info(f"Using cached image URL: {cached_url}")
+                return cached_url
+            
+            if not self.api_tracker.check_limit("uploadimg", self.API_LIMITS["uploadimg"]): 
+                return None
+            
+            access_token = self._get_access_token()
+            if not access_token: return None
+            
+            url = f"{self.api_base_url}/media/uploadimg?access_token={access_token}"
+            files = {'media': ('image.jpg', image_data, 'image/jpeg')}
+            
+            self.logger.info(f"Uploading content image to WeChat...")
+            upload_response = requests.post(url, files=files, timeout=30)
+            upload_response.raise_for_status()
+            upload_data = upload_response.json()
+            
+            if "url" in upload_data:
+                self.api_tracker.increment("uploadimg")
+                wechat_url = upload_data["url"]
+                self.logger.info(f"Successfully uploaded content image. WeChat URL: {wechat_url}")
+                # 缓存映射关系
+                self._cache_image_mapping(image_url, wechat_url, image_data)
+                return wechat_url
+            else:
+                error_msg = upload_data.get("errmsg", "Unknown upload error")
+                self.logger.error(f"Failed to upload content image to WeChat: {error_msg}")
+                return None
+                
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Failed to download or upload content image from {image_url}: {e}")
+            return None
+
     def _upload_thumb_media(self, image_path: Path) -> Optional[str]:
         if not image_path.exists(): return None
         if not self.api_tracker.check_limit("add_material", self.API_LIMITS["add_material"]): return None
@@ -212,12 +271,59 @@ Here is the HTML content to process:
             self.logger.error(f"Request to upload thumbnail failed: {e}")
         return None
 
+    def _upload_thumb_media_from_url(self, image_url: str) -> Optional[str]:
+        """从OneDrive URL下载图片并上传为thumb media"""
+        try:
+            self.logger.info(f"Downloading cover image from: {image_url}")
+            response = requests.get(image_url, timeout=20)
+            response.raise_for_status()
+            image_data = response.content
+            
+            if not self.api_tracker.check_limit("add_material", self.API_LIMITS["add_material"]): 
+                return None
+            
+            access_token = self._get_access_token()
+            if not access_token: return None
+            
+            url = f"{self.api_base_url}/material/add_material?access_token={access_token}&type=thumb"
+            files = {'media': ('cover_image.jpg', image_data, 'image/jpeg')}
+            
+            self.logger.info(f"Uploading cover image to WeChat as thumb media...")
+            upload_response = requests.post(url, files=files, timeout=30)
+            upload_response.raise_for_status()
+            upload_data = upload_response.json()
+            
+            if "media_id" in upload_data:
+                self.api_tracker.increment("add_material")
+                self.logger.info(f"Successfully uploaded cover image. Media ID: {upload_data['media_id']}")
+                return upload_data["media_id"]
+            else:
+                error_msg = upload_data.get("errmsg", "Unknown upload error")
+                self.logger.error(f"Failed to upload cover image to WeChat: {error_msg}")
+                return None
+                
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Failed to download or upload cover image from {image_url}: {e}")
+            return None
+
     def _process_html_images(self, html: str, project_root: Path) -> str:
         self.logger.info("Step 4: Processing and uploading images from HTML content...")
         img_pattern = re.compile(r'<img src="([^"]+)"')
         def replace_src(match):
             original_src = match.group(1)
-            if original_src.startswith(('http', '//', 'data:')): return match.group(0)
+            
+            # 处理OneDrive链接
+            if original_src.startswith("https://1drv.ms/"):
+                wechat_url = self._upload_content_image_from_url(original_src)
+                if wechat_url: 
+                    return f'<img src="{wechat_url}"'
+                return ""
+            
+            # 处理其他HTTP链接（跳过）
+            if original_src.startswith(('http', '//', 'data:')): 
+                return match.group(0)
+            
+            # 处理本地文件路径
             image_path = (project_root / original_src).resolve()
             wechat_url = self._upload_content_image(image_path)
             if wechat_url: return f'<img src="{wechat_url}"'
@@ -226,11 +332,38 @@ Here is the HTML content to process:
 
     def publish_to_draft(self, project_root: Path, front_matter: Dict[str, Any], markdown_content: str) -> Optional[str]:
         self.logger.info(f"Starting API publish process for: {front_matter.get('title', 'Untitled')}")
-        cover_image_path_str = front_matter.get("image", {}).get("path")
-        if not cover_image_path_str: return None
-        cover_image_path = (project_root / cover_image_path_str).resolve()
-        thumb_media_id = self._upload_thumb_media(cover_image_path)
-        if not thumb_media_id: return None
+        
+        # 尝试多种方式获取封面图片
+        cover_image_path_str = None
+        cover_image_url = None
+        
+        # 方式1: 从image.path获取本地文件路径
+        if front_matter.get("image", {}).get("path"):
+            cover_image_path_str = front_matter.get("image", {}).get("path")
+        # 方式2: 从header.overlay_image获取URL
+        elif front_matter.get("header", {}).get("overlay_image"):
+            cover_image_url = front_matter.get("header", {}).get("overlay_image")
+        # 方式3: 从header.teaser获取URL
+        elif front_matter.get("header", {}).get("teaser"):
+            cover_image_url = front_matter.get("header", {}).get("teaser")
+        else:
+            self.logger.error("No cover image found in front matter")
+            return None
+        
+        # 处理本地文件路径
+        if cover_image_path_str:
+            cover_image_path = (project_root / cover_image_path_str).resolve()
+            thumb_url = self._upload_content_image(cover_image_path)
+        # 处理OneDrive URL
+        elif cover_image_url and cover_image_url.startswith("https://1drv.ms/"):
+            thumb_url = self._upload_content_image_from_url(cover_image_url)
+        else:
+            self.logger.error(f"Unsupported cover image format: {cover_image_url}")
+            return None
+            
+        if not thumb_url: 
+            self.logger.error("Failed to upload cover image")
+            return None
 
         final_html = self._transform_for_wechat(markdown_content)
         final_html = self._process_html_images(final_html, project_root)
@@ -241,24 +374,32 @@ Here is the HTML content to process:
             "digest": front_matter.get("excerpt", "")[:120],
             "content": final_html,
             "content_source_url": "",
-            "thumb_media_id": thumb_media_id,
+            "thumb_url": thumb_url,
             "need_open_comment": 1,
             "only_fans_can_comment": 0
         }
         
-        if not self.api_tracker.check_limit("add_news", self.API_LIMITS["add_news"]): return None
+        if not self.api_tracker.check_limit("draft_add", self.API_LIMITS["draft_add"]): return None
         access_token = self._get_access_token()
         if not access_token: return None
-        url = f"{self.api_base_url}/material/add_news?access_token={access_token}"
+        url = f"{self.api_base_url}/draft/add?access_token={access_token}"
         payload = {"articles": [article]}
         try:
-            response = requests.post(url, data=json.dumps(payload, ensure_ascii=False).encode('utf-8'), timeout=30)
+            headers = {'Content-Type': 'application/json; charset=utf-8'}
+            response = requests.post(url, data=json.dumps(payload, ensure_ascii=False).encode('utf-8'), headers=headers, timeout=30)
             response.raise_for_status()
             data = response.json()
             if "media_id" in data:
-                self.api_tracker.increment("add_news")
+                self.api_tracker.increment("draft_add")
                 self.logger.info(f"✅ Successfully created draft! Media ID: {data['media_id']}")
                 return data["media_id"]
+            else:
+                # 处理微信API返回的错误
+                error_code = data.get("errcode", "unknown")
+                error_msg = data.get("errmsg", "Unknown error")
+                self.logger.error(f"WeChat API error: {error_code} - {error_msg}")
+                self.logger.error(f"Full response: {data}")
+                return None
         except requests.exceptions.RequestException as e:
             self.logger.error(f"Request to create draft failed: {e}")
         return None
@@ -272,18 +413,48 @@ Here is the HTML content to process:
         timestamp = time.strftime("%Y%m%d_%H%M%S")
         guide_file = guide_dir / f"{safe_title}_{timestamp}_guide.md"
 
-        final_html = self._transform_for_wechat(markdown_content)
-        final_html = self._process_html_images(final_html, project_root)
+        final_content = self._transform_for_wechat(markdown_content)
+        # 不需要处理图片，因为现在生成的是纯文本内容
 
-        guide_text = f"""# WeChat Publication Guide
-- **Title**: {front_matter.get('title', 'N/A')}
-- **Author**: {front_matter.get('author', 'N/A')}
-- **Cover Image**: `{front_matter.get("image", {}).get("path", "N/A")}`
-- **HTML Content**: See below
-```html
-{final_html}
-```"""
+        # 获取封面图片信息
+        cover_image = "N/A"
+        if front_matter.get("image", {}).get("path"):
+            cover_image = front_matter.get("image", {}).get("path")
+        elif front_matter.get("header", {}).get("overlay_image"):
+            cover_image = front_matter.get("header", {}).get("overlay_image")
+        elif front_matter.get("header", {}).get("teaser"):
+            cover_image = front_matter.get("header", {}).get("teaser")
+        
+        guide_text = f"""# 微信公众号发布指导
+
+## 📋 文章信息
+- **标题**: {front_matter.get('title', 'N/A')}
+- **作者**: {front_matter.get('author', 'N/A')}
+- **封面图片**: {cover_image}
+
+## 📱 使用方法
+1. 复制下方的"文章内容"
+2. 打开微信公众号后台
+3. 点击"写新图文"
+4. 将内容粘贴到编辑器中
+5. 手动上传封面图片
+6. 根据需要调整格式和样式
+7. 预览并发布
+
+## 📝 文章内容
+请复制以下内容到微信公众号编辑器：
+
+{final_content}
+
+## 💡 格式提示
+- 上述内容为纯文本格式，可直接粘贴使用
+- 建议在微信编辑器中手动调整字体大小和颜色
+- 可以使用微信编辑器的样式功能美化排版
+- 记得上传封面图片以获得更好的视觉效果
+"""
+        
         try:
+            # 保存指导文件
             with open(guide_file, 'w', encoding='utf-8') as f: f.write(guide_text)
             self.logger.info(f"✅ Successfully generated guide file: {guide_file}")
             return True
