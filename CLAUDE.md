@@ -109,9 +109,22 @@ This section records critical architectural adjustments for the project:
 ### Code Quality Standards
 - **Coding Style**: Follow PEP 8 standards, use type annotations, maintain consistency with existing project code style
 - **Type Safety**: Always use explicit type conversions (e.g., `str()`, `int()`) when IDE indicates type issues
+- **Import Standards**: Use correct import paths (e.g., `from google.generativeai.generative_models import GenerativeModel`)
 - **Error Handling**: Implement comprehensive error handling with meaningful log messages
 - **Testing**: Core business logic modifications and additions require corresponding `pytest` test cases
 - **Documentation**: Keep docstrings up-to-date, especially for public APIs
+
+### Testing Standards and Conventions
+- **Test File Organization**: All test files must be placed in the `tests/` directory
+- **Existing Test Modules**: Always check and utilize existing test modules before creating new ones:
+  - `test_wechat_draft.py`: WeChat functionality testing
+  - `test_content_pipeline.py`: Content processing pipeline tests
+  - `conftest.py`: Shared test fixtures and configurations
+  - `run_tests.py`: Test runner with custom configurations
+- **Test File Naming**: Follow `test_*.py` pattern for all test files
+- **Debug and Verification**: Use `test_*_debug.py` and `test_*_verify.py` for debugging utilities
+- **Test Isolation**: Each test should be independent and not rely on external state
+- **Cleanup**: Remove temporary test files after testing completion
 
 ### Git Workflow
 - **Commits**: Use descriptive commit messages following conventional commit format
@@ -163,18 +176,36 @@ This section records critical architectural adjustments for the project:
 ### API Configuration Requirements
 - **Credentials**: `WECHAT_APPID` and `WECHAT_APPSECRET` must be set in `.env`
 - **IP Whitelist**: Production server IP must be configured in WeChat backend
-- **Permissions**: Account must have draft management permissions
+- **Permissions**: Account must have "永久素材管理" (permanent material management) permissions
+- **API Limits**: System automatically tracks daily API call limits:
+  - Token requests: 2000/day
+  - Image uploads: 1000/day
+  - Material additions: 1000/day
+  - News creations: 1000/day
 
 ### Content Processing Standards
+- **Two-stage AI Processing**: 
+  - Stage 1: Content summarization and rewriting for WeChat audience
+  - Stage 2: Mobile-friendly HTML formatting with inline CSS and emojis
 - **Link Removal**: All hyperlinks are removed and replaced with "阅读原文" guidance
 - **Image Handling**: OneDrive images are automatically downloaded and re-uploaded to WeChat servers
 - **Mobile Optimization**: AI-powered layout optimization for mobile reading experience
-- **Guidance Generation**: Comprehensive publish guidance files are generated with step-by-step instructions
+- **Publishing Modes**:
+  - **API Mode**: Direct publishing to WeChat draft box via permanent material API
+  - **Guide Mode**: Generate detailed manual publishing guidance files
 - **HTML Cleaning**: Content is cleaned and optimized for WeChat editor compatibility
 
 ## 10. Document Update History
 
-### 2025-07-16: WeChat API Investigation and Workflow Optimization ✅
+### 2025-07-16: WeChat API升级和代码规范完善 ✅
+- **WeChat API双模式**: 实现API直接发布和指导文件生成两种模式
+- **永久素材管理**: 集成微信公众号永久素材管理接口
+- **API限制管理**: 新增智能API调用量跟踪和限制管理
+- **AI两阶段处理**: 内容精简和移动端排版的双重AI优化
+- **代码规范更新**: 完善类型安全、导入标准和测试规范
+- **测试约定**: 明确测试文件组织和现有测试模块使用规范
+
+### 2025-07-15: WeChat API Investigation and Workflow Optimization ✅
 - **Added**: WeChat API permission investigation and resolution decision
 - **Added**: Testing and debugging workflow conventions based on recent experience
 - **Added**: Type safety requirements for code quality standards
