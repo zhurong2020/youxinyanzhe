@@ -13,7 +13,8 @@ platforms:
   wechat:
     enabled: true
     name: wechat
-    author: 自定义公众号名
+    author: 有心言者
+    publish_mode: api          # 'guide' or 'api'
     polish_content: true       # 需要润色
     analyze_content: true      # 需要分析分类和标签
     replace_images: true       # 需要替换图片
