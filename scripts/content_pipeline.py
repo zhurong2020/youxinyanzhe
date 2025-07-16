@@ -1234,36 +1234,34 @@ class ContentPipeline:
             return False
 
     def _publish_to_wechat(self, content: str) -> bool:
-        """发布到微信公众号"""
+        """发布到微信公众号（保存为草稿）"""
         self.log("开始发布到微信公众号...", level="info", force=True)
         if not self.wechat_publisher:
             self.log("微信发布器未初始化，跳过发布。", level="error", force=True)
             return False
         
         try:
-            # 1. 获取Token（验证API连接）
-            token = self.wechat_publisher.get_access_token()
-            if not token:
-                self.log("获取微信 access_token 失败，无法发布。", level="error", force=True)
-                return False
-            self.log(f"成功获取 access_token: {token[:15]}...", level="info", force=True)
-
-            # 2. 提取正文内容
+            # 1. 解析文章内容
             post = frontmatter.loads(content)
+            title = post.metadata.get('title', '无标题')
             markdown_body = post.content
+            
+            self.log(f"准备发布文章: {title}", level="info", force=True)
 
-            # 3. 内容转换
-            transformed_html = self.wechat_publisher.transform_content(markdown_body)
-
-            # 4. 保存为预览文件（小范围测试）
-            preview_path = Path("wechat_preview.html")
-            with open(preview_path, "w", encoding="utf-8") as f:
-                f.write(transformed_html)
-            self.log(f"✅ 内容已转换为HTML并保存到预览文件: {preview_path}", level="info", force=True)
-            self.log("下一步是处理图片上传和调用AI进行排版优化。", level="info", force=True)
-
-            # 由于我们是测试阶段，暂时认为此步骤成功
-            return True
+            # 2. 调用发布方法（实际上是保存为草稿）
+            success = self.wechat_publisher.publish_article(
+                title=title, 
+                markdown_content=markdown_body,
+                author="博客系统"
+            )
+            
+            if success:
+                self.log(f"✅ 文章 '{title}' 已保存到微信公众号草稿箱", level="info", force=True)
+                self.log("您可以在微信公众号后台查看草稿并安排发布时间", level="info", force=True)
+            else:
+                self.log(f"❌ 文章 '{title}' 保存到微信草稿箱失败", level="error", force=True)
+                
+            return success
 
         except Exception as e:
             self.log(f"发布到微信时出错: {e}", level="error", force=True)
