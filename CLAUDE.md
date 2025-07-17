@@ -149,6 +149,8 @@ This section records critical architectural adjustments for the project:
 - **`tests/`**: All test files, including platform-specific tests and debugging utilities
 - **`config/`**: Configuration files organized by functionality (gemini, platforms, templates)
 - **`_drafts/.publishing/`**: Publication status tracking files (included in Git)
+- **`_drafts/archived/`**: Archived completed articles for reference
+- **`_drafts/musk-empire/`**: Musk Empire series planning and requirements files
 - **`_output/`**: Generated files and guidance (excluded from Git)
   - **`wechat_guides/`**: WeChat publish guidance files (*.md guides, *.html content)
   - **`wechat_image_cache/`**: WeChat uploaded image cache and mappings
@@ -197,6 +199,14 @@ This section records critical architectural adjustments for the project:
 
 ## 10. Document Update History
 
+### 2025-07-17: Content Creation and Series Management ✅
+- **Added**: "Musk Empire" series management conventions in Section 12
+- **Added**: Content creation workflow and lifecycle management
+- **Added**: Series consistency and reader engagement guidelines
+- **Updated**: Directory organization to include `_drafts/musk-empire/` and `_drafts/archived/` 
+- **Updated**: File naming conventions for series planning and archived content
+- **Updated**: Project structure documentation to reflect content creation needs
+
 ### 2025-07-16: WeChat API升级和代码规范完善 ✅
 - **WeChat API双模式**: 实现API直接发布和指导文件生成两种模式
 - **永久素材管理**: 集成微信公众号永久素材管理接口
@@ -233,7 +243,7 @@ This section records critical architectural adjustments for the project:
 
 **Note**: This document serves as the living guideline for all development work. It should be updated whenever major architectural decisions are made or significant features are implemented.
 
-**Last Updated**: 2025-07-16  
+**Last Updated**: 2025-07-17  
 **Next Review**: When major features are added or architectural changes are needed
 
 ## 11. Key Lessons from Recent Development
@@ -247,3 +257,27 @@ This section records critical architectural adjustments for the project:
 - **Systematic Investigation**: Use official debugging tools when available to verify API requests
 - **Incremental Testing**: Test each component (authentication, image upload, content processing) separately
 - **Clean Project Structure**: Regularly clean up temporary debug files and organize reusable test utilities
+
+## 12. Content Creation and Series Management
+
+### "Musk Empire" Series Conventions
+- **Planning Files**: All series planning and requirements are centralized in `_drafts/musk-empire/`
+  - `series-plan.md`: Complete series outline and chapter structure
+  - `writing-requirements.md`: Detailed writing guidelines and style conventions
+- **Content Creation Process**:
+  1. Reference planning files in `_drafts/musk-empire/` for topic selection and style guidelines
+  2. Create new articles directly in `_drafts/` root directory
+  3. Follow established writing style: engaging, insightful, data-driven
+  4. Include reader interaction elements and series navigation
+- **Article Lifecycle Management**:
+  - **Draft Stage**: Work on articles in `_drafts/` root directory
+  - **Publishing**: Use existing multi-platform publishing system
+  - **Archival**: Move completed articles to `_drafts/archived/` for reference
+- **Series Consistency**: Maintain consistent tone, formatting, and cross-references between articles
+
+### Content Creation Best Practices
+- **Research-Based Writing**: Use provided source materials and maintain factual accuracy
+- **Audience Focus**: Target Chinese domestic readers with relevant data and cultural context
+- **Technical Depth**: Balance technical accuracy with accessibility for general readers
+- **Series Continuity**: Reference previous articles and build narrative progression
+- **Reader Engagement**: Include thought-provoking questions and encourage comments
