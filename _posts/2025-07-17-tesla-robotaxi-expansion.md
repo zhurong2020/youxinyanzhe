@@ -12,15 +12,23 @@ tags:
 - Robotaxi
 - 人工智能
 title: 特斯拉22天扩张一倍！马斯克的「搞怪」地图背后藏着什么秘密？
+header:
+  overlay_image: https://1drv.ms/i/c/5644dab129afda10/IQRJpTkiZD8zToPEW5-ecPMPAduCJxQZzf4QMrQ8nqOhv-8?width=475&height=363
+  overlay_filter: 0.5
+  teaser: https://1drv.ms/i/c/5644dab129afda10/IQRJpTkiZD8zToPEW5-ecPMPAduCJxQZzf4QMrQ8nqOhv-8?width=475&height=363
 ---
 
-# 特斯拉22天扩张一倍！马斯克的"搞怪"地图背后藏着什么秘密？
+22天翻倍服务区域，一个T型地图引爆全网热议——特斯拉这次"搞怪"扩张背后隐藏着什么技术密码？马斯克帝国系列开篇，解密"钢铁侠"如何用纯视觉AI颠覆自动驾驶。
+
+<!-- more -->
+
+最近，特斯拉在奥斯汀的Robotaxi服务扩张引发了科技圈的广泛关注。这不仅仅是因为其惊人的扩张速度，更因为扩张后的服务区域呈现出一个颇具争议的T型形状，网友们对此展开了各种脑洞大开的解读。
+
+当传统自动驾驶公司还在为高精地图和激光雷达的巨额成本而苦恼时，特斯拉已经用纯视觉AI方案走出了一条截然不同的道路。这次看似"搞怪"的扩张，实际上展现了特斯拉技术路线的核心优势。
 
 **22天，服务面积翻倍。**
 
-这是特斯拉自动驾驶最近在奥斯汀交出的最新“成绩单”。
-下图展示的，就是特斯拉扩展运营范围后的最新服务区域。
-
+这是特斯拉自动驾驶最近在奥斯汀交出的最新“成绩单”。下图展示的，就是特斯拉扩展运营范围后的最新服务区域。
 
 ![tesla最新服务区域](https://1drv.ms/i/c/5644dab129afda10/IQSEyYxJcf5jQbxUhvoUBjylAXfryK_NDQKcz0RAjzPcnno?width=547&height=640)
 
