@@ -39,13 +39,11 @@ def main():
         # 处理现有草稿
         draft = pipeline.select_draft()
         if not draft:
-            print("没有找到草稿文件或选择无效")
             return
     elif choice == "2":
         # 重新发布已发布文章
         post = pipeline.select_published_post()
         if not post:
-            print("没有找到已发布文章或选择无效")
             return
         draft = pipeline.copy_post_to_draft(post)
         if not draft:
