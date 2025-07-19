@@ -216,12 +216,17 @@ This section records critical architectural adjustments for the project:
 
 ## 10. Document Update History
 
-### 2025-07-19: Musk Empire Series Research Enhancement ✅
+### 2025-07-19: Musk Empire Series Research Enhancement & Bug Fixes ✅
 - **Added**: Comprehensive research on X (formerly Twitter) and The Boring Company for Musk Empire series
 - **Created**: Detailed supplement document `musk-empire-supplement-x-boring-company.md` with latest 2025 data
 - **Updated**: Tesla AI Empire article with X and Boring Company content integration
 - **Enhanced**: Series planning document with deep research materials for future articles
 - **Fixed**: Date correction from 2025-01-18 to 2025-07-18 in Tesla article
+- **Bug Fixes**:
+  - Fixed multi-platform input parsing issue (input "1,2" causing "invalid input" error)
+  - Fixed Gemini API safety filter blocking normal tech content (finish_reason=2)
+  - Added safety settings to allow technical article content generation
+  - Enhanced error handling for API response validation
 - **Key Research Findings**:
   - X acquisition by xAI for $33B in March 2025, transforming into AI data engine
   - Boring Company valuation exceeds $7B, serving 3M+ passengers in Vegas Loop
