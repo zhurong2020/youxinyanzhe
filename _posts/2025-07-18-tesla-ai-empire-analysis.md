@@ -14,6 +14,7 @@ last_modified_at: '2025-07-19 11:49:50'
 layout: single
 related: true
 share: true
+classes: wide
 tags:
 - 马斯克
 - 特斯拉
