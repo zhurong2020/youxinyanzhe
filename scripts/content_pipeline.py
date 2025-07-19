@@ -675,7 +675,10 @@ class ContentPipeline:
                 elif not all_success:
                     self.log("⚠️ 处理未完全成功，跳过归档步骤", level="warning", force=True)
                 else:
-                    self.log("⚠️ 文章未在所有平台发布，保留草稿用于后续发布", level="info", force=True)
+                    # 计算未发布的平台
+                    unpublished_platforms = set(all_enabled_platforms) - set(published_platforms)
+                    self.log(f"💾 已发布到: {', '.join(published_platforms) if published_platforms else '无'}", level="info", force=True)
+                    self.log(f"📋 未发布平台: {', '.join(unpublished_platforms)} (可稍后发布)", level="info", force=True)
                 
             return all_success
             
@@ -842,13 +845,20 @@ class ContentPipeline:
                 )
             )
             
-            if response and response.text:
+            if response and hasattr(response, 'text') and response.text:
                 excerpt = response.text.strip()
                 self.log(f"生成摘要: {excerpt}", level="info")
                 return excerpt
-            else:
-                self.log("API未返回摘要", level="warning")
-                return ""
+            elif response and hasattr(response, 'parts') and response.parts:
+                # 尝试从parts获取文本
+                text_parts = [part.text for part in response.parts if hasattr(part, 'text')]
+                if text_parts:
+                    excerpt = ''.join(text_parts).strip()
+                    self.log(f"生成摘要: {excerpt}", level="info")
+                    return excerpt
+            
+            self.log("API未返回有效摘要", level="warning")
+            return ""
                 
         except Exception as e:
             self.log(f"生成摘要时出错: {str(e)}", level="error")
