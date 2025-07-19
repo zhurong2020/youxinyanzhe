@@ -5,11 +5,11 @@ categories:
 - 人工智能
 - 项目与创新
 comments: true
-date: 2025-01-18
+date: 2025-07-18
 header:
   overlay_filter: 0.5
-  overlay_image: null
-  teaser: null
+  overlay_image: https://1drv.ms/i/c/5644dab129afda10/IQQuNqdTuZDvToBvTtztQXGBAT7ZRA8OGopsM5vTa3qk96s?width=660
+  teaser: https://1drv.ms/i/c/5644dab129afda10/IQQuNqdTuZDvToBvTtztQXGBAT7ZRA8OGopsM5vTa3qk96s?width=660
 last_modified_at: '2025-07-18 22:51:37'
 layout: single
 related: true
@@ -33,6 +33,8 @@ toc_sticky: true
 ---
 
 从奥斯汀Robotaxi服务区域在几周内翻倍，到“擎天柱”机器人那双拥有22个自由度的灵巧双手，特斯拉正在构建的，远不止是全球最大的AI应用生态系统，这更像是一场人类历史上空前规模的AI基础设施建设。
+
+![特斯拉AI版图](https://1drv.ms/i/c/5644dab129afda10/IQQuNqdTuZDvToBvTtztQXGBAT7ZRA8OGopsM5vTa3qk96s?width=660)
 
 <!-- more -->
 
