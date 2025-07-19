@@ -405,3 +405,112 @@ a.btn.btn--primary {
     height: 200px; /* 单列时图片可以稍大一些 */
   }
 }
+
+/* ===== Single Layout 三栏布局优化 ===== */
+
+/* 方案C: 响应式宽度优化 - 大屏幕优化 */
+@media screen and (min-width: 1400px) {
+  /* 扩展主容器到90%屏宽 */
+  .layout--single .page {
+    width: 90%;
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* 优化三栏布局比例：作者 18% | 内容 64% | TOC 18% */
+  .layout--single .page__inner-wrap {
+    display: grid;
+    grid-template-columns: 18% 64% 18%;
+    grid-gap: 1em;
+    align-items: start;
+  }
+  
+  /* 确保作者区域不会过宽 */
+  .layout--single .sidebar.sticky {
+    max-width: none;
+    width: 100%;
+  }
+  
+  /* 文章内容区域 */
+  .layout--single .page__content {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  /* TOC区域 */
+  .layout--single .page__related {
+    width: 100%;
+  }
+}
+
+/* 中等屏幕优化 (1024px - 1400px) */
+@media screen and (min-width: 1024px) and (max-width: 1399px) {
+  /* 扩展主容器到85%屏宽 */
+  .layout--single .page {
+    width: 85%;
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* 保持现有比例但稍微调整：作者 20% | 内容 60% | TOC 20% */
+  .layout--single .page__inner-wrap {
+    display: grid;
+    grid-template-columns: 20% 60% 20%;
+    grid-gap: 1em;
+    align-items: start;
+  }
+  
+  .layout--single .sidebar.sticky {
+    max-width: none;
+    width: 100%;
+  }
+  
+  .layout--single .page__content {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .layout--single .page__related {
+    width: 100%;
+  }
+}
+
+/* 确保TOC在三栏布局中正确显示 */
+.layout--single .toc {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  font-size: 0.875rem;
+}
+
+.layout--single .toc__title {
+  margin: 0 0 0.5rem 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", Arial, sans-serif;
+  font-size: 0.875rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #494e52;
+}
+
+/* 确保在较小屏幕上恢复原始布局 */
+@media screen and (max-width: 1023px) {
+  .layout--single .page {
+    width: 100%;
+    max-width: 1280px;
+  }
+  
+  .layout--single .page__inner-wrap {
+    display: block;
+  }
+  
+  .layout--single .sidebar.sticky {
+    max-width: 200px;
+  }
+}
