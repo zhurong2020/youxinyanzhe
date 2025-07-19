@@ -554,7 +554,7 @@ class ContentPipeline:
                 
         return selected_platforms
     
-    def process_draft(self, draft_path: Path, platforms: List[str]) -> bool:
+    def process_draft(self, draft_path: Path, platforms: List[str]) -> dict:
         """处理草稿文件"""
         try:
             self.log(f"============================== 开始处理草稿 ==============================", force=True)
@@ -576,7 +576,14 @@ class ContentPipeline:
                 # 检查内容完整性
                 if len(content) < 100:
                     self.log("❌ 文章内容过短，可能不完整", level="error", force=True)
-                    return False
+                    return {
+                        'success': False,
+                        'successful_platforms': [],
+                        'total_platforms': len(platforms),
+                        'published_platforms': [],
+                        'article_name': draft_path.stem,
+                        'error': '文章内容过短'
+                    }
                 
                 # 预处理 front matter 中的引号问题
                 try:
@@ -590,7 +597,14 @@ class ContentPipeline:
                         post = frontmatter.loads(content)
                     except Exception as e:
                         self.log(f"❌ 修复后仍无法解析 front matter: {str(e)}", level="error")
-                        return False
+                        return {
+                            'success': False,
+                            'successful_platforms': [],
+                            'total_platforms': len(platforms),
+                            'published_platforms': [],
+                            'article_name': draft_path.stem,
+                            'error': f'front matter解析失败: {str(e)}'
+                        }
                 
                 # 2. 图片处理步骤（已移除Cloudflare Images功能）
                 progress.update(progress.add_task("🖼️ 图片处理（跳过）", total=1), completed=True)
@@ -683,11 +697,26 @@ class ContentPipeline:
                     self.log(f"💾 已发布到: {', '.join(published_platforms) if published_platforms else '无'}", level="info", force=True)
                     self.log(f"📋 未发布平台: {', '.join(unpublished_platforms)} (可稍后发布)", level="info", force=True)
                 
-            return all_success
+            # 返回详细的发布结果
+            result = {
+                'success': all_success,
+                'successful_platforms': successful_platforms if 'successful_platforms' in locals() else [],
+                'total_platforms': len(platforms),
+                'published_platforms': published_platforms if 'published_platforms' in locals() else [],
+                'article_name': draft_path.stem
+            }
+            return result
             
         except Exception as e:
             self.logger.error(f"处理草稿时出错: {str(e)}")
-            return False
+            return {
+                'success': False,
+                'successful_platforms': [],
+                'total_platforms': len(platforms),
+                'published_platforms': [],
+                'article_name': draft_path.stem,
+                'error': str(e)
+            }
     
     def _preprocess_content(self, text: str) -> str:
         """预处理内容，处理特殊格式"""

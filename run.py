@@ -66,11 +66,33 @@ def main():
         return
     
     # 处理并发布
-    success = pipeline.process_draft(draft, platforms)
-    if success:
-        print("✅ 处理完成!")
+    result = pipeline.process_draft(draft, platforms)
+    
+    # 处理返回结果（兼容旧的布尔值和新的字典格式）
+    if isinstance(result, bool):
+        # 兼容旧格式
+        if result:
+            print("✅ 处理完成!")
+        else:
+            print("⚠️ 处理未完全成功，请检查日志")
+    elif isinstance(result, dict):
+        # 新的详细格式
+        if result['success']:
+            platforms_str = ', '.join(result['successful_platforms']) if result['successful_platforms'] else '无'
+            print(f"✅ 处理完成! 成功发布到: {platforms_str}")
+        else:
+            if 'error' in result:
+                print(f"❌ 处理失败: {result['error']}")
+            else:
+                successful = result.get('successful_platforms', [])
+                total = result.get('total_platforms', 0)
+                if successful:
+                    platforms_str = ', '.join(successful)
+                    print(f"⚠️ 部分成功! 已发布到: {platforms_str} (共{total}个平台)")
+                else:
+                    print(f"❌ 发布失败! 所有{total}个平台都未成功")
     else:
-        print("⚠️ 处理未完全成功，请检查日志")
+        print("⚠️ 处理结果格式异常，请检查日志")
 
 if __name__ == "__main__":
     main() 
