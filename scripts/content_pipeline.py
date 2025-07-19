@@ -29,6 +29,16 @@ try:
 except ImportError:
     from wechat_publisher import WechatPublisher
 
+# 内容变现系统（可选导入）
+RewardSystemManager = None
+try:
+    from .reward_system_manager import RewardSystemManager
+except ImportError:
+    try:
+        from reward_system_manager import RewardSystemManager
+    except ImportError:
+        pass  # 内容变现系统模块不可用
+
 class PublishingStatusManager:
     """发布状态管理器"""
     
@@ -150,6 +160,17 @@ class ContentPipeline:
             # 初始化存量文档状态
             posts_dir = Path(self.config["paths"]["posts"])
             self.status_manager.initialize_legacy_post_status(posts_dir)
+            
+            # 初始化内容变现系统管理器（可选）
+            self.reward_manager = None
+            if RewardSystemManager:
+                try:
+                    self.reward_manager = RewardSystemManager()
+                    self.logger.debug("内容变现系统管理器初始化成功")
+                except Exception as e:
+                    self.logger.warning(f"内容变现系统管理器初始化失败: {e}")
+            else:
+                self.logger.debug("内容变现系统模块未找到，跳过初始化")
             
 
         except Exception as e:
@@ -554,7 +575,29 @@ class ContentPipeline:
                 
         return selected_platforms
     
-    def process_draft(self, draft_path: Path, platforms: List[str]) -> dict:
+    def ask_monetization_preference(self) -> bool:
+        """询问用户是否启用内容变现功能"""
+        if not self.reward_manager:
+            return False
+        
+        print("\n💰 内容变现选项：")
+        print("  1. 启用 - 自动生成资料包并上传到GitHub Release")
+        print("  2. 跳过 - 仅进行常规发布")
+        
+        try:
+            choice = input("\n请选择 (1/2，默认为2): ").strip()
+            
+            if choice == "1":
+                print("✅ 已启用内容变现功能")
+                return True
+            else:
+                print("⏭️  跳过内容变现功能")
+                return False
+        except (EOFError, KeyboardInterrupt):
+            print("\n⏭️  跳过内容变现功能")
+            return False
+    
+    def process_draft(self, draft_path: Path, platforms: List[str], enable_monetization: bool = False) -> dict:
         """处理草稿文件"""
         try:
             self.log(f"============================== 开始处理草稿 ==============================", force=True)
@@ -697,13 +740,83 @@ class ContentPipeline:
                     self.log(f"💾 已发布到: {', '.join(published_platforms) if published_platforms else '无'}", level="info", force=True)
                     self.log(f"📋 未发布平台: {', '.join(unpublished_platforms)} (可稍后发布)", level="info", force=True)
                 
+            # 内容变现处理
+            monetization_result = None
+            if enable_monetization and self.reward_manager and all_success:
+                try:
+                    task = progress.add_task("💰 创建内容变现包...", total=None)
+                    
+                    # 使用已发布的文章路径（如果已发布到GitHub Pages）
+                    if 'github' in published_platforms:
+                        # 使用_posts目录中的文章
+                        posts_dir = Path(self.config["paths"]["posts"])
+                        published_article_path = posts_dir / draft_path.name
+                        
+                        if published_article_path.exists():
+                            monetization_success, monetization_data = self.reward_manager.create_article_package(
+                                str(published_article_path), 
+                                upload_to_github=True
+                            )
+                            
+                            if monetization_success:
+                                monetization_result = {
+                                    'success': True,
+                                    'package_path': monetization_data.get('package_path'),
+                                    'github_release': monetization_data.get('github_release', {})
+                                }
+                                self.log(f"✅ 内容变现包创建成功", level="info", force=True)
+                                if monetization_data.get('github_release', {}).get('success'):
+                                    download_url = monetization_data['github_release']['download_url']
+                                    self.log(f"📦 下载链接: {download_url}", level="info", force=True)
+                            else:
+                                monetization_result = {
+                                    'success': False,
+                                    'error': monetization_data.get('error', '未知错误')
+                                }
+                                self.log(f"⚠️ 内容变现包创建失败: {monetization_data.get('error')}", level="warning", force=True)
+                        else:
+                            self.log(f"⚠️ 已发布文章未找到: {published_article_path}", level="warning", force=True)
+                    else:
+                        # 使用草稿文件
+                        monetization_success, monetization_data = self.reward_manager.create_article_package(
+                            str(draft_path), 
+                            upload_to_github=True
+                        )
+                        
+                        if monetization_success:
+                            monetization_result = {
+                                'success': True,
+                                'package_path': monetization_data.get('package_path'),
+                                'github_release': monetization_data.get('github_release', {})
+                            }
+                            self.log(f"✅ 内容变现包创建成功", level="info", force=True)
+                            if monetization_data.get('github_release', {}).get('success'):
+                                download_url = monetization_data['github_release']['download_url']
+                                self.log(f"📦 下载链接: {download_url}", level="info", force=True)
+                        else:
+                            monetization_result = {
+                                'success': False,
+                                'error': monetization_data.get('error', '未知错误')
+                            }
+                            self.log(f"⚠️ 内容变现包创建失败: {monetization_data.get('error')}", level="warning", force=True)
+                    
+                    progress.update(task, completed=True)
+                    
+                except Exception as e:
+                    monetization_result = {
+                        'success': False,
+                        'error': str(e)
+                    }
+                    self.log(f"❌ 内容变现处理异常: {str(e)}", level="error", force=True)
+                
             # 返回详细的发布结果
             result = {
                 'success': all_success,
                 'successful_platforms': successful_platforms if 'successful_platforms' in locals() else [],
                 'total_platforms': len(platforms),
                 'published_platforms': published_platforms if 'published_platforms' in locals() else [],
-                'article_name': draft_path.stem
+                'article_name': draft_path.stem,
+                'monetization': monetization_result
             }
             return result
             
