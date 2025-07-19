@@ -14,6 +14,11 @@ filetype>=1.2.0
 python-frontmatter>=1.0.0
 google-generativeai>=0.3.0
 
+# 微信内容变现系统新增依赖
+weasyprint>=60.0  # PDF生成
+fonttools>=4.42.0  # 字体支持
+cffi>=1.15.0  # weasyprint依赖
+
 # 测试
 pytest>=7.4.0
 pytest-cov>=4.1.0

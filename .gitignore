@@ -20,7 +20,7 @@ ENV/
 .env.test.local
 .env.production.local
 
-# 注意：.env文件包含敏感信息，正常情况下应排除在版本控制之外
+# 注意：.env文件包含敏感信息，已排除在版本控制之外
 
 # 日志
 logs/
@@ -43,7 +43,14 @@ coverage.xml
 
 # 输出目录
 _output/
+
+# 数据文件（包含敏感信息和缓存）
 _data/image_mappings.yml
+_data/github_releases.json
+_data/github_token_status.json
+_data/email_records.json
+_data/pending_reward_requests.json
+_data/processed_reward_requests.json
 
 # 归档目录
 _drafts/archived/
