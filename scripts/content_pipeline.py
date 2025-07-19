@@ -538,16 +538,19 @@ class ContentPipeline:
         selected_platforms = []
         
         for sel in selections:
+            sel_stripped = sel.strip()
+            if not sel_stripped:  # 跳过空字符串
+                continue
             try:
-                idx = int(sel.strip())
+                idx = int(sel_stripped)
                 if idx == 0:
                     return []  # 用户选择退出
                 elif 1 <= idx <= len(platform_list):
                     selected_platforms.append(platform_list[idx - 1])
                 else:
-                    print(f"无效选择: {sel}")
+                    print(f"无效选择: {sel_stripped}")
             except ValueError:
-                print(f"无效输入: {sel}")
+                print(f"无效输入: {sel_stripped}")
                 
         return selected_platforms
     
@@ -842,8 +845,21 @@ class ContentPipeline:
                     temperature=0.7,
                     max_output_tokens=200,  # 摘要不需要太长
                     top_p=0.8,
-                )
+                ),
+                safety_settings=[
+                    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+                ]
             )
+            
+            # 检查finish_reason
+            if response and hasattr(response, 'candidates') and response.candidates:
+                candidate = response.candidates[0]
+                if hasattr(candidate, 'finish_reason') and candidate.finish_reason != 1:  # 1 = STOP (正常完成)
+                    self.log(f"API响应被过滤，finish_reason: {candidate.finish_reason}", level="warning")
+                    return ""
             
             if response and hasattr(response, 'text') and response.text:
                 excerpt = response.text.strip()
