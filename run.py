@@ -65,8 +65,11 @@ def main():
         print("未选择任何发布平台")
         return
     
+    # 询问是否启用内容变现功能
+    enable_monetization = pipeline.ask_monetization_preference()
+    
     # 处理并发布
-    result = pipeline.process_draft(draft, platforms)
+    result = pipeline.process_draft(draft, platforms, enable_monetization=enable_monetization)
     
     # 处理返回结果（兼容旧的布尔值和新的字典格式）
     if isinstance(result, bool):
@@ -80,6 +83,19 @@ def main():
         if result['success']:
             platforms_str = ', '.join(result['successful_platforms']) if result['successful_platforms'] else '无'
             print(f"✅ 处理完成! 成功发布到: {platforms_str}")
+            
+            # 显示内容变现结果
+            if result.get('monetization'):
+                monetization = result['monetization']
+                if monetization['success']:
+                    print("💰 内容变现包创建成功!")
+                    github_release = monetization.get('github_release', {})
+                    if github_release.get('success'):
+                        print(f"📦 GitHub Release: {github_release.get('release_url', 'N/A')}")
+                        print(f"⬇️  下载链接: {github_release.get('download_url', 'N/A')}")
+                        print("📧 现在可以通过 reward_system_manager.py 发送奖励给用户了")
+                else:
+                    print(f"⚠️ 内容变现包创建失败: {monetization.get('error', '未知错误')}")
         else:
             if 'error' in result:
                 print(f"❌ 处理失败: {result['error']}")
