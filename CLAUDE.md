@@ -136,6 +136,23 @@ This section records critical architectural adjustments for the project:
 - **Status Updates**: Provide progress updates using TodoWrite tool for complex tasks
 - **Decision Documentation**: Record all architectural decisions in this document
 
+### Content Creation and Writing Standards
+- **Front Matter Standards**: 
+  - **Required Fields**: Only 3 fields are mandatory: `title`, `date`, and `header`
+  - **Optional Fields**: `categories` and `tags` can be added if the article has specific needs
+  - **Automatic Processing**: content_pipeline.py will automatically add other necessary fields during distribution
+- **Article Structure**: Each article must include:
+  - 60-80 character concise introduction after front matter for homepage display
+  - `<!-- more -->` tag after introduction
+  - Natural background/context transition after the more tag leading into main content
+- **Writing Style**: Follow established blog style from zhurong2020.github.io:
+  - Objective, fact-based approach rather than personal opinions
+  - Use "你知道吗?" and similar engaging opening questions
+  - Scientific popularization tone for general audiences
+  - Data-driven arguments with specific numbers and comparisons
+  - Open-ended questions to encourage reader thinking
+  - Series articles should leave space for future content expansion
+
 ### Testing and Debugging Workflow
 - **Test File Organization**: Move reusable test scripts to `tests/` directory, remove temporary debug files from project root
 - **Debugging Strategy**: Create focused test scripts for specific issues (API testing, system verification, etc.)
