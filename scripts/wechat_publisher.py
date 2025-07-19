@@ -404,6 +404,37 @@ Here is the content to optimize:
             self.logger.error(f"Request to create draft failed: {e}")
         return None
 
+    def _load_reward_footer_template(self, project_root: Path) -> str:
+        """加载奖励页脚模板"""
+        template_path = project_root / "config/templates/wechat_reward_footer.html"
+        if template_path.exists():
+            try:
+                with open(template_path, 'r', encoding='utf-8') as f:
+                    return f.read()
+            except Exception as e:
+                self.logger.warning(f"加载页脚模板失败: {e}")
+        
+        # 如果模板文件不存在，返回默认页脚
+        return """
+💡 获取完整深度版本
+
+本文为精华浓缩版，完整版包含：
+• 详细技术分析与数据解读  
+• 独家调研资料与趋势预测
+• 高清图表与参考资料合集
+
+📧 获取方式：
+1. 打赏本文任意金额
+2. 截图发送到本公众号 + 您的邮箱地址
+3. 24小时内发送完整资料包到您邮箱
+
+示例回复格式："已打赏截图 + example@email.com"
+
+---
+🌐 完整文章请点击"阅读原文"
+访问我们的博客获得最佳阅读体验
+"""
+
     def generate_guide_file(self, project_root: Path, front_matter: Dict[str, Any], markdown_content: str) -> bool:
         self.logger.info(f"Generating manual guide file for: {front_matter.get('title', 'Untitled')}")
         guide_dir = project_root / "_output/wechat_guides"
@@ -414,7 +445,10 @@ Here is the content to optimize:
         guide_file = guide_dir / f"{safe_title}_{timestamp}_guide.md"
 
         final_content = self._transform_for_wechat(markdown_content)
-        # 不需要处理图片，因为现在生成的是纯文本内容
+        
+        # 添加奖励页脚到内容末尾
+        reward_footer = self._load_reward_footer_template(project_root)
+        final_content_with_footer = final_content + "\n\n" + reward_footer
 
         # 获取封面图片信息
         cover_image = "N/A"
@@ -444,19 +478,25 @@ Here is the content to optimize:
 ## 📝 文章内容
 请复制以下内容到微信公众号编辑器：
 
-{final_content}
+{final_content_with_footer}
 
 ## 💡 格式提示
-- 上述内容为纯文本格式，可直接粘贴使用
+- 上述内容包含了完整的文章和奖励页脚
 - 建议在微信编辑器中手动调整字体大小和颜色
 - 可以使用微信编辑器的样式功能美化排版
 - 记得上传封面图片以获得更好的视觉效果
+- 奖励页脚已自动添加，支持读者获取完整资料包
+
+## 🎁 内容变现说明
+- 文章末尾已添加获取完整资料包的说明
+- 用户打赏后发送截图和邮箱即可获得完整资料
+- 确保在后台及时处理用户的打赏请求
 """
         
         try:
             # 保存指导文件
             with open(guide_file, 'w', encoding='utf-8') as f: f.write(guide_text)
-            self.logger.info(f"✅ Successfully generated guide file: {guide_file}")
+            self.logger.info(f"✅ Successfully generated guide file with reward footer: {guide_file}")
             return True
         except IOError as e:
             self.logger.error(f"Failed to write guide file: {e}")
