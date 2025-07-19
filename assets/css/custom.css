@@ -410,72 +410,84 @@ a.btn.btn--primary {
 
 /* 方案C: 响应式宽度优化 - 大屏幕优化 */
 @media screen and (min-width: 1400px) {
-  /* 扩展主容器到90%屏宽 */
-  .layout--single .page {
-    width: 90%;
-    max-width: none;
+  /* 扩展主要包装器到90%屏宽 */
+  body.layout--single .wrapper {
+    max-width: 90%;
     margin-left: auto;
     margin-right: auto;
   }
   
-  /* 优化三栏布局比例：作者 18% | 内容 64% | TOC 18% */
-  .layout--single .page__inner-wrap {
-    display: grid;
-    grid-template-columns: 18% 64% 18%;
-    grid-gap: 1em;
-    align-items: start;
+  /* 扩展页面容器 */
+  body.layout--single .page {
+    width: 100%;
+    max-width: none;
   }
   
-  /* 确保作者区域不会过宽 */
-  .layout--single .sidebar.sticky {
+  /* 创建更宽的主内容区域 */
+  body.layout--single #main {
     max-width: none;
     width: 100%;
   }
   
-  /* 文章内容区域 */
-  .layout--single .page__content {
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
+  /* 压缩作者侧边栏但保持功能 */
+  body.layout--single .sidebar.sticky {
+    width: 250px; /* 固定宽度而非百分比 */
+    max-width: 250px;
   }
   
-  /* TOC区域 */
-  .layout--single .page__related {
-    width: 100%;
+  /* 扩展文章内容区域 */
+  body.layout--single .page__content {
+    width: calc(100% - 300px); /* 为侧边栏留出空间 */
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+  
+  /* TOC样式优化 */
+  body.layout--single .page__content .toc {
+    max-width: 250px;
+    position: sticky;
+    top: 2rem;
+    margin-left: auto;
+    margin-right: 0;
   }
 }
 
 /* 中等屏幕优化 (1024px - 1400px) */
 @media screen and (min-width: 1024px) and (max-width: 1399px) {
-  /* 扩展主容器到85%屏宽 */
-  .layout--single .page {
-    width: 85%;
-    max-width: none;
+  /* 扩展主要包装器到85%屏宽 */
+  body.layout--single .wrapper {
+    max-width: 85%;
     margin-left: auto;
     margin-right: auto;
   }
   
-  /* 保持现有比例但稍微调整：作者 20% | 内容 60% | TOC 20% */
-  .layout--single .page__inner-wrap {
-    display: grid;
-    grid-template-columns: 20% 60% 20%;
-    grid-gap: 1em;
-    align-items: start;
+  /* 扩展页面容器 */
+  body.layout--single .page {
+    width: 100%;
+    max-width: none;
   }
   
-  .layout--single .sidebar.sticky {
+  /* 创建更宽的主内容区域 */
+  body.layout--single #main {
     max-width: none;
     width: 100%;
   }
   
-  .layout--single .page__content {
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
+  /* 作者侧边栏 */
+  body.layout--single .sidebar.sticky {
+    width: 220px;
+    max-width: 220px;
   }
   
-  .layout--single .page__related {
-    width: 100%;
+  /* 扩展文章内容区域 */
+  body.layout--single .page__content {
+    width: calc(100% - 270px);
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 1em;
+    padding-right: 1em;
   }
 }
 
@@ -501,16 +513,27 @@ a.btn.btn--primary {
 
 /* 确保在较小屏幕上恢复原始布局 */
 @media screen and (max-width: 1023px) {
-  .layout--single .page {
-    width: 100%;
+  body.layout--single .wrapper {
     max-width: 1280px;
   }
   
-  .layout--single .page__inner-wrap {
-    display: block;
+  body.layout--single .page {
+    width: 100%;
+    max-width: none;
   }
   
-  .layout--single .sidebar.sticky {
+  body.layout--single #main {
+    max-width: none;
+  }
+  
+  body.layout--single .sidebar.sticky {
+    width: auto;
     max-width: 200px;
+  }
+  
+  body.layout--single .page__content {
+    width: auto;
+    padding-left: 0;
+    padding-right: 0;
   }
 }
