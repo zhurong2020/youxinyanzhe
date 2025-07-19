@@ -154,7 +154,7 @@ Robotaxi需要AI理解道路环境，做出驾驶决策。Optimus需要AI理解�
 - **TED演讲**: [Cathie Wood - Why AI Will Spark Exponential Economic Growth](https://www.ted.com/talks/cathie_wood_why_ai_will_spark_exponential_economic_growth) - AI生产力提升观点
 
 ### 相关公司官网
-- **xAI**: [xAI官网](https://xai.com/) - Grok模型和AI技术发展
+- **xAI**: [xAI官网](https://x.ai/) - Grok模型和AI技术发展
 - **Neuralink**: [Neuralink官网](https://neuralink.com/) - 脑机接口技术进展
 - **SpaceX**: [SpaceX官网](https://www.spacex.com/) - 火箭技术和Starlink项目
 

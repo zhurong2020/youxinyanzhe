@@ -173,7 +173,7 @@ Robotaxi需要AI理解复杂的道路环境并做出驾驶决策；Optimus需要
 - **TED演讲**: [Cathie Wood - Why AI Will Spark Exponential Economic Growth](https://www.ted.com/talks/cathie_wood_why_ai_will_spark_exponential_economic_growth) - AI生产力提升观点
 
 ### 相关公司官网
-- **xAI**: [xAI官网](https://xai.com/) - Grok模型和AI技术发展
+- **xAI**: [xAI官网](https://x.ai/) - Grok模型和AI技术发展
 - **Neuralink**: [Neuralink官网](https://neuralink.com/) - 脑机接口技术进展
 - **SpaceX**: [SpaceX官网](https://www.spacex.com/) - 火箭技术和Starlink项目
 
@@ -184,7 +184,7 @@ Robotaxi需要AI理解复杂的道路环境并做出驾驶决策；Optimus需要
 
 ---
 
-*文章最后更新：2025年1月18日*
+*文章最后更新：2025年7月18日*
 
 
 {% assign investment_tags = 'QDII基金,指数投资,标普500,纳斯达克100,定投策略,基金投资,股票投资,投资理财,量化交易,投资策略,风险管理,资产配置,投资心理,美股投资,ETF投资' | split: ',' %}
