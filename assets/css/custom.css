@@ -423,42 +423,26 @@ a.btn.btn--primary {
     max-width: none;
   }
   
-  /* 创建更宽的主内容区域，使用flexbox布局 */
+  /* 保持原有布局但扩展宽度 */
   body.layout--single #main {
     max-width: none;
     width: 100%;
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
   }
   
-  /* 左侧作者边栏 - 固定宽度 */
+  /* 左侧作者边栏 - 保持原有浮动布局但调整宽度 */
   body.layout--single #main .sidebar.sticky {
-    flex: 0 0 250px; /* 不伸缩，固定250px宽度 */
     width: 250px;
     max-width: 250px;
-    order: 1; /* 确保在左侧 */
   }
   
-  /* 中间文章内容区域 - 占据剩余空间 */
+  /* 文章内容区域 - 添加左边距避免重叠 */
   body.layout--single #main article {
-    flex: 1; /* 占据剩余空间 */
-    min-width: 0; /* 允许缩小 */
-    order: 2; /* 确保在中间 */
-    padding-left: 0;
-    padding-right: 0;
-  }
-  
-  /* 文章内容的实际内容区域 */
-  body.layout--single article .page__content {
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 270px; /* 为左侧边栏(250px) + 间距(20px)留出空间 */
     padding-left: 1rem;
     padding-right: 1rem;
   }
   
-  /* TOC样式优化 - 确保在右侧显示 */
+  /* TOC样式优化 */
   body.layout--single .page__content .toc {
     max-width: 250px;
     position: sticky;
@@ -486,37 +470,21 @@ a.btn.btn--primary {
     max-width: none;
   }
   
-  /* 创建更宽的主内容区域，使用flexbox布局 */
+  /* 保持原有布局但扩展宽度 */
   body.layout--single #main {
     max-width: none;
     width: 100%;
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
   }
   
-  /* 左侧作者边栏 - 固定宽度 */
+  /* 左侧作者边栏 - 保持原有浮动布局但调整宽度 */
   body.layout--single #main .sidebar.sticky {
-    flex: 0 0 220px;
     width: 220px;
     max-width: 220px;
-    order: 1;
   }
   
-  /* 中间文章内容区域 - 占据剩余空间 */
+  /* 文章内容区域 - 添加左边距避免重叠 */
   body.layout--single #main article {
-    flex: 1;
-    min-width: 0;
-    order: 2;
-    padding-left: 0;
-    padding-right: 0;
-  }
-  
-  /* 文章内容的实际内容区域 */
-  body.layout--single article .page__content {
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 240px; /* 为左侧边栏(220px) + 间距(20px)留出空间 */
     padding-left: 1rem;
     padding-right: 1rem;
   }
