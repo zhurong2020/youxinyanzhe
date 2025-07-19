@@ -429,7 +429,15 @@ class ContentPipeline:
             
         print("\n可用的已发布文章：")
         for i, post in enumerate(posts, 1):
-            print(f"{i}. {post.name}")
+            # 获取文章的发布状态
+            article_name = post.stem
+            published_platforms = self.status_manager.get_published_platforms(article_name)
+            
+            if published_platforms:
+                platforms_str = ", ".join(published_platforms)
+                print(f"{i}. {post.name} [已发布: {platforms_str}]")
+            else:
+                print(f"{i}. {post.name} [未发布到任何平台]")
         print("0. 退出")
             
         while True:

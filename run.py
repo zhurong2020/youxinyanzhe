@@ -32,8 +32,9 @@ def main():
     print("1. 处理现有草稿")
     print("2. 重新发布已发布文章")
     print("3. 生成测试文章")
+    print("0. 退出")
     
-    choice = input("\n请输入选项 (1/2/3): ").strip()
+    choice = input("\n请输入选项 (1/2/3/0): ").strip()
     
     if choice == "1":
         # 处理现有草稿
@@ -55,6 +56,9 @@ def main():
         if not draft:
             print("生成测试文章失败")
             return
+    elif choice == "0":
+        print("👋 再见！")
+        return
     else:
         print("无效的选择")
         return
@@ -62,7 +66,34 @@ def main():
     # 选择发布平台
     platforms = pipeline.select_platforms(draft)
     if not platforms:
-        print("未选择任何发布平台")
+        # 检查是否是因为已经全部发布
+        article_name = draft.stem
+        published_platforms = pipeline.status_manager.get_published_platforms(article_name)
+        all_enabled_platforms = [name for name, config in pipeline.config["platforms"].items() 
+                               if config.get("enabled", False)]
+        
+        if set(published_platforms) >= set(all_enabled_platforms):
+            print("📋 该文章已在所有启用的平台发布，无需重复发布")
+            
+            # 询问是否仍要进行内容变现处理
+            if pipeline.reward_manager:
+                print("\n💡 提示：您仍可以为此文章创建内容变现包")
+                create_package = input("是否创建内容变现包？(y/N): ").strip().lower()
+                if create_package in ['y', 'yes']:
+                    try:
+                        success, result = pipeline.reward_manager.create_article_package(str(draft), upload_to_github=True)
+                        if success:
+                            print("💰 内容变现包创建成功!")
+                            github_release = result.get('github_release', {})
+                            if github_release.get('success'):
+                                print(f"📦 GitHub Release: {github_release.get('release_url', 'N/A')}")
+                                print(f"⬇️  下载链接: {github_release.get('download_url', 'N/A')}")
+                        else:
+                            print(f"⚠️ 创建失败: {result.get('error', '未知错误')}")
+                    except Exception as e:
+                        print(f"❌ 处理异常: {e}")
+        else:
+            print("未选择任何发布平台")
         return
     
     # 询问是否启用内容变现功能
