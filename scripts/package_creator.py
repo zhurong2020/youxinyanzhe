@@ -20,6 +20,12 @@ import markdown2
 from weasyprint import HTML, CSS
 from weasyprint.text.fonts import FontConfiguration
 
+# 配置weasyprint和相关库的日志级别
+logging.getLogger('weasyprint').setLevel(logging.ERROR)
+logging.getLogger('fontTools').setLevel(logging.ERROR)
+logging.getLogger('fontTools.subset').setLevel(logging.ERROR)
+logging.getLogger('fontTools.ttLib').setLevel(logging.ERROR)
+
 
 class PackageCreator:
     """内容包创建器"""
@@ -175,7 +181,7 @@ class PackageCreator:
             }
             
             body {
-                font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+                font-family: "DejaVu Sans", "Liberation Sans", "Arial", sans-serif;
                 line-height: 1.6;
                 color: #333;
                 font-size: 14px;
@@ -229,7 +235,7 @@ class PackageCreator:
                 background-color: #f1f2f6;
                 padding: 2px 4px;
                 border-radius: 3px;
-                font-family: "Consolas", "Monaco", monospace;
+                font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
             }
             
             pre {
@@ -299,9 +305,9 @@ class PackageCreator:
         )
         
         # 处理图片链接 - 移除OneDrive链接，因为PDF中无法显示
-        # html_body = re.sub(r'<img[^>]+src="[^"]*1drv\.ms[^"]*"[^>]*>', 
-        #                   '<p style="color: #666; font-style: italic;">[图片已省略，请查看原文]</p>', 
-        #                   html_body)
+        html_body = re.sub(r'<img[^>]+src="[^"]*1drv\.ms[^"]*"[^>]*>', 
+                          '<p style="color: #666; font-style: italic;">[图片已省略，请查看原文或下载图片资源]</p>', 
+                          html_body)
         
         # 构建完整HTML
         html_content = f"""
