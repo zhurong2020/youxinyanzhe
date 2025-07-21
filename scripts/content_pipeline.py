@@ -736,9 +736,10 @@ class ContentPipeline:
                                         if config.get("enabled", False)]
                 
                 # 如果已在所有启用平台发布，则归档草稿
+                archived_file_path = None
                 if set(published_platforms) >= set(all_enabled_platforms):
                     task = progress.add_task("📦 归档草稿...", total=None)
-                    self._archive_draft(draft_path)
+                    archived_file_path = self._archive_draft(draft_path)
                     progress.update(task, completed=True)
                 elif not all_success:
                     self.log("⚠️ 处理未完全成功，跳过归档步骤", level="warning", force=True)
@@ -758,7 +759,9 @@ class ContentPipeline:
                     if 'github' in published_platforms:
                         # 使用_posts目录中的文章
                         posts_dir = Path(self.config["paths"]["posts"])
-                        published_article_path = posts_dir / draft_path.name
+                        # 使用原始文件名，不管是否已归档
+                        original_filename = archived_file_path.name if archived_file_path else draft_path.name
+                        published_article_path = posts_dir / original_filename
                         
                         if published_article_path.exists():
                             monetization_success, monetization_data = self.reward_manager.create_article_package(
@@ -785,28 +788,37 @@ class ContentPipeline:
                         else:
                             self.log(f"⚠️ 已发布文章未找到: {published_article_path}", level="warning", force=True)
                     else:
-                        # 使用草稿文件
-                        monetization_success, monetization_data = self.reward_manager.create_article_package(
-                            str(draft_path), 
-                            upload_to_github=True
-                        )
+                        # 使用草稿文件或归档文件
+                        source_file_path = archived_file_path if archived_file_path and archived_file_path.exists() else draft_path
                         
-                        if monetization_success:
-                            monetization_result = {
-                                'success': True,
-                                'package_path': monetization_data.get('package_path'),
-                                'github_release': monetization_data.get('github_release', {})
-                            }
-                            self.log(f"✅ 内容变现包创建成功", level="info", force=True)
-                            if monetization_data.get('github_release', {}).get('success'):
-                                download_url = monetization_data['github_release']['download_url']
-                                self.log(f"📦 下载链接: {download_url}", level="info", force=True)
-                        else:
+                        if not source_file_path.exists():
+                            self.log(f"⚠️ 源文件不存在: {source_file_path}", level="warning", force=True)
                             monetization_result = {
                                 'success': False,
-                                'error': monetization_data.get('error', '未知错误')
+                                'error': f'源文件不存在: {source_file_path}'
                             }
-                            self.log(f"⚠️ 内容变现包创建失败: {monetization_data.get('error')}", level="warning", force=True)
+                        else:
+                            monetization_success, monetization_data = self.reward_manager.create_article_package(
+                                str(source_file_path), 
+                                upload_to_github=True
+                            )
+                            
+                            if monetization_success:
+                                monetization_result = {
+                                    'success': True,
+                                    'package_path': monetization_data.get('package_path'),
+                                    'github_release': monetization_data.get('github_release', {})
+                                }
+                                self.log(f"✅ 内容变现包创建成功", level="info", force=True)
+                                if monetization_data.get('github_release', {}).get('success'):
+                                    download_url = monetization_data['github_release']['download_url']
+                                    self.log(f"📦 下载链接: {download_url}", level="info", force=True)
+                            else:
+                                monetization_result = {
+                                    'success': False,
+                                    'error': monetization_data.get('error', '未知错误')
+                                }
+                                self.log(f"⚠️ 内容变现包创建失败: {monetization_data.get('error')}", level="warning", force=True)
                     
                     progress.update(task, completed=True)
                     
@@ -1198,9 +1210,13 @@ class ContentPipeline:
             draft_path.rename(new_path)
             logging.info(f"✅ 归档完成")
             
+            # 返回新的归档文件路径
+            return new_path
+            
         except Exception as e:
             logging.error(f"归档草稿时出错: {str(e)}")
             logging.debug("错误详情:", exc_info=True)
+            return None
     
     def _convert_links_to_new_window(self, content: str) -> str:
         """将Markdown链接转换为在新窗口打开的HTML链接"""
