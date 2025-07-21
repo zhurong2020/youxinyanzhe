@@ -216,6 +216,20 @@ This section records critical architectural adjustments for the project:
 
 ## 10. Document Update History
 
+### 2025-07-20: Investment-Oriented Content Strategy Framework ✅
+- **Added**: Comprehensive "Investment-Oriented Content Strategy" framework in Section 12
+- **Core Innovation**: Technology + Investment synergy approach to attract high-quality readership
+- **Theoretical Foundation**: Integration of classic financial literature (《金钱心理学》、《穷查理的宝典》、《穷爸爸富爸爸》)
+- **Cross-Series Strategy**: Natural cross-referencing between "Musk Empire" and "Investment & Quantitative Trading" series
+- **Content Guidelines**: 
+  - Balanced narrative avoiding sensationalism for objective data analysis
+  - Historical perspective using technology development cases for investment thinking
+  - Quantitative analysis with trackable metrics and milestone indicators
+  - Risk assessment balancing technical challenges with rational optimism
+- **Reader Conversion**: Value-driven approach providing concrete investment analysis frameworks
+- **Implementation**: Successfully applied to Tesla Optimus article as pilot case study
+- **Reference Integration**: Connects with existing blog content (zhurong2020.github.io) for consistency
+
 ### 2025-07-19: Musk Empire Series Research Enhancement & Bug Fixes ✅
 - **Added**: Comprehensive research on X (formerly Twitter) and The Boring Company for Musk Empire series
 - **Created**: Detailed supplement document `musk-empire-supplement-x-boring-company.md` with latest 2025 data
@@ -277,7 +291,7 @@ This section records critical architectural adjustments for the project:
 
 **Note**: This document serves as the living guideline for all development work. It should be updated whenever major architectural decisions are made or significant features are implemented.
 
-**Last Updated**: 2025-07-19  
+**Last Updated**: 2025-07-20  
 **Next Review**: When major features are added or architectural changes are needed
 
 ## 11. Key Lessons from Recent Development
@@ -315,3 +329,48 @@ This section records critical architectural adjustments for the project:
 - **Technical Depth**: Balance technical accuracy with accessibility for general readers
 - **Series Continuity**: Reference previous articles and build narrative progression
 - **Reader Engagement**: Include thought-provoking questions and encourage comments
+
+### Investment-Oriented Content Strategy (New Framework - 2025-07-20)
+
+#### Core Philosophy: Technology + Investment Synergy
+- **Target Audience**: Attract readers interested in both technology innovation and investment/financial management
+- **Content Integration**: Seamlessly blend technical analysis with investment thinking to create higher reader value
+- **Long-term Engagement**: Guide readers toward comprehensive investment education and rational decision-making
+
+#### Cross-Series Integration Strategy
+- **"Musk Empire" Series**: Focus on technology innovation while incorporating investment perspective analysis
+- **Investment & Quantitative Trading Series**: Provide practical investment methods and financial management tools
+- **Natural Cross-referencing**: Create organic connections between series to enhance reader stickiness and learning continuity
+
+#### Theoretical Framework: Classic Financial Literature
+**Primary Reference Books**:
+- **《金钱心理学》(The Psychology of Money)**: 
+  - Emphasize avoiding emotional decision-making, focus on data-driven analysis
+  - Explain media preference for pessimistic narratives vs. objective technical assessment
+  - Use historical cases (e.g., 1903 Washington Post's prediction about human flight) to illustrate cognitive limitations
+- **《穷查理的宝典》(Poor Charlie's Almanack)**: 
+  - Apply multi-model thinking to evaluate disruptive companies
+  - Emphasize first-principles thinking and long-term perspective
+- **《穷爸爸富爸爸》(Rich Dad Poor Dad)**: 
+  - Distinguish between investment opportunities and speculation
+  - Emphasize financial education and independent thinking
+
+#### Content Creation Guidelines
+**Investment Thinking Integration**:
+1. **Balanced Narrative**: Avoid sensationalism, provide objective data analysis
+2. **Historical Perspective**: Use historical technology development cases to guide current investment thinking
+3. **Quantitative Analysis**: Provide trackable metrics and milestone indicators
+4. **Risk Assessment**: Honestly discuss technical challenges while maintaining rational optimism
+5. **Reader Interaction**: Include investment-oriented discussion questions
+
+**Practical Application**:
+- Reference existing blog content (zhurong2020.github.io) for consistency
+- Connect with quantitative trading methods and AI-assisted investment tools
+- Emphasize "technology empowering individual investment" philosophy
+- Provide specific thinking frameworks and actionable insights
+
+#### Reader Conversion Strategy
+- **Natural Guidance**: Lead readers from technology content to investment thinking
+- **Value Creation**: Provide concrete investment analysis frameworks, not just concept introduction
+- **Series Synergy**: Create anticipation for investment content through technology articles
+- **Community Building**: Encourage rational discussion and independent thinking in comment sections
