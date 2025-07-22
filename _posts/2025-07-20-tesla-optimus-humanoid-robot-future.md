@@ -7,8 +7,9 @@ categories:
 comments: true
 date: 2025-07-20
 header:
-  image: https://1drv.ms/i/c/5644dab129afda10/IQRXT--4-F_rT5CL0j5OzFUyAb2Mjdwm_oF9M-ddC2fj54w
-  teaser: https://1drv.ms/i/c/5644dab129afda10/IQRXT--4-F_rT5CL0j5OzFUyAb2Mjdwm_oF9M-ddC2fj54w
+  image: https://1drv.ms/i/c/5644dab129afda10/IQRlU287liM5QJje6AeR7qNrAep7rTmv1tcHXpE0OvYBKic
+  teaser: https://1drv.ms/i/c/5644dab129afda10/IQRlU287liM5QJje6AeR7qNrAep7rTmv1tcHXpE0OvYBKic
+  overlay_filter: 0.5
 last_modified_at: '2025-07-21 14:19:17'
 layout: single
 related: true
