@@ -10,6 +10,7 @@ header:
   image: https://1drv.ms/i/c/5644dab129afda10/IQRlU287liM5QJje6AeR7qNrAep7rTmv1tcHXpE0OvYBKic
   teaser: https://1drv.ms/i/c/5644dab129afda10/IQRlU287liM5QJje6AeR7qNrAep7rTmv1tcHXpE0OvYBKic
   overlay_filter: 0.5
+  overlay_color: '#333'
 last_modified_at: '2025-07-21 14:19:17'
 layout: single
 related: true
