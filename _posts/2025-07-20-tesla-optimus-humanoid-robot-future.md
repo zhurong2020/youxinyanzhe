@@ -229,7 +229,7 @@ Optimus采用了一种革命性的方法——**用单一神经网络处理所�
 <iframe 
      width="560"
      height="315"
-     src="https://youtube.com/embed/T14-JahrSHU?mute=1"
+     src="https://youtube.com/embed/T14-JahrSHU?mute=1&autoplay=0"
      title="YouTube video player"
      frameborder="0"
      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
