@@ -221,20 +221,19 @@ Optimus采用了一种革命性的方法——**用单一神经网络处理所�
 **最新实际应用展示**：
 - **餐饮服务**：马斯克已确认，Optimus机器人即将在餐厅提供爆米花服务，这展示了其在服务业的商业化潜力。
 
-
+<iframe 
+  width="560"
+  height="315"
+  src="https://youtube.com/embed/T14-JahrSHU?mute=1&autoplay=0"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope;picture-in-picture"
+  allowfullscreen>
+</iframe>
 
   *[点击查看视频：机器人爆米花服务演示]*
 - **娱乐互动**：在2024年10月的特斯拉"We, Robot"发布会上，多台Optimus机器人表演了同步舞蹈，展现了其卓越的协调控制能力。
 
-<iframe 
-     width="560"
-     height="315"
-     src="https://youtube.com/embed/T14-JahrSHU?mute=1&autoplay=0"
-     title="YouTube video player"
-     frameborder="0"
-     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-     allowfullscreen>
-</iframe>
 
 ![机器人舞蹈](https://1drv.ms/i/c/5644dab129afda10/IQSF-N24unUcSJ9zxOKtXQDeAYDE4K9Bz3zFYWS2767zr6M?width=660)
 
