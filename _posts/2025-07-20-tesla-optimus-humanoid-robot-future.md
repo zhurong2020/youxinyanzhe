@@ -39,7 +39,7 @@ toc_sticky: true
 从2021年概念的首次亮相，到2025年临近的量产节点，Optimus走过了怎样的道路？它将如何成为马斯克“可持续富足”宏大愿景中的关键拼图？面对重重技术不确定性，理性的投资者又该如何把握这一历史性机遇？让我们一同深入探寻这个可能重新定义劳动与人类关系的技术奇迹。
 
 
-![机器人卖爆米花](https://1drv.ms/i/c/5644dab129afda10/IQSJZYnYXoh-TZ4VDX528gJxAW8Uv5oK8b9j19oDDuqMw_s)
+![机器人卖爆米花](/assets/images/optimus-serve-popcorn.gif)
 
 
 ## 一、为什么是人形？马斯克的“适应性设计”哲学
@@ -221,13 +221,22 @@ Optimus采用了一种革命性的方法——**用单一神经网络处理所�
 **最新实际应用展示**：
 - **餐饮服务**：马斯克已确认，Optimus机器人即将在餐厅提供爆米花服务，这展示了其在服务业的商业化潜力。
 
-  
-![机器人爆米花服务视频演示](https://1drv.ms/v/c/5644dab129afda10/IQRRiUtBPDmARISVhaoSpoPxAbJt1A1ogFjeIMH9Sq78NGM?width=720&height=1280)
+
 
   *[点击查看视频：机器人爆米花服务演示]*
 - **娱乐互动**：在2024年10月的特斯拉"We, Robot"发布会上，多台Optimus机器人表演了同步舞蹈，展现了其卓越的协调控制能力。
-  
-[机器人舞蹈](https://1drv.ms/i/c/5644dab129afda10/IQSF-N24unUcSJ9zxOKtXQDeAYDE4K9Bz3zFYWS2767zr6M?width=660)
+
+<iframe 
+     width="560"
+     height="315"
+     src="https://youtube.com/embed/T14-JahrSHU?mute=1"
+     title="YouTube video player"
+     frameborder="0"
+     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+     allowfullscreen>
+</iframe>
+
+![机器人舞蹈](https://1drv.ms/i/c/5644dab129afda10/IQSF-N24unUcSJ9zxOKtXQDeAYDE4K9Bz3zFYWS2767zr6M?width=660)
 
 
 ### 教育和医疗
