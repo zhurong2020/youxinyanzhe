@@ -36,7 +36,6 @@ toc_sticky: true
 
 <audio controls style="width: 100%; margin: 10px 0;">
   <source src="/assets/audio/tesla-unboxed-manufacturing-podcast.mp3" type="audio/mpeg">
-  <source src="/assets/audio/tesla-unboxed-manufacturing-revolution.wav" type="audio/wav">
   您的浏览器不支持音频元素。
 </audio>
 
@@ -59,11 +58,11 @@ toc_sticky: true
 **制造方式对比动态演示**：
 
 
-![传统汽车制造](https://1drv.ms/i/c/5644dab129afda10/IQQUkmzgoLRBQ7Oxt6hxn0pQAXfleHNfqjmh35AZhEhAzMI)
+![传统汽车制造](/assets/images/posts/2025/07/traditional-car-manufacturing.gif)
 
 
 
-![特斯拉去盒子化制造](https://1drv.ms/i/c/5644dab129afda10/IQQykPSJcKGrT6F0Nz3NmcnvAQLTT3xBY_MBlpd08PxpBjQ)
+![特斯拉去盒子化制造](/assets/images/posts/2025/07/tesla-unboxed-manufacturing.gif)
 
 
 *上面2张动图展示：传统汽车制造流水线 vs 特斯拉"去盒子化"并行制造。更清晰的MP4格式视频见文末附件。*
