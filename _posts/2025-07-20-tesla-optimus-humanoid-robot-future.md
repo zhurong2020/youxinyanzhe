@@ -46,7 +46,7 @@ toc_sticky: true
 从2021年概念的首次亮相，到2025年临近的量产节点，Optimus走过了怎样的道路？它将如何成为马斯克“可持续富足”宏大愿景中的关键拼图？面对重重技术不确定性，理性的投资者又该如何把握这一历史性机遇？让我们一同深入探寻这个可能重新定义劳动与人类关系的技术奇迹。
 
 
-![机器人卖爆米花](/assets/images/optimus-serve-popcorn.gif)
+![机器人卖爆米花](/assets/images/posts/2025/07/optimus-serve-popcorn.gif)
 
 
 ## 一、为什么是人形？马斯克的“适应性设计”哲学
