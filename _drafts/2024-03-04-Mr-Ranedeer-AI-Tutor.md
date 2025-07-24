@@ -4,9 +4,9 @@ title: "云端生活入门：用ChatGPT-4开启个性化在线学习之旅"
 date: 2024-03-04 19:55:00 +0000
 excerpt: "Mr. Ranedeer AI导师项目基于GPT-4为用户提供定制化的个性化学习体验。"
 header:
-  overlay_image: assets/images/202403/personalizedaitutor.png
+  overlay_image: {{ site.baseurl }}/assets/images/posts/2024/03/personalizedaitutor.png
   overlay_filter: 0.5
-  teaser: assets/images/202403/personalizedaitutor.png
+  teaser: {{ site.baseurl }}/assets/images/posts/2024/03/personalizedaitutor.png
 ---
 
 ### 引言
