@@ -3,15 +3,17 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.venv/
 .python-version
 *.pyc
 *.pyo
 *.pyd
 .Python
+
+# 虚拟环境
 env/
 venv/
 ENV/
+.venv/
 
 # 环境变量
 .env
@@ -41,8 +43,9 @@ nosetests.xml
 coverage.xml
 *.cover
 
-# 输出目录
-_output/
+# 构建和运行时目录
+.build/
+.tmp/
 
 # 数据文件（包含敏感信息和缓存）
 _data/image_mappings.yml
