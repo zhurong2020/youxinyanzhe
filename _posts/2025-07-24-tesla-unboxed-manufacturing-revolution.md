@@ -35,7 +35,7 @@ toc_sticky: true
 > 🎧 **音频版本**：如果您更喜欢听而不是读，或想在通勤路上了解本文内容，可以点击下方播放按钮收听文章的AI语音版本（约6分钟）：
 
 <audio controls style="width: 100%; margin: 10px 0;">
-  <source src="/assets/audio/tesla-unboxed-manufacturing-podcast.mp3" type="audio/mpeg">
+  <source src="{{ site.baseurl }}/assets/audio/tesla-unboxed-manufacturing-podcast.mp3" type="audio/mpeg">
   您的浏览器不支持音频元素。
 </audio>
 
