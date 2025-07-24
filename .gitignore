@@ -62,6 +62,15 @@ Thumbs.db
 .*.swp
 *~
 
+# 临时和优化文件
+assets/images/*/temp/
+assets/images/*/optimized/
+assets/images/*/wechat_optimized/
+assets/audio/temp/
+*-temp.*
+*-test.*
+*-backup.*
+
 # Jekyll
 _site/
 .sass-cache/
