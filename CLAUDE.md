@@ -145,6 +145,8 @@ This section records critical architectural adjustments for the project:
   - 60-80 character concise introduction after front matter for homepage display
   - `<!-- more -->` tag after introduction
   - Natural background/context transition after the more tag leading into main content
+  - **🎧 播客收听** section with AI-generated Chinese podcast (length adjusted to content)
+  - **🌍 英文原始资料** section with original English sources for learning and research
 - **Writing Style**: Follow established blog style from zhurong2020.github.io:
   - Objective, fact-based approach rather than personal opinions
   - Use "你知道吗?" and similar engaging opening questions
@@ -215,6 +217,20 @@ This section records critical architectural adjustments for the project:
 - **HTML Cleaning**: Content is cleaned and optimized for WeChat editor compatibility
 
 ## 10. Document Update History
+
+### 2025-07-24: Enhanced Content Format - Podcast and English Resources ✅
+- **Added**: New mandatory content sections for all blog articles:
+  - **🎧 播客收听**: AI-generated Chinese podcast version (using 豆包 AI, length adjusted to content)
+  - **🌍 英文原始资料**: Original English sources for advanced readers and English learning
+- **Content Strategy Enhancement**: 
+  - Podcast provides accessible content consumption for commuting readers
+  - English resources serve dual purpose: in-depth research and language learning materials
+  - Maintains content accessibility across different reader preferences and skill levels
+- **Implementation**: Successfully applied to Tesla Unboxed Manufacturing article as template
+- **Technical Details**:
+  - Podcast section includes MP3 links, estimated duration, and usage suggestions
+  - English section categorizes content by type (video, audio) with difficulty levels and key terminology
+  - Both sections use emoji-based visual organization for easy scanning
 
 ### 2025-07-20: Investment-Oriented Content Strategy Framework ✅
 - **Added**: Comprehensive "Investment-Oriented Content Strategy" framework in Section 12
