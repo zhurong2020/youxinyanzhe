@@ -162,6 +162,28 @@ This section records critical architectural adjustments for the project:
   - Open-ended questions to encourage reader thinking
   - Series articles should leave space for future content expansion
 
+### Jekyll Assets Path Standards (Critical for GitHub Pages Deployment)
+- **Problem Context**: Site deployed with `baseurl: "/youxinyanzhe"` requires special path handling
+- **NEVER use absolute paths** like `/assets/images/...` or `/assets/audio/...`
+- **ALWAYS use Jekyll baseurl variable**: `{{ site.baseurl }}/assets/...`
+- **Asset Path Examples**:
+  - ❌ Wrong: `<img src="/assets/images/example.jpg">`
+  - ✅ Correct: `<img src="{{ site.baseurl }}/assets/images/example.jpg">`
+  - ❌ Wrong: `<source src="/assets/audio/podcast.mp3">`
+  - ✅ Correct: `<source src="{{ site.baseurl }}/assets/audio/podcast.mp3">`
+  - ❌ Wrong: `![Image](/assets/images/example.gif)`
+  - ✅ Correct: `![Image]({{ site.baseurl }}/assets/images/example.gif)`
+- **Asset Organization**:
+  - Images: `/assets/images/posts/YYYY/MM/filename.ext`
+  - Audio: `/assets/audio/filename.mp3`
+  - Static assets: `/assets/css/`, `/assets/js/`
+- **Testing Protocol**: Always test assets on both local Jekyll server and GitHub Pages
+- **Common Symptoms of Path Issues**:
+  - Images not displaying (broken image icons)
+  - Audio players showing as disabled/grayed out
+  - CSS/JS not loading properly
+- **Debugging**: Use browser developer tools Network tab to check for 404 errors on asset URLs
+
 ### Testing and Debugging Workflow
 - **Test File Organization**: Move reusable test scripts to `tests/` directory, remove temporary debug files from project root
 - **Debugging Strategy**: Create focused test scripts for specific issues (API testing, system verification, etc.)
@@ -224,6 +246,16 @@ This section records critical architectural adjustments for the project:
 - **HTML Cleaning**: Content is cleaned and optimized for WeChat editor compatibility
 
 ## 10. Document Update History
+
+### 2025-07-24: Jekyll Assets Path Standards and Media Fix ✅
+- **Added**: Critical Jekyll Assets Path Standards section to prevent baseurl deployment issues
+- **Fixed**: Tesla article audio player grayed out issue - incorrect asset paths
+- **Fixed**: OneDrive GIF images not displaying - path and format issues
+- **Established**: Mandatory use of `{{ site.baseurl }}` variable for all asset paths
+- **Documentation**: Common symptoms, debugging methods, and asset organization standards
+- **Testing Protocol**: Requirements for local and GitHub Pages testing
+- **Root Cause**: GitHub Pages deployment with baseurl="/youxinyanzhe" requires Jekyll variable usage
+- **Prevention**: Clear examples of correct vs incorrect path syntax for images, audio, CSS/JS
 
 ### 2025-07-24: Enhanced Content Format - Podcast and English Resources ✅
 - **Added**: New mandatory content sections for all blog articles:
