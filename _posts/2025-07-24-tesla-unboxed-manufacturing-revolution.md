@@ -58,11 +58,11 @@ toc_sticky: true
 **制造方式对比动态演示**：
 
 
-![传统汽车制造](/assets/images/posts/2025/07/traditional-car-manufacturing.gif)
+![传统汽车制造]({{ site.baseurl }}/assets/images/posts/2025/07/traditional-car-manufacturing.gif)
 
 
 
-![特斯拉去盒子化制造](/assets/images/posts/2025/07/tesla-unboxed-manufacturing.gif)
+![特斯拉去盒子化制造]({{ site.baseurl }}/assets/images/posts/2025/07/tesla-unboxed-manufacturing.gif)
 
 
 *上面2张动图展示：传统汽车制造流水线 vs 特斯拉"去盒子化"并行制造。更清晰的MP4格式视频见文末附件。*
