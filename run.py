@@ -6,7 +6,7 @@ import os
 import sys
 import argparse
 import logging
-from scripts.content_pipeline import ContentPipeline
+from scripts.core.content_pipeline import ContentPipeline
 
 # 禁用 tensorflow 警告
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'

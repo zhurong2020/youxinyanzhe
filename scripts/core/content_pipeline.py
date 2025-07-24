@@ -27,15 +27,15 @@ from dotenv import load_dotenv
 try:
     from .wechat_publisher import WechatPublisher
 except ImportError:
-    from wechat_publisher import WechatPublisher
+    from scripts.core.wechat_publisher import WechatPublisher
 
 # 内容变现系统（可选导入）
 RewardSystemManager = None
 try:
-    from .reward_system_manager import RewardSystemManager
+    from ..utils.reward_system_manager import RewardSystemManager
 except ImportError:
     try:
-        from reward_system_manager import RewardSystemManager
+        from scripts.utils.reward_system_manager import RewardSystemManager
     except ImportError:
         pass  # 内容变现系统模块不可用
 
@@ -222,7 +222,10 @@ class ContentPipeline:
             getattr(self.logger, level)(message)
         
         # 始终写入日志文件
-        with open("logs/pipeline.log", "a", encoding="utf-8") as f:
+        # 确保日志目录存在
+        log_dir = ".build/logs"
+        os.makedirs(log_dir, exist_ok=True)
+        with open(f"{log_dir}/pipeline.log", "a", encoding="utf-8") as f:
             f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {level.upper()} - {message}\n")
     
     def _load_config(self) -> dict:

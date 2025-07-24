@@ -193,19 +193,27 @@ This section records critical architectural adjustments for the project:
 ## 7. Project Structure Best Practices
 
 ### Directory Organization
-- **`scripts/`**: Core functionality modules only (no test files)
+- **`docs/`**: Project documentation and guides
+- **`scripts/`**: Core functionality modules organized by purpose
+  - **`core/`**: Core business logic (content_pipeline, wechat_publisher)
+  - **`utils/`**: Reusable utilities and helper functions
+  - **`tools/`**: Standalone tools and scripts
 - **`tests/`**: All test files, including platform-specific tests and debugging utilities
 - **`config/`**: Configuration files organized by functionality (gemini, platforms, templates)
 - **`_drafts/.publishing/`**: Publication status tracking files (included in Git)
 - **`_drafts/archived/`**: Archived completed articles for reference
 - **`_drafts/musk-empire/`**: Musk Empire series planning and requirements files
-- **`_output/`**: Generated files and guidance (excluded from Git)
-  - **`wechat_guides/`**: WeChat publish guidance files (*.md guides, *.html content)
-  - **`wechat_image_cache/`**: WeChat uploaded image cache and mappings
+- **`.build/`**: Build and runtime files (excluded from Git)
+  - **`logs/`**: Application logs
+  - **`htmlcov/`**: Test coverage reports
+- **`.tmp/`**: Temporary files and outputs (excluded from Git)
+  - **`output/wechat_guides/`**: WeChat publish guidance files
+  - **`output/wechat_image_cache/`**: WeChat uploaded image cache and mappings
+  - **`output/packages/`**: Generated content packages
 
 ### File Naming Conventions
 - **Status Files**: `article-name.yml` in `_drafts/.publishing/`
-- **Guidance Files**: `article-title_timestamp_guide.md` and `article-title_timestamp_content.html` in `_output/wechat_guides/`
+- **Guidance Files**: `article-title_timestamp_guide.md` and `article-title_timestamp_content.html` in `.tmp/output/wechat_guides/`
 - **Test Files**: `test_feature_name.py` in `tests/`
 - **Debug Files**: `test_*_debug.py`, `test_*_verify.py` for debugging and verification utilities
 
@@ -246,6 +254,14 @@ This section records critical architectural adjustments for the project:
 - **HTML Cleaning**: Content is cleaned and optimized for WeChat editor compatibility
 
 ## 10. Document Update History
+
+### 2025-07-24: Project Structure Refactoring ✅
+- **Added**: Unified `docs/` directory for all project documentation
+- **Refactored**: Script organization with `core/`, `utils/`, and `tools/` subdirectories
+- **Improved**: Runtime file management with `.build/` and `.tmp/` directories
+- **Updated**: All import paths and file references to match new structure
+- **Enhanced**: .gitignore to properly exclude temporary and build files
+- **Benefits**: Better separation of concerns, cleaner project structure, follows software engineering best practices
 
 ### 2025-07-24: Jekyll Assets Path Standards and Media Fix ✅
 - **Added**: Critical Jekyll Assets Path Standards section to prevent baseurl deployment issues

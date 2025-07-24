@@ -84,7 +84,7 @@ class WechatPublisher:
         self.access_token: Optional[str] = None
         self.token_expires_at: int = 0
         
-        cache_dir = project_root / "_output/wechat_image_cache"
+        cache_dir = project_root / ".tmp/output/wechat_image_cache"
         cache_dir.mkdir(parents=True, exist_ok=True)
         self.cache_file = cache_dir / "image_cache.json"
         self.image_cache = self._load_image_cache()
@@ -437,7 +437,7 @@ Here is the content to optimize:
 
     def generate_guide_file(self, project_root: Path, front_matter: Dict[str, Any], markdown_content: str) -> bool:
         self.logger.info(f"Generating manual guide file for: {front_matter.get('title', 'Untitled')}")
-        guide_dir = project_root / "_output/wechat_guides"
+        guide_dir = project_root / ".tmp/output/wechat_guides"
         guide_dir.mkdir(parents=True, exist_ok=True)
         safe_title = re.sub(r'[^\w\s-]', '', front_matter.get('title', 'draft')).strip()
         safe_title = re.sub(r'[-\s]+', '-', safe_title)

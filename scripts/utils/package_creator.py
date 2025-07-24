@@ -34,8 +34,8 @@ class PackageCreator:
         self.logger = logging.getLogger(__name__)
         
         # 项目路径
-        self.project_root = Path(__file__).parent.parent
-        self.output_dir = self.project_root / "_output/packages"
+        self.project_root = Path(__file__).parent.parent.parent
+        self.output_dir = self.project_root / ".tmp/output/packages"
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
         # 资料清单模板
