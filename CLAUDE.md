@@ -48,6 +48,13 @@ Claude Code serves as the AI software engineer for this project, with primary re
    - Maintain comprehensive test coverage
    - Keep documentation synchronized with feature updates
 
+3. **Article Sync Management System** (规划中):
+   - 文章同步管理功能集成到run.py主菜单
+   - 支持posts到archived的单个和批量同步
+   - Gridea格式内容准备（去除frontmatter）
+   - 同步状态检查和差异提示
+   - 日志记录同步操作历史
+
 ## 5. Key Technical Decisions
 
 This section records critical architectural adjustments for the project:
