@@ -22,6 +22,12 @@ header:
 
 <!-- more -->
 
+<audio controls style="width: 100%; margin: 10px 0;">
+  <source src="{{ site.baseurl }}/assets/audio/tesla-robotaxi-expansion.mp3" type="audio/mpeg">
+  您的浏览器不支持音频元素。
+</audio>
+
+
 最近，特斯拉在奥斯汀的Robotaxi服务扩张引发了科技圈的广泛关注。这不仅仅是因为其惊人的扩张速度，更因为扩张后的服务区域呈现出一个颇具争议的T型形状，网友们对此展开了各种脑洞大开的解读。
 
 当传统自动驾驶公司还在为高精地图和激光雷达的巨额成本而苦恼时，特斯拉已经用纯视觉AI方案走出了一条截然不同的道路。这次看似"搞怪"的扩张，实际上展现了特斯拉技术路线的核心优势。

@@ -37,6 +37,11 @@ toc_sticky: true
 
 <!-- more -->
 
+<audio controls style="width: 100%; margin: 10px 0;">
+  <source src="{{ site.baseurl }}/assets/audio/tesla-ai-empire.mp3" type="audio/mpeg">
+  您的浏览器不支持音频元素。
+</audio>
+
 当许多人还在争论特斯拉是否只是一家汽车公司时，一个更引人深思的问题浮现出来：如果不是，那它究竟是什么？
 
 近几个月来，答案正变得日益清晰。从奥斯汀Robotaxi服务区域的迅速扩张，到擎天柱（Optimus）机器人展示其拥有22个自由度的灵巧双手，再到马斯克提出的“可持续富足”愿景，一个惊人的事实逐渐浮出水面：**特斯拉或许正在成为全球最大的AI应用公司**。
