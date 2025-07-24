@@ -181,7 +181,7 @@ class PackageCreator:
             }
             
             body {
-                font-family: "DejaVu Sans", "Liberation Sans", "Arial", sans-serif;
+                font-family: "Noto Sans CJK SC", "Source Han Sans CN", "PingFang SC", "Microsoft YaHei", "SimHei", "DejaVu Sans", "Liberation Sans", "Arial", sans-serif;
                 line-height: 1.6;
                 color: #333;
                 font-size: 14px;
@@ -235,7 +235,7 @@ class PackageCreator:
                 background-color: #f1f2f6;
                 padding: 2px 4px;
                 border-radius: 3px;
-                font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
+                font-family: "Noto Sans Mono CJK SC", "Source Han Sans CN", "Consolas", "DejaVu Sans Mono", "Liberation Mono", monospace;
             }
             
             pre {
@@ -278,9 +278,31 @@ class PackageCreator:
             pdf_filename = f"{self._safe_filename(title)}.pdf"
             pdf_path = temp_path / pdf_filename
             
+            # 配置中文字体支持
             font_config = FontConfiguration()
+            
+            # 添加中文字体CSS - 使用系统已有字体
+            chinese_font_css = """
+            @font-face {
+                font-family: 'ChineseFont';
+                src: local('DejaVu Sans'), local('Liberation Sans'), local('Arial Unicode MS');
+                unicode-range: U+4E00-9FFF, U+3400-4DBF, U+20000-2A6DF, U+2A700-2B73F, U+2B740-2B81F, U+2B820-2CEAF;
+            }
+            
+            body, p, h1, h2, h3, h4, h5, h6, li, td, th, div, span {
+                font-family: 'ChineseFont', 'DejaVu Sans', 'Liberation Sans', 'Arial', sans-serif !important;
+            }
+            
+            /* 为中文字符强制使用特定字体 */
+            .chinese-text {
+                font-family: 'DejaVu Sans', 'Liberation Sans', 'Arial Unicode MS', sans-serif;
+                font-size: 14px;
+                line-height: 1.8;
+            }
+            """
+            
             html_doc = HTML(string=html_content)
-            css_doc = CSS(string=css_content, font_config=font_config)
+            css_doc = CSS(string=css_content + chinese_font_css, font_config=font_config)
             
             html_doc.write_pdf(str(pdf_path), stylesheets=[css_doc], font_config=font_config)
             
@@ -318,19 +340,21 @@ class PackageCreator:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
 </head>
-<body>
-    <h1>{title}</h1>
+<body class="chinese-text">
+    <h1 class="chinese-text">{title}</h1>
     
-    <div class="article-meta">
+    <div class="article-meta chinese-text">
         <p><strong>发布日期</strong>: {date}</p>
         {f'<p><strong>分类</strong>: {", ".join(categories)}</p>' if categories else ''}
         {f'<p><strong>标签</strong>: {", ".join(tags)}</p>' if tags else ''}
         <p><strong>PDF生成时间</strong>: {datetime.now().strftime("%Y年%m月%d日 %H:%M")}</p>
     </div>
     
+    <div class="chinese-text">
     {html_body}
+    </div>
     
-    <div class="footer">
+    <div class="footer chinese-text">
         <p>本PDF由"有心言者"自动生成系统创建</p>
         <p>获取更多内容请关注微信公众号：有心言者</p>
         <p>博客地址：https://zhurong2020.github.io</p>
