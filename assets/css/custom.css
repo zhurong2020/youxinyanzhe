@@ -229,7 +229,7 @@ a.btn.btn--primary {
 
 .subscribe-section {
   text-align: center;
-  padding: 1.5em 0; /* Reduced from 2em */
+  padding: 1em 0; /* Further reduced for better spacing */
   background-color: #f3f6f6;
   margin: 1.5em auto; /* Reduced from 2em 0, added auto for centering */
   border-radius: 5px;
