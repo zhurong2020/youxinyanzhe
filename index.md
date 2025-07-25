@@ -12,13 +12,21 @@ excerpt: "让普通人受益于科技、全球视野与终身学习的知识分�
 intro: 
   - excerpt: '探索认知升级、技术赋能、全球视野与投资理财，助力个人成长与财富积累的完整知识体系。'
 feature_row:
-  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/25b4d7c3-4f8e-4b62-5b9e-9fe1a6c10200/public?format=auto&width=600&quality=75
-    alt: "🧠 认知升级系列"
-    title: "🧠 认知升级系列"
-    excerpt: "思维模型、学习方法、认知心理学与决策科学。帮你建立科学的思维框架，避免认知偏差，提升学习效率与人生决策质量。"
-    url: "/categories/认知升级/"
-    btn_label: "开始升级"
-    btn_class: "btn--primary"
+  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/e35cd10a-83b4-4939-ecb6-35edeb1a2d00/public?format=auto&width=600&quality=75
+    alt: "💰 投资理财系列"
+    title: "💰 投资理财系列"
+    excerpt: "投资思维培养、理财方法实践与财务自由规划。结合量化分析与价值投资理念，构建科学的个人财富管理体系。"
+    url: "/categories/投资理财/"
+    btn_label: "财富增长"
+    btn_class: "btn--success"
+  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/dfa9d2a3-3054-46d8-241e-717209aaf600/public?format=auto&width=600&quality=75
+    alt: "🌍 全球视野系列"
+    title: "🌍 全球视野系列"
+    excerpt: "国际趋势洞察、文化差异观察与跨文化思维训练。开拓全球化视野，理解世界发展脉络，培养国际化思维能力。"
+    url: "/categories/全球视野/"
+    btn_label: "拓展视野"
+    btn_class: "btn--info"
+feature_row2:
   - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/c553d355-9a2e-4753-4a47-9009b7cab200/public?format=auto&width=600&quality=75
     alt: "🛠️ 技术赋能系列"
     title: "🛠️ 技术赋能系列"
@@ -26,21 +34,13 @@ feature_row:
     url: "/categories/技术赋能/"
     btn_label: "获得赋能"
     btn_class: "btn--primary"
-feature_row2:
-  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/dfa9d2a3-3054-46d8-241e-717209aaf600/public?format=auto&width=600&quality=75
-    alt: "🌍 全球视野系列"
-    title: "🌍 全球视野系列"
-    excerpt: "国际趋势洞察、文化差异观察与跨文化思维训练。开拓全球化视野，理解世界发展脉络，培养国际化思维能力。"
-    url: "/categories/全球视野/"
-    btn_label: "拓展视野"
-    btn_class: "btn--primary"
-  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/e35cd10a-83b4-4939-ecb6-35edeb1a2d00/public?format=auto&width=600&quality=75
-    alt: "💰 投资理财系列"
-    title: "💰 投资理财系列"
-    excerpt: "投资思维培养、理财方法实践与财务自由规划。结合量化分析与价值投资理念，构建科学的个人财富管理体系。"
-    url: "/categories/投资理财/"
-    btn_label: "财富增长"
-    btn_class: "btn--primary"
+  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/25b4d7c3-4f8e-4b62-5b9e-9fe1a6c10200/public?format=auto&width=600&quality=75
+    alt: "🧠 认知升级系列"
+    title: "🧠 认知升级系列"
+    excerpt: "思维模型、学习方法、认知心理学与决策科学。帮你建立科学的思维框架，避免认知偏差，提升学习效率与人生决策质量。"
+    url: "/categories/认知升级/"
+    btn_label: "开始升级"
+    btn_class: "btn--warning"
 ---
 
 {% include feature_row id="intro" type="center" %}
@@ -50,6 +50,36 @@ feature_row2:
 {% include feature_row %}
 
 {% include feature_row id="feature_row2" %}
+
+<!-- 分类导航统计区域 -->
+<div class="categories-nav" style="margin: 3em 0; padding: 2em; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
+  <h2 style="text-align: center; margin-bottom: 1.5em; color: white; font-size: 1.8em;">📊 内容分类导航</h2>
+  <div class="grid__wrapper" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1em;">
+    <div class="category-card" style="background: rgba(255,255,255,0.15); padding: 1.5em; border-radius: 10px; text-align: center; backdrop-filter: blur(10px); border: 2px solid rgba(40, 167, 69, 0.5);">
+      <h3 style="color: white; margin-bottom: 0.5em;">💰 投资理财</h3>
+      <p style="color: rgba(255,255,255,0.9); margin-bottom: 1em; font-size: 0.9em;"><strong>{{ site.categories.投资理财 | size }} 篇文章</strong></p>
+      <a href="{{ site.baseurl }}/categories/投资理财/" class="btn btn--inverse btn--small">财富增长</a>
+    </div>
+    <div class="category-card" style="background: rgba(255,255,255,0.15); padding: 1.5em; border-radius: 10px; text-align: center; backdrop-filter: blur(10px); border: 2px solid rgba(23, 162, 184, 0.5);">
+      <h3 style="color: white; margin-bottom: 0.5em;">🌍 全球视野</h3>
+      <p style="color: rgba(255,255,255,0.9); margin-bottom: 1em; font-size: 0.9em;"><strong>{{ site.categories.全球视野 | size }} 篇文章</strong></p>
+      <a href="{{ site.baseurl }}/categories/全球视野/" class="btn btn--inverse btn--small">开拓视野</a>
+    </div>
+    <div class="category-card" style="background: rgba(255,255,255,0.1); padding: 1.5em; border-radius: 10px; text-align: center; backdrop-filter: blur(10px);">
+      <h3 style="color: white; margin-bottom: 0.5em;">🛠️ 技术赋能</h3>
+      <p style="color: rgba(255,255,255,0.8); margin-bottom: 1em; font-size: 0.9em;">{{ site.categories.技术赋能 | size }} 篇文章</p>
+      <a href="{{ site.baseurl }}/categories/技术赋能/" class="btn btn--inverse btn--small">获取工具</a>
+    </div>
+    <div class="category-card" style="background: rgba(255,255,255,0.1); padding: 1.5em; border-radius: 10px; text-align: center; backdrop-filter: blur(10px); border: 2px solid rgba(255, 193, 7, 0.3);">
+      <h3 style="color: white; margin-bottom: 0.5em;">🧠 认知升级</h3>
+      <p style="color: rgba(255,255,255,0.8); margin-bottom: 1em; font-size: 0.9em;">{{ site.categories.认知升级 | size }} 篇文章 <span style="color: #ffc107;">⚡需补强</span></p>
+      <a href="{{ site.baseurl }}/categories/认知升级/" class="btn btn--inverse btn--small">立即学习</a>
+    </div>
+  </div>
+  <div style="text-align: center; margin-top: 2em;">
+    <p style="color: rgba(255,255,255,0.9); font-size: 1em;">💡 <strong>探索完整知识体系</strong> - 从认知提升到财富增长的全方位成长路径</p>
+  </div>
+</div>
 
 <div class="latest-posts">
   <h2 class="archive__subtitle">最新文章</h2>
