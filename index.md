@@ -23,7 +23,7 @@ feature_row:
     alt: "量化交易系列"
     title: "量化交易系列"
     excerpt: "探索量化交易平台、算法策略开发与自动化投资工具。让数据驱动决策，实现更科学的投资方法。分享实用的量化分析技术与工具。"
-    url: "/categories/量化交易/"
+    url: "/categories/量化投资/"
     btn_label: "了解更多"
     btn_class: "btn--primary"
   - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/25b4d7c3-4f8e-4b62-5b9e-9fe1a6c10200/public?format=auto&width=600&quality=75

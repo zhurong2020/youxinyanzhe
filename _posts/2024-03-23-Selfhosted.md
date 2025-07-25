@@ -126,7 +126,7 @@ GitHub 上汇集了各种开源项目，从简单的脚本到复杂的操作系�
 - 多国语言支持：English, 简体中文, 繁体中文, 日本語, Español, Italiano, Türkçe, Deutsch, Tiếng Việt, Русский, Čeština, 한국어, Indonesia
 - 拥有自己的域名？好上加好，绑定后即可在任何地方无障碍快速访问
 
-[NextChat 官网](https://nextchat.dev/)
+[NextChat GitHub仓库](https://github.com/NextChat/NextChat)
 
 ### 安装 Jellyfin，实现家庭的影音服务器
 
@@ -188,7 +188,7 @@ GitHub 上汇集了各种开源项目，从简单的脚本到复杂的操作系�
 为了让你能更直观地体验这些自托管服务，你可以使用以下演示网址体验部分应用：
 
 - [Jellyfin Demo](https://demo.jellyfin.org/stable/web/#/home.html)
-- [NextChat Demo](https://app.nextchat.dev/)
+- [NextChat GitHub仓库](https://github.com/NextChat/NextChat)
 
 现在就开始你的自托管旅程吧！选择一个开源项目，跟随我们的指南，一步一步构建你的数字王国。每个人都值得拥有一个完全自主控制的数字空间。
 
@@ -203,7 +203,6 @@ GitHub 上汇集了各种开源项目，从简单的脚本到复杂的操作系�
 - [云端生活体验-让人呼吸顺畅的 ChatGPT（可惜项目已经停止，为感谢作者留文纪念）](https://zhurong2020.github.io/post/yun-duan-sheng-huo-ti-yan-rang-ren-hu-xi-shun-chang-de-chatgpt/)
 - [云端生活体验-NextChat 一个跨平台的 AI 聊天项目](https://zhurong2020.github.io/post/nextchatge-xing-hua-nin-de-chatgpt-ti-yan-kai-yuan-kuai-su-bu-shu-yu-duo-yuan-ying-yong/)
 - [云端启航：轻松拥有自己的 VPS 开启你的云端之旅](https://zhurong2020.github.io/post/yun-duan-qi-hang-qing-song-yong-you-zi-ji-de-vpskai-qi-ni-de-yun-duan-zhi-lu/)
-- [聊天机器人秘诀-悄悄话让 AI 更懂你](https://znhskzj.github.io/posts/qiao-qiao-hua/)
 
 好了，今天就到这里。如果您对今天讨论的自托管还有疑问，欢迎您加入我们的“云端生活交流群”，和其他小伙伴一起学习交流。另外，您希望我下一篇写什么内容，也欢迎在评论区留言。
 
