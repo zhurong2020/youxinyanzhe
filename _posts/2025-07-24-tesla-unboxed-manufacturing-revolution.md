@@ -2,8 +2,7 @@
 author_profile: true
 breadcrumbs: true
 categories:
-- 项目与创新
-- 技术实践
+- 全球视野
 comments: true
 date: 2025-07-22
 header:

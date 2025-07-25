@@ -2,8 +2,7 @@
 author_profile: true
 breadcrumbs: true
 categories:
-- 智能理财
-- 基金投资
+- 投资理财
 comments: true
 date: 2025-07-10 15:00:00 +0000
 excerpt: 继《为何普通人应该现在就开始投资美股》后，本文详细介绍如何通过QDII基金，让中国投资者轻松参与全球市场，分享经济增长红利。

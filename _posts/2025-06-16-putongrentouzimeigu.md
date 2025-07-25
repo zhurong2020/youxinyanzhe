@@ -2,8 +2,7 @@
 author_profile: true
 breadcrumbs: true
 categories:
-- 智能理财
-- 学习成长
+- 投资理财
 comments: true
 date: 2025-06-16 16:45:00 +0000     
 excerpt: 本文作者分析了美国生活成本现状，探讨了美股投资作为普通人实现财务自由的重要途径。

@@ -1,7 +1,6 @@
 ---
 categories:
-- insights
-- tech
+- 全球视野
 date: 2025-07-17
 excerpt: 从一个T型地图的搞怪扩张，看特斯拉如何用纯视觉AI颠覆自动驾驶行业
 layout: single
