@@ -11,45 +11,78 @@ header:
 excerpt: "让普通人受益于科技、全球视野与终身学习的知识分享平台"
 intro: 
   - excerpt: '探索认知升级、技术赋能、全球视野与投资理财，助力个人成长与财富积累的完整知识体系。'
-feature_row:
-  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/e35cd10a-83b4-4939-ecb6-35edeb1a2d00/public?format=auto&width=600&quality=75
-    alt: "💰 投资理财系列"
-    title: "💰 投资理财系列"
-    excerpt: "投资思维培养、理财方法实践与财务自由规划。结合量化分析与价值投资理念，构建科学的个人财富管理体系。"
-    url: "/categories/投资理财/"
-    btn_label: "财富增长"
-    btn_class: "btn--success"
-  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/dfa9d2a3-3054-46d8-241e-717209aaf600/public?format=auto&width=600&quality=75
-    alt: "🌍 全球视野系列"
-    title: "🌍 全球视野系列"
-    excerpt: "国际趋势洞察、文化差异观察与跨文化思维训练。开拓全球化视野，理解世界发展脉络，培养国际化思维能力。"
-    url: "/categories/全球视野/"
-    btn_label: "拓展视野"
-    btn_class: "btn--info"
-feature_row2:
-  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/c553d355-9a2e-4753-4a47-9009b7cab200/public?format=auto&width=600&quality=75
-    alt: "🛠️ 技术赋能系列"
-    title: "🛠️ 技术赋能系列"
-    excerpt: "实用工具推荐、技术教程与自动化方案。让科技真正为普通人赋能，提升工作效率，享受数字化生活的便利与乐趣。"
-    url: "/categories/技术赋能/"
-    btn_label: "获得赋能"
-    btn_class: "btn--primary"
-  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/25b4d7c3-4f8e-4b62-5b9e-9fe1a6c10200/public?format=auto&width=600&quality=75
-    alt: "🧠 认知升级系列"
-    title: "🧠 认知升级系列"
-    excerpt: "思维模型、学习方法、认知心理学与决策科学。帮你建立科学的思维框架，避免认知偏差，提升学习效率与人生决策质量。"
-    url: "/categories/认知升级/"
-    btn_label: "开始升级"
-    btn_class: "btn--warning"
 ---
 
 {% include feature_row id="intro" type="center" %}
 
-<!-- 样式已移至custom.css文件 -->
+<!-- 四大分类展示区域 - 优化布局宽度 -->
+<div class="feature-categories-wrapper" style="margin: 3em 0;">
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2em; width: 100%; max-width: 1200px; margin: 0 auto;">
+    
+    <!-- 投资理财系列 -->
+    <div class="category-feature-card" style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.3s ease; position: relative;">
+      <div style="height: 200px; overflow: hidden;">
+        <img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/e35cd10a-83b4-4939-ecb6-35edeb1a2d00/public?format=auto&width=600&quality=75" alt="💰 投资理财系列" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div style="padding: 1.5em; text-align: center;">
+        <h3 style="font-size: 1.5em; margin-bottom: 0.5em; color: #2c3e50;">💰 投资理财系列</h3>
+        <p style="color: #666; margin-bottom: 1.5em; line-height: 1.6;">投资思维培养、理财方法实践与财务自由规划。结合量化分析与价值投资理念，构建科学的个人财富管理体系。</p>
+        <a href="{{ site.baseurl }}/categories/投资理财/" class="btn btn--success" style="display: inline-block; padding: 0.75em 1.5em; border-radius: 25px;">财富增长</a>
+      </div>
+    </div>
 
-{% include feature_row %}
+    <!-- 全球视野系列 -->
+    <div class="category-feature-card" style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+      <div style="height: 200px; overflow: hidden;">
+        <img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/dfa9d2a3-3054-46d8-241e-717209aaf600/public?format=auto&width=600&quality=75" alt="🌍 全球视野系列" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div style="padding: 1.5em; text-align: center;">
+        <h3 style="font-size: 1.5em; margin-bottom: 0.5em; color: #2c3e50;">🌍 全球视野系列</h3>
+        <p style="color: #666; margin-bottom: 1.5em; line-height: 1.6;">国际趋势洞察、文化差异观察与跨文化思维训练。开拓全球化视野，理解世界发展脉络，培养国际化思维能力。</p>
+        <a href="{{ site.baseurl }}/categories/全球视野/" class="btn btn--info" style="display: inline-block; padding: 0.75em 1.5em; border-radius: 25px;">拓展视野</a>
+      </div>
+    </div>
 
-{% include feature_row id="feature_row2" %}
+    <!-- 技术赋能系列 -->
+    <div class="category-feature-card" style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+      <div style="height: 200px; overflow: hidden;">
+        <img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/c553d355-9a2e-4753-4a47-9009b7cab200/public?format=auto&width=600&quality=75" alt="🛠️ 技术赋能系列" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div style="padding: 1.5em; text-align: center;">
+        <h3 style="font-size: 1.5em; margin-bottom: 0.5em; color: #2c3e50;">🛠️ 技术赋能系列</h3>
+        <p style="color: #666; margin-bottom: 1.5em; line-height: 1.6;">实用工具推荐、技术教程与自动化方案。让科技真正为普通人赋能，提升工作效率，享受数字化生活的便利与乐趣。</p>
+        <a href="{{ site.baseurl }}/categories/技术赋能/" class="btn btn--primary" style="display: inline-block; padding: 0.75em 1.5em; border-radius: 25px;">获得赋能</a>
+      </div>
+    </div>
+
+    <!-- 认知升级系列 -->
+    <div class="category-feature-card" style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+      <div style="height: 200px; overflow: hidden;">
+        <img src="https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/25b4d7c3-4f8e-4b62-5b9e-9fe1a6c10200/public?format=auto&width=600&quality=75" alt="🧠 认知升级系列" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div style="padding: 1.5em; text-align: center;">
+        <h3 style="font-size: 1.5em; margin-bottom: 0.5em; color: #2c3e50;">🧠 认知升级系列</h3>
+        <p style="color: #666; margin-bottom: 1.5em; line-height: 1.6;">思维模型、学习方法、认知心理学与决策科学。帮你建立科学的思维框架，避免认知偏差，提升学习效率与人生决策质量。</p>
+        <a href="{{ site.baseurl }}/categories/认知升级/" class="btn btn--warning" style="display: inline-block; padding: 0.75em 1.5em; border-radius: 25px;">开始升级</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.category-feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+}
+
+@media (max-width: 768px) {
+  .feature-categories-wrapper > div {
+    grid-template-columns: 1fr !important;
+    gap: 1.5em !important;
+  }
+}
+</style>
 
 <!-- 分类导航统计区域 -->
 <div class="categories-nav" style="margin: 3em 0; padding: 2em; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
