@@ -123,15 +123,21 @@ This section records critical architectural adjustments for the project:
 
 ### Testing Standards and Conventions
 - **Test File Organization**: All test files must be placed in the `tests/` directory
+- **Debug Tools Organization**: Standalone debugging tools moved to `scripts/tools/` directory:
+  - `wechat_api_debug.py`: WeChat API testing and debugging
+  - `wechat_system_verify.py`: System verification utilities
 - **Existing Test Modules**: Always check and utilize existing test modules before creating new ones:
   - `test_wechat_draft.py`: WeChat functionality testing
   - `test_content_pipeline.py`: Content processing pipeline tests
   - `conftest.py`: Shared test fixtures and configurations
   - `run_tests.py`: Test runner with custom configurations
 - **Test File Naming**: Follow `test_*.py` pattern for all test files
-- **Debug and Verification**: Use `test_*_debug.py` and `test_*_verify.py` for debugging utilities
+- **Test Generation**: Test article generation functionality improved with:
+  - Enhanced AI prompts to avoid format issues
+  - Content cleaning logic to remove explanatory text
+  - Proper front matter handling
 - **Test Isolation**: Each test should be independent and not rely on external state
-- **Cleanup**: Remove temporary test files after testing completion
+- **Cleanup**: Remove temporary test files after testing completion, maintain clean project structure
 
 ### Git Workflow
 - **Commits**: Use descriptive commit messages following conventional commit format
@@ -185,10 +191,15 @@ This section records critical architectural adjustments for the project:
 - **Debugging**: Use browser developer tools Network tab to check for 404 errors on asset URLs
 
 ### Testing and Debugging Workflow
-- **Test File Organization**: Move reusable test scripts to `tests/` directory, remove temporary debug files from project root
-- **Debugging Strategy**: Create focused test scripts for specific issues (API testing, system verification, etc.)
-- **Test Naming**: Use descriptive names like `test_wechat_api_debug.py`, `test_system_verify.py`
-- **Cleanup Protocol**: Remove temporary debug files after issues are resolved, keep only reusable test utilities
+- **Test File Organization**: Maintain clean separation between tests (`tests/`) and tools (`scripts/tools/`)
+- **Debugging Strategy**: Use dedicated debugging tools in `scripts/tools/` for specific issues
+- **Logging and Debugging**: 
+  - Unified logging system with `.build/logs/pipeline.log`
+  - Intelligent log level filtering (DEBUG only in verbose mode)
+  - Session tracking with unique identifiers
+  - Log rotation to prevent file bloat
+- **Tool Naming**: Use descriptive names like `wechat_api_debug.py`, `wechat_system_verify.py`
+- **Cleanup Protocol**: Remove temporary debug files after issues are resolved, keep organized structure
 
 ## 7. Project Structure Best Practices
 
@@ -254,6 +265,16 @@ This section records critical architectural adjustments for the project:
 - **HTML Cleaning**: Content is cleaned and optimized for WeChat editor compatibility
 
 ## 10. Document Update History
+
+### 2025-07-24: System Optimization and Logging Enhancement ✅
+- **Fixed**: Test article generation issues including double front matter and AI explanation text
+- **Enhanced**: Gemini prompt optimization to generate cleaner content without embedded YAML blocks
+- **Improved**: Content cleaning logic to properly remove AI explanatory text
+- **Optimized**: Logging system to reduce duplicate records and improve clarity
+- **Unified**: Log directory structure to `.build/logs/` with file rotation
+- **Cleaned**: Duplicate test files and reorganized debug tools to `scripts/tools/`
+- **Added**: Intelligent logging with level filtering and session tracking
+- **Benefits**: More stable test article generation, cleaner logs, better developer experience
 
 ### 2025-07-24: Project Structure Refactoring ✅
 - **Added**: Unified `docs/` directory for all project documentation
