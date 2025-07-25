@@ -3,7 +3,7 @@ title: "💰 投资理财系列"
 layout: category
 permalink: /categories/投资理财/
 taxonomy: 投资理财
-entries_layout: grid
+entries_layout: list
 author_profile: true
 ---
 
