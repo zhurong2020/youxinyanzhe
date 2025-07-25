@@ -13,13 +13,13 @@ def check_system_status():
     print("🔍 检查微信发布系统状态...")
     
     # 检查输出目录
-    output_dir = Path("_output")
+    output_dir = Path(".tmp/output")
     guides_dir = output_dir / "wechat_guides"
-    previews_dir = output_dir / "wechat_previews"
+    image_cache_dir = output_dir / "wechat_image_cache"
     
-    print(f"📁 输出目录: {output_dir.exists()}")
-    print(f"📋 指导文件目录: {guides_dir.exists()}")
-    print(f"📱 预览文件目录: {previews_dir.exists()}")
+    print(f"📁 输出目录: {'✅ 存在' if output_dir.exists() else '📋 不存在 (正常，首次使用时自动创建)'}")
+    print(f"📋 指导文件目录: {'✅ 存在' if guides_dir.exists() else '📋 不存在 (正常，发布微信内容时自动创建)'}")
+    print(f"📱 图片缓存目录: {'✅ 存在' if image_cache_dir.exists() else '📋 不存在 (正常，上传图片时自动创建)'}")
     
     # 列出最新的文件
     if guides_dir.exists():
@@ -27,15 +27,24 @@ def check_system_status():
         html_files = list(guides_dir.glob("*.html"))
         
         print(f"\n📋 指导文件 ({len(guide_files)} 个):")
-        for f in sorted(guide_files)[-5:]:  # 显示最新5个
-            print(f"  - {f.name}")
+        if guide_files:
+            for f in sorted(guide_files)[-5:]:  # 显示最新5个
+                print(f"  - {f.name}")
+        else:
+            print("  - 暂无指导文件")
         
         print(f"\n📄 HTML文件 ({len(html_files)} 个):")
-        for f in sorted(html_files)[-5:]:  # 显示最新5个
-            print(f"  - {f.name}")
+        if html_files:
+            for f in sorted(html_files)[-5:]:  # 显示最新5个
+                print(f"  - {f.name}")
+        else:
+            print("  - 暂无HTML文件")
+    else:
+        print(f"\n💡 提示: 指导文件目录将在首次发布微信内容时自动创建")
+        print(f"    目录路径: {guides_dir}")
     
     # 检查图片缓存
-    cache_file = output_dir / "wechat_image_cache" / "image_cache.json"
+    cache_file = image_cache_dir / "image_cache.json"
     if cache_file.exists():
         try:
             with open(cache_file, 'r') as f:

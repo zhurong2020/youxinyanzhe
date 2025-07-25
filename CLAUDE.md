@@ -30,7 +30,7 @@ Claude Code serves as the AI software engineer for this project, with primary re
    - ✅ **Status Tracking**: `_drafts/.publishing/*.yml` files track publication status
    - ✅ **Cross-platform Republishing**: Support republishing existing articles to other platforms
    - ✅ **Duplicate Prevention**: Automatically filter already-published platforms
-   - ✅ **Publish Guidance**: WeChat guidance files saved to `_output/wechat_guides/`
+   - ✅ **Publish Guidance**: WeChat guidance files saved to `.tmp/output/wechat_guides/`
 
 3. **Content Enhancement Features**:
    - ✅ **Conditional Content**: Investment articles automatically include risk disclaimers
@@ -94,7 +94,7 @@ This section records critical architectural adjustments for the project:
 - **Rationale**: WeChat API draft/publishing permissions require enterprise certification or special approval
 - **Implementation**:
   - Complete content processing (Markdown → HTML, image upload, AI optimization)
-  - Generate comprehensive publish guidance files in `_output/wechat_guides/`
+  - Generate comprehensive publish guidance files in `.tmp/output/wechat_guides/`
   - Provide step-by-step instructions for manual publishing in WeChat backend
   - Include ready-to-use HTML content for direct copy-paste
 - **Benefits**: Maintains full automation of technical processing while providing clear guidance for manual publication

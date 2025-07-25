@@ -7,10 +7,30 @@
 import json
 import os
 import requests
+import logging
+from pathlib import Path
+from datetime import datetime
 from dotenv import load_dotenv
 
 # 加载环境变量
 load_dotenv()
+
+# 配置日志
+def setup_logging():
+    """设置日志配置"""
+    log_dir = Path(".build/logs")
+    log_dir.mkdir(parents=True, exist_ok=True)
+    
+    # 只使用文件日志，避免与stdout/stderr混淆
+    file_handler = logging.FileHandler(log_dir / "pipeline.log", encoding='utf-8')
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - [微信API调试] %(message)s'))
+    
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    logger.addHandler(file_handler)
+    return logging.getLogger(__name__)
+
+logger = setup_logging()
 
 def get_access_token():
     """获取access_token"""
@@ -18,7 +38,9 @@ def get_access_token():
     secret = os.getenv('WECHAT_APPSECRET')
     
     if not appid or not secret:
-        print("❌ 请确保在.env文件中设置了WECHAT_APPID和WECHAT_APPSECRET")
+        error_msg = "❌ 请确保在.env文件中设置了WECHAT_APPID和WECHAT_APPSECRET"
+        print(error_msg)
+        logger.error("缺少微信API配置")
         return None
     
     url = "https://api.weixin.qq.com/cgi-bin/stable_token"
@@ -142,10 +164,12 @@ def test_with_image_draft(access_token):
 def main():
     print("🔧 微信草稿API调试工具")
     print("=" * 50)
+    logger.info("开始微信API调试")
     
     # 1. 获取access_token
     access_token = get_access_token()
     if not access_token:
+        logger.error("获取access_token失败，调试终止")
         return
     
     # 2. 测试简单草稿
