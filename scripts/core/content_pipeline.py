@@ -130,6 +130,9 @@ class PublishingStatusManager:
         return legacy_count
 
 class ContentPipeline:
+    _instance = None  # 类属性用于单例模式
+    _initialized = False  # 记录是否已初始化
+    
     def __init__(self, config_path: str = "config/pipeline_config.yml", verbose: bool = False):
         """初始化内容处理管道
         Args:
@@ -142,6 +145,9 @@ class ContentPipeline:
         
         # 初始化API状态
         self.api_available = True
+        
+        # 记录是否是首次初始化
+        self.is_first_init = not ContentPipeline._initialized
         
         # 加载配置
         try:
@@ -206,10 +212,15 @@ class ContentPipeline:
             if self.platforms_config.get("wechat", {}).get("enabled", False):
                 # Pass the initialized Gemini model to the publisher
                 self.wechat_publisher = WechatPublisher(gemini_model=self.model)
-                self.log("✅ 微信发布器初始化成功", level="info")
+                self.log("✅ 微信发布器初始化成功", level="debug")
         except Exception as e:
             self.log(f"⚠️ 微信发布器初始化失败: {e}", level="warning")
             self.log("微信发布功能将不可用，但不影响其他功能", level="info")
+        
+        # 标记初始化完成
+        ContentPipeline._initialized = True
+        if self.is_first_init:
+            self.log("🚀 系统初始化完成", level="info")
         
     def log(self, message: str, level: str = "info", force: bool = False):
         """统一的日志处理
@@ -218,15 +229,19 @@ class ContentPipeline:
             level: 日志级别 (debug/info/warning/error)
             force: 是否强制显示（忽略verbose设置）
         """
-        if self.verbose or force or level in ["error", "warning"]:
-            getattr(self.logger, level)(message)
+        # 统一使用logging系统，让处理器决定级别过滤
+        logger_method = getattr(self.logger, level, self.logger.info)
         
-        # 始终写入日志文件
-        # 确保日志目录存在
-        log_dir = ".build/logs"
-        os.makedirs(log_dir, exist_ok=True)
-        with open(f"{log_dir}/pipeline.log", "a", encoding="utf-8") as f:
-            f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {level.upper()} - {message}\n")
+        # 如果force=True或者是高级别日志，则直接记录
+        if force or level in ["error", "warning"]:
+            logger_method(message)
+        elif level == "debug":
+            # DEBUG级别只在verbose模式下记录
+            if self.verbose:
+                logger_method(message)
+        else:
+            # INFO级别正常记录
+            logger_method(message)
     
     def _load_config(self) -> dict:
         """加载所有配置"""
@@ -277,17 +292,49 @@ class ContentPipeline:
         log_path = Path(self.config["paths"]["logs"])
         log_path.parent.mkdir(parents=True, exist_ok=True)
         
-        # 同时输出到文件和控制台
-        handlers = [
-            logging.FileHandler(log_path, encoding='utf-8'),
-            logging.StreamHandler()
-        ]
+        # 清除根记录器的处理器以避免重复记录
+        root_logger = logging.getLogger()
+        for handler in root_logger.handlers[:]:
+            root_logger.removeHandler(handler)
         
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(asctime)s - %(levelname)s - %(message)s",
-            handlers=handlers
+        # 文件处理器 - 使用轮转处理器防止日志文件过大
+        from logging.handlers import RotatingFileHandler
+        file_handler = RotatingFileHandler(
+            log_path, 
+            maxBytes=1024*1024,  # 1MB
+            backupCount=3,       # 保留3个备份文件
+            encoding='utf-8'
         )
+        # 只记录INFO级别及以上的消息到文件
+        file_handler.setLevel(logging.INFO)
+        file_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        file_handler.setFormatter(file_formatter)
+        
+        # 控制台处理器 - 根据详细模式决定级别
+        console_handler = logging.StreamHandler()
+        if self.verbose:
+            console_handler.setLevel(logging.DEBUG)
+        else:
+            console_handler.setLevel(logging.WARNING)  # 只显示警告和错误
+        console_formatter = logging.Formatter("%(levelname)s - %(message)s")
+        console_handler.setFormatter(console_formatter)
+        
+        # 不再设置根记录器的处理器，只使用ContentPipeline特定记录器
+        
+        # 设置ContentPipeline特定的logger，但不添加重复处理器
+        self.logger.setLevel(logging.DEBUG)
+        # 防止消息传播到根记录器，避免重复记录
+        self.logger.propagate = False
+        # 清除现有处理器
+        for handler in self.logger.handlers[:]:
+            self.logger.removeHandler(handler)
+        # 只给ContentPipeline logger添加处理器
+        self.logger.addHandler(file_handler)
+        self.logger.addHandler(console_handler)
+        
+        # 记录初始化状态（仅在详细模式下）
+        if self.verbose:
+            self.log("📄 日志系统初始化完成", level="debug")
     
     def _setup_apis(self):
         """设置API客户端"""
@@ -301,7 +348,10 @@ class ContentPipeline:
             
             # 使用配置文件中的模型名称
             model_name = self.config["content_processing"]["gemini"]["model"]
-            self.log(f"使用配置的模型: {model_name}", level="info", force=True)
+            if self.is_first_init:
+                self.log(f"使用配置的模型: {model_name}", level="info")
+            else:
+                self.log(f"使用配置的模型: {model_name}", level="debug")
             # 创建模型实例
             self.model = GenerativeModel(model_name)
             
@@ -315,7 +365,10 @@ class ContentPipeline:
                     )
                 )
                 if response:
-                    self.log("✅ Gemini API 连接成功", level="info", force=True)
+                    if self.is_first_init:
+                        self.log("✅ Gemini API 连接成功", level="info")
+                    else:
+                        self.log("✅ Gemini API 连接成功", level="debug")
                     
                     # 验证模板加载
                     self._validate_templates()
@@ -343,10 +396,10 @@ class ContentPipeline:
         if 'front_matter' in self.templates:
             if 'default' in self.templates['front_matter']:
                 default_template = self.templates['front_matter']['default']
-                self.log(f"默认前端模板包含 {len(default_template)} 个设置", level="info")
+                self.log(f"默认前端模板包含 {len(default_template)} 个设置", level="debug")
                 # 检查关键设置
                 if 'toc' in default_template and default_template['toc']:
-                    self.log("✅ 目录设置已加载", level="info")
+                    self.log("✅ 目录设置已加载", level="debug")
                 else:
                     self.log("⚠️ 目录设置未加载或未启用", level="warning")
             else:
@@ -358,13 +411,13 @@ class ContentPipeline:
         # 验证页脚模板
         if 'footer' in self.templates:
             footer_platforms = list(self.templates['footer'].keys())
-            self.log(f"页脚模板平台: {footer_platforms}", level="info")
+            self.log(f"页脚模板平台: {footer_platforms}", level="debug")
             
             # 检查GitHub Pages页脚
             if 'github_pages' in self.templates['footer']:
                 footer_content = self.templates['footer']['github_pages']
                 if footer_content and len(footer_content) > 10:
-                    self.log("✅ GitHub Pages页脚模板已加载", level="info")
+                    self.log("✅ GitHub Pages页脚模板已加载", level="debug")
                 else:
                     self.log("⚠️ GitHub Pages页脚模板为空或内容过短", level="warning")
             else:
@@ -391,8 +444,20 @@ class ContentPipeline:
         """让用户选择要处理的草稿"""
         drafts = self.list_drafts()
         if not drafts:
-            print("没有找到草稿文件")
-            return None
+            print("📝 没有找到草稿文件")
+            print("\n💡 提示：")
+            print("   1. 您可以在 _drafts/ 目录创建新的 .md 文件")
+            print("   2. 或者选择主菜单的 '3. 生成测试文章' 选项")
+            print("   3. 或者使用 '2. 重新发布已发布文章' 将已发布文章转为草稿")
+            
+            while True:
+                choice = input("\n是否现在生成测试文章？(y/N): ").strip().lower()
+                if choice in ['y', 'yes']:
+                    return self.generate_test_content()
+                elif choice in ['n', 'no', '']:
+                    return None
+                else:
+                    print("请输入 y 或 N")
             
         print("\n可用的草稿文件：")
         for i, draft in enumerate(drafts, 1):
@@ -1500,61 +1565,269 @@ class ContentPipeline:
     def generate_test_content(self) -> Optional[Path]:
         """使用Gemini生成测试文章"""
         try:
-            prompt = self.config["content_processing"]["gemini"]["prompts"]["test"]
+            print("🤖 正在使用AI生成测试文章...")
+            print("⏳ 正在连接Gemini AI模型，这通常需要15-30秒时间，请耐心等待...")
+            print("💡 生成中: 模型正在根据CLAUDE.md规范创建完整的技术博客文章...")
             
-            response = self.model.generate_content(
-                prompt,
-                generation_config=GenerationConfig(
-                    temperature=self.config["content_processing"]["gemini"]["temperature"],
-                    max_output_tokens=self.config["content_processing"]["gemini"]["max_output_tokens"],
-                    top_p=self.config["content_processing"]["gemini"]["top_p"]
+            # 检查模型状态
+            if not hasattr(self, 'model') or self.model is None:
+                print("❌ Gemini模型未初始化")
+                logging.error("Gemini模型未初始化")
+                return None
+            
+            prompt = self.config["content_processing"]["gemini"]["prompts"]["test"]
+            logging.debug(f"使用的prompt长度: {len(prompt)}")
+            
+            # 添加重试机制
+            max_retries = 2
+            for attempt in range(max_retries):
+                if attempt > 0:
+                    print(f"⚠️ 第{attempt + 1}次尝试生成...")
+                    logging.info(f"重试生成测试文章，第{attempt + 1}次尝试")
+                
+                # 配置安全设置以允许技术内容生成
+                safety_settings = [
+                    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_ONLY_HIGH"},
+                ]
+                
+                response = self.model.generate_content(
+                    prompt,
+                    generation_config=GenerationConfig(
+                        temperature=self.config["content_processing"]["gemini"]["temperature"],
+                        max_output_tokens=self.config["content_processing"]["gemini"]["max_output_tokens"],
+                        top_p=self.config["content_processing"]["gemini"]["top_p"]
+                    ),
+                    safety_settings=safety_settings
                 )
-            )
+                
+                # 检查这次尝试是否成功
+                if response and hasattr(response, 'candidates') and response.candidates:
+                    if len(response.candidates) > 0 and response.candidates[0].content:
+                        break  # 成功，跳出重试循环
+                
+                if attempt == max_retries - 1:
+                    print("❌ 多次尝试后仍然生成失败")
+                    logging.error("多次尝试后仍然生成失败")
+                    return None
             
             if response:
+                logging.debug(f"Gemini响应类型: {type(response)}")
+                logging.debug(f"Gemini响应属性: candidates={hasattr(response, 'candidates')}, parts={hasattr(response, 'parts')}")
                 try:
                     # 获取响应内容
                     if hasattr(response, 'candidates') and response.candidates:
-                        content = response.candidates[0].content.parts[0].text
-                    else:
+                        if len(response.candidates) > 0 and response.candidates[0].content:
+                            content = response.candidates[0].content.parts[0].text
+                        else:
+                            print("⚠️ Gemini响应中无候选结果")
+                            logging.error("Gemini响应中无候选结果")
+                            return None
+                    elif hasattr(response, 'parts') and response.parts:
                         content = ' '.join(part.text for part in response.parts)
+                    else:
+                        print("⚠️ Gemini响应格式异常")
+                        logging.error(f"Gemini响应格式异常: {type(response)}, hasattr candidates: {hasattr(response, 'candidates')}, hasattr parts: {hasattr(response, 'parts')}")
+                        return None
                     
                     logging.debug(f"原始响应类型: {type(content)}")
-                    logging.debug(f"原始响应内容: {content[:100]}...")
+                    logging.debug(f"原始响应内容: {content[:200]}...")
                     
-                    # 使用OrderedDict确保layout字段在最前面
-                    from collections import OrderedDict
-                    post = OrderedDict()
-                    post["layout"] = "single"
-                    post["title"] = "自动化测试实践：从CI到CD的最佳实践"
-                    post["date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S +0000")
-                    post["categories"] = ["技术"]
-                    post["tags"] = ["自动化测试", "CI/CD", "DevOps"]
-                    post["header"] = {
-                        "image": "/assets/images/posts/2025/02/test-post/header.webp",
-                        "overlay_filter": 0.5
-                    }
+                    print("✅ AI内容生成完成，正在保存文件...")
                     
-                    # 先转换为字符串
-                    post_text = frontmatter.dumps(frontmatter.Post(content, **post))
+                    # 检查响应是否完整（检查是否有明确的结尾）
+                    if not self._has_complete_ending(content):
+                        print("⚠️ 检测到生成内容可能不完整，正在重新生成...")
+                        # 重新生成一次，使用更明确的prompt
+                        complete_prompt = prompt + "\n\n【特别强调】文章必须有完整的结尾段落，包含总结或思考问题。"
+                        response = self.model.generate_content(
+                            complete_prompt,
+                            generation_config=GenerationConfig(
+                                temperature=0.6,  # 降低随机性，提高稳定性
+                                max_output_tokens=self.config["content_processing"]["gemini"]["max_output_tokens"],
+                                top_p=0.8
+                            ),
+                            safety_settings=safety_settings
+                        )
+                        if hasattr(response, 'candidates') and response.candidates:
+                            content = response.candidates[0].content.parts[0].text
+                        else:
+                            content = ' '.join(part.text for part in response.parts)
+                    
+                    # 生成时间戳文件名避免覆盖
+                    timestamp = datetime.now().strftime("%Y-%m-%d-%H%M%S")
+                    
+                    # 清理和处理AI生成的内容
+                    cleaned_content = self._clean_ai_generated_content(content)
+                    
+                    # 调试信息
+                    logging.debug(f"原始内容长度: {len(content)}")
+                    logging.debug(f"清理后内容长度: {len(cleaned_content)}")
+                    logging.debug(f"原始内容前200字符: {content[:200]}")
+                    logging.debug(f"清理后内容前200字符: {cleaned_content[:200] if cleaned_content else 'EMPTY'}")
+                    
+                    if not cleaned_content.strip():
+                        print("❌ AI生成的内容为空或无效")
+                        print(f"🔍 调试信息：原始内容长度 {len(content)}, 清理后长度 {len(cleaned_content)}")
+                        logging.error(f"AI生成的内容为空或无效 - 原始长度: {len(content)}, 清理后长度: {len(cleaned_content)}")
+                        logging.error(f"原始内容示例: {content[:500] if content else 'NONE'}")
+                        return None
+                    
+                    # 检查是否已包含valid front matter
+                    if cleaned_content.startswith('---') and cleaned_content.count('---') >= 2:
+                        # AI生成的内容已包含front matter，直接使用
+                        post_text = cleaned_content
+                        print("📝 使用AI生成的完整文章格式")
+                    else:
+                        # 手动添加front matter
+                        from collections import OrderedDict
+                        post = OrderedDict()
+                        post["title"] = f"AI生成测试文章 - {timestamp}"
+                        post["date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S +0000")
+                        post["header"] = {
+                            "overlay_image": "https://1drv.ms/i/c/b5f6bce7f0f6f9f8/EQl5xJjYnAJOhRfDgJ7HZFABL8y5c7d1e2f3g4h5i6j7k8l9?format=webp&width=1200",
+                            "overlay_filter": 0.5
+                        }
+                        post_text = frontmatter.dumps(frontmatter.Post(cleaned_content, **post))
+                        print("📝 添加了标准front matter")
                     
                     # 写入文件
-                    draft_path = Path("_drafts/2025-02-20-auto-test.md")
+                    draft_path = Path(f"_drafts/test-article-{timestamp}.md")
                     draft_path.parent.mkdir(parents=True, exist_ok=True)
                     draft_path.write_text(post_text, encoding='utf-8')
                     
-                    logging.info(f"✅ 已生成测试文章: {draft_path}")
+                    print(f"✅ 测试文章已生成: {draft_path}")
+                    print(f"📝 文章长度: {len(content)} 字符")
+                    logging.info(f"✅ 已生成测试文章: {draft_path} (长度: {len(content)} 字符)")
+                    
+                    # 记录测试文章生成的详细信息
+                    lines = post_text.count('\n') + 1
+                    self.log(f"测试文章生成详情 - 文件: {draft_path}, 总长度: {len(content)}字符, 行数: {lines}行", level="info", force=True)
                     return draft_path
                     
                 except Exception as e:
                     logging.error(f"处理响应内容时出错: {str(e)}")
                     logging.debug("错误详情:", exc_info=True)
                     return None
+            else:
+                print("❌ Gemini API返回空响应")
+                logging.error("Gemini API返回空响应")
+                return None
                 
         except Exception as e:
             logging.error(f"生成测试文章失败: {str(e)}")
             logging.debug("错误详情:", exc_info=True)
             return None
+    
+    def _has_complete_ending(self, content: str) -> bool:
+        """检查文章是否有完整的结尾"""
+        # 检查是否以句号、问号或感叹号结尾
+        content = content.strip()
+        if not content:
+            return False
+            
+        # 检查最后几行是否包含明显的结尾标识
+        lines = content.split('\n')
+        last_lines = '\n'.join(lines[-5:])  # 检查最后5行
+        
+        # 检查结尾特征
+        ending_indicators = [
+            '？', '。', '！',  # 中文标点
+            '?', '.', '!',     # 英文标点
+            '思考', '总结', '结论', '展望', '未来',
+            '问题', '挑战', '机遇', '发展'
+        ]
+        
+        # 检查是否包含结尾指示词
+        has_ending_word = any(indicator in last_lines for indicator in ending_indicators)
+        
+        # 检查最后一行是否看起来像完整的句子
+        last_line = lines[-1].strip() if lines else ""
+        is_complete_sentence = len(last_line) > 10 and any(punct in last_line for punct in ['。', '？', '！', '.', '?', '!'])
+        
+        return has_ending_word and is_complete_sentence
+    
+    def _clean_ai_generated_content(self, content: str) -> str:
+        """清理AI生成的内容，去除解释性文字和多余的格式"""
+        if not content:
+            return ""
+        
+        lines = content.split('\n')
+        cleaned_lines = []
+        start_found = False
+        in_yaml_block = False
+        in_code_block = False
+        yaml_block_start = -1
+        
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            
+            # 检测代码块
+            if stripped.startswith('```'):
+                in_code_block = not in_code_block
+                # 如果是包装YAML的代码块，跳过
+                if 'yaml' in stripped.lower() or 'markdown' in stripped.lower():
+                    continue
+                # 其他代码块保留
+                if not in_code_block and start_found:
+                    cleaned_lines.append(line)
+                continue
+            
+            # 在代码块内且是YAML包装，特殊处理
+            if in_code_block:
+                # 检查是否是嵌入的YAML front matter
+                if stripped == '---':
+                    if not in_yaml_block:
+                        in_yaml_block = True
+                        yaml_block_start = i
+                    else:
+                        in_yaml_block = False
+                        # 跳过整个YAML块
+                    continue
+                elif in_yaml_block:
+                    continue  # 跳过YAML块内容
+                elif start_found:
+                    cleaned_lines.append(line)  # 保留非嵌入YAML的代码块内容
+                continue
+            
+            # 跳过明显的AI解释性文字
+            if not start_found:
+                # 跳过常见的AI解释性开头
+                if (stripped.startswith('好的') or 
+                    stripped.startswith('遵照') or
+                    stripped.startswith('我将') or
+                    stripped.startswith('根据') or
+                    stripped.startswith('以下是') or
+                    stripped.startswith('这里是') or
+                    stripped.startswith('这是一篇') or
+                    '按照您的规范' in stripped or
+                    '用于测试' in stripped):
+                    continue
+                # 空行跳过
+                elif not stripped:
+                    continue
+                # 找到正式内容开始
+                else:
+                    start_found = True
+            
+            # 已找到开始，保留正式内容
+            if start_found:
+                cleaned_lines.append(line)
+        
+        cleaned_content = '\n'.join(cleaned_lines)
+        
+        # 清理多余空行
+        cleaned_content = re.sub(r'\n\s*\n\s*\n+', '\n\n', cleaned_content)
+        cleaned_content = cleaned_content.strip()
+        
+        # 如果清理后内容为空或太短，返回原始内容
+        if not cleaned_content or len(cleaned_content) < 100:
+            logging.warning("内容清理后为空或过短，返回原始内容")
+            return content.strip()
+        
+        return cleaned_content
 
     def process_post_images(self, post_path: Path) -> Dict[str, str]:
         """处理文章中的图片"""

@@ -6,7 +6,7 @@ paths:
   images: "assets/images/posts"
   output: "_output"
   archive: "_drafts/archived"
-  logs: "logs/pipeline.log"
+  logs: ".build/logs/pipeline.log"
   data: "_data"
 
 # 日志配置
