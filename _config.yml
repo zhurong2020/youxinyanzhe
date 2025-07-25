@@ -169,14 +169,14 @@ footer:
 main:
   - title: "所有文章"
     url: /posts/
-  - title: "分类"
-    url: /categories/
-  - title: "云生活"
-    url: /categories/云生活/
-  - title: "量化投资"
-    url: /categories/量化投资/
-  - title: "技术心得"
-    url: /categories/心得/
+  - title: "🧠 认知升级"
+    url: /categories/认知升级/
+  - title: "🛠️ 技术赋能"  
+    url: /categories/技术赋能/
+  - title: "🌍 全球视野"
+    url: /categories/全球视野/
+  - title: "💰 投资理财"
+    url: /categories/投资理财/
   - title: "关于"
     url: /about/
 
@@ -344,6 +344,9 @@ defaults:
       comments: true
       share: true
       related: true
+      show_date: true
+      toc: true
+      toc_sticky: true
 
 # Assets 配置
   - scope:

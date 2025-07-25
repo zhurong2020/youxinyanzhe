@@ -149,12 +149,60 @@ This section records critical architectural adjustments for the project:
 - **Status Updates**: Provide progress updates using TodoWrite tool for complex tasks
 - **Decision Documentation**: Record all architectural decisions in this document
 
-### Content Creation and Writing Standards
-- **Content Classification System**: 博客采用四大核心分类体系，所有新文章必须归入以下之一：
-  - **🧠 认知升级** (`categories: [认知升级]`): 思维模型、学习方法、认知心理学、决策科学
-  - **🛠️ 技术赋能** (`categories: [技术赋能]`): 实用工具推荐、技术教程、自动化方案、效率提升
-  - **🌍 全球视野** (`categories: [全球视野]`): 国际趋势洞察、文化差异观察、跨文化思维训练
-  - **💰 投资理财** (`categories: [投资理财]`): 投资策略、理财方法、财务自由规划、量化分析
+### Content Classification and Series Management Standards
+
+#### 四大核心分类体系
+博客采用四大核心分类体系，所有新文章必须归入以下之一：
+- **🧠 认知升级** (`categories: [认知升级]`): 思维模型、学习方法、认知心理学、决策科学
+- **🛠️ 技术赋能** (`categories: [技术赋能]`): 实用工具推荐、技术教程、自动化方案、效率提升
+- **🌍 全球视野** (`categories: [全球视野]`): 国际趋势洞察、文化差异观察、跨文化思维训练
+- **💰 投资理财** (`categories: [投资理财]`): 投资策略、理财方法、财务自由规划、量化分析
+
+#### 系列文章导航系统设计方案 (待实现)
+
+**设计目标**: 在分类页面右侧边栏添加系列文章导航，方便用户在大类下选择特定系列
+
+**技术实现方案**:
+1. **标签体系**: 使用Jekyll的tags系统标识系列文章
+   - 格式: `tags: ["系列名称", "其他标签"]`
+   - 示例: `tags: ["普通人云生活", "VPS教程", "技术工具"]`
+
+2. **系列定义约定**:
+   ```yaml
+   # _data/series.yml
+   技术赋能:
+     - name: "普通人云生活"
+       tag: "普通人云生活"
+       description: "利用云技术提升生活效率"
+       icon: "☁️"
+     - name: "AI工具实战"
+       tag: "AI工具"
+       description: "人工智能工具使用指南"
+       icon: "🤖"
+   
+   全球视野:
+     - name: "Musk Empire"
+       tag: "马斯克帝国"
+       description: "深度解析马斯克商业帝国"
+       icon: "🚀"
+   ```
+
+3. **侧边栏组件设计**:
+   - 位置: 分类页面右侧边栏 (利用Jekyll主题的sidebar功能)
+   - 结构: 系列标题 + 文章列表 + 系列描述
+   - 样式: 与主题一致的卡片式设计
+   - 交互: 点击系列名展开/收起文章列表
+
+4. **实现步骤**:
+   - 创建`_includes/series-navigation.html`组件
+   - 在分类页面模板中引入侧边栏组件
+   - 使用Liquid语法动态生成系列导航
+   - 添加相应的CSS样式
+
+**内容创作约定**:
+- 系列文章必须使用统一的标签命名
+- 首篇文章应包含系列介绍和导航
+- 每篇文章应包含系列内的前后文章链接
 - **Front Matter Standards**: 
   - **Required Fields**: Only 3 fields are mandatory: `title`, `date`, and `header`
   - **Classification Field**: `categories` must contain exactly one of the four core categories above
@@ -270,6 +318,21 @@ This section records critical architectural adjustments for the project:
 - **HTML Cleaning**: Content is cleaned and optimized for WeChat editor compatibility
 
 ## 10. Document Update History
+
+### 2025-07-25: 主页布局优化与分类页面完善 ✅
+- **布局问题修复**: 解决主页四个关键布局问题
+  - 内容分类导航从1x4高度过高恢复为2x2紧凑布局
+  - 修复标题上方间距过大，使用精确margin控制
+  - 订阅区域标题上边距优化，提升视觉密度
+  - 分类页面文章显示从密集4列改为按行列表显示
+- **分类页面系统**: 创建完整的四大分类页面体系
+  - 每个分类页面包含详细说明和内容方向指导
+  - 使用Jekyll主题的category布局和list显示模式
+  - 统一的页面结构和用户体验
+- **视觉一致性**: 利用Jekyll主题功能实现更好的集成
+  - 精确的间距控制和响应式设计
+  - 保持与主题设计语言的一致性
+  - 动态统计数据和交互效果
 
 ### 2025-07-25: 博客四大核心分类体系重构 ✅
 - **重构完成**: 实施基于用户价值定位的四大核心分类体系

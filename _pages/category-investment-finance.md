@@ -5,6 +5,8 @@ permalink: /categories/投资理财/
 taxonomy: 投资理财
 entries_layout: list
 author_profile: true
+sidebar:
+  nav: "quant-investment"
 ---
 
 **投资思维培养、理财方法实践与财务自由规划**

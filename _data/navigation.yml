@@ -1,0 +1,55 @@
+# 系列文章导航配置
+# 用于侧边栏显示系列文章目录
+
+# 技术赋能系列 - 普通人云生活
+cloud-living:
+  - title: "普通人云生活系列"
+    children:
+      - title: "系列介绍"
+        url: /categories/技术赋能/#云生活系列
+      - title: "VPS服务器选购指南"
+        url: /posts/2024/01/vps-selection-guide/
+      - title: "域名注册与DNS配置"
+        url: /posts/2024/02/domain-dns-setup/
+      - title: "个人网站快速搭建"
+        url: /posts/2024/03/personal-website-setup/
+      - title: "开源应用部署实战"
+        url: /posts/2024/04/opensource-apps-deployment/
+      - title: "数据备份与安全防护"
+        url: /posts/2024/05/data-backup-security/
+
+# 投资理财系列 - 量化投资
+quant-investment:
+  - title: "量化投资系列"
+    children:
+      - title: "系列介绍"
+        url: /categories/投资理财/#量化投资系列
+      - title: "量化投资入门理念"
+        url: /posts/2024/01/quant-investment-basics/
+      - title: "数据获取与处理"
+        url: /posts/2024/02/data-acquisition-processing/
+      - title: "策略开发框架"
+        url: /posts/2024/03/strategy-development-framework/
+      - title: "回测系统搭建"
+        url: /posts/2024/04/backtesting-system/
+      - title: "实盘交易部署"
+        url: /posts/2024/05/live-trading-deployment/
+      - title: "风险管理实践"
+        url: /posts/2024/06/risk-management-practices/
+
+# 全球视野系列 - 马斯克帝国
+musk-empire:
+  - title: "马斯克帝国系列"
+    children:
+      - title: "系列介绍"
+        url: /categories/全球视野/#马斯克帝国系列
+      - title: "Tesla：电动车革命的先锋"
+        url: /posts/2025/07/tesla-electric-revolution/
+      - title: "SpaceX：重新定义太空探索"
+        url: /posts/2025/07/spacex-space-exploration/
+      - title: "Neuralink：脑机接口的未来"
+        url: /posts/2025/08/neuralink-brain-interface/
+      - title: "The Boring Company：地下交通革命"
+        url: /posts/2025/08/boring-company-underground/
+      - title: "X平台：社交媒体的重构"
+        url: /posts/2025/08/x-platform-reconstruction/

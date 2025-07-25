@@ -9,6 +9,8 @@
   - 自动润色和格式化
   - 支持多种内容模板和条件显示
   - 投资理财文章自动添加风险声明
+  - **四大内容分类系统**: 🧠 认知升级、🛠️ 技术赋能、🌍 全球视野、💰 投资理财
+  - **智能文章分类**: 基于关键词和AI分析的自动分类功能
 
 - 🚀 多平台发布系统
   - **GitHub Pages**: 完整的Jekyll网站发布
@@ -59,6 +61,10 @@ youxinyanzhe/
 │   └── archived/          # 已处理草稿归档
 ├── _posts/                # 已发布文章
 ├── _pages/                # 静态页面
+│   ├── category-cognitive-enhancement.md  # 🧠 认知升级分类页
+│   ├── category-tech-empowerment.md       # 🛠️ 技术赋能分类页
+│   ├── category-global-perspective.md     # 🌍 全球视野分类页
+│   └── category-investment-finance.md     # 💰 投资理财分类页
 ├── _includes/             # Jekyll包含文件
 ├── _output/               # 输出文件(自动生成)
 │   ├── wechat_guides/     # 微信发布指导文件
@@ -76,7 +82,7 @@ youxinyanzhe/
 - `_config.yml`: Jekyll 站点配置
 - `config/pipeline_config.yml`: 内容处理流程配置
 - `config/gemini_config.yml`: AI 内容生成配置
-- `config/post_templates.yml`: 文章模板配置(支持投资文章风险声明)
+- `config/post_templates.yml`: 文章模板配置(支持投资文章风险声明和四大分类系统)
 - `.env`: 环境变量(API密钥等敏感信息)
 
 ### 环境变量配置 (.env)
@@ -118,6 +124,7 @@ GITHUB_REPO=your_repo_name
 
 ### 1. 文章创建和处理
 - **新建草稿**: 在`_drafts/`目录创建文章
+- **智能分类**: 基于关键词匹配和AI分析自动分类到四大内容方向
 - **AI 润色**: 使用Gemini AI优化内容质量
 - **内容转换**: 根据目标平台自动调整格式
 - **条件显示**: 投资理财文章自动添加风险声明
@@ -276,6 +283,14 @@ Rong Zhu
 - [Google Gemini](https://deepmind.google/technologies/gemini/)
 
 ## 最近更新
+
+### 2025-07-25: 博客分类系统重构 🎯
+- **四大内容分类**: 重构为🧠认知升级、🛠️技术赋能、🌍全球视野、💰投资理财四大核心方向
+- **主页布局优化**: 2x2响应式布局展示四大分类，完美适配宽屏和移动端
+- **分类页面系统**: 创建独立分类页面，包含详细内容方向和系列特色说明
+- **智能文章分类**: 更新自动分类算法，基于新的四分类关键词体系
+- **历史文章迁移**: 完成14篇历史文章的分类标签更新和内容对齐
+- **响应式设计**: 解决布局宽度、间距、404链接等用户体验问题
 
 ### 2025-07-16: 微信发布功能重大升级 🚀
 - **双模式发布系统**: 支持API直接发布和手动发布指导两种模式
