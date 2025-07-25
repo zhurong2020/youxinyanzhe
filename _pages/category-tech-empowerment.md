@@ -3,7 +3,7 @@ title: "🛠️ 技术赋能系列"
 layout: category
 permalink: /categories/技术赋能/
 taxonomy: 技术赋能
-entries_layout: grid
+entries_layout: list
 author_profile: true
 ---
 

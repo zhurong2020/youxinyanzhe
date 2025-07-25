@@ -3,7 +3,7 @@ title: "🌍 全球视野系列"
 layout: category
 permalink: /categories/全球视野/
 taxonomy: 全球视野
-entries_layout: grid
+entries_layout: list
 author_profile: true
 ---
 

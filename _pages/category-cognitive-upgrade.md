@@ -3,7 +3,7 @@ title: "🧠 认知升级系列"
 layout: category
 permalink: /categories/认知升级/
 taxonomy: 认知升级
-entries_layout: grid
+entries_layout: list
 author_profile: true
 ---
 
