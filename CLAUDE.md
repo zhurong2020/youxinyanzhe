@@ -150,9 +150,14 @@ This section records critical architectural adjustments for the project:
 - **Decision Documentation**: Record all architectural decisions in this document
 
 ### Content Creation and Writing Standards
+- **Content Classification System**: 博客采用四大核心分类体系，所有新文章必须归入以下之一：
+  - **🧠 认知升级** (`categories: [认知升级]`): 思维模型、学习方法、认知心理学、决策科学
+  - **🛠️ 技术赋能** (`categories: [技术赋能]`): 实用工具推荐、技术教程、自动化方案、效率提升
+  - **🌍 全球视野** (`categories: [全球视野]`): 国际趋势洞察、文化差异观察、跨文化思维训练
+  - **💰 投资理财** (`categories: [投资理财]`): 投资策略、理财方法、财务自由规划、量化分析
 - **Front Matter Standards**: 
   - **Required Fields**: Only 3 fields are mandatory: `title`, `date`, and `header`
-  - **Optional Fields**: `categories` and `tags` can be added if the article has specific needs
+  - **Classification Field**: `categories` must contain exactly one of the four core categories above
   - **Automatic Processing**: content_pipeline.py will automatically add other necessary fields during distribution
 - **Article Structure**: Each article must include:
   - 60-80 character concise introduction after front matter for homepage display
@@ -265,6 +270,28 @@ This section records critical architectural adjustments for the project:
 - **HTML Cleaning**: Content is cleaned and optimized for WeChat editor compatibility
 
 ## 10. Document Update History
+
+### 2025-07-25: 博客四大核心分类体系重构 ✅
+- **重构完成**: 实施基于用户价值定位的四大核心分类体系
+- **新分类体系**:
+  - **🧠 认知升级系列**: 思维模型、学习方法、认知心理学与决策科学
+  - **🛠️ 技术赋能系列**: 实用工具推荐、技术教程与自动化方案
+  - **🌍 全球视野系列**: 国际趋势洞察、文化差异观察与跨文化思维训练
+  - **💰 投资理财系列**: 投资思维培养、理财方法实践与财务自由规划
+- **文章重新归类**: 全部14篇现有文章按新体系重新分类
+  - 认知升级系列：1篇 (需要重点补强)
+  - 技术赋能系列：4篇 (AI工具、自托管、VPS、远程工具)
+  - 全球视野系列：5篇 (Tesla分析系列、新闻观点分析)
+  - 投资理财系列：4篇 (美股投资、QDII基金、量化策略、加密货币)
+- **主页全面升级**: 
+  - 更新四大分类展示布局，使用2x2网格展示
+  - 重新设计intro文案体现核心价值定位
+  - 优化按钮文案和精选推荐逻辑适配新分类
+- **战略价值**:
+  - 聚焦投资理财系列作为主要流量入口和变现重点
+  - 强化全球视野差异化竞争优势
+  - 为后续内容创作和用户增长提供清晰方向定位
+- **实施原则**: 基于"让普通人受益于科技、全球视野与终身学习"的核心理念
 
 ### 2025-07-24: System Optimization and Logging Enhancement ✅
 - **Fixed**: Test article generation issues including double front matter and AI explanation text
