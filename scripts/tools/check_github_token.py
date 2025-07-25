@@ -5,18 +5,37 @@ GitHub Token状态检查工具
 """
 
 import sys
+import logging
 from pathlib import Path
 from datetime import datetime
 
 # 添加项目路径
-sys.path.append(str(Path(__file__).parent))
+sys.path.append(str(Path(__file__).parent.parent))
 
-from github_release_manager import create_github_manager
+# 配置日志
+def setup_logging():
+    """设置日志配置"""
+    log_dir = Path(".build/logs")
+    log_dir.mkdir(parents=True, exist_ok=True)
+    
+    # 只使用文件日志，避免与stdout/stderr混淆
+    file_handler = logging.FileHandler(log_dir / "pipeline.log", encoding='utf-8')
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - [GitHub Token检查] %(message)s'))
+    
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    logger.addHandler(file_handler)
+    return logging.getLogger(__name__)
+
+logger = setup_logging()
+
+from utils.github_release_manager import create_github_manager
 
 
 def main():
     """检查GitHub Token状态"""
     print("🔍 GitHub Token状态检查\n")
+    logger.info("开始GitHub Token状态检查")
     
     try:
         manager = create_github_manager()

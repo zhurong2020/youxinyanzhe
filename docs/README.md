@@ -25,7 +25,7 @@
   - 跟踪文章在各平台的发布状态
   - 支持已发布文章的重新发布到其他平台
   - 防止重复发布到同一平台
-  - 微信发布指导文件保存(`_output/wechat_guides/`)
+  - 微信发布指导文件保存(`.tmp/output/wechat_guides/`)
 
 ## 项目结构
 
@@ -135,7 +135,7 @@ GITHUB_REPO=your_repo_name
 - **状态跟踪**: `_drafts/.publishing/*.yml`记录各平台发布状态
 - **重新发布**: 支持已发布文章发布到其他平台
 - **防重复**: 自动过滤已发布的平台选项
-- **发布指导**: 微信版本保存到`_output/wechat_guides/`
+- **发布指导**: 微信版本保存到`.tmp/output/wechat_guides/`
 
 
 
@@ -213,7 +213,7 @@ python run.py
 
 # 指导模式：生成发布指导文件
 # 查看生成的发布指导文件
-cat _output/wechat_guides/*_guide.md
+cat .tmp/output/wechat_guides/*_guide.md
 # 按照指导文件在微信后台创建文章
 ```
 
@@ -223,7 +223,7 @@ cat _output/wechat_guides/*_guide.md
 ls _drafts/.publishing/
 
 # 查看微信发布指导文件
-ls _output/wechat_guides/
+ls .tmp/output/wechat_guides/
 ```
 
 3. **运行测试**:
