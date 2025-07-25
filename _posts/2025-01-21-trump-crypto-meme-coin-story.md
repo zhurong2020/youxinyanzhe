@@ -6,8 +6,7 @@ last_modified_at: 2025-02-16 12:00:00
 author_profile: true
 
 categories:
-  - 智能理财
-  - 投资教育
+  - 投资理财
 tags:
   - 加密货币
   - 比特币

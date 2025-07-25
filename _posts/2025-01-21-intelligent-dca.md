@@ -2,8 +2,7 @@
 author_profile: true
 breadcrumbs: true
 categories:
-- 智能理财
-- 量化交易
+- 投资理财
 comments: true
 date: 2025-01-21 16:45:00 +0000
 excerpt: 定投是一种广受欢迎的理财投资策略，通过Moomoo量化工具我们可以实现特定美股的定投策略。

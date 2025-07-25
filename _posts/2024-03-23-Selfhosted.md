@@ -2,8 +2,7 @@
 author_profile: true
 breadcrumbs: true
 categories:
-- 技术实践
-- 项目与创新
+- 技术赋能
 comments: true
 date: 2024-03-24 19:55:00 +0000
 excerpt: 通过选择并自托管 Github 上的开源项目，每个人都可以轻松构建属于自己的数字王国。

@@ -8,30 +8,38 @@ header:
   actions:
     - label: "浏览全部文章"
       url: "/posts/"
-excerpt: "探索云技术、量化投资与生活思考的交汇点"
+excerpt: "让普通人受益于科技、全球视野与终身学习的知识分享平台"
 intro: 
-  - excerpt: '分享云技术应用、量化投资策略和个人成长心得，让技术真正为生活赋能。'
+  - excerpt: '探索认知升级、技术赋能、全球视野与投资理财，助力个人成长与财富积累的完整知识体系。'
 feature_row:
+  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/25b4d7c3-4f8e-4b62-5b9e-9fe1a6c10200/public?format=auto&width=600&quality=75
+    alt: "🧠 认知升级系列"
+    title: "🧠 认知升级系列"
+    excerpt: "思维模型、学习方法、认知心理学与决策科学。帮你建立科学的思维框架，避免认知偏差，提升学习效率与人生决策质量。"
+    url: "/categories/认知升级/"
+    btn_label: "开始升级"
+    btn_class: "btn--primary"
   - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/c553d355-9a2e-4753-4a47-9009b7cab200/public?format=auto&width=600&quality=75
-    alt: "普通人云生活系列"
-    title: "普通人云生活系列"
-    excerpt: "利用云技术让普通人提高效率，享受数字化生活的便利。从域名注册、网站搭建到云服务应用，打造个人数字生态系统的全方位指南。"
-    url: "/categories/云生活/"
-    btn_label: "了解更多"
+    alt: "🛠️ 技术赋能系列"
+    title: "🛠️ 技术赋能系列"
+    excerpt: "实用工具推荐、技术教程与自动化方案。让科技真正为普通人赋能，提升工作效率，享受数字化生活的便利与乐趣。"
+    url: "/categories/技术赋能/"
+    btn_label: "获得赋能"
+    btn_class: "btn--primary"
+feature_row2:
+  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/dfa9d2a3-3054-46d8-241e-717209aaf600/public?format=auto&width=600&quality=75
+    alt: "🌍 全球视野系列"
+    title: "🌍 全球视野系列"
+    excerpt: "国际趋势洞察、文化差异观察与跨文化思维训练。开拓全球化视野，理解世界发展脉络，培养国际化思维能力。"
+    url: "/categories/全球视野/"
+    btn_label: "拓展视野"
     btn_class: "btn--primary"
   - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/e35cd10a-83b4-4939-ecb6-35edeb1a2d00/public?format=auto&width=600&quality=75
-    alt: "量化交易系列"
-    title: "量化交易系列"
-    excerpt: "探索量化交易平台、算法策略开发与自动化投资工具。让数据驱动决策，实现更科学的投资方法。分享实用的量化分析技术与工具。"
-    url: "/categories/量化投资/"
-    btn_label: "了解更多"
-    btn_class: "btn--primary"
-  - image_path: https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/25b4d7c3-4f8e-4b62-5b9e-9fe1a6c10200/public?format=auto&width=600&quality=75
-    alt: "技术与阅读心得"
-    title: "技术与阅读心得"
-    excerpt: "分享技术实践经验、工具使用技巧以及读书笔记。记录思考的火花，启发创新的灵感。让知识转化为实践的力量，提升个人与职业发展。"
-    url: "/categories/心得/"
-    btn_label: "了解更多"
+    alt: "💰 投资理财系列"
+    title: "💰 投资理财系列"
+    excerpt: "投资思维培养、理财方法实践与财务自由规划。结合量化分析与价值投资理念，构建科学的个人财富管理体系。"
+    url: "/categories/投资理财/"
+    btn_label: "财富增长"
     btn_class: "btn--primary"
 ---
 
@@ -40,6 +48,8 @@ feature_row:
 <!-- 样式已移至custom.css文件 -->
 
 {% include feature_row %}
+
+{% include feature_row id="feature_row2" %}
 
 <div class="latest-posts">
   <h2 class="archive__subtitle">最新文章</h2>
@@ -59,7 +69,7 @@ feature_row:
 
 <div class="featured-post">
   <h2 class="archive__subtitle">精选推荐</h2>
-  {% assign featured_posts = site.tags.featured | default: site.categories.量化交易 | default: site.posts | slice: 0, 6 %}
+  {% assign featured_posts = site.tags.featured | default: site.categories.投资理财 | default: site.categories.认知升级 | default: site.posts | slice: 0, 6 %}
   {% if featured_posts.size > 0 %}
     <div class="grid__wrapper">
       {% for post in featured_posts limit:6 %}
@@ -70,9 +80,9 @@ feature_row:
     <div class="view-more-btn">
       <a href="{{ site.baseurl }}/tags/featured/" class="btn btn--primary">查看更多精选</a>
     </div>
-    {% elsif site.categories.量化交易.size > 6 %}
+    {% elsif site.categories.投资理财.size > 6 %}
     <div class="view-more-btn">
-      <a href="{{ site.baseurl }}/categories/量化交易/" class="btn btn--primary">查看更多量化</a>
+      <a href="{{ site.baseurl }}/categories/投资理财/" class="btn btn--primary">查看更多投资内容</a>
     </div>
     {% endif %}
   {% else %}

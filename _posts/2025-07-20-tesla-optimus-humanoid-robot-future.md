@@ -2,8 +2,7 @@
 author_profile: true
 breadcrumbs: true
 categories:
-- 人工智能
-- 项目与创新
+- 全球视野
 comments: true
 date: 2025-07-20
 header:
