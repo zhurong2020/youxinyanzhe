@@ -24,7 +24,9 @@ classes: wide
 
 ## 📚 系列内容
 
-{% assign interview_posts = site.posts | where_exp: "post", "post.tags contains '名人访谈' or post.tags contains 'celebrity-interview'" %}
+{% assign interview_posts_cn = site.posts | where_exp: "post", "post.tags contains '名人访谈'" %}
+{% assign interview_posts_en = site.posts | where_exp: "post", "post.tags contains 'celebrity-interview'" %}
+{% assign interview_posts = interview_posts_cn | concat: interview_posts_en | uniq %}
 {% assign sorted_posts = interview_posts | sort: 'date' | reverse %}
 
 {% if sorted_posts.size > 0 %}
