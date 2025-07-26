@@ -95,7 +95,7 @@ intro:
     <div class="category-nav-card" style="background: rgba(255,255,255,0.15); border: 2px solid rgba(40, 167, 69, 0.5); padding: 1em; border-radius: 10px; text-align: center; backdrop-filter: blur(10px); min-height: 140px; display: flex; flex-direction: column; justify-content: space-between;">
       <div>
         <h3 style="color: white; margin: 0 0 0.5em 0; font-size: 1.1em;">💰 投资理财</h3>
-        <p style="color: rgba(255,255,255,0.9); margin: 0 0 0.8em 0; font-size: 0.9em;"><strong>{{ site.categories.投资理财 | size }} 篇文章</strong></p>
+        <p style="color: rgba(255,255,255,0.9); margin: 0 0 0.8em 0; font-size: 0.9em;"><strong>{{ site.categories["投资理财"] | size }} 篇文章</strong></p>
       </div>
       <a href="{{ site.baseurl }}/categories/投资理财/" class="btn btn--inverse btn--small" style="margin: 0;">财富增长</a>
     </div>
@@ -104,7 +104,7 @@ intro:
     <div class="category-nav-card" style="background: rgba(255,255,255,0.15); border: 2px solid rgba(23, 162, 184, 0.5); padding: 1em; border-radius: 10px; text-align: center; backdrop-filter: blur(10px); min-height: 140px; display: flex; flex-direction: column; justify-content: space-between;">
       <div>
         <h3 style="color: white; margin: 0 0 0.5em 0; font-size: 1.1em;">🌍 全球视野</h3>
-        <p style="color: rgba(255,255,255,0.9); margin: 0 0 0.8em 0; font-size: 0.9em;"><strong>{{ site.categories.全球视野 | size }} 篇文章</strong></p>
+        <p style="color: rgba(255,255,255,0.9); margin: 0 0 0.8em 0; font-size: 0.9em;"><strong>{{ site.categories["全球视野"] | size }} 篇文章</strong></p>
       </div>
       <a href="{{ site.baseurl }}/categories/全球视野/" class="btn btn--inverse btn--small" style="margin: 0;">开拓视野</a>
     </div>
@@ -113,7 +113,7 @@ intro:
     <div class="category-nav-card" style="background: rgba(255,255,255,0.1); padding: 1em; border-radius: 10px; text-align: center; backdrop-filter: blur(10px); min-height: 140px; display: flex; flex-direction: column; justify-content: space-between;">
       <div>
         <h3 style="color: white; margin: 0 0 0.5em 0; font-size: 1.1em;">🛠️ 技术赋能</h3>
-        <p style="color: rgba(255,255,255,0.8); margin: 0 0 0.8em 0; font-size: 0.9em;">{{ site.categories.技术赋能 | size }} 篇文章</p>
+        <p style="color: rgba(255,255,255,0.8); margin: 0 0 0.8em 0; font-size: 0.9em;">{{ site.categories["技术赋能"] | size }} 篇文章</p>
       </div>
       <a href="{{ site.baseurl }}/categories/技术赋能/" class="btn btn--inverse btn--small" style="margin: 0;">获取工具</a>
     </div>
@@ -122,7 +122,7 @@ intro:
     <div class="category-nav-card" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255, 193, 7, 0.3); padding: 1em; border-radius: 10px; text-align: center; backdrop-filter: blur(10px); min-height: 140px; display: flex; flex-direction: column; justify-content: space-between;">
       <div>
         <h3 style="color: white; margin: 0 0 0.5em 0; font-size: 1.1em;">🧠 认知升级</h3>
-        <p style="color: rgba(255,255,255,0.8); margin: 0 0 0.8em 0; font-size: 0.9em;">{{ site.categories.认知升级 | size }} 篇文章 <span style="color: #ffc107;">⚡需补强</span></p>
+        <p style="color: rgba(255,255,255,0.8); margin: 0 0 0.8em 0; font-size: 0.9em;">{{ site.categories["认知升级"] | size }} 篇文章 <span style="color: #ffc107;">⚡需补强</span></p>
       </div>
       <a href="{{ site.baseurl }}/categories/认知升级/" class="btn btn--inverse btn--small" style="margin: 0;">立即学习</a>
     </div>
@@ -170,7 +170,7 @@ intro:
 
 <div class="featured-post">
   <h2 class="archive__subtitle">精选推荐</h2>
-  {% assign featured_posts = site.tags.featured | default: site.categories.投资理财 | default: site.categories.认知升级 | default: site.posts | slice: 0, 6 %}
+  {% assign featured_posts = site.tags.featured | default: site.categories["投资理财"] | default: site.categories["认知升级"] | default: site.posts | slice: 0, 6 %}
   {% if featured_posts.size > 0 %}
     <div class="grid__wrapper">
       {% for post in featured_posts limit:6 %}
@@ -181,7 +181,7 @@ intro:
     <div class="view-more-btn">
       <a href="{{ site.baseurl }}/tags/featured/" class="btn btn--primary">查看更多精选</a>
     </div>
-    {% elsif site.categories.投资理财.size > 6 %}
+    {% elsif site.categories["投资理财"].size > 6 %}
     <div class="view-more-btn">
       <a href="{{ site.baseurl }}/categories/投资理财/" class="btn btn--primary">查看更多投资内容</a>
     </div>
