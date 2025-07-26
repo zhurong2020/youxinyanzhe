@@ -27,14 +27,18 @@ classes: wide
 </div>
 <div style="flex: 1; background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #007bff;" markdown="1">
 
-## 🚀 马斯克帝国系列
+## 📖 精选系列专题
 
-- [系列介绍](/youxinyanzhe/categories/全球视野/#马斯克帝国系列)
-- [Tesla：电动车革命的先锋](/youxinyanzhe/posts/2025/07/tesla-electric-revolution/)
-- [SpaceX：重新定义太空探索](/youxinyanzhe/posts/2025/07/spacex-space-exploration/)
-- [Neuralink：脑机接口的未来](/youxinyanzhe/posts/2025/08/neuralink-brain-interface/)
-- [The Boring Company：地下交通革命](/youxinyanzhe/posts/2025/08/boring-company-underground/)
-- [X平台：社交媒体的重构](/youxinyanzhe/posts/2025/08/x-platform-reconstruction/)
+### 🚀 [马斯克帝国系列](/youxinyanzhe/series/马斯克帝国/)
+深度解析马斯克商业帝国的战略布局与颠覆性创新
+- 已发布：4篇文章
+- 涵盖：特斯拉AI帝国、Robotaxi扩张、Optimus机器人、未来工厂
+
+### 🎙️ 名人访谈系列 <small style="color: #666;">（规划中）</small>
+国际知名人士观点、行业领袖见解、跨文化对话
+
+### 🌐 全球趋势观察 <small style="color: #666;">（规划中）</small>
+国际政经格局分析、新兴市场观察、科技发展趋势
 
 </div>
 </div>
