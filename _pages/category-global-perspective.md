@@ -6,7 +6,8 @@ taxonomy: 全球视野
 entries_layout: list
 author_profile: true
 sidebar:
-  nav: "musk-empire"
+  - title: "马斯克帝国系列"
+    nav: "musk-empire"
 ---
 
 **国际趋势洞察、文化差异观察与跨文化思维训练**
