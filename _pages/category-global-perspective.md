@@ -34,8 +34,9 @@ classes: wide
 - 已发布：4篇文章
 - 涵盖：特斯拉AI帝国、Robotaxi扩张、Optimus机器人、未来工厂
 
-### 🎙️ 名人访谈系列 <small style="color: #666;">（规划中）</small>
+### 🎙️ [名人访谈系列](/youxinyanzhe/series/celebrity-interviews/)
 国际知名人士观点、行业领袖见解、跨文化对话
+- 筹备中：Joe Rogan × Elon Musk、美国国会经典辩论、Cathie Wood投资哲学
 
 ### 🌐 全球趋势观察 <small style="color: #666;">（规划中）</small>
 国际政经格局分析、新兴市场观察、科技发展趋势
