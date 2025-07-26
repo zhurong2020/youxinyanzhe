@@ -13,7 +13,7 @@ classes: wide
 开拓全球化视野，理解世界发展脉络，培养国际化思维能力。通过深度分析国际事件、科技趋势和文化现象，提升全球化时代的认知水平。
 
 <div style="display: flex; gap: 2rem; margin: 2rem 0;">
-<div style="flex: 2;">
+<div style="flex: 2;" markdown="1">
 
 ## 🌐 主要内容方向
 
@@ -25,7 +25,7 @@ classes: wide
 > 💡 **系列特色**: 以全球化视角审视世界变化，结合亲身经历和深度调研，为读者提供独特的国际化观察视角。
 
 </div>
-<div style="flex: 1; background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #007bff;">
+<div style="flex: 1; background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #007bff;" markdown="1">
 
 ## 🚀 马斯克帝国系列
 

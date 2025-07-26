@@ -13,7 +13,7 @@ classes: wide
 让科技真正为普通人赋能，提升工作效率，享受数字化生活的便利与乐趣。从实用工具到自动化解决方案，让技术成为你的得力助手。
 
 <div style="display: flex; gap: 2rem; margin: 2rem 0;">
-<div style="flex: 2;">
+<div style="flex: 2;" markdown="1">
 
 ## 🔧 主要内容方向
 
@@ -25,7 +25,7 @@ classes: wide
 > 💡 **系列特色**: 注重实用性和可操作性，让复杂的技术变得简单易懂，真正服务于普通用户的日常需求。
 
 </div>
-<div style="flex: 1; background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #fd7e14;">
+<div style="flex: 1; background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #fd7e14;" markdown="1">
 
 ## ☁️ 普通人云生活系列
 
