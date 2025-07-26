@@ -13,7 +13,7 @@ classes: wide
 结合量化分析与价值投资理念，构建科学的个人财富管理体系。从投资心理学到实战策略，从基础理财到高级量化，全方位提升财务素养。
 
 <div style="display: flex; gap: 2rem; margin: 2rem 0;">
-<div style="flex: 2;">
+<div style="flex: 2;" markdown="1">
 
 ## 💎 主要内容方向
 
@@ -29,7 +29,7 @@ classes: wide
 > 💡 **系列特色**: 理论与实践并重，注重投资思维的培养，强调风险意识和长期价值创造，帮助读者建立科学的财富观念。
 
 </div>
-<div style="flex: 1; background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #28a745;">
+<div style="flex: 1; background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #28a745;" markdown="1">
 
 ## 📊 量化投资系列
 
