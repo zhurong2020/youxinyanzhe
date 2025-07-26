@@ -1,7 +1,7 @@
 ---
 title: "🚀 马斯克帝国系列"
 layout: collection
-permalink: /series/马斯克帝国/
+permalink: /series/musk-empire/
 collection: posts
 entries_layout: list
 author_profile: true

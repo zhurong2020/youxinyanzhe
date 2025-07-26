@@ -1,8 +1,8 @@
 ---
-title: "🧠 认知升级系列"
+title: "🧠 Cognitive Upgrade"
 layout: category
-permalink: /categories/认知升级/
-taxonomy: 认知升级
+permalink: /categories/cognitive-upgrade/
+taxonomy: cognitive-upgrade
 entries_layout: list
 author_profile: true
 ---

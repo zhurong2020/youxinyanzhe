@@ -1,8 +1,8 @@
 ---
-title: "🛠️ 技术赋能系列"
+title: "🛠️ Tech Empowerment"
 layout: category
-permalink: /categories/技术赋能/
-taxonomy: 技术赋能
+permalink: /categories/tech-empowerment/
+taxonomy: tech-empowerment
 entries_layout: list
 author_profile: true
 classes: wide

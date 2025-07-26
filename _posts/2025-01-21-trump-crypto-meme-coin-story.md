@@ -6,7 +6,7 @@ last_modified_at: 2025-02-16 12:00:00
 author_profile: true
 
 categories:
-  - 投资理财
+  - investment-finance
 tags:
   - 加密货币
   - 比特币

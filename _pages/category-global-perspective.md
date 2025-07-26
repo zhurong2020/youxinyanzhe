@@ -1,8 +1,8 @@
 ---
-title: "🌍 全球视野系列"
+title: "🌍 Global Perspective"
 layout: category
-permalink: /categories/全球视野/
-taxonomy: 全球视野
+permalink: /categories/global-perspective/
+taxonomy: global-perspective
 entries_layout: list
 author_profile: true
 classes: wide
@@ -29,7 +29,7 @@ classes: wide
 
 ## 📖 精选系列专题
 
-### 🚀 [马斯克帝国系列](/youxinyanzhe/series/马斯克帝国/)
+### 🚀 [马斯克帝国系列](/youxinyanzhe/series/musk-empire/)
 深度解析马斯克商业帝国的战略布局与颠覆性创新
 - 已发布：4篇文章
 - 涵盖：特斯拉AI帝国、Robotaxi扩张、Optimus机器人、未来工厂

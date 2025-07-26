@@ -27,7 +27,7 @@ intro:
       <div style="padding: 1.5em; text-align: center;">
         <h3 style="font-size: 1.5em; margin-bottom: 0.5em; color: #2c3e50;">💰 投资理财系列</h3>
         <p style="color: #666; margin-bottom: 1.5em; line-height: 1.6;">投资思维培养、理财方法实践与财务自由规划。结合量化分析与价值投资理念，构建科学的个人财富管理体系。</p>
-        <a href="{{ site.baseurl }}/categories/投资理财/" class="btn btn--success" style="display: inline-block; padding: 0.75em 1.5em; border-radius: 25px;">财富增长</a>
+        <a href="{{ site.baseurl }}/categories/investment-finance/" class="btn btn--success" style="display: inline-block; padding: 0.75em 1.5em; border-radius: 25px;">财富增长</a>
       </div>
     </div>
 
@@ -39,7 +39,7 @@ intro:
       <div style="padding: 1.5em; text-align: center;">
         <h3 style="font-size: 1.5em; margin-bottom: 0.5em; color: #2c3e50;">🌍 全球视野系列</h3>
         <p style="color: #666; margin-bottom: 1.5em; line-height: 1.6;">国际趋势洞察、文化差异观察与跨文化思维训练。开拓全球化视野，理解世界发展脉络，培养国际化思维能力。</p>
-        <a href="{{ site.baseurl }}/categories/全球视野/" class="btn btn--info" style="display: inline-block; padding: 0.75em 1.5em; border-radius: 25px;">拓展视野</a>
+        <a href="{{ site.baseurl }}/categories/global-perspective/" class="btn btn--info" style="display: inline-block; padding: 0.75em 1.5em; border-radius: 25px;">拓展视野</a>
       </div>
     </div>
 
@@ -51,7 +51,7 @@ intro:
       <div style="padding: 1.5em; text-align: center;">
         <h3 style="font-size: 1.5em; margin-bottom: 0.5em; color: #2c3e50;">🛠️ 技术赋能系列</h3>
         <p style="color: #666; margin-bottom: 1.5em; line-height: 1.6;">实用工具推荐、技术教程与自动化方案。让科技真正为普通人赋能，提升工作效率，享受数字化生活的便利与乐趣。</p>
-        <a href="{{ site.baseurl }}/categories/技术赋能/" class="btn btn--primary" style="display: inline-block; padding: 0.75em 1.5em; border-radius: 25px;">获得赋能</a>
+        <a href="{{ site.baseurl }}/categories/tech-empowerment/" class="btn btn--primary" style="display: inline-block; padding: 0.75em 1.5em; border-radius: 25px;">获得赋能</a>
       </div>
     </div>
 
@@ -63,7 +63,7 @@ intro:
       <div style="padding: 1.5em; text-align: center;">
         <h3 style="font-size: 1.5em; margin-bottom: 0.5em; color: #2c3e50;">🧠 认知升级系列</h3>
         <p style="color: #666; margin-bottom: 1.5em; line-height: 1.6;">思维模型、学习方法、认知心理学与决策科学。帮你建立科学的思维框架，避免认知偏差，提升学习效率与人生决策质量。</p>
-        <a href="{{ site.baseurl }}/categories/认知升级/" class="btn btn--warning" style="display: inline-block; padding: 0.75em 1.5em; border-radius: 25px;">开始升级</a>
+        <a href="{{ site.baseurl }}/categories/cognitive-upgrade/" class="btn btn--warning" style="display: inline-block; padding: 0.75em 1.5em; border-radius: 25px;">开始升级</a>
       </div>
     </div>
 
@@ -97,7 +97,7 @@ intro:
         <h3 style="color: white; margin: 0 0 0.5em 0; font-size: 1.1em;">💰 投资理财</h3>
         <p style="color: rgba(255,255,255,0.9); margin: 0 0 0.8em 0; font-size: 0.9em;"><strong>{{ site.categories["投资理财"] | size }} 篇文章</strong></p>
       </div>
-      <a href="{{ site.baseurl }}/categories/投资理财/" class="btn btn--inverse btn--small" style="margin: 0;">财富增长</a>
+      <a href="{{ site.baseurl }}/categories/investment-finance/" class="btn btn--inverse btn--small" style="margin: 0;">财富增长</a>
     </div>
 
     <!-- 全球视野 -->
@@ -106,7 +106,7 @@ intro:
         <h3 style="color: white; margin: 0 0 0.5em 0; font-size: 1.1em;">🌍 全球视野</h3>
         <p style="color: rgba(255,255,255,0.9); margin: 0 0 0.8em 0; font-size: 0.9em;"><strong>{{ site.categories["全球视野"] | size }} 篇文章</strong></p>
       </div>
-      <a href="{{ site.baseurl }}/categories/全球视野/" class="btn btn--inverse btn--small" style="margin: 0;">开拓视野</a>
+      <a href="{{ site.baseurl }}/categories/global-perspective/" class="btn btn--inverse btn--small" style="margin: 0;">开拓视野</a>
     </div>
 
     <!-- 技术赋能 -->
@@ -115,7 +115,7 @@ intro:
         <h3 style="color: white; margin: 0 0 0.5em 0; font-size: 1.1em;">🛠️ 技术赋能</h3>
         <p style="color: rgba(255,255,255,0.8); margin: 0 0 0.8em 0; font-size: 0.9em;">{{ site.categories["技术赋能"] | size }} 篇文章</p>
       </div>
-      <a href="{{ site.baseurl }}/categories/技术赋能/" class="btn btn--inverse btn--small" style="margin: 0;">获取工具</a>
+      <a href="{{ site.baseurl }}/categories/tech-empowerment/" class="btn btn--inverse btn--small" style="margin: 0;">获取工具</a>
     </div>
 
     <!-- 认知升级 -->
@@ -124,7 +124,7 @@ intro:
         <h3 style="color: white; margin: 0 0 0.5em 0; font-size: 1.1em;">🧠 认知升级</h3>
         <p style="color: rgba(255,255,255,0.8); margin: 0 0 0.8em 0; font-size: 0.9em;">{{ site.categories["认知升级"] | size }} 篇文章 <span style="color: #ffc107;">⚡需补强</span></p>
       </div>
-      <a href="{{ site.baseurl }}/categories/认知升级/" class="btn btn--inverse btn--small" style="margin: 0;">立即学习</a>
+      <a href="{{ site.baseurl }}/categories/cognitive-upgrade/" class="btn btn--inverse btn--small" style="margin: 0;">立即学习</a>
     </div>
 
   </div>
@@ -183,7 +183,7 @@ intro:
     </div>
     {% elsif site.categories["投资理财"].size > 6 %}
     <div class="view-more-btn">
-      <a href="{{ site.baseurl }}/categories/投资理财/" class="btn btn--primary">查看更多投资内容</a>
+      <a href="{{ site.baseurl }}/categories/investment-finance/" class="btn btn--primary">查看更多投资内容</a>
     </div>
     {% endif %}
   {% else %}

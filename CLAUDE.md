@@ -153,10 +153,10 @@ This section records critical architectural adjustments for the project:
 
 #### 四大核心分类体系
 博客采用四大核心分类体系，所有新文章必须归入以下之一：
-- **🧠 认知升级** (`categories: [认知升级]`): 思维模型、学习方法、认知心理学、决策科学
-- **🛠️ 技术赋能** (`categories: [技术赋能]`): 实用工具推荐、技术教程、自动化方案、效率提升
-- **🌍 全球视野** (`categories: [全球视野]`): 国际趋势洞察、文化差异观察、跨文化思维训练
-- **💰 投资理财** (`categories: [投资理财]`): 投资策略、理财方法、财务自由规划、量化分析
+- **🧠 Cognitive Upgrade** (`categories: [cognitive-upgrade]`): 思维模型、学习方法、认知心理学、决策科学
+- **🛠️ Tech Empowerment** (`categories: [tech-empowerment]`): 实用工具推荐、技术教程、自动化方案、效率提升
+- **🌍 Global Perspective** (`categories: [global-perspective]`): 国际趋势洞察、文化差异观察、跨文化思维训练
+- **💰 Investment & Finance** (`categories: [investment-finance]`): 投资策略、理财方法、财务自由规划、量化分析
 
 #### 系列文章导航系统设计方案 (待实现)
 
@@ -205,7 +205,7 @@ This section records critical architectural adjustments for the project:
 - 每篇文章应包含系列内的前后文章链接
 - **Front Matter Standards**: 
   - **Required Fields**: Only 3 fields are mandatory: `title`, `date`, and `header`
-  - **Classification Field**: `categories` must contain exactly one of the four core categories above
+  - **Classification Field**: `categories` must contain exactly one of the four core categories above (using English slugs)
   - **Automatic Processing**: content_pipeline.py will automatically add other necessary fields during distribution
 - **Article Structure**: Each article must include:
   - 60-80 character concise introduction after front matter for homepage display

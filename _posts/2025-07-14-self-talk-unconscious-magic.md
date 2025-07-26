@@ -2,7 +2,7 @@
 author_profile: true
 breadcrumbs: true
 categories:
-- 认知升级
+- cognitive-upgrade
 comments: true
 date: 2025-07-14 16:45:00 +0000
 excerpt: 一个抽了近40年烟的老烟民，如何做到"无痛戒烟"？李笑来老师的5秒"咒语"背后蕴含着什么认知密码？本文深度解析"自我对话"方法，教你如何巧妙"劫持"潜意识，实现习惯的无痛重塑。
