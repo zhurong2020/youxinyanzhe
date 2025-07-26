@@ -2,7 +2,7 @@
 author_profile: true
 breadcrumbs: true
 categories:
-- 技术赋能
+- tech-empowerment
 comments: true
 date: 2024-03-06 19:55:00 +0000
 excerpt: 只有好问题才可能获得 AI 更精准的解答，本文教你掌握向 AI 提问的方法。

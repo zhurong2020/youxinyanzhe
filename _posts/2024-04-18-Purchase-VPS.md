@@ -2,7 +2,7 @@
 author_profile: true
 breadcrumbs: true
 categories:
-- 技术赋能
+- tech-empowerment
 comments: true
 date: 2024-04-18 16:45:00 +0000
 excerpt: 云主机是开启云端生活的基础设施，本文主要介绍其概念以及如何在RackNerd购买VPS。

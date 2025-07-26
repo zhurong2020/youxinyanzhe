@@ -2,7 +2,7 @@
 author_profile: true
 breadcrumbs: true
 categories:
-- 全球视野
+- global-perspective
 comments: true
 date: 2025-07-18
 header:
