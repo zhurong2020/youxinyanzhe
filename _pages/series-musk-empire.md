@@ -24,8 +24,10 @@ classes: wide
 
 ## 📚 系列文章
 
-{% assign musk_posts = site.posts | where_exp: "post", "post.tags contains '马斯克' or post.tags contains 'Musk' or post.tags contains '特斯拉' or post.tags contains 'Tesla'" %}
-{% assign sorted_posts = musk_posts | sort: 'date' %}
+{% assign musk_posts = site.posts | where_exp: "post", "post.tags contains '马斯克'" %}
+{% assign tesla_posts = site.posts | where_exp: "post", "post.tags contains '特斯拉'" %}
+{% assign all_musk_posts = musk_posts | concat: tesla_posts | uniq %}
+{% assign sorted_posts = all_musk_posts | sort: 'date' %}
 
 {% for post in sorted_posts %}
 <div style="margin-bottom: 2rem; padding: 1.5rem; border: 1px solid #e1e4e8; border-radius: 8px;">
