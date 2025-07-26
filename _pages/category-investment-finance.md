@@ -6,7 +6,8 @@ taxonomy: 投资理财
 entries_layout: list
 author_profile: true
 sidebar:
-  nav: "quant-investment"
+  - title: "量化投资系列"
+    nav: "quant-investment"
 ---
 
 **投资思维培养、理财方法实践与财务自由规划**

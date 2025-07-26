@@ -6,7 +6,8 @@ taxonomy: 技术赋能
 entries_layout: list
 author_profile: true
 sidebar:
-  nav: "cloud-living"
+  - title: "普通人云生活系列"
+    nav: "cloud-living"
 ---
 
 **实用工具推荐、技术教程与自动化方案**
