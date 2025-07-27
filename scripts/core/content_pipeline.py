@@ -1549,7 +1549,17 @@ class ContentPipeline:
                     markdown_content=post.content
                 )
                 if success:
-                    self.log("✅ 成功生成微信发布指南文件。", force=True)
+                    # Find the latest guide file
+                    import time
+                    guide_dir = self.project_root / ".tmp/output/wechat_guides"
+                    if guide_dir.exists():
+                        latest_files = sorted(guide_dir.glob("*_guide.md"), key=lambda p: p.stat().st_mtime, reverse=True)
+                        if latest_files:
+                            self.log(f"✅ 成功生成微信发布指南文件: {latest_files[0]}", force=True)
+                        else:
+                            self.log("✅ 成功生成微信发布指南文件。", force=True)
+                    else:
+                        self.log("✅ 成功生成微信发布指南文件。", force=True)
                 else:
                     self.log("❌ 生成微信发布指南文件失败。", level="error", force=True)
                 return success

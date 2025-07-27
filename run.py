@@ -206,7 +206,13 @@ def main():
                     if github_release.get('success'):
                         print(f"📦 GitHub Release: {github_release.get('release_url', 'N/A')}")
                         print(f"⬇️  下载链接: {github_release.get('download_url', 'N/A')}")
-                        print("📧 现在可以通过 reward_system_manager.py 发送奖励给用户了")
+                        # Check if guidance file was generated
+                        guidance_dir = Path(".tmp/output/wechat_guides")
+                        if guidance_dir.exists():
+                            latest_files = sorted(guidance_dir.glob("*_guide.md"), key=lambda p: p.stat().st_mtime, reverse=True)
+                            if latest_files:
+                                print(f"📧 微信发布指导文件已生成: {latest_files[0]}")
+                        print("📧 内容变现管理请使用本程序 run.py 选项 6: 内容变现系统")
                         pipeline.log(f"内容变现包创建成功: {github_release.get('release_url', 'N/A')}", level="info", force=True)
                 else:
                     print(f"⚠️ 内容变现包创建失败: {monetization.get('error', '未知错误')}")
