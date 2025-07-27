@@ -5,6 +5,7 @@ categories:
 - global-perspective
 comments: true
 date: 2025-07-18
+excerpt: "从奥斯汀Robotaxi服务区域翻倍到擎天柱机器人，特斯拉构建庞大AI应用生态系统。"
 header:
   overlay_filter: 0.5
   overlay_image: https://1drv.ms/i/c/5644dab129afda10/IQQuNqdTuZDvToBvTtztQXGBAT7ZRA8OGopsM5vTa3qk96s?width=660

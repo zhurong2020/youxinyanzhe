@@ -5,6 +5,7 @@ categories:
 - global-perspective
 comments: true
 date: 2025-07-20
+excerpt: "马斯克计划以2.5万美元让Optimus成为每个人的机器人伙伴，智能革命正拉开序幕。"
 header:
   image: https://1drv.ms/i/c/5644dab129afda10/IQRlU287liM5QJje6AeR7qNrAep7rTmv1tcHXpE0OvYBKic
   teaser: https://1drv.ms/i/c/5644dab129afda10/IQRlU287liM5QJje6AeR7qNrAep7rTmv1tcHXpE0OvYBKic

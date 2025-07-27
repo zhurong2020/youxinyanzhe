@@ -5,6 +5,7 @@ categories:
 - global-perspective
 comments: true
 date: 2025-07-22
+excerpt: "特斯拉制造革命密码：去盒子化流程、巨型压铸技术，揭秘马斯克制造帝国核心。"
 header:
   overlay_filter: 0.5
   overlay_image: https://1drv.ms/i/c/5644dab129afda10/IQSL3bIwZwlCQaiekMp9RSnXAeGzbhy1PePtI8rWWenBn8M
