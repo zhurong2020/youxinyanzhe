@@ -20,7 +20,7 @@ tags:
 - 自托管
 - Cloudreve
 - Trilium
-title: 轻松上手：用开源自托管项目打造你的数字王国
+title: 轻松上手：用GitHub开源项目自托管，打造属于你的数字王国
 toc: true
 toc_icon: list
 toc_label: 本页内容
