@@ -5,7 +5,7 @@ categories:
 - investment-finance
 comments: true
 date: 2025-07-10 15:00:00 +0000
-excerpt: 继《为何普通人应该现在就开始投资美股》后，本文详细介绍如何通过QDII基金，让中国投资者轻松参与全球市场，分享经济增长红利。
+excerpt: "QDII基金投资指南：轻松参与全球市场，分享经济增长红利的最佳路径。"
 header:
   image: https://1drv.ms/i/c/5644dab129afda10/IQQe0ONpY3jpRoOEKoFC4CKeAc_Fr4MHIhnfJhoGSCW0dT8
   og_image: https://1drv.ms/i/c/5644dab129afda10/IQQe0ONpY3jpRoOEKoFC4CKeAc_Fr4MHIhnfJhoGSCW0dT8

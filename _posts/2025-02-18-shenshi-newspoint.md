@@ -5,7 +5,7 @@ categories:
 - global-perspective
 comments: true
 date: 2025-02-8 16:45:00 +0000
-excerpt: 2025年，信息爆炸时代，如何避免'信息茧房'？本文介绍两大媒体偏见评估工具，帮你科学审视新闻。
+excerpt: "2025年避免信息茧房指南：两大工具帮你科学审视新闻偏见。"
 header:
   image: https://1drv.ms/u/c/5644dab129afda10/IQTW4xroKj7uT6C8dqzA5UjKAbfh3BqPDLnkDDXmP6g0soI?width=1024
   og_image: https://1drv.ms/u/c/5644dab129afda10/IQTW4xroKj7uT6C8dqzA5UjKAbfh3BqPDLnkDDXmP6g0soI?width=1024
