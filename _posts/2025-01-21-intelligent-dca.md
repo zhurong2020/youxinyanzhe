@@ -21,7 +21,7 @@ tags:
 - 量化交易
 - 美股
 - 自动化投资
-title: 智能投资指南：手把手教你用量化工具定投美股
+title: 智能投资指南：手把手教你用Moomoo量化工具定投美股
 toc: true
 toc_icon: list
 toc_label: 本页内容

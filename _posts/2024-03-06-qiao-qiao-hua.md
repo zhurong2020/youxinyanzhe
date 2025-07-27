@@ -20,7 +20,7 @@ tags:
 - 大型语言模型
 - AI助手
 - 人机交互
-title: 聊天机器人小秘诀：Prompt让AI更懂你
+title: 聊天机器人小秘诀：掌握Prompt工程让AI更懂你的需求
 toc: true
 toc_icon: list
 toc_label: 本页内容
