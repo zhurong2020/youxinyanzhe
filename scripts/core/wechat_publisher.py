@@ -79,7 +79,7 @@ class WechatPublisher:
         if not self.app_id or not self.app_secret:
             raise ValueError("WECHAT_APPID and WECHAT_APPSECRET must be set in .env file.")
 
-        project_root = Path(__file__).parent.parent
+        project_root = Path(__file__).parent.parent.parent
         self.api_base_url = "https://api.weixin.qq.com/cgi-bin"
         self.access_token: Optional[str] = None
         self.token_expires_at: int = 0
