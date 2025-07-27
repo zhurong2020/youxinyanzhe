@@ -497,6 +497,7 @@ Here is the content to optimize:
             # 保存指导文件
             with open(guide_file, 'w', encoding='utf-8') as f: f.write(guide_text)
             self.logger.info(f"✅ Successfully generated guide file with reward footer: {guide_file}")
+            self.logger.info(f"📂 微信指导文件位置: {guide_file}")
             return True
         except IOError as e:
             self.logger.error(f"Failed to write guide file: {e}")
