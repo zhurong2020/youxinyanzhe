@@ -5,6 +5,7 @@ categories:
 - global-perspective
 comments: true
 date: 2025-07-26
+excerpt: "当两位最具影响力的声音相遇，会擦出怎样的思想火花？在这期长达3小时11分钟的深度对话中，马斯克毫无保留地分享了他对AI风险、政府腐败、太空探索和社会问题的深刻见解。从Grok AI的"不羁模式"到政府效率部门（DOGE）的惊人发现，从火星殖民计划到当今政治的信息战，这不仅是一场访谈，更是对人类文明未来的深度思辨。"
 header:
   overlay_filter: 0.5
   overlay_image: https://1drv.ms/i/c/5644dab129afda10/IQT0E5J4575yQ7R4FFryho8sAaYJeSnBM-zQljZs-satDsg
