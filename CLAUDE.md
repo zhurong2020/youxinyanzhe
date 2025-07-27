@@ -205,12 +205,18 @@ This section records critical architectural adjustments for the project:
 - 每篇文章应包含系列内的前后文章链接
 - **Front Matter Standards**: 
   - **Required Fields**: Only 3 fields are mandatory: `title`, `date`, and `header`
+  - **Title Length**: 25-35 characters for optimal 3×2 grid display (2-3 lines in homepage layout)
+  - **Excerpt Field**: Must be included for all articles, 50-60 characters maximum
+    - Appears in homepage article previews and page headers
+    - Use double quotes, avoid nested quotes to prevent YAML parsing errors
+    - Focus on key value proposition, avoid detailed descriptions
   - **Classification Field**: `categories` must contain exactly one of the four core categories above (using English slugs)
   - **Automatic Processing**: content_pipeline.py will automatically add other necessary fields during distribution
 - **Article Structure**: Each article must include:
-  - 60-80 character concise introduction after front matter for homepage display
-  - `<!-- more -->` tag after introduction
-  - Natural background/context transition after the more tag leading into main content
+  - **Opening Hook**: Brief engaging opening (matching excerpt content) after front matter
+  - **More Tag**: `<!-- more -->` tag to separate preview from full content
+  - **Background Context**: Optional background information after more tag for reader context
+  - **Main Content Introduction**: Natural transition leading into detailed content
   - **🎧 播客收听** section with AI-generated Chinese podcast (length adjusted to content)
   - **🌍 英文原始资料** section with original English sources for learning and research
 - **Writing Style**: Follow established blog style from zhurong2020.github.io:
@@ -318,6 +324,21 @@ This section records critical architectural adjustments for the project:
 - **HTML Cleaning**: Content is cleaned and optimized for WeChat editor compatibility
 
 ## 10. Document Update History
+
+### 2025-07-27: 文章标题和摘要长度规范化 ✅
+- **标题长度标准**: 建立25-35字最佳标题长度规范
+  - 优化3×2网格布局的2-3行显示效果
+  - 修复过短标题（18字→27字，16字→35字）
+  - 微调中等长度标题提升关键词密度
+- **摘要字段规范**: 统一excerpt字段要求
+  - 严格控制在50-60字范围内
+  - 避免YAML引号嵌套问题
+  - 专注核心价值主张，提升首页显示效果
+- **脚本prompt同步**: 更新AI生成规范
+  - content_pipeline.py摘要生成prompt更新
+  - gemini_config.yml测试文章生成规范同步
+  - 确保自动化流程与手动规范一致
+- **文档完善**: 在Front Matter Standards中详细记录规范要求
 
 ### 2025-07-25: 主页布局优化与分类页面完善 ✅
 - **布局问题修复**: 解决主页四个关键布局问题
