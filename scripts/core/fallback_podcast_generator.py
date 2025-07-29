@@ -68,7 +68,8 @@ class FallbackPodcastGenerator:
         # 设置Gemini API
         if 'GEMINI_API_KEY' in self.config:
             genai.configure(api_key=self.config['GEMINI_API_KEY'])
-            self.gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+            # 使用与主系统一致的模型配置
+            self.gemini_model = genai.GenerativeModel('gemini-2.0-flash-exp')
             self.logger.info("Gemini API 配置完成")
         else:
             raise ValueError("需要GEMINI_API_KEY配置")

@@ -63,7 +63,10 @@ class YouTubePodcastGenerator:
         # 设置Gemini API
         if 'GEMINI_API_KEY' in self.config:
             genai.configure(api_key=self.config['GEMINI_API_KEY'])
-            self.gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+            # 使用与主系统一致的模型配置（从配置文件读取）
+            model_name = "gemini-2.0-flash-exp"  # 默认模型
+            self.gemini_model = genai.GenerativeModel(model_name)
+            self.logger.info(f"使用Gemini模型: {model_name}")
             self.logger.info("Gemini API 配置完成")
         else:
             raise ValueError("需要GEMINI_API_KEY配置")
@@ -295,25 +298,88 @@ class YouTubePodcastGenerator:
 [学习导师]: 好的，今天的播客就到这里。记得点击原视频链接深入学习！
 """
 
-    def generate_local_audio(self, script: str, output_path: str) -> bool:
+    def generate_local_audio(self, script: str, output_path: str, tts_engine: str = "gtts") -> bool:
         """
-        使用本地TTS生成音频（eSpeak后端）
+        使用本地TTS生成音频，支持多种TTS引擎
+        
+        Args:
+            script: 播客脚本
+            output_path: 输出音频文件路径
+            tts_engine: TTS引擎选择 ("gtts", "espeak", "pyttsx3")
         """
+        # 处理脚本，移除角色标签和格式化
+        clean_text = re.sub(r'\[.*?\]:\s*', '', script)
+        clean_text = clean_text.replace('\n', ' ').strip()
+        
+        # 限制文本长度以避免过长的音频
+        if len(clean_text) > 3000:
+            clean_text = clean_text[:3000] + "..."
+            self.logger.info("文本过长，已截取前3000字符")
+            
+        self.logger.info(f"开始使用{tts_engine}引擎生成音频，文本长度: {len(clean_text)}字符")
+        
+        # 1. 优先尝试Google TTS（最佳音质）
+        if tts_engine == "gtts":
+            if self._generate_gtts_audio(clean_text, output_path):
+                return True
+            self.logger.warning("Google TTS失败，尝试其他引擎")
+        
+        # 2. 尝试eSpeak（快速但音质一般）
+        if tts_engine == "espeak" or tts_engine == "gtts":
+            if self._generate_espeak_audio(clean_text, output_path):
+                return True
+            self.logger.warning("eSpeak TTS失败，尝试pyttsx3")
+            
+        # 3. 最后尝试pyttsx3（系统TTS）
+        if self._generate_pyttsx3_audio(clean_text, output_path):
+            return True
+            
+        self.logger.error("所有TTS引擎都失败了")
+        return False
+    
+    def _generate_gtts_audio(self, text: str, output_path: str) -> bool:
+        """使用Google Text-to-Speech生成高质量音频"""
         try:
-            # 首先尝试使用eSpeak直接生成音频
-            self.logger.info("尝试使用eSpeak TTS生成音频")
+            from gtts import gTTS
+            import pygame
             
-            # 处理脚本，移除角色标签和格式化
-            clean_text = re.sub(r'\[.*?\]:\s*', '', script)
-            clean_text = clean_text.replace('\n', ' ').strip()
+            self.logger.info("尝试使用Google TTS生成音频")
             
-            # 限制文本长度以避免过长的音频
-            if len(clean_text) > 3000:
-                clean_text = clean_text[:3000] + "..."
-                self.logger.info("文本过长，已截取前3000字符")
+            # 创建gTTS对象
+            tts = gTTS(text=text, lang='zh-cn', slow=False)
             
-            # 使用eSpeak生成音频，指定中文语音
+            # 保存到临时文件
+            temp_path = output_path.replace('.wav', '_temp.mp3')
+            tts.save(temp_path)
+            
+            # 如果需要WAV格式，转换音频格式
+            if output_path.endswith('.wav'):
+                self._convert_audio_format(temp_path, output_path)
+                os.remove(temp_path)  # 删除临时文件
+            else:
+                # 直接重命名为最终文件
+                os.rename(temp_path, output_path)
+            
+            if os.path.exists(output_path):
+                self.logger.info(f"Google TTS音频生成成功: {output_path}")
+                return True
+            else:
+                self.logger.error("Google TTS未能创建音频文件")
+                return False
+                
+        except ImportError:
+            self.logger.warning("gtts库未安装，跳过Google TTS。安装命令: pip install gtts pygame")
+            return False
+        except Exception as e:
+            self.logger.warning(f"Google TTS生成失败: {e}")
+            return False
+    
+    def _generate_espeak_audio(self, text: str, output_path: str) -> bool:
+        """使用eSpeak生成音频"""
+        try:
             import subprocess
+            
+            self.logger.info("尝试使用eSpeak TTS生成音频")
             
             # 尝试不同的音频格式
             for audio_format in ['wav', 'mp3']:
@@ -325,7 +391,7 @@ class YouTubePodcastGenerator:
                         '-s', '150',  # 语速
                         '-a', '80',   # 音量
                         '-w', output_file,  # 输出到文件
-                        clean_text
+                        text
                     ]
                     
                     self.logger.info(f"执行eSpeak命令: {' '.join(cmd[:6])}...")
@@ -333,6 +399,9 @@ class YouTubePodcastGenerator:
                     
                     if result.returncode == 0 and os.path.exists(output_file):
                         self.logger.info(f"eSpeak音频生成成功: {output_file}")
+                        # 如果生成的不是目标格式，重命名
+                        if output_file != output_path:
+                            os.rename(output_file, output_path)
                         return True
                     else:
                         self.logger.warning(f"eSpeak生成失败，返回码: {result.returncode}")
@@ -344,10 +413,19 @@ class YouTubePodcastGenerator:
                 except Exception as e:
                     self.logger.warning(f"eSpeak格式{audio_format}失败: {e}")
                     continue
+                    
+            return False
             
-            # 备用：尝试pyttsx3
-            self.logger.info("eSpeak失败，尝试pyttsx3作为备用")
+        except Exception as e:
+            self.logger.warning(f"eSpeak生成失败: {e}")
+            return False
+    
+    def _generate_pyttsx3_audio(self, text: str, output_path: str) -> bool:
+        """使用pyttsx3生成音频"""
+        try:
             import pyttsx3
+            
+            self.logger.info("尝试使用pyttsx3 TTS生成音频")
             
             # 初始化TTS引擎
             engine = pyttsx3.init()
@@ -373,7 +451,7 @@ class YouTubePodcastGenerator:
             engine.setProperty('volume', 0.8)
             
             # 生成音频
-            engine.save_to_file(clean_text, output_path)
+            engine.save_to_file(text, output_path)
             engine.runAndWait()
             
             if os.path.exists(output_path):
@@ -382,12 +460,36 @@ class YouTubePodcastGenerator:
             else:
                 self.logger.error("pyttsx3未能创建音频文件")
                 return False
-            
+                
         except ImportError:
-            self.logger.error("缺少必要的依赖包（subprocess或pyttsx3）")
+            self.logger.warning("pyttsx3库未安装，跳过。安装命令: pip install pyttsx3")
             return False
         except Exception as e:
-            self.logger.error(f"本地音频生成失败: {e}")
+            self.logger.warning(f"pyttsx3生成失败: {e}")
+            return False
+    
+    def _convert_audio_format(self, input_path: str, output_path: str) -> bool:
+        """转换音频格式（MP3转WAV等）"""
+        try:
+            from pydub import AudioSegment
+            
+            # 读取输入音频
+            audio = AudioSegment.from_file(input_path)
+            
+            # 导出为目标格式
+            audio.export(output_path, format="wav")
+            
+            self.logger.info(f"音频格式转换成功: {input_path} -> {output_path}")
+            return True
+            
+        except ImportError:
+            self.logger.warning("pydub库未安装，无法转换音频格式。安装命令: pip install pydub")
+            # 如果无法转换，直接复制文件
+            import shutil
+            shutil.copy2(input_path, output_path)
+            return True
+        except Exception as e:
+            self.logger.warning(f"音频格式转换失败: {e}")
             return False
 
     def generate_podcast(self, youtube_url: str, custom_style: str = "casual,informative", 
@@ -747,10 +849,18 @@ header:
                 audio_path = os.path.join(self.audio_dir, audio_filename)
                 
                 try:
-                    if self.generate_local_audio(script, audio_path):
+                    # 根据用户选择的TTS模型决定使用的引擎
+                    tts_engine = "gtts"  # 默认使用Google TTS获得最佳音质
+                    if tts_model == "edge":
+                        tts_engine = "gtts"  # 使用Google TTS替代Edge TTS
+                    elif tts_model == "espeak":
+                        tts_engine = "espeak"
+                    
+                    self.logger.info(f"使用TTS引擎: {tts_engine}")
+                    if self.generate_local_audio(script, audio_path, tts_engine):
                         self.logger.info(f"本地音频生成成功: {audio_path}")
                     else:
-                        raise Exception("TTS引擎不可用")
+                        raise Exception("所有TTS引擎都不可用")
                 except Exception as e:
                     self.logger.warning(f"本地音频生成失败: {e}")
                     self.logger.warning("将只提供文本脚本，请考虑安装eSpeak或其他TTS引擎")
@@ -766,27 +876,20 @@ header:
                 audio_path = self.save_audio_file(temp_audio_path, video_id)
             
             # 4. 生成导读内容
-            self.logger.info("开始生成中文导读")
             content_guide = self.generate_content_guide(video_info, youtube_url)
             if custom_title:
                 content_guide['title'] = custom_title
                 self.logger.info(f"使用自定义标题: {custom_title}")
-            self.logger.info("导读内容生成成功")
             
             # 5. 下载缩略图
-            self.logger.info("开始下载视频缩略图")
             thumbnail_path = self.download_thumbnail(video_info['thumbnail_url'], video_info)
-            if thumbnail_path:
-                self.logger.info(f"缩略图下载成功: {thumbnail_path}")
-            else:
+            if not thumbnail_path:
                 self.logger.warning("缩略图下载失败")
             
             # 6. 创建Jekyll文章
-            self.logger.info("开始创建Jekyll文章")
             article_path = self.create_jekyll_article(
                 video_info, content_guide, youtube_url, audio_path, thumbnail_path
             )
-            self.logger.info(f"Jekyll文章创建成功: {article_path}")
             
             result = {
                 'status': 'success',
