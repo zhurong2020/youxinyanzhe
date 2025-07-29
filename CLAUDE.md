@@ -26,13 +26,21 @@ Claude Code serves as the AI software engineer for this project, with primary re
      - Generate publish guidance files for manual publishing (due to API limitations)
    - 🔄 **WordPress**: Basic API publishing (requires further enhancement)
 
-2. **Publishing Status Management**:
+2. **YouTube Podcast Generator** ✅:
+   - ✅ **English to Chinese Podcast**: Convert English YouTube videos to Chinese learning podcasts
+   - ✅ **Automatic Article Generation**: Create Jekyll articles with embedded podcast audio
+   - ✅ **Multi-language TTS Support**: Support for Chinese, English, Japanese, Korean TTS
+   - ✅ **Flexible Configuration**: Multiple TTS models and conversation styles
+   - ✅ **Learning Guide Generation**: Automatic English learning guides and content outlines
+   - ✅ **Integration with Main Menu**: Full workflow integrated into run.py interface
+
+3. **Publishing Status Management**:
    - ✅ **Status Tracking**: `_drafts/.publishing/*.yml` files track publication status
    - ✅ **Cross-platform Republishing**: Support republishing existing articles to other platforms
    - ✅ **Duplicate Prevention**: Automatically filter already-published platforms
    - ✅ **Publish Guidance**: WeChat guidance files saved to `.tmp/output/wechat_guides/`
 
-3. **Content Enhancement Features**:
+4. **Content Enhancement Features**:
    - ✅ **Conditional Content**: Investment articles automatically include risk disclaimers
    - ✅ **UI Improvements**: Fixed subscription form alignment with flexbox
    - ✅ **AI Integration**: Gemini-powered content optimization

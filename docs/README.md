@@ -12,6 +12,13 @@
   - **四大内容分类系统**: 🧠 认知升级、🛠️ 技术赋能、🌍 全球视野、💰 投资理财
   - **智能文章分类**: 基于关键词和AI分析的自动分类功能
 
+- 🎬 YouTube播客生成器
+  - **英转中播客**: 将英文YouTube视频转换为中文学习播客
+  - **自动生成文章**: 创建包含播客音频的Jekyll学习文章
+  - **多语言支持**: 支持中英日韩多种语言TTS
+  - **灵活配置**: 可选择不同TTS模型和播客对话风格
+  - **学习导读**: 自动生成英语学习指南和内容大纲
+
 - 🚀 多平台发布系统
   - **GitHub Pages**: 完整的Jekyll网站发布
   - **WordPress**: 自动发布到WordPress站点
@@ -89,6 +96,9 @@ youxinyanzhe/
 ```bash
 # AI配置
 GEMINI_API_KEY=your_gemini_api_key
+
+# YouTube播客生成器配置（可选）
+YOUTUBE_API_KEY=your_youtube_api_key
 
 # 微信公众号配置
 WECHAT_APPID=your_wechat_appid
@@ -202,6 +212,7 @@ python run.py
    - `1`: 处理现有草稿 (新文章发布)
    - `2`: 重新发布已发布文章 (跨平台发布)
    - `3`: 生成测试文章
+   - `6`: YouTube播客生成器 (英文视频转中文播客)
 
 3. **选择发布平台**:
    - 系统会自动显示可用的发布平台
