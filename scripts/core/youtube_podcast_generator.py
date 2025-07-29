@@ -26,6 +26,13 @@ except ImportError as e:
     print(f"请安装必要的依赖: pip install gradio-client google-generativeai google-api-python-client")
     raise e
 
+# 可选TTS库导入
+try:
+    from elevenlabs import Voice, VoiceSettings, generate, set_api_key
+    ELEVENLABS_AVAILABLE = True
+except ImportError:
+    ELEVENLABS_AVAILABLE = False
+
 
 class YouTubePodcastGenerator:
     """YouTube播客生成器类"""
@@ -83,6 +90,20 @@ class YouTubePodcastGenerator:
         else:
             self.logger.warning("未配置YOUTUBE_API_KEY，将使用基础视频信息提取")
             self.youtube = None
+        
+        # 设置ElevenLabs API
+        if 'ELEVENLABS_API_KEY' in self.config and ELEVENLABS_AVAILABLE:
+            try:
+                set_api_key(self.config['ELEVENLABS_API_KEY'])
+                self.elevenlabs_available = True
+                self.logger.info("✅ ElevenLabs API 配置完成")
+            except Exception as e:
+                self.logger.warning(f"ElevenLabs API 配置失败: {e}")
+                self.elevenlabs_available = False
+        else:
+            self.elevenlabs_available = False
+            if not ELEVENLABS_AVAILABLE:
+                self.logger.info("💡 ElevenLabs库未安装，可运行 pip install elevenlabs 获得高质量语音")
         
         # 设置Podcastfy客户端
         try:
@@ -333,7 +354,7 @@ class YouTubePodcastGenerator:
         Args:
             script: 播客脚本
             output_path: 输出音频文件路径
-            tts_engine: TTS引擎选择 ("gtts", "espeak", "pyttsx3")
+            tts_engine: TTS引擎选择 ("gtts", "elevenlabs", "espeak", "pyttsx3")
         """
         # 处理脚本，移除角色标签和格式化
         clean_text = re.sub(r'\[.*?\]:\s*', '', script)
@@ -345,25 +366,67 @@ class YouTubePodcastGenerator:
         if len(clean_text) > 5000:
             self.logger.info("💡 检测到超长文本，gTTS将自动分块处理以保证完整性")
         
-        # 1. 优先尝试Google TTS（最佳音质）
+        # 1. 优先尝试ElevenLabs（最高音质）
+        if tts_engine == "elevenlabs":
+            if self._generate_elevenlabs_audio(clean_text, output_path):
+                return True
+            self.logger.warning("ElevenLabs失败，尝试其他引擎")
+        
+        # 2. 尝试Google TTS（高音质）
         if tts_engine == "gtts":
             if self._generate_gtts_audio(clean_text, output_path):
                 return True
             self.logger.warning("Google TTS失败，尝试其他引擎")
         
-        # 2. 尝试eSpeak（快速但音质一般）
+        # 3. 尝试eSpeak（快速但音质一般）
         if tts_engine == "espeak" or tts_engine == "gtts":
             if self._generate_espeak_audio(clean_text, output_path):
                 return True
             self.logger.warning("eSpeak TTS失败，尝试pyttsx3")
             
-        # 3. 最后尝试pyttsx3（系统TTS）
+        # 4. 最后尝试pyttsx3（系统TTS）
         if self._generate_pyttsx3_audio(clean_text, output_path):
             return True
             
         self.logger.error("所有TTS引擎都失败了")
         return False
     
+    def _generate_elevenlabs_audio(self, text: str, output_path: str) -> bool:
+        """使用ElevenLabs生成高质量AI语音"""
+        if not self.elevenlabs_available:
+            self.logger.warning("ElevenLabs API未配置或库未安装")
+            return False
+            
+        try:
+            self.logger.info("🎙️ 使用ElevenLabs生成高质量AI语音")
+            
+            # 使用ElevenLabs的中文语音模型
+            # 注意：这里使用的是一个通用的英文声音，ElevenLabs对中文支持可能有限
+            audio = generate(
+                text=text,
+                voice=Voice(
+                    voice_id="21m00Tcm4TlvDq8ikWAM",  # Rachel (女声，适合叙述)
+                    settings=VoiceSettings(
+                        stability=0.75,    # 语音稳定性
+                        similarity_boost=0.75,  # 相似度增强
+                        style=0.1,         # 风格强度
+                        use_speaker_boost=True  # 使用说话者增强
+                    )
+                ),
+                model="eleven_multilingual_v2"  # 多语言模型，支持中文
+            )
+            
+            # 保存音频文件
+            with open(output_path, 'wb') as f:
+                f.write(audio)
+            
+            self.logger.info(f"✅ ElevenLabs音频生成成功: {output_path}")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"❌ ElevenLabs音频生成失败: {e}")
+            return False
+
     def _generate_gtts_audio(self, text: str, output_path: str) -> bool:
         """使用Google Text-to-Speech生成高质量音频"""
         try:
@@ -566,7 +629,7 @@ class YouTubePodcastGenerator:
                 image_files=[],
                 gemini_key=clean_string(self.config['GEMINI_API_KEY']),
                 openai_key="",  # 使用Edge TTS，不需要OpenAI密钥
-                elevenlabs_key="",  # 不使用ElevenLabs
+                elevenlabs_key=clean_string(self.config.get('ELEVENLABS_API_KEY', "")),  # 如果配置了就使用ElevenLabs
                 word_count=1500,
                 conversation_style=clean_style,
                 roles_person1=clean_string("主播助手"),
@@ -891,11 +954,18 @@ header:
                 
                 try:
                     # 根据用户选择的TTS模型决定使用的引擎
-                    tts_engine = "gtts"  # 默认使用Google TTS获得最佳音质
-                    if tts_model == "edge":
+                    if tts_model == "elevenlabs" and self.elevenlabs_available:
+                        tts_engine = "elevenlabs"  # 使用ElevenLabs获得最高音质
+                    elif tts_model == "edge":
                         tts_engine = "gtts"  # 使用Google TTS替代Edge TTS
                     elif tts_model == "espeak":
                         tts_engine = "espeak"
+                    else:
+                        # 智能默认选择：ElevenLabs > Google TTS > eSpeak
+                        if self.elevenlabs_available:
+                            tts_engine = "elevenlabs"
+                        else:
+                            tts_engine = "gtts"  # 默认使用Google TTS获得最佳音质
                     
                     self.logger.info(f"使用TTS引擎: {tts_engine}")
                     if self.generate_local_audio(script, audio_path, tts_engine):
