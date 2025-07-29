@@ -66,15 +66,14 @@ class YouTubePodcastGenerator:
             # 使用与主系统一致的模型配置（从配置文件读取）
             model_name = "gemini-2.0-flash-exp"  # 默认模型
             self.gemini_model = genai.GenerativeModel(model_name)
-            self.logger.info(f"使用Gemini模型: {model_name}")
-            self.logger.info("Gemini API 配置完成")
+            self.logger.info(f"✅ Gemini配置完成 - 模型: {model_name}")
         else:
             raise ValueError("需要GEMINI_API_KEY配置")
         
         # 设置YouTube API
         if 'YOUTUBE_API_KEY' in self.config:
             self.youtube = build('youtube', 'v3', developerKey=self.config['YOUTUBE_API_KEY'])
-            self.logger.info("YouTube API 配置完成")
+            self.logger.info("✅ YouTube API 配置完成")
         else:
             self.logger.warning("未配置YOUTUBE_API_KEY，将使用基础视频信息提取")
             self.youtube = None
@@ -82,7 +81,7 @@ class YouTubePodcastGenerator:
         # 设置Podcastfy客户端
         try:
             self.podcastfy_client = Client("thatupiso/Podcastfy.ai_demo")
-            self.logger.info("Podcastfy 客户端连接成功")
+            self.logger.info("✅ Podcastfy 客户端连接成功")
             self.use_fallback = False
             
         except Exception as e:
@@ -241,6 +240,29 @@ class YouTubePodcastGenerator:
             
         return safe_title.lower()
     
+    def _format_learning_items(self, items) -> str:
+        """
+        格式化学习项目（关键词汇、常用表达等）
+        
+        Args:
+            items: 可能是字符串或数组
+            
+        Returns:
+            格式化后的字符串
+        """
+        try:
+            if isinstance(items, list):
+                # 如果是数组，用逗号和空格连接
+                return ', '.join(items)
+            elif isinstance(items, str):
+                # 如果是字符串，直接返回
+                return items
+            else:
+                # 其他情况，转换为字符串
+                return str(items)
+        except Exception:
+            return "暂无相关内容"
+    
     def generate_podcast_script(self, video_info: Dict[str, Any], youtube_url: str, 
                               target_language: str = "zh-CN",
                               conversation_style: str = "casual,informative") -> str:
@@ -316,7 +338,7 @@ class YouTubePodcastGenerator:
             clean_text = clean_text[:3000] + "..."
             self.logger.info("文本过长，已截取前3000字符")
             
-        self.logger.info(f"开始使用{tts_engine}引擎生成音频，文本长度: {len(clean_text)}字符")
+        self.logger.info(f"🎧 开始音频生成 - 引擎: {tts_engine}, 文本长度: {len(clean_text)}字符")
         
         # 1. 优先尝试Google TTS（最佳音质）
         if tts_engine == "gtts":
@@ -534,7 +556,7 @@ class YouTubePodcastGenerator:
                 dialogue_structure="引言,内容总结,学习要点,结语",  # 新增对话结构
                 podcast_name="全球视野英语学习",
                 podcast_tagline="用中文播客理解英文内容",
-                tts_model=tts_model,  # 使用指定的TTS模型
+                tts_model="edge",  # Podcastfy只支持edge, openai, elevenlabs
                 creativity_level=0.7,
                 user_instructions=f"请生成一个关于YouTube视频的中文播客目标语言是{target_language}内容要适合英语学习者收听".replace('\n', ' ').replace('\r', ''),
                 api_name="/process_inputs"  # 使用正确的API端点
@@ -767,10 +789,10 @@ header:
 ## 🌍 英语学习指南
 
 ### 🔤 关键词汇
-{', '.join(content_guide['learning_tips']['vocabulary'])}
+{self._format_learning_items(content_guide['learning_tips']['vocabulary'])}
 
 ### 💬 常用表达
-{', '.join(content_guide['learning_tips']['expressions'])}
+{self._format_learning_items(content_guide['learning_tips']['expressions'])}
 
 ### 🏛️ 文化背景
 {content_guide['learning_tips']['cultural_context']}
@@ -845,7 +867,8 @@ header:
                 
                 # 尝试生成本地音频
                 today = datetime.now()
-                audio_filename = f"youtube-{today.strftime('%Y%m%d')}-{video_id}.wav"
+                safe_title = self._generate_safe_filename(video_info['title'])
+                audio_filename = f"youtube-{today.strftime('%Y%m%d')}-{safe_title}.wav"
                 audio_path = os.path.join(self.audio_dir, audio_filename)
                 
                 try:
@@ -865,7 +888,7 @@ header:
                     self.logger.warning(f"本地音频生成失败: {e}")
                     self.logger.warning("将只提供文本脚本，请考虑安装eSpeak或其他TTS引擎")
                     # 保存脚本到文件
-                    script_filename = f"youtube-{today.strftime('%Y%m%d')}-{video_id}-script.txt"
+                    script_filename = f"youtube-{today.strftime('%Y%m%d')}-{safe_title}-script.txt"
                     script_path = os.path.join(self.audio_dir, script_filename)
                     with open(script_path, 'w', encoding='utf-8') as f:
                         f.write(script)
