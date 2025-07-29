@@ -8,7 +8,11 @@ import argparse
 import logging
 import subprocess
 from pathlib import Path
+from dotenv import load_dotenv
 from scripts.core.content_pipeline import ContentPipeline
+
+# 加载环境变量
+load_dotenv()
 
 # 禁用 tensorflow 警告
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -49,17 +53,18 @@ def main():
         print("\n🛠️ 系统工具：")
         print("4. 内容变现管理")
         print("5. 系统状态检查")
-        print("6. 文章更新工具")
-        print("7. 调试和维护工具")
+        print("6. YouTube播客生成器")
+        print("7. 文章更新工具")
+        print("8. 调试和维护工具")
         print("\n0. 退出")
         
-        choice = input("\n请输入选项 (1-7/0): ").strip()
+        choice = input("\n请输入选项 (1-8/0): ").strip()
         
         # 记录用户选择的操作
         choice_names = {
             '1': '处理现有草稿', '2': '重新发布已发布文章', '3': '生成测试文章',
-            '4': '内容变现管理', '5': '系统状态检查', '6': '文章更新工具', 
-            '7': '调试和维护工具', '0': '退出'
+            '4': '内容变现管理', '5': '系统状态检查', '6': 'YouTube播客生成器',
+            '7': '文章更新工具', '8': '调试和维护工具', '0': '退出'
         }
         operation_name = choice_names.get(choice, '无效选择')
         pipeline.log(f"用户选择操作: {choice} ({operation_name})", level="info", force=True)
@@ -110,10 +115,14 @@ def main():
             handle_system_check_menu(pipeline)
             continue  # 返回主菜单
         elif choice == "6":
+            # YouTube播客生成器
+            handle_youtube_podcast_menu(pipeline)
+            continue  # 返回主菜单
+        elif choice == "7":
             # 文章更新工具
             handle_post_update_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "7":
+        elif choice == "8":
             # 调试和维护工具
             handle_debug_menu(pipeline)
             continue  # 返回主菜单
@@ -579,6 +588,230 @@ def handle_post_update_menu(pipeline):
         print("   2. 复制到草稿目录进行编辑")
         print("   3. 根据模式处理内容")
         print("   4. 更新原文章并提交Git")
+    
+    input("\n按Enter键返回主菜单...")
+
+
+def handle_youtube_podcast_menu(pipeline):
+    """处理YouTube播客生成器菜单"""
+    print("\n" + "="*40)
+    print("🎧 YouTube播客生成器")
+    print("="*40)
+    print("📋 功能说明：")
+    print("   • 将英文YouTube视频转换为中文播客")
+    print("   • 自动生成学习导读和Jekyll文章")
+    print("   • 专为英语学习和全球视野系列设计")
+    print("\n⚠️  前提条件：")
+    print("   • 需要配置GEMINI_API_KEY (用于内容生成)")
+    print("   • 可选配置YOUTUBE_API_KEY (用于视频信息获取)")
+    print("   • 确保网络连接正常访问Podcastfy服务")
+    
+    print("\n请选择操作：")
+    print("1. 生成YouTube播客学习文章")
+    print("2. 查看配置状态")
+    print("3. 使用说明和示例")
+    print("0. 返回主菜单")
+    
+    sub_choice = input("\n请输入选项 (1-3/0): ").strip()
+    pipeline.log(f"YouTube播客生成器 - 用户选择: {sub_choice}", level="info", force=True)
+    
+    if sub_choice == "1":
+        # 生成YouTube播客学习文章
+        try:
+            youtube_url = input("\n请输入YouTube视频链接: ").strip()
+            if not youtube_url:
+                print("❌ YouTube链接不能为空")
+                return
+            
+            # 验证YouTube链接格式
+            if not ("youtube.com" in youtube_url or "youtu.be" in youtube_url):
+                print("❌ 请输入有效的YouTube链接")
+                return
+            
+            custom_title = input("请输入自定义标题 (可选，留空使用自动生成): ").strip()
+            
+            # 语音设置选项
+            print("\n🎤 播客语音设置:")
+            print("1. 中文播客 (推荐)")
+            print("2. 英文播客")
+            print("3. 日文播客")  
+            print("4. 韩文播客")
+            
+            voice_choice = input("请选择播客语言 (1-4，默认1): ").strip()
+            language_map = {
+                "1": "zh-CN", "2": "en-US", "3": "ja-JP", "4": "ko-KR", "": "zh-CN"
+            }
+            target_language = language_map.get(voice_choice, "zh-CN")
+            
+            print("\n🔊 TTS模型选择:")
+            print("1. Edge TTS (免费，推荐)")
+            print("2. OpenAI TTS (需要API密钥)")
+            print("3. Google Multi-speaker (最佳质量)")
+            print("4. ElevenLabs (最高质量，需要API密钥)")
+            
+            tts_choice = input("请选择TTS模型 (1-4，默认1): ").strip()
+            tts_map = {
+                "1": "edge", "2": "openai", "3": "geminimulti", "4": "elevenlabs", "": "edge"
+            }
+            tts_model = tts_map.get(tts_choice, "edge")
+            
+            print("\n🎭 播客对话风格:")
+            print("1. 轻松聊天 (casual,informative)")
+            print("2. 学术讨论 (academic,analytical)")
+            print("3. 新闻播报 (news,professional)")
+            print("4. 深度分析 (deep-dive,expert)")
+            print("5. 自定义风格")
+            
+            style_choice = input("请选择对话风格 (1-5，默认1): ").strip()
+            style_map = {
+                "1": "casual,informative",
+                "2": "academic,analytical", 
+                "3": "news,professional",
+                "4": "deep-dive,expert",
+                "": "casual,informative"
+            }
+            
+            if style_choice == "5":
+                conversation_style = input("请输入自定义风格 (例: casual,funny,engaging): ").strip()
+                if not conversation_style:
+                    conversation_style = "casual,informative"
+            else:
+                conversation_style = style_map.get(style_choice, "casual,informative")
+            
+            print(f"\n🔄 开始处理YouTube视频...")
+            print(f"📝 语言: {target_language}, TTS: {tts_model}")
+            print("📝 这可能需要1-3分钟，请耐心等待...")
+            
+            # 导入并使用YouTube播客生成器
+            try:
+                from scripts.core.youtube_podcast_generator import YouTubePodcastGenerator
+                
+                # 获取配置
+                config = {
+                    'GEMINI_API_KEY': os.getenv('GEMINI_API_KEY'),
+                    'YOUTUBE_API_KEY': os.getenv('YOUTUBE_API_KEY')  # 可选
+                }
+                
+                if not config['GEMINI_API_KEY']:
+                    print("❌ 未配置GEMINI_API_KEY，请在.env文件中设置")
+                    return
+                
+                # 创建生成器实例
+                generator = YouTubePodcastGenerator(config)
+                pipeline.log(f"开始处理YouTube视频: {youtube_url}", level="info", force=True)
+                
+                # 生成播客和文章
+                result = generator.generate_from_youtube(
+                    youtube_url, 
+                    custom_title, 
+                    tts_model, 
+                    target_language,
+                    conversation_style
+                )
+                
+                if result['status'] == 'success':
+                    print("✅ YouTube播客生成成功!")
+                    print(f"📄 文章路径: {result['article_path']}")
+                    print(f"🎧 音频路径: {result['audio_path']}")
+                    print(f"🖼️  缩略图: {result['thumbnail_path']}")
+                    print(f"📺 原视频: {result['video_title']}")
+                    print(f"📝 文章标题: {result['article_title']}")
+                    
+                    pipeline.log(f"YouTube播客生成成功: {result['article_title']}", level="info", force=True)
+                    
+                    # 询问是否要发布
+                    publish_choice = input("\n是否要发布此文章到各平台？(y/N): ").strip().lower()
+                    if publish_choice in ['y', 'yes']:
+                        print("📝 请返回主菜单选择 '1. 处理现有草稿' 来发布文章")
+                        pipeline.log("用户选择发布文章，提示返回主菜单", level="info", force=True)
+                    else:
+                        print("📄 文章已保存到草稿目录，您可以稍后发布")
+                        
+                else:
+                    print(f"❌ 生成失败: {result.get('error', '未知错误')}")
+                    pipeline.log(f"YouTube播客生成失败: {result.get('error', '未知错误')}", level="error", force=True)
+                    
+            except ImportError as e:
+                print(f"❌ 导入模块失败: {e}")
+                print("请确保已安装必要的依赖: pip install gradio-client google-generativeai google-api-python-client")
+            except Exception as e:
+                print(f"❌ 生成过程失败: {e}")
+                pipeline.log(f"YouTube播客生成异常: {e}", level="error", force=True)
+                
+        except Exception as e:
+            print(f"❌ 操作失败: {e}")
+            
+    elif sub_choice == "2":
+        # 查看配置状态
+        print("\n🔍 配置状态检查")
+        print("="*40)
+        
+        # 检查环境变量
+        gemini_key = os.getenv('GEMINI_API_KEY')
+        youtube_key = os.getenv('YOUTUBE_API_KEY')
+        
+        print(f"GEMINI_API_KEY: {'✅ 已配置' if gemini_key else '❌ 未配置'}")
+        print(f"YOUTUBE_API_KEY: {'✅ 已配置' if youtube_key else '⚠️  未配置 (可选)'}")
+        
+        # 检查依赖
+        try:
+            import gradio_client
+            print("gradio_client: ✅ 已安装")
+        except ImportError:
+            print("gradio_client: ❌ 未安装")
+            
+        try:
+            import google.generativeai
+            print("google-generativeai: ✅ 已安装")
+        except ImportError:
+            print("google-generativeai: ❌ 未安装")
+            
+        try:
+            from googleapiclient.discovery import build
+            print("google-api-python-client: ✅ 已安装")
+        except ImportError:
+            print("google-api-python-client: ❌ 未安装")
+        
+        # 检查目录
+        dirs_to_check = ['assets/audio', 'assets/images/posts', '_drafts']
+        for dir_path in dirs_to_check:
+            path = Path(dir_path)
+            print(f"{dir_path}: {'✅ 存在' if path.exists() else '❌ 不存在'}")
+            
+    elif sub_choice == "3":
+        # 使用说明和示例
+        print("\n📖 YouTube播客生成器使用说明")
+        print("="*40)
+        print("🎯 功能概述:")
+        print("   • 输入英文YouTube视频链接")
+        print("   • 自动生成中文播客音频")
+        print("   • 创建包含导读的Jekyll文章")
+        print("   • 自动分类到全球视野系列")
+        
+        print("\n🔧 使用步骤:")
+        print("   1. 配置.env文件中的GEMINI_API_KEY")
+        print("   2. 选择 '1. 生成YouTube播客学习文章'")
+        print("   3. 输入YouTube视频链接")
+        print("   4. 等待1-3分钟自动处理")
+        print("   5. 选择是否发布到各平台")
+        
+        print("\n📋 文章结构:")
+        print("   • 📺 原始视频信息和链接")
+        print("   • 🎧 中文播客音频播放器")
+        print("   • 📋 内容大纲和要点")
+        print("   • 🌍 英语学习指南")
+        print("   • 🎯 学习建议和使用方法")
+        
+        print("\n💡 支持的YouTube链接格式:")
+        print("   • https://www.youtube.com/watch?v=VIDEO_ID")
+        print("   • https://youtu.be/VIDEO_ID")
+        print("   • https://www.youtube.com/embed/VIDEO_ID")
+        
+        print("\n⚠️  注意事项:")
+        print("   • 视频语言建议为英文")
+        print("   • 内容长度建议在60分钟以内")
+        print("   • 需要稳定的网络连接")
+        print("   • 首次使用可能需要安装额外依赖")
     
     input("\n按Enter键返回主菜单...")
 

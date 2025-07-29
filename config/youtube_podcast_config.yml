@@ -1,0 +1,124 @@
+# YouTube播客生成器配置文件
+# 用于英语学习和全球视野系列文章生成
+
+# API配置
+api_keys:
+  # Gemini API密钥 (必需)
+  # 用于内容分析和中文导读生成
+  gemini_api_key: "${GEMINI_API_KEY}"
+  
+  # YouTube Data API密钥 (可选)
+  # 用于获取视频详细信息，如未配置将使用基础信息提取
+  youtube_api_key: "${YOUTUBE_API_KEY}"
+
+# Podcastfy服务配置
+podcastfy:
+  # 托管服务端点
+  endpoint: "thatupiso/Podcastfy.ai_demo"
+  
+  # 播客生成参数
+  default_word_count: 1500
+  conversation_style: "casual,informative"
+  podcast_name: "全球视野英语学习"
+  podcast_tagline: "用中文播客理解英文内容"
+  tts_model: "edge"  # 使用免费的Edge TTS
+  creativity_level: 0.7
+
+# 内容生成配置
+content:
+  # 文章分类
+  category: "global-perspective"
+  
+  # 默认标签
+  default_tags:
+    - "英语学习"
+    - "YouTube"
+    - "全球视野"
+  
+  # 文章模板设置
+  title_prefix: "【英语学习】"
+  title_max_length: 35
+  excerpt_max_length: 60
+  
+  # 难度级别选项
+  difficulty_levels:
+    - "初级"
+    - "中级" 
+    - "高级"
+
+# 文件存储配置
+storage:
+  # 音频文件存储目录
+  audio_dir: "assets/audio"
+  
+  # 图片文件存储目录  
+  image_dir: "assets/images/posts"
+  
+  # 草稿文件存储目录
+  draft_dir: "_drafts"
+  
+  # 文件命名规则
+  naming:
+    audio: "youtube-{date}-{video_id}.mp3"
+    image: "youtube-{date}-{video_id}-thumbnail.jpg"
+    article: "{date}-youtube-learning-{video_id}.md"
+
+# Jekyll文章配置
+jekyll:
+  # 前置元数据模板
+  frontmatter:
+    layout: "single"  # 使用Jekyll主题的单页布局
+    classes: "wide"   # 宽页面布局
+    
+  # 资产路径配置
+  asset_base_url: "{{ site.baseurl }}/assets"
+  
+  # 音频播放器配置
+  audio_player:
+    controls: true
+    preload: "metadata"
+    
+# 内容处理配置
+processing:
+  # Gemini内容生成提示模板
+  prompts:
+    content_guide: |
+      请为以下英文YouTube视频生成一篇中文导读文章，用于英语学习：
+
+      视频标题: {title}
+      视频描述: {description}
+      频道: {channel}
+      时长: {duration}
+      
+      请生成以下内容：
+      1. 25-35字符的中文标题（前缀：【英语学习】）
+      2. 50-60字的文章摘要
+      3. 4-5个要点的内容大纲
+      4. 英语学习建议（关键词汇、表达方式、文化背景）
+      5. 3-5个相关标签
+      
+      要求：
+      - 强调全球视野和学习价值
+      - 内容要吸引中文读者
+      - 突出英语学习的实用性
+      - 保持客观和专业的语调
+      
+      请以JSON格式返回。
+
+# 日志配置
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+# 错误处理配置
+error_handling:
+  # 失败重试次数
+  max_retries: 3
+  
+  # 超时设置（秒）
+  timeout: 300
+  
+  # 降级选项
+  fallback:
+    use_basic_video_info: true
+    default_thumbnail: true

@@ -14,6 +14,10 @@ filetype>=1.2.0
 python-frontmatter>=1.0.0
 google-generativeai>=0.3.0
 
+# YouTube播客生成器专用依赖
+gradio-client>=0.8.0  # Podcastfy API客户端
+google-api-python-client>=2.0.0  # YouTube Data API (可选)
+
 # 微信内容变现系统新增依赖
 weasyprint>=60.0  # PDF生成
 fonttools>=4.42.0  # 字体支持
