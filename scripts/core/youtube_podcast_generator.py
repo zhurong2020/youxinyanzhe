@@ -339,12 +339,11 @@ class YouTubePodcastGenerator:
         clean_text = re.sub(r'\[.*?\]:\s*', '', script)
         clean_text = clean_text.replace('\n', ' ').strip()
         
-        # 限制文本长度以避免过长的音频
-        if len(clean_text) > 3000:
-            clean_text = clean_text[:3000] + "..."
-            self.logger.info("文本过长，已截取前3000字符")
-            
         self.logger.info(f"🎧 开始音频生成 - 引擎: {tts_engine}, 文本长度: {len(clean_text)}字符")
+        
+        # 对于超长文本，gTTS库会自动分块处理，无需人为截断
+        if len(clean_text) > 5000:
+            self.logger.info("💡 检测到超长文本，gTTS将自动分块处理以保证完整性")
         
         # 1. 优先尝试Google TTS（最佳音质）
         if tts_engine == "gtts":
