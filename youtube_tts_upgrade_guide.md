@@ -43,7 +43,7 @@ pip install -r requirements.txt
 ### 测试命令
 ```bash
 # 测试Google TTS
-python -c "from gtts import gTTS; tts = gTTS('这是Google TTS测试', lang='zh-cn'); tts.save('test_gtts.mp3')"
+python -c "from gtts import gTTS; tts = gTTS('这是Google TTS测试', lang='zh-CN'); tts.save('test_gtts.mp3')"
 
 # 测试eSpeak
 espeak -v zh -s 150 "这是eSpeak测试" -w test_espeak.wav

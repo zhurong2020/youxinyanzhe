@@ -51,12 +51,18 @@ class YouTubePodcastGenerator:
             os.makedirs(directory, exist_ok=True)
     
     def setup_logging(self):
-        """设置日志"""
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
+        """设置日志 - 避免重复配置"""
         self.logger = logging.getLogger(__name__)
+        
+        # 检查是否已经配置过处理器，避免重复日志
+        if not self.logger.handlers:
+            # 只有在没有处理器时才添加
+            handler = logging.StreamHandler()
+            handler.setFormatter(logging.Formatter(
+                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            ))
+            self.logger.addHandler(handler)
+            self.logger.setLevel(logging.INFO)
     
     def setup_apis(self):
         """设置API连接"""
@@ -368,7 +374,7 @@ class YouTubePodcastGenerator:
             self.logger.info("尝试使用Google TTS生成音频")
             
             # 创建gTTS对象
-            tts = gTTS(text=text, lang='zh-cn', slow=False)
+            tts = gTTS(text=text, lang='zh-CN', slow=False)
             
             # 保存到临时文件
             temp_path = output_path.replace('.wav', '_temp.mp3')
@@ -536,9 +542,22 @@ class YouTubePodcastGenerator:
             return "fallback_mode"  # 标识使用备用模式
         
         try:
-            # 确保URL格式正确，去除可能的换行符、空格和特殊字符
-            clean_url = youtube_url.strip().replace('\n', '').replace('\r', '')
-            self.logger.info(f"处理的URL: {clean_url}")
+            # 强化URL和字符串清理 - 移除所有不可打印字符
+            def clean_string(s: str) -> str:
+                """清理字符串中的不可打印字符"""
+                if not s:
+                    return ""
+                # 移除换行符、回车符、制表符等不可打印字符
+                cleaned = re.sub(r'[\n\r\t\x00-\x1f\x7f-\x9f]', '', str(s).strip())
+                return cleaned
+            
+            clean_url = clean_string(youtube_url)
+            clean_style = clean_string(custom_style)
+            clean_language = clean_string(target_language)
+            clean_instructions = clean_string(f"请生成一个关于YouTube视频的中文播客，目标语言是{clean_language}，内容要适合英语学习者收听")
+            
+            self.logger.info(f"🔍 清理后的URL: {clean_url}")
+            self.logger.info(f"🎭 清理后的风格: {clean_style}")
             
             # 使用正确的API端点和参数
             result = self.podcastfy_client.predict(
@@ -546,19 +565,19 @@ class YouTubePodcastGenerator:
                 urls_input=clean_url,
                 pdf_files=[],
                 image_files=[],
-                gemini_key=self.config['GEMINI_API_KEY'],
+                gemini_key=clean_string(self.config['GEMINI_API_KEY']),
                 openai_key="",  # 使用Edge TTS，不需要OpenAI密钥
                 elevenlabs_key="",  # 不使用ElevenLabs
                 word_count=1500,
-                conversation_style=custom_style,
-                roles_person1="主播助手",  # 新增角色1
-                roles_person2="学习导师",  # 新增角色2
-                dialogue_structure="引言,内容总结,学习要点,结语",  # 新增对话结构
-                podcast_name="全球视野英语学习",
-                podcast_tagline="用中文播客理解英文内容",
+                conversation_style=clean_style,
+                roles_person1=clean_string("主播助手"),
+                roles_person2=clean_string("学习导师"),
+                dialogue_structure=clean_string("引言,内容总结,学习要点,结语"),
+                podcast_name=clean_string("全球视野英语学习"),
+                podcast_tagline=clean_string("用中文播客理解英文内容"),
                 tts_model="edge",  # Podcastfy只支持edge, openai, elevenlabs
                 creativity_level=0.7,
-                user_instructions=f"请生成一个关于YouTube视频的中文播客目标语言是{target_language}内容要适合英语学习者收听".replace('\n', ' ').replace('\r', ''),
+                user_instructions=clean_instructions,
                 api_name="/process_inputs"  # 使用正确的API端点
             )
             

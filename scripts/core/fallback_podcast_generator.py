@@ -56,12 +56,18 @@ class FallbackPodcastGenerator:
             os.makedirs(directory, exist_ok=True)
     
     def setup_logging(self):
-        """设置日志"""
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
+        """设置日志 - 避免重复配置"""
         self.logger = logging.getLogger(__name__)
+        
+        # 检查是否已经配置过处理器，避免重复日志
+        if not self.logger.handlers:
+            # 只有在没有处理器时才添加
+            handler = logging.StreamHandler()
+            handler.setFormatter(logging.Formatter(
+                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            ))
+            self.logger.addHandler(handler)
+            self.logger.setLevel(logging.INFO)
     
     def setup_apis(self):
         """设置API连接"""
