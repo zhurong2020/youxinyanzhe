@@ -749,9 +749,11 @@ def handle_youtube_podcast_menu(pipeline):
         # 检查环境变量
         gemini_key = os.getenv('GEMINI_API_KEY')
         youtube_key = os.getenv('YOUTUBE_API_KEY')
+        elevenlabs_key = os.getenv('ELEVENLABS_API_KEY')
         
         print(f"GEMINI_API_KEY: {'✅ 已配置' if gemini_key else '❌ 未配置'}")
         print(f"YOUTUBE_API_KEY: {'✅ 已配置' if youtube_key else '⚠️  未配置 (可选)'}")
+        print(f"ELEVENLABS_API_KEY: {'✅ 已配置' if elevenlabs_key else '⚠️  未配置 (可选，但推荐)'}")
         
         # 检查依赖
         try:
@@ -771,6 +773,12 @@ def handle_youtube_podcast_menu(pipeline):
             print("google-api-python-client: ✅ 已安装")
         except ImportError:
             print("google-api-python-client: ❌ 未安装")
+            
+        try:
+            import elevenlabs
+            print("elevenlabs: ✅ 已安装")
+        except ImportError:
+            print("elevenlabs: ❌ 未安装 (可选，但推荐安装获得最高音质)")
         
         # 检查目录
         dirs_to_check = ['assets/audio', 'assets/images/posts', '_drafts']
