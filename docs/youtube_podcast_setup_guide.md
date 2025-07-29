@@ -19,6 +19,23 @@ pip install -r requirements_youtube_only.txt
 pip install gradio-client google-api-python-client
 ```
 
+### 4. 本地TTS支持（推荐）
+
+为了支持本地音频生成，建议安装eSpeak TTS引擎：
+
+#### Ubuntu/Debian系统
+```bash
+sudo apt-get update
+sudo apt-get install -y espeak espeak-data
+```
+
+#### 验证安装
+```bash
+espeak "Hello World" -v zh -s 150
+```
+
+如果听到语音输出，说明安装成功。如果无法安装eSpeak，系统会生成播客文本脚本并提供替代学习方案。
+
 ### 2. 配置API密钥
 
 确保在`.env`文件中配置以下密钥：
