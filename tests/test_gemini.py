@@ -42,8 +42,10 @@ def gemini_model():
         model_names = [model.name for model in models]
         logging.info(f"Available models: {model_names}")
         
-        # 优先选择 Gemini 2.0 模型
+        # 优先选择 Gemini 2.5 模型
         preferred_models = [
+            "models/gemini-2.5-flash",
+            "models/gemini-2.5-pro",
             "models/gemini-2.0-flash",
             "models/gemini-2.0-pro",
             "models/gemini-1.5-flash",
@@ -70,7 +72,7 @@ def gemini_model():
             if gemini_models:
                 model_name = gemini_models[0]
             else:
-                model_name = "models/gemini-2.0-flash"  # 默认值
+                model_name = "models/gemini-2.5-flash"  # 默认值
         
         logging.info(f"Using model: {model_name}")
         
