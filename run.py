@@ -56,15 +56,16 @@ def main():
         print("6. YouTube播客生成器")
         print("7. 文章更新工具")
         print("8. 调试和维护工具")
+        print("9. LLM引擎切换")
         print("\n0. 退出")
         
-        choice = input("\n请输入选项 (1-8/0): ").strip()
+        choice = input("\n请输入选项 (1-9/0): ").strip()
         
         # 记录用户选择的操作
         choice_names = {
             '1': '处理现有草稿', '2': '重新发布已发布文章', '3': '生成测试文章',
             '4': '内容变现管理', '5': '系统状态检查', '6': 'YouTube播客生成器',
-            '7': '文章更新工具', '8': '调试和维护工具', '0': '退出'
+            '7': '文章更新工具', '8': '调试和维护工具', '9': 'LLM引擎切换', '0': '退出'
         }
         operation_name = choice_names.get(choice, '无效选择')
         pipeline.log(f"用户选择操作: {choice} ({operation_name})", level="info", force=True)
@@ -125,6 +126,10 @@ def main():
         elif choice == "8":
             # 调试和维护工具
             handle_debug_menu(pipeline)
+            continue  # 返回主菜单
+        elif choice == "9":
+            # LLM引擎切换
+            handle_llm_engine_menu(pipeline)
             continue  # 返回主菜单
         elif choice == "0":
             print("👋 再见！")
@@ -984,6 +989,284 @@ def handle_debug_menu(pipeline):
                 print(f"❌ 清理失败: {e}")
         else:
             print("已取消操作")
+    
+    input("\n按Enter键返回主菜单...")
+
+
+def handle_llm_engine_menu(pipeline):
+    """处理LLM引擎切换菜单"""
+    print("\n" + "="*40)
+    print("🤖 LLM引擎切换管理")
+    print("="*40)
+    print("📋 功能说明：")
+    print("   • 管理AI引擎使用模式")
+    print("   • Claude Pro订阅 + 备用API引擎切换")
+    print("   • 查看当前引擎状态和模型信息")
+    print("\n💡 使用模式说明：")
+    print("   • Claude: 使用您的Claude Pro订阅 ($20/月)")
+    print("   • 千问3-code: 备用API引擎 (阿里云)")
+    print("   • Kimi K2: 备用API引擎 (月之暗面, 高性价比)")
+    print("\n⚠️  注意事项：")
+    print("   • 当Claude Pro达到月度限制时，可切换到备用引擎")
+    print("   • 备用引擎按使用量付费，适合突发需求")
+    
+    # 检查当前状态
+    current_base_url = os.getenv('ANTHROPIC_BASE_URL', '')
+    current_auth_token = os.getenv('ANTHROPIC_AUTH_TOKEN', '')
+    current_api_key = os.getenv('ANTHROPIC_API_KEY', '')
+    
+    if current_base_url and 'dashscope.aliyuncs.com' in current_base_url:
+        current_engine = "千问3-code (Qwen)"
+        engine_status = "🟢 活跃"
+        model_info = "qwen3-code (1万亿参数MoE)"
+    elif current_base_url and 'moonshot.ai' in current_base_url:
+        current_engine = "Kimi K2 (Moonshot)"
+        engine_status = "🟢 活跃"
+        model_info = "kimi-k2 (1万亿参数MoE, 128K上下文)"
+    elif current_api_key and current_api_key.startswith('sk-ant-'):
+        current_engine = "Claude API"
+        engine_status = "🟢 活跃"
+        model_info = "claude-3.5-sonnet (API模式)"
+    else:
+        current_engine = "Claude Pro (默认)"
+        engine_status = "🟢 活跃"
+        model_info = "claude-3.5-sonnet (Pro订阅)"
+    
+    print(f"\n📊 当前状态：")
+    print(f"   • 当前引擎: {current_engine}")
+    print(f"   • 状态: {engine_status}")
+    print(f"   • 模型信息: {model_info}")
+    
+    print("\n请选择操作：")
+    print("1. 恢复Claude Pro模式 (默认)")
+    print("2. 切换到千问3-code引擎")
+    print("3. 切换到Kimi K2引擎")
+    print("4. 查看引擎配置详情")
+    print("5. 测试当前引擎连接")
+    print("6. 重置引擎配置")
+    print("0. 返回主菜单")
+    
+    sub_choice = input("\n请输入选项 (1-6/0): ").strip()
+    pipeline.log(f"LLM引擎切换 - 用户选择: {sub_choice}", level="info", force=True)
+    
+    if sub_choice == "1":
+        # 恢复Claude Pro模式
+        print("\n🔄 恢复Claude Pro模式...")
+        try:
+            # 清除所有API配置，恢复默认Claude Pro模式
+            env_vars_to_clear = ['ANTHROPIC_BASE_URL', 'ANTHROPIC_AUTH_TOKEN', 'ANTHROPIC_API_KEY']
+            cleared_vars = []
+            
+            for var in env_vars_to_clear:
+                if var in os.environ:
+                    del os.environ[var]
+                    cleared_vars.append(var)
+            
+            print("✅ 已恢复Claude Pro模式")
+            print("📝 配置详情：")
+            print("   • 使用模式: Claude Pro订阅 ($20/月)")
+            print("   • 认证方式: 浏览器登录 (非API)")
+            print("   • 计费方式: 包月订阅")
+            print("   • 使用限制: Claude Pro用户限制")
+            if cleared_vars:
+                print("   • 已清除的API配置:", ", ".join(cleared_vars))
+            
+            pipeline.log("LLM引擎恢复到Claude Pro模式", level="info", force=True)
+            
+        except Exception as e:
+            print(f"❌ 恢复失败: {e}")
+            pipeline.log(f"LLM引擎恢复到Claude Pro失败: {e}", level="error", force=True)
+    
+    elif sub_choice == "2":
+        # 切换到千问3-code引擎
+        print("\n🔄 切换到千问3-code引擎...")
+        try:
+            # 设置千问配置
+            qwen_api_key = "sk-258b0d7d3f39412f93b43df2e9446b43"
+            qwen_base_url = "https://dashscope.aliyuncs.com/api/v2"
+            
+            # 清除Claude配置
+            if 'ANTHROPIC_API_KEY' in os.environ:
+                del os.environ['ANTHROPIC_API_KEY']
+            
+            # 设置千问配置
+            os.environ['ANTHROPIC_BASE_URL'] = qwen_base_url
+            os.environ['ANTHROPIC_AUTH_TOKEN'] = qwen_api_key
+            
+            print("✅ 已切换到千问3-code引擎")
+            print("📝 配置详情：")
+            print(f"   • ANTHROPIC_BASE_URL: {qwen_base_url}")
+            print(f"   • ANTHROPIC_AUTH_TOKEN: {qwen_api_key[:8]}...{qwen_api_key[-8:]}")
+            print("   • ANTHROPIC_API_KEY: 🚫 已清除")
+            
+            pipeline.log("LLM引擎切换到千问3-code", level="info", force=True)
+            
+        except Exception as e:
+            print(f"❌ 切换失败: {e}")
+            pipeline.log(f"LLM引擎切换到千问3-code失败: {e}", level="error", force=True)
+    
+    elif sub_choice == "3":
+        # 切换到Kimi K2引擎
+        print("\n🔄 切换到Kimi K2引擎...")
+        try:
+            # 设置Kimi K2配置
+            kimi_api_key = "sk-qAvR9EygbSliadXY3OTnxPIqruyF27uPQQakXyOWVQOxH1D5"
+            kimi_base_url = "https://api.moonshot.ai/anthropic"
+            
+            # 清除其他配置
+            if 'ANTHROPIC_API_KEY' in os.environ:
+                del os.environ['ANTHROPIC_API_KEY']
+            
+            # 设置Kimi K2配置
+            os.environ['ANTHROPIC_BASE_URL'] = kimi_base_url
+            os.environ['ANTHROPIC_AUTH_TOKEN'] = kimi_api_key
+            
+            print("✅ 已切换到Kimi K2引擎")
+            print("📝 配置详情：")
+            print(f"   • ANTHROPIC_BASE_URL: {kimi_base_url}")
+            print(f"   • ANTHROPIC_AUTH_TOKEN: {kimi_api_key[:8]}...{kimi_api_key[-8:]}")
+            print("   • ANTHROPIC_API_KEY: 🚫 已清除")
+            print("   • 模型特性: 1万亿参数MoE, 128K上下文长度")
+            print("   • 定价: $0.6/M输入, $2.5/M输出")
+            print("   • SWE-Bench得分: 65.8%")
+            
+            pipeline.log("LLM引擎切换到Kimi K2", level="info", force=True)
+            
+        except Exception as e:
+            print(f"❌ 切换失败: {e}")
+            pipeline.log(f"LLM引擎切换到Kimi K2失败: {e}", level="error", force=True)
+    
+    elif sub_choice == "4":
+        # 查看引擎配置详情
+        print("\n🔍 引擎配置详情")
+        print("="*40)
+        
+        # 检查环境变量
+        anthropic_api_key = os.getenv('ANTHROPIC_API_KEY', '')
+        anthropic_base_url = os.getenv('ANTHROPIC_BASE_URL', '')
+        anthropic_auth_token = os.getenv('ANTHROPIC_AUTH_TOKEN', '')
+        
+        print("📊 环境变量状态：")
+        print(f"ANTHROPIC_API_KEY: {'✅ 已设置 (' + anthropic_api_key[:8] + '...' + anthropic_api_key[-4:] + ')' if anthropic_api_key else '❌ 未设置'}")
+        print(f"ANTHROPIC_BASE_URL: {'✅ ' + anthropic_base_url if anthropic_base_url else '❌ 未设置 (使用默认)'}")
+        print(f"ANTHROPIC_AUTH_TOKEN: {'✅ 已设置 (' + anthropic_auth_token[:8] + '...' + anthropic_auth_token[-8:] + ')' if anthropic_auth_token else '❌ 未设置'}")
+        
+        print("\n🎯 引擎识别：")
+        if anthropic_base_url and 'dashscope.aliyuncs.com' in anthropic_base_url:
+            print("   • 当前配置：千问3-code (阿里云)")
+            print("   • 模型：qwen3-code")
+            print("   • 提供商：阿里云DashScope")
+            print("   • 特性：1万亿参数MoE架构")
+        elif anthropic_base_url and 'moonshot.ai' in anthropic_base_url:
+            print("   • 当前配置：Kimi K2 (月之暗面)")
+            print("   • 模型：kimi-k2")
+            print("   • 提供商：Moonshot AI")
+            print("   • 特性：1万亿参数MoE, 128K上下文, SWE-Bench 65.8%")
+        elif anthropic_api_key and anthropic_api_key.startswith('sk-ant-'):
+            print("   • 当前配置：Claude API模式")
+            print("   • 提供商：Anthropic")
+            print("   • 计费：按token使用量")
+            print("   • 特性：多模态能力, 高质量推理")
+        else:
+            print("   • 当前配置：Claude Pro模式 (默认)")
+            print("   • 提供商：Anthropic")
+            print("   • 计费：$20/月订阅")
+            print("   • 特性：浏览器登录, 包月使用")
+        
+        print("\n💡 配置说明：")
+        print("   • Claude Pro: 默认模式，使用您的$20/月订阅")
+        print("   • 千问3-code: 备用API，使用 ANTHROPIC_BASE_URL + AUTH_TOKEN")
+        print("   • Kimi K2: 备用API，使用 ANTHROPIC_BASE_URL + AUTH_TOKEN")
+        print("   • 三种模式互斥，同时只能使用一种")
+        
+        print("\n💰 成本对比：")
+        print("   • Claude Pro: $20/月固定 (推荐日常使用)")
+        print("   • 千问3-code: 按量付费 (备用选择)")
+        print("   • Kimi K2: $0.6/M输入, $2.5/M输出 (高性价比备用)")
+    
+    elif sub_choice == "5":
+        # 测试当前引擎连接
+        print("\n🧪 测试当前引擎连接...")
+        try:
+            # 这里可以添加实际的连接测试代码
+            # 目前只显示配置状态，因为实际测试需要调用相应的API
+            
+            anthropic_api_key = os.getenv('ANTHROPIC_API_KEY', '')
+            anthropic_base_url = os.getenv('ANTHROPIC_BASE_URL', '')
+            anthropic_auth_token = os.getenv('ANTHROPIC_AUTH_TOKEN', '')
+            
+            if anthropic_base_url and anthropic_auth_token:
+                if 'dashscope.aliyuncs.com' in anthropic_base_url:
+                    print("🟡 千问3-code引擎配置检测")
+                    print(f"   • Base URL: {anthropic_base_url}")
+                    print(f"   • Auth Token: 已配置")
+                    print("   • 模型: qwen3-code (1万亿参数MoE)")
+                    print("   • 状态: 配置完整，建议手动测试")
+                elif 'moonshot.ai' in anthropic_base_url:
+                    print("🟡 Kimi K2引擎配置检测")
+                    print(f"   • Base URL: {anthropic_base_url}")
+                    print(f"   • Auth Token: 已配置")
+                    print("   • 模型: kimi-k2 (1万亿参数MoE, 128K上下文)")
+                    print("   • 定价: $0.6/M输入, $2.5/M输出")
+                    print("   • 状态: 配置完整，建议手动测试")
+                else:
+                    print("🟡 未知引擎配置检测")
+                    print(f"   • Base URL: {anthropic_base_url}")
+                    print("   • 状态: 配置存在但引擎未识别")
+            elif anthropic_api_key:
+                print("🟡 Claude API模式配置检测")
+                print("   • API Key: 已配置")
+                print("   • 模型: claude-3.5-sonnet (多模态)")
+                print("   • 计费: 按token使用量")
+                print("   • 状态: 配置完整，建议手动测试")
+            else:
+                print("🟢 Claude Pro模式 (默认)")
+                print("   • 认证: 浏览器登录")
+                print("   • 模型: claude-3.5-sonnet")
+                print("   • 计费: $20/月订阅")
+                print("   • 状态: 默认模式，无需额外配置")
+            
+            print("\n💡 提示：")
+            print("   • 完整的连接测试需要实际调用API")
+            print("   • 可以通过运行内容生成功能来验证引擎")
+            print("   • 如果遇到错误，请检查API密钥有效性")
+            
+        except Exception as e:
+            print(f"❌ 测试失败: {e}")
+    
+    elif sub_choice == "6":
+        # 重置引擎配置
+        print("\n🔄 重置引擎配置...")
+        print("⚠️  此操作将清除所有LLM引擎相关的环境变量")
+        
+        confirm = input("\n确认重置配置？(y/N): ").strip().lower()
+        if confirm in ['y', 'yes']:
+            try:
+                # 清除所有相关环境变量
+                env_vars_to_clear = ['ANTHROPIC_API_KEY', 'ANTHROPIC_BASE_URL', 'ANTHROPIC_AUTH_TOKEN']
+                cleared_vars = []
+                
+                for var in env_vars_to_clear:
+                    if var in os.environ:
+                        del os.environ[var]
+                        cleared_vars.append(var)
+                
+                if cleared_vars:
+                    print("✅ 配置重置完成")
+                    print("📝 已清除的环境变量：")
+                    for var in cleared_vars:
+                        print(f"   • {var}")
+                else:
+                    print("📋 没有需要清除的配置")
+                
+                print("\n💡 下次使用时请重新配置引擎")
+                pipeline.log("LLM引擎配置已重置", level="info", force=True)
+                
+            except Exception as e:
+                print(f"❌ 重置失败: {e}")
+                pipeline.log(f"LLM引擎配置重置失败: {e}", level="error", force=True)
+        else:
+            print("已取消重置操作")
     
     input("\n按Enter键返回主菜单...")
 
