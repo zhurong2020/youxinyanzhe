@@ -208,6 +208,36 @@ class YouTubePodcastGenerator:
         
         return "".join(parts) if parts else "0秒"
     
+    def _generate_safe_filename(self, title: str, max_length: int = 50) -> str:
+        """
+        从标题生成安全的文件名
+        
+        Args:
+            title: 原始标题
+            max_length: 最大长度
+            
+        Returns:
+            安全的文件名
+        """
+        # 移除特殊字符，只保留字母、数字、中文和连字符
+        safe_title = re.sub(r'[^\w\u4e00-\u9fa5\s-]', '', title)
+        
+        # 将空格替换为连字符
+        safe_title = re.sub(r'\s+', '-', safe_title.strip())
+        
+        # 移除多余的连字符
+        safe_title = re.sub(r'-+', '-', safe_title)
+        
+        # 限制长度
+        if len(safe_title) > max_length:
+            safe_title = safe_title[:max_length].rstrip('-')
+        
+        # 如果结果为空，使用默认名称
+        if not safe_title:
+            safe_title = "youtube-video"
+            
+        return safe_title.lower()
+    
     def generate_podcast_script(self, video_info: Dict[str, Any], youtube_url: str, 
                               target_language: str = "zh-CN",
                               conversation_style: str = "casual,informative") -> str:
@@ -217,24 +247,29 @@ class YouTubePodcastGenerator:
         self.logger.info("开始生成播客脚本")
         
         prompt = f"""
-        请为以下YouTube视频生成一个中文播客脚本，包含两个主播的对话：
+        请为以下YouTube视频生成一个详细的中文播客脚本，包含两个主播的深度对话：
 
         视频标题: {video_info['title']}
-        视频描述: {video_info['description'][:500]}...
+        视频描述: {video_info['description'][:1000] if video_info['description'] else '暂无描述'}
         频道: {video_info['channel_title']}
         时长: {video_info['duration']}
         
         要求：
-        1. 生成一个约5-8分钟的播客对话脚本
-        2. 两个角色：主播助手（负责介绍和总结）和学习导师（负责提问和解释）
-        3. 对话风格：{conversation_style}
+        1. 生成一个约8-12分钟的详细播客对话脚本（约2000-3000字）
+        2. 两个角色：
+           - 主播助手：负责引导话题、总结要点、提供背景信息
+           - 学习导师：负责深度分析、解释概念、提供学习建议
+        3. 对话风格：{conversation_style}，但要保持专业性和教育性
         4. 目标语言：{target_language}
-        5. 内容要适合英语学习者收听
-        6. 包含以下结构：
-           - 开场白（30秒）
-           - 内容总结（3-4分钟）
-           - 学习要点（2-3分钟）
-           - 结语（30秒）
+        5. 内容要适合英语学习者收听，包含丰富的背景知识和学习价值
+        6. 详细结构：
+           - 开场白和背景介绍（1-2分钟）
+           - 视频内容深度解析（4-6分钟）
+           - 关键概念和词汇解释（2-3分钟）
+           - 学习方法和建议（1-2分钟）
+           - 总结和展望（1分钟）
+        7. 每个部分都要有充实的内容，避免空洞的对话
+        8. 加入相关的文化背景、行业知识、技术解释等增值内容
         
         请以以下格式输出：
         [主播助手]: 对话内容
@@ -316,8 +351,8 @@ class YouTubePodcastGenerator:
             return "fallback_mode"  # 标识使用备用模式
         
         try:
-            # 确保URL格式正确，去除可能的换行符和空格
-            clean_url = youtube_url.strip()
+            # 确保URL格式正确，去除可能的换行符、空格和特殊字符
+            clean_url = youtube_url.strip().replace('\n', '').replace('\r', '')
             self.logger.info(f"处理的URL: {clean_url}")
             
             # 使用正确的API端点和参数
@@ -513,13 +548,15 @@ class YouTubePodcastGenerator:
         """
         today = datetime.now()
         
-        # 生成文件名
+        # 生成文件名 - 使用有意义的标题而非视频ID
         video_id = self.extract_video_id(youtube_url)
-        article_filename = f"{today.strftime('%Y-%m-%d')}-youtube-learning-{video_id}.md"
+        # 从视频标题生成安全的文件名
+        safe_title = self._generate_safe_filename(video_info['title'])
+        article_filename = f"{today.strftime('%Y-%m-%d')}-youtube-{safe_title}.md"
         article_path = os.path.join(self.draft_dir, article_filename)
         
         # 生成相对路径（用于Jekyll）
-        audio_relative = audio_path.replace("assets/", "{{ site.baseurl }}/assets/")
+        audio_relative = audio_path.replace("assets/", "{{ site.baseurl }}/assets/") if audio_path else None
         thumbnail_relative = thumbnail_path.replace("assets/", "{{ site.baseurl }}/assets/") if thumbnail_path else ""
         
         # 构建文章内容
@@ -540,12 +577,19 @@ header:
 <!-- more -->
 
 ## 🎧 中文播客导读
-<audio controls>
+{f'''<audio controls>
   <source src="{audio_relative}" type="audio/mpeg">
   您的浏览器不支持音频播放。
 </audio>
 
-*建议配合原视频食用，通过中文播客快速理解英文内容精华*
+*建议配合原视频食用，通过中文播客快速理解英文内容精华*''' if audio_relative else '''
+> ⚠️ **音频生成失败**：本次未能生成音频文件，但播客文本脚本已保存在 `assets/audio/` 目录中。
+> 
+> 建议：
+> 1. 查看文本脚本了解播客内容结构
+> 2. 直接观看英文原视频进行学习
+> 3. 可考虑安装 eSpeak TTS 引擎以支持本地音频生成
+'''}
 
 ## 📋 内容大纲
 """
@@ -637,16 +681,21 @@ header:
                 audio_filename = f"youtube-{today.strftime('%Y%m%d')}-{video_id}.wav"
                 audio_path = os.path.join(self.audio_dir, audio_filename)
                 
-                if self.generate_local_audio(script, audio_path):
-                    self.logger.info(f"本地音频生成成功: {audio_path}")
-                else:
-                    self.logger.warning("本地音频生成失败，将只提供文本脚本")
+                try:
+                    if self.generate_local_audio(script, audio_path):
+                        self.logger.info(f"本地音频生成成功: {audio_path}")
+                    else:
+                        raise Exception("TTS引擎不可用")
+                except Exception as e:
+                    self.logger.warning(f"本地音频生成失败: {e}")
+                    self.logger.warning("将只提供文本脚本，请考虑安装eSpeak或其他TTS引擎")
                     # 保存脚本到文件
                     script_filename = f"youtube-{today.strftime('%Y%m%d')}-{video_id}-script.txt"
                     script_path = os.path.join(self.audio_dir, script_filename)
                     with open(script_path, 'w', encoding='utf-8') as f:
                         f.write(script)
-                    audio_path = script_path
+                    # 设置音频路径为None，表示没有音频文件
+                    audio_path = None
             else:
                 # 使用Podcastfy生成的音频
                 audio_path = self.save_audio_file(temp_audio_path, video_id)

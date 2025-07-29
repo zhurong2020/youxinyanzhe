@@ -381,7 +381,9 @@ class FallbackPodcastGenerator:
         
         # 生成文件名
         video_id = self.extract_video_id(youtube_url)
-        article_filename = f"{today.strftime('%Y-%m-%d')}-youtube-learning-{video_id}.md"
+        # 从视频标题生成安全的文件名
+        safe_title = self._generate_safe_filename(video_info['title'])
+        article_filename = f"{today.strftime('%Y-%m-%d')}-youtube-{safe_title}.md"
         article_path = os.path.join(self.draft_dir, article_filename)
         
         # 生成相对路径（用于Jekyll）
