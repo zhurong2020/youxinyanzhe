@@ -298,8 +298,27 @@ class YouTubePodcastGenerator:
         """
         self.logger.info("开始生成播客脚本")
         
+        # 解析视频时长，智能调整播客长度
+        duration_str = video_info.get('duration', '未知')
+        try:
+            # 尝试从时长字符串中提取分钟数
+            import re
+            duration_match = re.search(r'(\d+)分钟|(\d+):\d+', duration_str)
+            if duration_match:
+                video_minutes = int(duration_match.group(1) or duration_match.group(2))
+                # 播客长度不超过原视频的80%，但至少5分钟
+                podcast_minutes = max(5, min(10, int(video_minutes * 0.8)))
+                word_count = podcast_minutes * 250  # 每分钟约250字
+            else:
+                podcast_minutes = 6
+                word_count = 1500
+        except:
+            # 默认值
+            podcast_minutes = 6
+            word_count = 1500
+        
         prompt = f"""
-        请为以下YouTube视频生成一个详细的中文播客脚本，包含两个主播的深度对话：
+        请为以下YouTube视频生成一个简洁高效的中文播客脚本，包含两个主播的对话：
 
         视频标题: {video_info['title']}
         视频描述: {video_info['description'][:1000] if video_info['description'] else '暂无描述'}
@@ -307,27 +326,24 @@ class YouTubePodcastGenerator:
         时长: {video_info['duration']}
         
         要求：
-        1. 生成一个约8-12分钟的详细播客对话脚本（约2000-3000字）
+        1. 生成约{podcast_minutes}分钟的播客脚本（约{word_count}字）
         2. 两个角色：
-           - 主播助手：负责引导话题、总结要点、提供背景信息
-           - 学习导师：负责深度分析、解释概念、提供学习建议
-        3. 对话风格：{conversation_style}，但要保持专业性和教育性
+           - 主播助手：负责引导话题、总结要点
+           - 学习导师：负责核心分析、提供学习建议
+        3. 对话风格：{conversation_style}，保持专业且简洁
         4. 目标语言：{target_language}
-        5. 内容要适合英语学习者收听，包含丰富的背景知识和学习价值
-        6. 详细结构：
-           - 开场白和背景介绍（1-2分钟）
-           - 视频内容深度解析（4-6分钟）
-           - 关键概念和词汇解释（2-3分钟）
-           - 学习方法和建议（1-2分钟）
-           - 总结和展望（1分钟）
-        7. 每个部分都要有充实的内容，避免空洞的对话
-        8. 加入相关的文化背景、行业知识、技术解释等增值内容
+        5. 内容结构：
+           - 简要开场和背景（30秒）
+           - 核心内容精华解析（{podcast_minutes-2}分钟）
+           - 学习要点总结（1分钟）
+           - 简短结语（30秒）
+        6. 重点突出，避免冗长重复，确保每句话都有价值
         
         请以以下格式输出：
         [主播助手]: 对话内容
         [学习导师]: 对话内容
         
-        确保对话自然流畅，信息丰富且具有教育价值。
+        确保对话紧凑高效，信息密度高。
         """
         
         try:
@@ -356,9 +372,23 @@ class YouTubePodcastGenerator:
             output_path: 输出音频文件路径
             tts_engine: TTS引擎选择 ("gtts", "elevenlabs", "espeak", "pyttsx3")
         """
-        # 处理脚本，移除角色标签和格式化
-        clean_text = re.sub(r'\[.*?\]:\s*', '', script)
+        # 处理脚本，移除角色标签和Markdown格式
+        clean_text = re.sub(r'\[.*?\]:\s*', '', script)  # 移除角色标签
+        
+        # 移除Markdown格式标识
+        clean_text = re.sub(r'\*\*(.*?)\*\*', r'\1', clean_text)  # **粗体** -> 粗体
+        clean_text = re.sub(r'\*(.*?)\*', r'\1', clean_text)      # *斜体* -> 斜体  
+        clean_text = re.sub(r'`(.*?)`', r'\1', clean_text)        # `代码` -> 代码
+        clean_text = re.sub(r'#{1,6}\s*', '', clean_text)         # 移除标题标记
+        clean_text = re.sub(r'\[(.*?)\]\(.*?\)', r'\1', clean_text)  # [链接文本](url) -> 链接文本
+        clean_text = re.sub(r'!\[.*?\]\(.*?\)', '', clean_text)   # 移除图片标记
+        clean_text = re.sub(r'[-\*\+]\s*', '', clean_text)        # 移除列表标记
+        clean_text = re.sub(r'>\s*', '', clean_text)              # 移除引用标记
+        clean_text = re.sub(r'---+', '', clean_text)              # 移除分隔线
+        
         clean_text = clean_text.replace('\n', ' ').strip()
+        # 清理多余的空格
+        clean_text = re.sub(r'\s+', ' ', clean_text)
         
         self.logger.info(f"🎧 开始音频生成 - 引擎: {tts_engine}, 文本长度: {len(clean_text)}字符")
         
@@ -952,6 +982,13 @@ header:
                 audio_filename = f"youtube-{today.strftime('%Y%m%d')}-{safe_title}.wav"
                 audio_path = os.path.join(self.audio_dir, audio_filename)
                 
+                # 总是保存播客脚本供用户查看和调试
+                script_filename = f"youtube-{today.strftime('%Y%m%d')}-{safe_title}-script.txt"
+                script_path = os.path.join(self.audio_dir, script_filename)
+                with open(script_path, 'w', encoding='utf-8') as f:
+                    f.write(script)
+                self.logger.info(f"📝 播客脚本已保存: {script_path}")
+                
                 try:
                     # 根据用户选择的TTS模型决定使用的引擎
                     if tts_model == "elevenlabs" and self.elevenlabs_available:
@@ -975,11 +1012,6 @@ header:
                 except Exception as e:
                     self.logger.warning(f"本地音频生成失败: {e}")
                     self.logger.warning("将只提供文本脚本，请考虑安装eSpeak或其他TTS引擎")
-                    # 保存脚本到文件
-                    script_filename = f"youtube-{today.strftime('%Y%m%d')}-{safe_title}-script.txt"
-                    script_path = os.path.join(self.audio_dir, script_filename)
-                    with open(script_path, 'w', encoding='utf-8') as f:
-                        f.write(script)
                     # 设置音频路径为None，表示没有音频文件
                     audio_path = None
             else:
