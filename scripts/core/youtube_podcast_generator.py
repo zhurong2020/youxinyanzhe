@@ -297,9 +297,56 @@ class YouTubePodcastGenerator:
 
     def generate_local_audio(self, script: str, output_path: str) -> bool:
         """
-        使用本地TTS生成音频
+        使用本地TTS生成音频（eSpeak后端）
         """
         try:
+            # 首先尝试使用eSpeak直接生成音频
+            self.logger.info("尝试使用eSpeak TTS生成音频")
+            
+            # 处理脚本，移除角色标签和格式化
+            clean_text = re.sub(r'\[.*?\]:\s*', '', script)
+            clean_text = clean_text.replace('\n', ' ').strip()
+            
+            # 限制文本长度以避免过长的音频
+            if len(clean_text) > 3000:
+                clean_text = clean_text[:3000] + "..."
+                self.logger.info("文本过长，已截取前3000字符")
+            
+            # 使用eSpeak生成音频，指定中文语音
+            import subprocess
+            
+            # 尝试不同的音频格式
+            for audio_format in ['wav', 'mp3']:
+                try:
+                    output_file = output_path.replace('.wav', f'.{audio_format}')
+                    cmd = [
+                        'espeak', 
+                        '-v', 'zh',  # 使用中文语音
+                        '-s', '150',  # 语速
+                        '-a', '80',   # 音量
+                        '-w', output_file,  # 输出到文件
+                        clean_text
+                    ]
+                    
+                    self.logger.info(f"执行eSpeak命令: {' '.join(cmd[:6])}...")
+                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+                    
+                    if result.returncode == 0 and os.path.exists(output_file):
+                        self.logger.info(f"eSpeak音频生成成功: {output_file}")
+                        return True
+                    else:
+                        self.logger.warning(f"eSpeak生成失败，返回码: {result.returncode}")
+                        if result.stderr:
+                            self.logger.warning(f"eSpeak错误: {result.stderr}")
+                        
+                except subprocess.TimeoutExpired:
+                    self.logger.warning("eSpeak执行超时")
+                except Exception as e:
+                    self.logger.warning(f"eSpeak格式{audio_format}失败: {e}")
+                    continue
+            
+            # 备用：尝试pyttsx3
+            self.logger.info("eSpeak失败，尝试pyttsx3作为备用")
             import pyttsx3
             
             # 初始化TTS引擎
@@ -307,24 +354,38 @@ class YouTubePodcastGenerator:
             
             # 设置语音属性
             voices = engine.getProperty('voices')
-            for voice in voices:
-                if 'chinese' in voice.name.lower() or 'mandarin' in voice.name.lower():
+            chinese_voice_found = False
+            
+            self.logger.info(f"可用语音数量: {len(voices)}")
+            for i, voice in enumerate(voices):
+                self.logger.debug(f"语音{i}: {voice.name} - {voice.id}")
+                # 更宽松的中文语音匹配
+                if any(keyword in voice.name.lower() for keyword in ['chinese', 'mandarin', 'zh', 'china']):
                     engine.setProperty('voice', voice.id)
+                    chinese_voice_found = True
+                    self.logger.info(f"选择中文语音: {voice.name}")
                     break
+            
+            if not chinese_voice_found:
+                self.logger.warning("未找到中文语音，使用默认语音")
             
             engine.setProperty('rate', 150)
             engine.setProperty('volume', 0.8)
-            
-            # 处理脚本，移除角色标签
-            clean_text = re.sub(r'\[.*?\]:\s*', '', script)
             
             # 生成音频
             engine.save_to_file(clean_text, output_path)
             engine.runAndWait()
             
-            self.logger.info(f"本地音频生成成功: {output_path}")
-            return True
+            if os.path.exists(output_path):
+                self.logger.info(f"pyttsx3音频生成成功: {output_path}")
+                return True
+            else:
+                self.logger.error("pyttsx3未能创建音频文件")
+                return False
             
+        except ImportError:
+            self.logger.error("缺少必要的依赖包（subprocess或pyttsx3）")
+            return False
         except Exception as e:
             self.logger.error(f"本地音频生成失败: {e}")
             return False
@@ -373,7 +434,7 @@ class YouTubePodcastGenerator:
                 podcast_tagline="用中文播客理解英文内容",
                 tts_model=tts_model,  # 使用指定的TTS模型
                 creativity_level=0.7,
-                user_instructions=f"请生成一个关于YouTube视频的中文播客，目标语言是{target_language}，内容要适合英语学习者收听。".replace('\n', ' '),  # 新增用户指令
+                user_instructions=f"请生成一个关于YouTube视频的中文播客目标语言是{target_language}内容要适合英语学习者收听".replace('\n', ' ').replace('\r', ''),
                 api_name="/process_inputs"  # 使用正确的API端点
             )
             
@@ -468,13 +529,13 @@ class YouTubePodcastGenerator:
                 "difficulty_level": "中级"
             }
     
-    def download_thumbnail(self, thumbnail_url: str, video_id: str) -> str:
+    def download_thumbnail(self, thumbnail_url: str, video_info: Dict[str, Any]) -> str:
         """
         下载视频缩略图
         
         Args:
             thumbnail_url: 缩略图URL
-            video_id: 视频ID
+            video_info: 视频信息字典
             
         Returns:
             本地缩略图路径
@@ -486,7 +547,9 @@ class YouTubePodcastGenerator:
             os.makedirs(date_dir, exist_ok=True)
             
             # 生成文件名
-            thumbnail_filename = f"youtube-{today.strftime('%Y%m%d')}-{video_id}-thumbnail.jpg"
+            # 使用有意义的文件名而非视频ID
+            safe_title = self._generate_safe_filename(video_info['title'])
+            thumbnail_filename = f"youtube-{today.strftime('%Y%m%d')}-{safe_title}-thumbnail.jpg"
             thumbnail_path = os.path.join(date_dir, thumbnail_filename)
             
             # 下载图片
@@ -673,8 +736,10 @@ header:
             # 检查是否使用备用模式
             if temp_audio_path == "fallback_mode":
                 self.logger.info("使用备用播客生成模式")
+                self.logger.info(f"配置参数 - 目标语言: {target_language}, 对话风格: {conversation_style}")
                 # 生成播客脚本
                 script = self.generate_podcast_script(video_info, youtube_url, target_language, conversation_style)
+                self.logger.info(f"播客脚本生成完成，长度: {len(script)}字符")
                 
                 # 尝试生成本地音频
                 today = datetime.now()
@@ -701,17 +766,27 @@ header:
                 audio_path = self.save_audio_file(temp_audio_path, video_id)
             
             # 4. 生成导读内容
+            self.logger.info("开始生成中文导读")
             content_guide = self.generate_content_guide(video_info, youtube_url)
             if custom_title:
                 content_guide['title'] = custom_title
+                self.logger.info(f"使用自定义标题: {custom_title}")
+            self.logger.info("导读内容生成成功")
             
             # 5. 下载缩略图
-            thumbnail_path = self.download_thumbnail(video_info['thumbnail_url'], video_id)
+            self.logger.info("开始下载视频缩略图")
+            thumbnail_path = self.download_thumbnail(video_info['thumbnail_url'], video_info)
+            if thumbnail_path:
+                self.logger.info(f"缩略图下载成功: {thumbnail_path}")
+            else:
+                self.logger.warning("缩略图下载失败")
             
             # 6. 创建Jekyll文章
+            self.logger.info("开始创建Jekyll文章")
             article_path = self.create_jekyll_article(
                 video_info, content_guide, youtube_url, audio_path, thumbnail_path
             )
+            self.logger.info(f"Jekyll文章创建成功: {article_path}")
             
             result = {
                 'status': 'success',
