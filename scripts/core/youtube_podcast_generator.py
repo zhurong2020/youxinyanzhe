@@ -64,7 +64,7 @@ class YouTubePodcastGenerator:
         if 'GEMINI_API_KEY' in self.config:
             genai.configure(api_key=self.config['GEMINI_API_KEY'])
             # 使用与主系统一致的模型配置（从配置文件读取）
-            model_name = "gemini-2.0-flash-exp"  # 默认模型
+            model_name = "gemini-2.5-flash"  # 默认模型
             self.gemini_model = genai.GenerativeModel(model_name)
             self.logger.info(f"✅ Gemini配置完成 - 模型: {model_name}")
         else:
