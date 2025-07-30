@@ -34,13 +34,18 @@ python run.py
 
 ## 📚 完整文档
 
-| 文档 | 描述 |
-|------|------|
-| [详细说明](docs/README.md) | 完整的功能介绍和使用指南 |
-| [项目路线图](docs/ROADMAP.md) | 功能规划和发展方向 |
-| [集成指南](docs/INTEGRATION_GUIDE.md) | 系统集成和配置说明 |
-| [变现系统](docs/REWARD_SYSTEM.md) | 内容变现功能详解 |
-| [开发指南](docs/DEVELOPMENT.md) | 开发环境和贡献指南 |
+| 文档类型 | 文档 | 描述 |
+|---------|------|------|
+| **核心文档** | [详细说明](docs/README.md) | 完整的功能介绍和使用指南 |
+| | [项目结构](docs/PROJECT_STRUCTURE.md) | 详细的目录结构说明 |
+| | [开发指南](docs/DEVELOPMENT.md) | 开发环境和贡献指南 |
+| **配置指南** | [Gemini配置](docs/setup/gemini_setup.md) | AI模型配置说明 |
+| | [TTS设置](docs/setup/tts_setup.md) | 文本转语音配置 |
+| **功能指南** | [ElevenLabs集成](docs/guides/elevenlabs_integration_guide.md) | 高质量语音合成 |
+| | [YouTube TTS升级](docs/guides/youtube_tts_upgrade_guide.md) | YouTube播客功能 |
+| **系统文档** | [集成指南](docs/INTEGRATION_GUIDE.md) | 系统集成和配置说明 |
+| | [变现系统](docs/REWARD_SYSTEM.md) | 内容变现功能详解 |
+| | [项目路线图](docs/ROADMAP.md) | 功能规划和发展方向 |
 
 ## 🏗️ 项目结构
 

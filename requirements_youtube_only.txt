@@ -1,9 +1,0 @@
-# YouTube播客生成器独有依赖
-# 如果您只想安装YouTube功能的额外依赖，使用此文件
-# 运行: pip install -r requirements_youtube_only.txt
-
-# Podcastfy API客户端
-gradio-client>=0.8.0
-
-# YouTube Data API (可选)
-google-api-python-client>=2.0.0

@@ -694,15 +694,16 @@ def handle_youtube_podcast_menu(pipeline):
                 # 获取配置
                 config = {
                     'GEMINI_API_KEY': os.getenv('GEMINI_API_KEY'),
-                    'YOUTUBE_API_KEY': os.getenv('YOUTUBE_API_KEY')  # 可选
+                    'YOUTUBE_API_KEY': os.getenv('YOUTUBE_API_KEY'),  # 可选
+                    'ELEVENLABS_API_KEY': os.getenv('ELEVENLABS_API_KEY')  # 可选，高质量TTS
                 }
                 
                 if not config['GEMINI_API_KEY']:
                     print("❌ 未配置GEMINI_API_KEY，请在.env文件中设置")
                     return
                 
-                # 创建生成器实例
-                generator = YouTubePodcastGenerator(config)
+                # 创建生成器实例，传递pipeline用于统一日志
+                generator = YouTubePodcastGenerator(config, pipeline)
                 pipeline.log(f"开始处理YouTube视频: {youtube_url}", level="info", force=True)
                 
                 # 生成播客和文章
