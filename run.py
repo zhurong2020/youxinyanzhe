@@ -994,6 +994,51 @@ def handle_debug_menu(pipeline):
     input("\n按Enter键返回主菜单...")
 
 
+def update_env_file(key, value=None):
+    """更新.env file中的环境变量
+    
+    Args:
+        key: 环境变量名
+        value: 环境变量值，如果为None则删除该变量
+    """
+    env_file_path = '.env'
+    
+    try:
+        # 读取现有.env文件
+        env_lines = []
+        if os.path.exists(env_file_path):
+            with open(env_file_path, 'r', encoding='utf-8') as f:
+                env_lines = f.readlines()
+        
+        # 查找并更新/删除指定的环境变量
+        key_found = False
+        updated_lines = []
+        
+        for line in env_lines:
+            line_stripped = line.strip()
+            if line_stripped.startswith(f'{key}=') and not line_stripped.startswith('#'):
+                # 找到了要更新的key
+                key_found = True
+                if value is not None:
+                    updated_lines.append(f'{key}={value}\n')
+                # 如果value为None，跳过这行（删除）
+            else:
+                updated_lines.append(line)
+        
+        # 如果没找到key且value不为None，添加新的环境变量
+        if not key_found and value is not None:
+            updated_lines.append(f'{key}={value}\n')
+        
+        # 写回.env文件
+        with open(env_file_path, 'w', encoding='utf-8') as f:
+            f.writelines(updated_lines)
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ 更新.env文件失败: {e}")
+        return False
+
 def handle_llm_engine_menu(pipeline):
     """处理LLM引擎切换菜单"""
     print("\n" + "="*40)
@@ -1058,10 +1103,15 @@ def handle_llm_engine_menu(pipeline):
             env_vars_to_clear = ['ANTHROPIC_BASE_URL', 'ANTHROPIC_AUTH_TOKEN', 'ANTHROPIC_API_KEY']
             cleared_vars = []
             
+            # 清除运行时环境变量
             for var in env_vars_to_clear:
                 if var in os.environ:
                     del os.environ[var]
                     cleared_vars.append(var)
+            
+            # 持久化到.env文件
+            for var in env_vars_to_clear:
+                update_env_file(var, None)  # 删除.env文件中的配置
             
             print("✅ 已恢复Claude Pro模式")
             print("📝 配置详情：")
@@ -1070,9 +1120,14 @@ def handle_llm_engine_menu(pipeline):
             print("   • 计费方式: 包月订阅")
             print("   • 使用限制: Claude Pro用户限制")
             if cleared_vars:
-                print("   • 已清除的API配置:", ", ".join(cleared_vars))
+                print("   • 已清除的运行时配置:", ", ".join(cleared_vars))
+            print("   • 📁 已从.env文件中移除相关配置")
+            print("\n⚠️  重要提示：")
+            print("   • 当前run.py进程中配置已生效")
+            print("   • Claude Code终端需要重启才能完全生效")
+            print("   • 建议：关闭并重新打开Claude Code终端")
             
-            pipeline.log("LLM引擎恢复到Claude Pro模式", level="info", force=True)
+            pipeline.log("LLM引擎恢复到Claude Pro模式，已持久化到.env文件", level="info", force=True)
             
         except Exception as e:
             print(f"❌ 恢复失败: {e}")
@@ -1086,21 +1141,31 @@ def handle_llm_engine_menu(pipeline):
             qwen_api_key = "sk-258b0d7d3f39412f93b43df2e9446b43"
             qwen_base_url = "https://dashscope.aliyuncs.com/api/v2"
             
-            # 清除Claude配置
+            # 清除Claude配置（运行时）
             if 'ANTHROPIC_API_KEY' in os.environ:
                 del os.environ['ANTHROPIC_API_KEY']
             
-            # 设置千问配置
+            # 设置千问配置（运行时）
             os.environ['ANTHROPIC_BASE_URL'] = qwen_base_url
             os.environ['ANTHROPIC_AUTH_TOKEN'] = qwen_api_key
+            
+            # 持久化到.env文件
+            update_env_file('ANTHROPIC_API_KEY', None)  # 删除Claude API配置
+            update_env_file('ANTHROPIC_BASE_URL', qwen_base_url)
+            update_env_file('ANTHROPIC_AUTH_TOKEN', qwen_api_key)
             
             print("✅ 已切换到千问3-code引擎")
             print("📝 配置详情：")
             print(f"   • ANTHROPIC_BASE_URL: {qwen_base_url}")
             print(f"   • ANTHROPIC_AUTH_TOKEN: {qwen_api_key[:8]}...{qwen_api_key[-8:]}")
             print("   • ANTHROPIC_API_KEY: 🚫 已清除")
+            print("   • 📁 配置已持久化到.env文件")
+            print("\n⚠️  重要提示：")
+            print("   • 当前run.py进程中配置已生效")
+            print("   • Claude Code终端需要重启才能完全生效")
+            print("   • 建议：关闭并重新打开Claude Code终端")
             
-            pipeline.log("LLM引擎切换到千问3-code", level="info", force=True)
+            pipeline.log("LLM引擎切换到千问3-code，已持久化到.env文件", level="info", force=True)
             
         except Exception as e:
             print(f"❌ 切换失败: {e}")
@@ -1114,13 +1179,18 @@ def handle_llm_engine_menu(pipeline):
             kimi_api_key = "sk-qAvR9EygbSliadXY3OTnxPIqruyF27uPQQakXyOWVQOxH1D5"
             kimi_base_url = "https://api.moonshot.ai/anthropic"
             
-            # 清除其他配置
+            # 清除其他配置（运行时）
             if 'ANTHROPIC_API_KEY' in os.environ:
                 del os.environ['ANTHROPIC_API_KEY']
             
-            # 设置Kimi K2配置
+            # 设置Kimi K2配置（运行时）
             os.environ['ANTHROPIC_BASE_URL'] = kimi_base_url
             os.environ['ANTHROPIC_AUTH_TOKEN'] = kimi_api_key
+            
+            # 持久化到.env文件
+            update_env_file('ANTHROPIC_API_KEY', None)  # 删除Claude API配置
+            update_env_file('ANTHROPIC_BASE_URL', kimi_base_url)
+            update_env_file('ANTHROPIC_AUTH_TOKEN', kimi_api_key)
             
             print("✅ 已切换到Kimi K2引擎")
             print("📝 配置详情：")
@@ -1130,8 +1200,13 @@ def handle_llm_engine_menu(pipeline):
             print("   • 模型特性: 1万亿参数MoE, 128K上下文长度")
             print("   • 定价: $0.6/M输入, $2.5/M输出")
             print("   • SWE-Bench得分: 65.8%")
+            print("   • 📁 配置已持久化到.env文件")
+            print("\n⚠️  重要提示：")
+            print("   • 当前run.py进程中配置已生效")
+            print("   • Claude Code终端需要重启才能完全生效")
+            print("   • 建议：关闭并重新打开Claude Code终端")
             
-            pipeline.log("LLM引擎切换到Kimi K2", level="info", force=True)
+            pipeline.log("LLM引擎切换到Kimi K2，已持久化到.env文件", level="info", force=True)
             
         except Exception as e:
             print(f"❌ 切换失败: {e}")
@@ -1247,21 +1322,28 @@ def handle_llm_engine_menu(pipeline):
                 env_vars_to_clear = ['ANTHROPIC_API_KEY', 'ANTHROPIC_BASE_URL', 'ANTHROPIC_AUTH_TOKEN']
                 cleared_vars = []
                 
+                # 清除运行时环境变量
                 for var in env_vars_to_clear:
                     if var in os.environ:
                         del os.environ[var]
                         cleared_vars.append(var)
                 
+                # 从.env文件中清除
+                for var in env_vars_to_clear:
+                    update_env_file(var, None)
+                
                 if cleared_vars:
                     print("✅ 配置重置完成")
-                    print("📝 已清除的环境变量：")
+                    print("📝 已清除的运行时环境变量：")
                     for var in cleared_vars:
                         print(f"   • {var}")
                 else:
-                    print("📋 没有需要清除的配置")
+                    print("📋 没有需要清除的运行时配置")
                 
-                print("\n💡 下次使用时请重新配置引擎")
-                pipeline.log("LLM引擎配置已重置", level="info", force=True)
+                print("   • 📁 已从.env文件中移除相关配置")
+                print("\n💡 引擎已恢复为默认Claude Pro模式")
+                print("⚠️  建议：关闭并重新打开Claude Code终端以完全生效")
+                pipeline.log("LLM引擎配置已重置，已持久化到.env文件", level="info", force=True)
                 
             except Exception as e:
                 print(f"❌ 重置失败: {e}")
