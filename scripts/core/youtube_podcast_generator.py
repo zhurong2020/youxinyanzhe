@@ -27,10 +27,15 @@ except ImportError as e:
 
 # 可选TTS库导入
 try:
-    from elevenlabs import Voice, VoiceSettings, generate, set_api_key
+    from elevenlabs import ElevenLabs
     ELEVENLABS_AVAILABLE = True
 except ImportError:
     ELEVENLABS_AVAILABLE = False
+    from typing import TYPE_CHECKING
+    if TYPE_CHECKING:
+        from elevenlabs import ElevenLabs
+    else:
+        ElevenLabs = None
 
 # Markdown和音频处理
 try:
@@ -45,14 +50,16 @@ except ImportError:
 class YouTubePodcastGenerator:
     """YouTube播客生成器类"""
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Dict[str, Any], pipeline=None):
         """
         初始化生成器
         
         Args:
             config: 配置字典，包含API密钥等
+            pipeline: ContentPipeline实例，用于统一日志管理
         """
         self.config = config
+        self.pipeline = pipeline
         self.setup_logging()
         self.setup_apis()
         
@@ -66,63 +73,83 @@ class YouTubePodcastGenerator:
             os.makedirs(directory, exist_ok=True)
     
     def setup_logging(self):
-        """设置日志 - 避免重复配置"""
-        self.logger = logging.getLogger(__name__)
-        
-        # 检查是否已经配置过处理器，避免重复日志
-        if not self.logger.handlers:
-            # 只有在没有处理器时才添加
-            handler = logging.StreamHandler()
-            handler.setFormatter(logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-            ))
-            self.logger.addHandler(handler)
+        """设置日志 - 使用系统统一日志配置"""
+        if self.pipeline:
+            # 使用pipeline的日志系统
+            self.logger = self.pipeline
+        else:
+            # 备用日志配置
+            self.logger = logging.getLogger(__name__)
             self.logger.setLevel(logging.INFO)
+    
+    def _log(self, message: str, level: str = "info", force: bool = False):
+        """统一的日志处理方法"""
+        if self.pipeline:
+            # 使用pipeline的log方法
+            self.pipeline.log(message, level, force)
+        else:
+            # 使用标准logging
+            logger_method = getattr(self.logger, level, self.logger.info)
+            logger_method(message)
     
     def setup_apis(self):
         """设置API连接"""
         # 设置Gemini API
         if 'GEMINI_API_KEY' in self.config:
-            genai.configure(api_key=self.config['GEMINI_API_KEY'])
+            genai.configure(api_key=self.config['GEMINI_API_KEY'])  # type: ignore
             # 使用与主系统一致的模型配置（从配置文件读取）
             model_name = "gemini-2.5-flash"  # 默认模型
-            self.gemini_model = genai.GenerativeModel(model_name)
-            self.logger.info(f"✅ Gemini配置完成 - 模型: {model_name}")
+            self.gemini_model = genai.GenerativeModel(model_name)  # type: ignore
+            self._log(f"✅ Gemini配置完成 - 模型: {model_name}", "info")
         else:
             raise ValueError("需要GEMINI_API_KEY配置")
         
         # 设置YouTube API
         if 'YOUTUBE_API_KEY' in self.config:
             self.youtube = build('youtube', 'v3', developerKey=self.config['YOUTUBE_API_KEY'])
-            self.logger.info("✅ YouTube API 配置完成")
+            self._log("✅ YouTube API 配置完成")
         else:
-            self.logger.warning("未配置YOUTUBE_API_KEY，将使用基础视频信息提取")
+            self._log("未配置YOUTUBE_API_KEY，将使用基础视频信息提取")
             self.youtube = None
         
-        # 设置ElevenLabs API
+        # 设置ElevenLabs API  
         if 'ELEVENLABS_API_KEY' in self.config and ELEVENLABS_AVAILABLE:
             try:
-                from elevenlabs import set_api_key
-                set_api_key(self.config['ELEVENLABS_API_KEY'])
+                # 检查API密钥是否为空
+                api_key = self.config['ELEVENLABS_API_KEY']
+                if not api_key or api_key.strip() == '':
+                    raise ValueError("ELEVENLABS_API_KEY为空")
+                    
+                # 创建ElevenLabs客户端实例
+                if ElevenLabs is not None:
+                    self.elevenlabs_client = ElevenLabs(api_key=api_key.strip())
+                else:
+                    raise ImportError("ElevenLabs library not available")
                 self.elevenlabs_available = True
-                self.logger.info("✅ ElevenLabs API 配置完成")
+                self._log("✅ ElevenLabs API 配置完成")
             except Exception as e:
-                self.logger.warning(f"ElevenLabs API 配置失败: {e}")
+                self._log(f"ElevenLabs API 配置失败: {e}", "warning")
                 self.elevenlabs_available = False
+                self.elevenlabs_client = None
         else:
             self.elevenlabs_available = False
+            self.elevenlabs_client = None
             if not ELEVENLABS_AVAILABLE:
-                self.logger.info("💡 ElevenLabs库未安装，可运行 pip install elevenlabs 获得高质量语音")
+                self._log("💡 ElevenLabs库未安装，可运行 pip install elevenlabs 获得高质量语音")
+            elif 'ELEVENLABS_API_KEY' not in self.config:
+                self._log("💡 未配置ELEVENLABS_API_KEY，跳过ElevenLabs配置")
+            else:
+                self._log("⚠️ ElevenLabs配置不满足条件")
         
         # 设置Podcastfy客户端
         try:
             self.podcastfy_client = Client("thatupiso/Podcastfy.ai_demo")
-            self.logger.info("✅ Podcastfy 客户端连接成功")
+            self._log("✅ Podcastfy 客户端连接成功")
             self.use_fallback = False
             
         except Exception as e:
-            self.logger.warning(f"Podcastfy 客户端连接失败: {e}")
-            self.logger.info("将使用备用播客生成器")
+            self._log(f"Podcastfy 客户端连接失败: {e}")
+            self._log("将使用备用播客生成器")
             self.podcastfy_client = None
             self.use_fallback = True
     
@@ -187,7 +214,7 @@ class YouTubePodcastGenerator:
                     'thumbnail_url': snippet['thumbnails']['maxres']['url'] if 'maxres' in snippet['thumbnails'] else snippet['thumbnails']['high']['url']
                 }
             except Exception as e:
-                self.logger.error(f"YouTube API调用失败: {e}")
+                self._log(f"YouTube API调用失败: {e}")
                 # 降级到基础信息提取
                 return self.get_basic_video_info(video_id)
         else:
@@ -303,65 +330,67 @@ class YouTubePodcastGenerator:
                               target_language: str = "zh-CN",
                               conversation_style: str = "casual,informative") -> str:
         """
-        生成播客脚本（备用方法）
+        生成NotebookLM风格的纯对话播客脚本
         """
-        self.logger.info("开始生成播客脚本")
+        self._log("开始生成NotebookLM风格播客脚本")
         
         # 解析视频时长，智能调整播客长度
         duration_str = video_info.get('duration', '未知')
         try:
-            # 尝试从时长字符串中提取分钟数
             import re
             duration_match = re.search(r'(\d+)分钟|(\d+):\d+', duration_str)
             if duration_match:
                 video_minutes = int(duration_match.group(1) or duration_match.group(2))
-                # 播客长度不超过原视频的80%，但至少5分钟
-                podcast_minutes = max(5, min(10, int(video_minutes * 0.8)))
-                word_count = podcast_minutes * 250  # 每分钟约250字
+                podcast_minutes = max(4, min(8, int(video_minutes * 0.7)))  # 更紧凑的时长
+                word_count = podcast_minutes * 200  # 每分钟200字，更自然的语速
             else:
-                podcast_minutes = 6
-                word_count = 1500
+                podcast_minutes = 5
+                word_count = 1000
         except:
-            # 默认值
-            podcast_minutes = 6
-            word_count = 1500
+            podcast_minutes = 5
+            word_count = 1000
         
         prompt = f"""
-        请为以下YouTube视频生成一个简洁高效的中文播客脚本，包含两个主播的对话：
+        你是一个专业的播客主持人，请为以下YouTube视频生成一个完全模仿NotebookLM风格的对话播客。
 
-        视频标题: {video_info['title']}
-        视频描述: {video_info['description'][:1000] if video_info['description'] else '暂无描述'}
+        视频信息：
+        标题: {video_info['title']}
+        描述: {video_info['description'][:800] if video_info['description'] else '暂无描述'}
         频道: {video_info['channel_title']}
-        时长: {video_info['duration']}
+
+        生成要求（严格遵守）：
+        1. **绝对禁止**：任何开场白、介绍、总结、结束语
+        2. **绝对禁止**：时间提示、章节划分、主持人自我介绍
+        3. **格式要求**：只能是两个人的对话，一问一答
+        4. **风格要求**：像两个朋友在咖啡馆聊天的自然对话
+        5. **内容深度**：深入讨论视频的核心观点，不是简单复述
+        6. **语言风格**：口语化、自然、有思考深度
+
+        两个角色设定：
+        - A（好奇提问者）：提出关键问题，表达真实困惑，推动对话深入
+        - B（深度解析者）：提供深刻见解，用简单例子解释复杂概念
+
+        输出格式（严格）：
+        [A]: 自然的提问或观点
+        [B]: 深入的回答和分析
         
-        要求：
-        1. 生成约{podcast_minutes}分钟的播客脚本（约{word_count}字）
-        2. 两个角色：
-           - 主播助手：负责引导话题、总结要点
-           - 学习导师：负责核心分析、提供学习建议
-        3. 对话风格：{conversation_style}，保持专业且简洁
-        4. 目标语言：{target_language}
-        5. 内容结构：
-           - 简要开场和背景（30秒）
-           - 核心内容精华解析（{podcast_minutes-2}分钟）
-           - 学习要点总结（1分钟）
-           - 简短结语（30秒）
-        6. 重点突出，避免冗长重复，确保每句话都有价值
+        直接从第一句对话开始，最后一句对话结束。不要有任何其他内容。
+        对话长度控制在{word_count}字左右，保持{podcast_minutes}分钟的收听体验。
         
-        请以以下格式输出：
-        [主播助手]: 对话内容
-        [学习导师]: 对话内容
+        记住：要像真实的人类对话，避免任何"播客腔"或"AI腔"。
         
-        确保对话紧凑高效，信息密度高。
+        参数说明（保持兼容性）：
+        - 目标语言: {target_language}
+        - 对话风格: {conversation_style}
         """
         
         try:
             response = self.gemini_model.generate_content(prompt)
             script = response.text
-            self.logger.info("播客脚本生成成功")
+            self._log("播客脚本生成成功")
             return script
         except Exception as e:
-            self.logger.error(f"播客脚本生成失败: {e}")
+            self._log(f"播客脚本生成失败: {e}")
             return f"""
 [主播助手]: 大家好，欢迎收听全球视野英语学习播客。今天我们要讨论的是YouTube视频《{video_info['title']}》。
 
@@ -395,83 +424,86 @@ class YouTubePodcastGenerator:
                 clean_text = soup.get_text()
             except ImportError:
                 # Fallback to basic regex cleaning
-                self.logger.warning("Markdown/Audio tools import failed. Using basic text cleaning.")
+                self._log("Markdown/Audio tools import failed. Using basic text cleaning.")
                 clean_text = re.sub(r'<[^>]+>', '', script)
         else:
             # Fallback to basic regex cleaning if libraries are not available
-            self.logger.warning("Markdown/Audio tools not found. Using basic text cleaning.")
+            self._log("Markdown/Audio tools not found. Using basic text cleaning.")
             clean_text = re.sub(r'<[^>]+>', '', script) # Basic HTML tag removal
 
         # 移除多余的空白
         clean_text = re.sub(r'\s+', ' ', clean_text).strip()
 
-        self.logger.info(f"🎧 开始音频生成 - 引擎: {tts_engine}, 文本长度: {len(clean_text)}字符")
+        self._log(f"🎧 开始音频生成 - 引擎: {tts_engine}, 文本长度: {len(clean_text)}字符")
         
         # 对于超长文本，gTTS库会自动分块处理，无需人为截断
         if len(clean_text) > 5000:
-            self.logger.info("💡 检测到超长文本，gTTS将自动分块处理以保证完整性")
+            self._log("💡 检测到超长文本，gTTS将自动分块处理以保证完整性")
         
         # 1. 优先尝试ElevenLabs（最高音质）
         if tts_engine == "elevenlabs":
             if self._generate_elevenlabs_audio(clean_text, output_path):
                 return True
-            self.logger.warning("ElevenLabs失败，尝试其他引擎")
+            self._log("ElevenLabs失败，尝试其他引擎")
         
         # 2. 尝试Google TTS（高音质）
         if tts_engine == "gtts":
             if self._generate_gtts_audio(clean_text, output_path):
                 return True
-            self.logger.warning("Google TTS失败，尝试其他引擎")
+            self._log("Google TTS失败，尝试其他引擎")
         
         # 3. 尝试eSpeak（快速但音质一般）
         if tts_engine == "espeak" or tts_engine == "gtts":
             if self._generate_espeak_audio(clean_text, output_path):
                 return True
-            self.logger.warning("eSpeak TTS失败，尝试pyttsx3")
+            self._log("eSpeak TTS失败，尝试pyttsx3")
             
         # 4. 最后尝试pyttsx3（系统TTS）
         if self._generate_pyttsx3_audio(clean_text, output_path):
             return True
             
-        self.logger.error("所有TTS引擎都失败了")
+        self._log("所有TTS引擎都失败了", "error")
         return False
     
     def _generate_elevenlabs_audio(self, text: str, output_path: str) -> bool:
-        """使用ElevenLabs生成高质量AI语音"""
-        if not self.elevenlabs_available:
-            self.logger.warning("ElevenLabs API未配置或库未安装")
+        """使用ElevenLabs生成高质量AI语音（优化中文自然度）"""
+        if not self.elevenlabs_available or not self.elevenlabs_client:
+            self._log("ElevenLabs API未配置或库未安装")
             return False
             
         try:
-            from elevenlabs import Voice, VoiceSettings, generate
+            self._log("🎙️ 使用ElevenLabs生成高质量AI语音（优化版）")
             
-            self.logger.info("🎙️ 使用ElevenLabs生成高质量AI语音")
+            # 为中文播客优化参数，减少机器人感
+            if ELEVENLABS_AVAILABLE:
+                from elevenlabs import VoiceSettings
+                voice_settings = VoiceSettings(
+                    stability=0.35,  # 更低稳定性，增加自然变化，减少机器人感
+                    similarity_boost=0.85,  # 保持声音特征
+                    style=0.6,  # 增强表现力，让语调更自然
+                    use_speaker_boost=True
+                )
+            else:
+                self._log("ElevenLabs库不可用")
+                return False
             
-            # 使用ElevenLabs的中文语音模型
-            # 注意：这里使用的是一个通用的英文声音，ElevenLabs对中文支持可能有限
-            audio = generate(
+            audio_generator = self.elevenlabs_client.text_to_speech.convert(
+                voice_id="Xb7hH8MSUJpSbSDYjk0o",  # 中文优化女声，更自然
                 text=text,
-                voice=Voice(
-                    voice_id="21m00Tcm4TlvDq8ikWAM",  # Rachel (女声，适合叙述)
-                    settings=VoiceSettings(
-                        stability=0.75,    # 语音稳定性
-                        similarity_boost=0.75,  # 相似度增强
-                        style=0.1,         # 风格强度
-                        use_speaker_boost=True  # 使用说话者增强
-                    )
-                ),
-                model="eleven_multilingual_v2"  # 多语言模型，支持中文
+                model_id="eleven_multilingual_v2",  # 多语言模型
+                voice_settings=voice_settings
             )
             
             # 保存音频文件
             with open(output_path, 'wb') as f:
-                f.write(audio)
+                for chunk in audio_generator:
+                    f.write(chunk)
             
-            self.logger.info(f"✅ ElevenLabs音频生成成功: {output_path}")
+            self._log(f"✅ ElevenLabs音频生成成功: {output_path}")
             return True
             
         except Exception as e:
-            self.logger.error(f"❌ ElevenLabs音频生成失败: {e}")
+            self._log(f"❌ ElevenLabs音频生成失败: {e}", "error")
             return False
 
     def _generate_gtts_audio(self, text: str, output_path: str) -> bool:
@@ -479,27 +511,45 @@ class YouTubePodcastGenerator:
         try:
             from gtts import gTTS
             
-            self.logger.info("尝试使用Google TTS生成音频")
+            self._log("尝试使用Google TTS生成音频")
             
-            # 创建gTTS对象
-            tts = gTTS(text=text, lang='zh-CN', slow=False)
+            # 添加重试机制
+            max_retries = 3
+            temp_path = None
+            for attempt in range(max_retries):
+                try:
+                    # 创建gTTS对象
+                    tts = gTTS(text=text, lang='zh-CN', slow=False)
+                    
+                    # 保存到临时文件
+                    temp_path = output_path.replace('.wav', '_temp.mp3')
+                    tts.save(temp_path)
+                    break  # 成功则退出重试循环
+                    
+                except Exception as e:
+                    if attempt < max_retries - 1:
+                        self._log(f"Google TTS第{attempt + 1}次尝试失败: {e}，{3-attempt}秒后重试...")
+                        import time
+                        time.sleep(3)
+                        continue
+                    else:
+                        raise e
             
-            # 保存到临时文件
-            temp_path = output_path.replace('.wav', '_temp.mp3')
-            tts.save(temp_path)
+            if temp_path is None:
+                raise Exception("无法生成临时音频文件")
             
             # 加速音频
             if MARKDOWN_AUDIO_TOOLS_AVAILABLE:
                 try:
                     from pydub import AudioSegment
-                    self.logger.info("加速音频至1.5倍速")
+                    self._log("加速音频至1.5倍速")
                     sound = AudioSegment.from_mp3(temp_path)
                     fast_sound = sound.speedup(playback_speed=1.5)
                     
                     # 导出加速后的音频
                     fast_sound.export(temp_path, format="mp3")
                 except ImportError:
-                    self.logger.warning("pydub未安装，跳过音频加速")
+                    self._log("pydub未安装，跳过音频加速")
 
             # 如果需要WAV格式，转换音频格式
             if output_path.endswith('.wav'):
@@ -510,17 +560,17 @@ class YouTubePodcastGenerator:
                 os.rename(temp_path, output_path)
             
             if os.path.exists(output_path):
-                self.logger.info(f"Google TTS音频生成成功: {output_path}")
+                self._log(f"Google TTS音频生成成功: {output_path}")
                 return True
             else:
-                self.logger.error("Google TTS未能创建音频文件")
+                self._log("Google TTS未能创建音频文件", "error")
                 return False
                 
         except ImportError:
-            self.logger.warning("gtts库未安装，跳过Google TTS。安装命令: pip install gtts pygame")
+            self._log("gtts库未安装，跳过Google TTS。安装命令: pip install gtts pygame")
             return False
         except Exception as e:
-            self.logger.warning(f"Google TTS生成失败: {e}")
+            self._log(f"Google TTS生成失败: {e}")
             return False
     
     def _generate_espeak_audio(self, text: str, output_path: str) -> bool:
@@ -530,7 +580,7 @@ class YouTubePodcastGenerator:
         try:
             import subprocess
             
-            self.logger.info("尝试使用eSpeak TTS生成音频")
+            self._log("尝试使用eSpeak TTS生成音频")
             
             # 尝试不同的音频格式
             for audio_format in ['wav', 'mp3']:
@@ -545,30 +595,30 @@ class YouTubePodcastGenerator:
                         text
                     ]
                     
-                    self.logger.info(f"执行eSpeak命令: {' '.join(cmd[:6])}...")
+                    self._log(f"执行eSpeak命令: {' '.join(cmd[:6])}...")
                     result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
                     
                     if result.returncode == 0 and os.path.exists(output_file):
-                        self.logger.info(f"eSpeak音频生成成功: {output_file}")
+                        self._log(f"eSpeak音频生成成功: {output_file}")
                         # 如果生成的不是目标格式，重命名
                         if output_file != output_path:
                             os.rename(output_file, output_path)
                         return True
                     else:
-                        self.logger.warning(f"eSpeak生成失败，返回码: {result.returncode}")
+                        self._log(f"eSpeak生成失败，返回码: {result.returncode}")
                         if result.stderr:
-                            self.logger.warning(f"eSpeak错误: {result.stderr}")
+                            self._log(f"eSpeak错误: {result.stderr}")
                         
                 except subprocess.TimeoutExpired:
-                    self.logger.warning("eSpeak执行超时")
+                    self._log("eSpeak执行超时")
                 except Exception as e:
-                    self.logger.warning(f"eSpeak格式{audio_format}失败: {e}")
+                    self._log(f"eSpeak格式{audio_format}失败: {e}")
                     continue
                     
             return False
             
         except Exception as e:
-            self.logger.warning(f"eSpeak生成失败: {e}")
+            self._log(f"eSpeak生成失败: {e}")
             return False
     
     def _generate_pyttsx3_audio(self, text: str, output_path: str) -> bool:
@@ -578,7 +628,7 @@ class YouTubePodcastGenerator:
         try:
             import pyttsx3
             
-            self.logger.info("尝试使用pyttsx3 TTS生成音频")
+            self._log("尝试使用pyttsx3 TTS生成音频")
             
             # 初始化TTS引擎
             engine = pyttsx3.init()
@@ -587,20 +637,26 @@ class YouTubePodcastGenerator:
             voices = engine.getProperty('voices')
             chinese_voice_found = False
             
-            if voices and hasattr(voices, '__len__') and hasattr(voices, '__iter__'):
-                self.logger.info(f"可用语音数量: {len(voices)}")
-                for i, voice in enumerate(voices):
+            if voices is not None:
+                try:
+                    voices_list = list(voices) if hasattr(voices, '__iter__') else []  # type: ignore
+                    self._log(f"可用语音数量: {len(voices_list)}")
+                except (TypeError, AttributeError):
+                    self._log("无法获取语音列表")
+                    voices_list = []
+                    
+                for i, voice in enumerate(voices_list):
                     if hasattr(voice, 'name') and hasattr(voice, 'id'):
-                        self.logger.debug(f"语音{i}: {voice.name} - {voice.id}")
+                        self._log(f"语音{i}: {voice.name} - {voice.id}", "debug")
                         # 更宽松的中文语音匹配
                         if any(keyword in voice.name.lower() for keyword in ['chinese', 'mandarin', 'zh', 'china']):
                             engine.setProperty('voice', voice.id)
                             chinese_voice_found = True
-                            self.logger.info(f"选择中文语音: {voice.name}")
+                            self._log(f"选择中文语音: {voice.name}")
                             break
             
             if not chinese_voice_found:
-                self.logger.warning("未找到中文语音，使用默认语音")
+                self._log("未找到中文语音，使用默认语音")
             
             engine.setProperty('rate', 150)
             engine.setProperty('volume', 0.8)
@@ -610,17 +666,17 @@ class YouTubePodcastGenerator:
             engine.runAndWait()
             
             if os.path.exists(output_path):
-                self.logger.info(f"pyttsx3音频生成成功: {output_path}")
+                self._log(f"pyttsx3音频生成成功: {output_path}")
                 return True
             else:
-                self.logger.error("pyttsx3未能创建音频文件")
+                self._log("pyttsx3未能创建音频文件")
                 return False
                 
         except ImportError:
-            self.logger.warning("pyttsx3库未安装，跳过。安装命令: pip install pyttsx3")
+            self._log("pyttsx3库未安装，跳过。安装命令: pip install pyttsx3")
             return False
         except Exception as e:
-            self.logger.warning(f"pyttsx3生成失败: {e}")
+            self._log(f"pyttsx3生成失败: {e}")
             return False
     
     def _convert_audio_format(self, input_path: str, output_path: str) -> bool:
@@ -634,17 +690,17 @@ class YouTubePodcastGenerator:
             # 导出为目标格式
             audio.export(output_path, format="wav")
             
-            self.logger.info(f"音频格式转换成功: {input_path} -> {output_path}")
+            self._log(f"音频格式转换成功: {input_path} -> {output_path}")
             return True
             
         except ImportError:
-            self.logger.warning("pydub库未安装，无法转换音频格式。安装命令: pip install pydub")
+            self._log("pydub库未安装，无法转换音频格式。安装命令: pip install pydub")
             # 如果无法转换，直接复制文件
             import shutil
             shutil.copy2(input_path, output_path)
             return True
         except Exception as e:
-            self.logger.warning(f"音频格式转换失败: {e}")
+            self._log(f"音频格式转换失败: {e}")
             return False
 
     def generate_podcast(self, youtube_url: str, custom_style: str = "casual,informative", 
@@ -660,34 +716,86 @@ class YouTubePodcastGenerator:
         Returns:
             生成的音频文件路径
         """
-        self.logger.info(f"开始生成播客: {youtube_url}")
+        self._log(f"开始生成播客: {youtube_url}")
         
         # 如果Podcastfy不可用，使用备用方法
         if self.use_fallback or not self.podcastfy_client:
-            self.logger.info("使用备用播客生成方法")
+            self._log("使用备用播客生成方法")
             return "fallback_mode"  # 标识使用备用模式
         
         try:
-            # 清理URL
-            clean_url = youtube_url.strip()
-            
             # 强化URL和字符串清理 - 移除所有不可打印字符
             def clean_string(s: str) -> str:
-                """清理字符串中的不可打印字符"""
+                """彻底清理字符串中的不可打印字符"""
                 if not s:
                     return ""
-                # 移除换行符、回车符、制表符等不可打印字符
-                cleaned = re.sub(r'[\n\r\t\x00-\x1f\x7f-\x9f]', '', str(s).strip())
-                return cleaned
+                # 转换为字符串并严格清理所有控制字符
+                s_str = str(s)
+                # 移除所有控制字符包括换行符、制表符等
+                cleaned = re.sub(r'[\x00-\x1f\x7f-\x9f\n\r\t\v\f]', '', s_str)
+                # 只保留可打印的ASCII字符和基本中文字符  
+                cleaned = re.sub(r'[^\x20-\x7e\u4e00-\u9fff]', '', cleaned)
+                # 规范化空白字符
+                cleaned = re.sub(r'\s+', ' ', cleaned.strip())
+                # 限制长度并确保结果有效
+                return cleaned[:500] if cleaned else ""
             
+            # 清理所有输入参数
+            clean_url = clean_string(youtube_url)
             clean_style = clean_string(custom_style)
             clean_language = clean_string(target_language)
             clean_instructions = clean_string(f"请生成一个关于YouTube视频的中文播客，目标语言是{clean_language}，内容要适合英语学习者收听")
             
-            self.logger.info(f"🔍 清理后的URL: {clean_url}")
-            self.logger.info(f"🎭 清理后的风格: {clean_style}")
+            self._log(f"🔍 清理后的URL: {clean_url}")
+            self._log(f"🔍 URL长度: {len(clean_url)}, URL字符检查: {repr(clean_url)}")
+            self._log(f"🎭 清理后的风格: {clean_style}")
             
-            # 使用正确的API端点和参数
+            # 额外验证所有参数不包含非打印字符
+            all_params = {
+                'clean_url': clean_url,
+                'clean_style': clean_style,
+                'clean_language': clean_language,
+                'clean_instructions': clean_instructions,
+                'gemini_key': clean_string(self.config['GEMINI_API_KEY'])[:10] + "...",
+                'elevenlabs_key': clean_string(self.config.get('ELEVENLABS_API_KEY', ''))[:10] + "..."
+            }
+            
+            # 检查每个参数是否包含非打印字符
+            for param_name, param_value in all_params.items():
+                if param_value and any(ord(c) < 32 or ord(c) > 126 for c in str(param_value) if c not in '一二三四五六七八九十'):
+                    self._log(f"⚠️ 参数{param_name}可能包含问题字符，长度: {len(param_value)}", "warning")
+                    # 显示前50个字符用于调试
+                    self._log(f"   内容预览: {repr(str(param_value)[:50])}", "debug")
+            
+            # 额外的URL验证
+            if '\\n' in repr(clean_url) or '\\r' in repr(clean_url):
+                self._log("⚠️ 检测到URL中仍有换行符，进行二次清理", "warning")
+                clean_url = clean_url.replace('\n', '').replace('\r', '').replace('\t', '').strip()
+                self._log(f"🔍 二次清理后的URL: {repr(clean_url)}")
+            
+            # 验证所有参数
+            all_params = {
+                'urls_input': clean_url,
+                'conversation_style': clean_style,
+                'user_instructions': clean_instructions
+            }
+            
+            for param_name, param_value in all_params.items():
+                if any(ord(c) < 32 or ord(c) == 127 for c in str(param_value)):
+                    self._log(f"⚠️ 参数{param_name}包含控制字符: {repr(param_value)}", "warning")
+            
+            # 修改Podcastfy参数，实现NotebookLM风格的纯对话
+            notebooklm_instructions = f"""
+            生成NotebookLM风格的纯对话播客，要求：
+            1. 绝对禁止开场白、介绍、总结、结束语
+            2. 只能是两个人的自然对话，一问一答
+            3. 像真实朋友聊天，深入讨论视频内容
+            4. 不要任何"欢迎来到播客"等话语
+            5. 直接开始讨论，自然结束
+            6. 保持口语化、真实、有深度的对话风格
+            目标语言：{target_language}
+            """
+            
             result = self.podcastfy_client.predict(
                 text_input="",
                 urls_input=clean_url,
@@ -696,30 +804,30 @@ class YouTubePodcastGenerator:
                 gemini_key=clean_string(self.config['GEMINI_API_KEY']),
                 openai_key="",  # 使用Edge TTS，不需要OpenAI密钥
                 elevenlabs_key=clean_string(self.config.get('ELEVENLABS_API_KEY', "")),
-                word_count=1500,
-                conversation_style=clean_style,
-                roles_person1=clean_string("主播助手"),
-                roles_person2=clean_string("学习导师"),
-                dialogue_structure=clean_string("引言,内容总结,学习要点,结语"),
-                podcast_name=clean_string("全球视野英语学习"),
-                podcast_tagline=clean_string("用中文播客理解英文内容"),
-                tts_model="edge",  # Podcastfy只支持edge, openai, elevenlabs
-                creativity_level=0.7,
-                user_instructions=clean_instructions,
-                api_name="/process_inputs"  # 使用正确的API端点
+                word_count=1200,  # 更精炼的对话长度
+                conversation_style=clean_string("natural,deep,conversational"),
+                roles_person1=clean_string("A"),  # 简化角色名
+                roles_person2=clean_string("B"),
+                dialogue_structure=clean_string("对话"),  # 禁用结构化的章节
+                podcast_name=clean_string(""),  # 禁用播客名称
+                podcast_tagline=clean_string(""),  # 禁用标语
+                tts_model="elevenlabs",  # 优先使用ElevenLabs获得最佳音质
+                creativity_level=0.8,  # 增加创造力，使对话更自然
+                user_instructions=clean_string(notebooklm_instructions),
+                api_name="/process_inputs"
             )
             
             # result应该包含生成的音频文件路径
             if result and len(result) > 0:
                 audio_path = result[0]  # 通常第一个元素是音频文件路径
-                self.logger.info(f"播客生成成功: {audio_path}")
+                self._log(f"播客生成成功: {audio_path}")
                 return audio_path
             else:
                 raise Exception("播客生成失败，未返回音频文件")
                 
         except Exception as e:
-            self.logger.error(f"Podcastfy播客生成失败: {e}")
-            self.logger.info("切换到备用播客生成方法")
+            self._log(f"Podcastfy播客生成失败: {e}")
+            self._log("切换到备用播客生成方法")
             self.use_fallback = True
             return "fallback_mode"
     
@@ -733,7 +841,7 @@ class YouTubePodcastGenerator:
         Returns:
             导读内容字典
         """
-        self.logger.info("开始生成中文导读")
+        self._log("开始生成中文导读")
         
         prompt = f"""
         请为以下英文YouTube视频生成一篇中文导读文章，用于英语学习：
@@ -773,13 +881,13 @@ class YouTubePodcastGenerator:
             json_match = re.search(r'\{.*\}', content_text, re.DOTALL)
             if json_match:
                 content_data = json.loads(json_match.group())
-                self.logger.info("导读内容生成成功")
+                self._log("导读内容生成成功")
                 return content_data
             else:
                 raise ValueError("无法解析Gemini返回的JSON内容")
                 
         except Exception as e:
-            self.logger.error(f"导读生成失败: {e}")
+            self._log(f"导读生成失败: {e}")
             # 返回默认内容
             return {
                 "title": f"【英语学习】{video_info['title'][:20]}",
@@ -830,11 +938,11 @@ class YouTubePodcastGenerator:
                 for chunk in response.iter_content(chunk_size=8192):
                     f.write(chunk)
             
-            self.logger.info(f"缩略图下载成功: {thumbnail_path}")
+            self._log(f"缩略图下载成功: {thumbnail_path}")
             return thumbnail_path
             
         except Exception as e:
-            self.logger.error(f"缩略图下载失败: {e}")
+            self._log(f"缩略图下载失败: {e}")
             return ""
     
     def save_audio_file(self, temp_audio_path: str, video_id: str) -> str:
@@ -857,11 +965,11 @@ class YouTubePodcastGenerator:
             import shutil
             shutil.copy2(temp_audio_path, final_audio_path)
             
-            self.logger.info(f"音频文件保存成功: {final_audio_path}")
+            self._log(f"音频文件保存成功: {final_audio_path}")
             return final_audio_path
             
         except Exception as e:
-            self.logger.error(f"音频文件保存失败: {e}")
+            self._log(f"音频文件保存失败: {e}")
             return temp_audio_path
     
     def create_jekyll_article(self, video_info: Dict[str, Any], content_guide: Dict[str, Any], 
@@ -963,15 +1071,15 @@ header:
             with open(article_path, 'w', encoding='utf-8') as f:
                 f.write(article_content)
             
-            self.logger.info(f"Jekyll文章创建成功: {article_path}")
+            self._log(f"Jekyll文章创建成功: {article_path}")
             return article_path
             
         except Exception as e:
-            self.logger.error(f"文章创建失败: {e}")
+            self._log(f"文章创建失败: {e}")
             raise
     
     def generate_from_youtube(self, youtube_url: str, custom_title: str = "", 
-                            tts_model: str = "edge", target_language: str = "zh-CN",
+                            tts_model: str = "elevenlabs", target_language: str = "zh-CN",
                             conversation_style: str = "casual,informative") -> Dict[str, str]:
         """
         从YouTube链接生成完整的播客学习资料
@@ -987,29 +1095,33 @@ header:
             生成结果字典
         """
         try:
-            self.logger.info(f"开始处理YouTube视频: {youtube_url}")
+            self._log(f"开始处理YouTube视频: {youtube_url}")
             
             # 1. 提取视频ID
             video_id = self.extract_video_id(youtube_url)
-            self.logger.info(f"视频ID: {video_id}")
+            self._log(f"视频ID: {video_id}")
             
             # 2. 获取视频信息
             video_info = self.get_video_info(video_id)
-            self.logger.info(f"视频标题: {video_info['title']}")
+            self._log(f"视频标题: {video_info['title']}")
             
             # 3. 生成播客
-            self.logger.info("正在生成中文播客（预计1-3分钟）...")
+            self._log("正在生成中文播客（预计1-3分钟）...")
             temp_audio_path = self.generate_podcast(youtube_url, conversation_style, target_language)
             
             # 检查是否使用备用模式
             if temp_audio_path == "fallback_mode":
-                self.logger.info("使用备用播客生成模式")
-                self.logger.info(f"配置参数 - 目标语言: {target_language}, 对话风格: {conversation_style}")
+                self._log("使用备用播客生成模式", "info", True)
+                self._log("🔄 步骤1/4: 初始化本地播客生成器...", "info", True)
+                self._log(f"配置参数 - 目标语言: {target_language}, 对话风格: {conversation_style}")
+                
                 # 生成播客脚本
+                self._log("🔄 步骤2/4: 正在生成播客脚本（可能需要30-60秒）...", "info", True)
                 script = self.generate_podcast_script(video_info, target_language, conversation_style)
-                self.logger.info(f"播客脚本生成完成，长度: {len(script)}字符")
+                self._log(f"播客脚本生成完成，长度: {len(script)}字符")
                 
                 # 尝试生成本地音频
+                self._log("🔄 步骤3/4: 准备音频生成...", "info", True)
                 today = datetime.now()
                 safe_title = self._generate_safe_filename(video_info['title'])
                 audio_filename = f"youtube-{today.strftime('%Y%m%d')}-{safe_title}.wav"
@@ -1020,31 +1132,38 @@ header:
                 script_path = os.path.join(self.audio_dir, script_filename)
                 with open(script_path, 'w', encoding='utf-8') as f:
                     f.write(script)
-                self.logger.info(f"📝 播客脚本已保存: {script_path}")
+                self._log(f"📝 播客脚本已保存: {script_path}")
                 
                 try:
-                    # 根据用户选择的TTS模型决定使用的引擎
+                    # 智能TTS引擎选择，优先ElevenLabs获得最佳音质
+                    self._log(f"🎯 TTS选择检查: tts_model={tts_model}, elevenlabs_available={self.elevenlabs_available}")
+                    
                     if tts_model == "elevenlabs" and self.elevenlabs_available:
-                        tts_engine = "elevenlabs"  # 使用ElevenLabs获得最高音质
-                    elif tts_model == "edge":
-                        tts_engine = "gtts"  # 使用Google TTS替代Edge TTS
+                        tts_engine = "elevenlabs"
+                        self._log("🎯 选择ElevenLabs - 最高质量AI语音")
+                    elif tts_model == "gtts":
+                        tts_engine = "gtts"
+                        self._log("🎯 选择Google TTS - 高质量语音")
                     elif tts_model == "espeak":
                         tts_engine = "espeak"
+                        self._log("🎯 选择eSpeak - 快速生成")
                     else:
-                        # 智能默认选择：ElevenLabs > Google TTS > eSpeak
+                        # 智能默认：始终优先ElevenLabs
                         if self.elevenlabs_available:
                             tts_engine = "elevenlabs"
+                            self._log("🎯 智能选择ElevenLabs（最高质量）")
                         else:
-                            tts_engine = "gtts"  # 默认使用Google TTS获得最佳音质
+                            tts_engine = "gtts"
+                            self._log("🎯 智能选择Google TTS（高质量）")
                     
-                    self.logger.info(f"使用TTS引擎: {tts_engine}")
+                    self._log(f"🔄 步骤4/4: 开始音频生成（使用{tts_engine}引擎，可能需要1-2分钟）...", "info", True)
                     if self.generate_local_audio(script, audio_path, tts_engine):
-                        self.logger.info(f"本地音频生成成功: {audio_path}")
+                        self._log(f"✅ 本地音频生成成功: {audio_path}", "info", True)
                     else:
                         raise Exception("所有TTS引擎都不可用")
                 except Exception as e:
-                    self.logger.warning(f"本地音频生成失败: {e}")
-                    self.logger.warning("将只提供文本脚本，请考虑安装eSpeak或其他TTS引擎")
+                    self._log(f"本地音频生成失败: {e}")
+                    self._log("将只提供文本脚本，请考虑安装eSpeak或其他TTS引擎")
                     # 设置音频路径为None，表示没有音频文件
                     audio_path = None
             else:
@@ -1055,12 +1174,12 @@ header:
             content_guide = self.generate_content_guide(video_info)
             if custom_title:
                 content_guide['title'] = custom_title
-                self.logger.info(f"使用自定义标题: {custom_title}")
+                self._log(f"使用自定义标题: {custom_title}")
             
             # 5. 下载缩略图
             thumbnail_path = self.download_thumbnail(video_info['thumbnail_url'], video_info)
             if not thumbnail_path:
-                self.logger.warning("缩略图下载失败")
+                self._log("缩略图下载失败")
             
             # 6. 创建Jekyll文章
             article_path = self.create_jekyll_article(
@@ -1076,11 +1195,11 @@ header:
                 'article_title': content_guide['title']
             }
             
-            self.logger.info("YouTube播客生成完成！")
+            self._log("YouTube播客生成完成！")
             return result
             
         except Exception as e:
-            self.logger.error(f"生成过程失败: {e}")
+            self._log(f"生成过程失败: {e}")
             return {
                 'status': 'error',
                 'error': str(e)
