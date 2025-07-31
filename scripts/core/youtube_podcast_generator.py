@@ -49,7 +49,7 @@ except ImportError:
 
 # MoviePy动态导入
 try:
-    import moviepy.editor
+    import moviepy.editor  # type: ignore
     MOVIEPY_AVAILABLE = True
 except ImportError:
     MOVIEPY_AVAILABLE = False
@@ -356,8 +356,8 @@ class YouTubePodcastGenerator:
             return "暂无相关内容"
     
     def generate_podcast_script(self, video_info: Dict[str, Any], 
-                              _target_language: str = "zh-CN",
-                              _conversation_style: str = "casual,informative") -> str:
+                              target_language: str = "zh-CN",
+                              conversation_style: str = "casual,informative") -> str:
         """
         生成NotebookLM风格的纯对话播客脚本
         """
@@ -548,7 +548,7 @@ class YouTubePodcastGenerator:
         
         try:
             # 使用正确的ElevenLabs API调用方式
-            if hasattr(self.elevenlabs_client, 'text_to_speech'):
+            if self.elevenlabs_client and hasattr(self.elevenlabs_client, 'text_to_speech'):
                 audio_generator = self.elevenlabs_client.text_to_speech.convert(
                     voice_id=voice_id,
                     text=text,
@@ -557,12 +557,15 @@ class YouTubePodcastGenerator:
                 )
             else:
                 # 使用兼容的API方法
-                from elevenlabs import generate, Voice
-                audio_generator = generate(
-                    text=text,
-                    voice=Voice(voice_id=voice_id),
-                    model="eleven_multilingual_v2"
-                )
+                try:
+                    from elevenlabs import generate, Voice  # type: ignore
+                    audio_generator = generate(
+                        text=text,
+                        voice=Voice(voice_id=voice_id),
+                        model="eleven_multilingual_v2"
+                    )
+                except ImportError:
+                    raise RuntimeError("ElevenLabs generate功能不可用，请检查库版本")
         except (AttributeError, ImportError):
             # 如果API方法不可用，抛出错误
             raise RuntimeError("ElevenLabs API方法不兼容，请检查库版本")
@@ -601,7 +604,7 @@ class YouTubePodcastGenerator:
                 
                 try:
                     # 使用正确的ElevenLabs API调用方式
-                    if hasattr(self.elevenlabs_client, 'text_to_speech'):
+                    if self.elevenlabs_client and hasattr(self.elevenlabs_client, 'text_to_speech'):
                         audio_generator = self.elevenlabs_client.text_to_speech.convert(
                             voice_id=voice_id,
                             text=segment_text,
@@ -610,12 +613,15 @@ class YouTubePodcastGenerator:
                         )
                     else:
                         # 使用兼容的API方法
-                        from elevenlabs import generate, Voice
-                        audio_generator = generate(
-                            text=segment_text,
-                            voice=Voice(voice_id=voice_id),
-                            model="eleven_multilingual_v2"
-                        )
+                        try:
+                            from elevenlabs import generate, Voice  # type: ignore
+                            audio_generator = generate(
+                                text=segment_text,
+                                voice=Voice(voice_id=voice_id),
+                                model="eleven_multilingual_v2"
+                            )
+                        except ImportError:
+                            raise RuntimeError("ElevenLabs generate功能不可用，请检查库版本")
                 except (AttributeError, ImportError):
                     # 如果API方法不可用，抛出错误
                     raise RuntimeError("ElevenLabs API方法不兼容，请检查库版本")
@@ -1295,7 +1301,7 @@ class YouTubePodcastGenerator:
             # 动态导入moviepy以避免必须依赖
             if not MOVIEPY_AVAILABLE:
                 raise ImportError("MoviePy not available")
-            from moviepy.editor import AudioFileClip, ImageClip
+            from moviepy.editor import AudioFileClip, ImageClip  # type: ignore
             
             self._log("使用moviepy生成音频视频")
             
@@ -1332,7 +1338,7 @@ class YouTubePodcastGenerator:
             self._log(f"moviepy生成失败: {e}")
             return False
     
-    def upload_to_youtube(self, video_path: str, _video_info: Dict[str, Any], 
+    def upload_to_youtube(self, video_path: str, video_info: Dict[str, Any], 
                          content_guide: Dict[str, Any], youtube_url: str) -> Optional[str]:
         """
         上传视频到YouTube
