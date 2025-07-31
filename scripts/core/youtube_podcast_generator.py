@@ -8,6 +8,7 @@ import os
 import re
 import json
 import requests
+import subprocess
 from datetime import datetime
 from typing import Dict, Any, Optional, List, Tuple
 import logging
@@ -45,6 +46,13 @@ try:
     MARKDOWN_AUDIO_TOOLS_AVAILABLE = True
 except ImportError:
     MARKDOWN_AUDIO_TOOLS_AVAILABLE = False
+
+# MoviePy动态导入
+try:
+    import moviepy.editor
+    MOVIEPY_AVAILABLE = True
+except ImportError:
+    MOVIEPY_AVAILABLE = False
 
 
 class YouTubePodcastGenerator:
@@ -348,8 +356,8 @@ class YouTubePodcastGenerator:
             return "暂无相关内容"
     
     def generate_podcast_script(self, video_info: Dict[str, Any], 
-                              target_language: str = "zh-CN",
-                              conversation_style: str = "casual,informative") -> str:
+                              _target_language: str = "zh-CN",
+                              _conversation_style: str = "casual,informative") -> str:
         """
         生成NotebookLM风格的纯对话播客脚本
         """
@@ -371,38 +379,25 @@ class YouTubePodcastGenerator:
             podcast_minutes = 5
             word_count = 1000
         
+        # 简化的英语学习播客prompt
         prompt = f"""
-        你是一个专业的播客主持人，请为以下YouTube视频生成一个完全模仿NotebookLM风格的对话播客。
+为YouTube视频《{video_info['title']}》生成{podcast_minutes}分钟中文学习播客对话。
 
-        视频信息：
-        标题: {video_info['title']}
-        描述: {video_info['description'][:800] if video_info['description'] else '暂无描述'}
-        频道: {video_info['channel_title']}
+重点：解释英语难点、文化背景、学习价值
+对象：中国英语学习者
+长度：{word_count}字
 
-        生成要求（严格遵守）：
-        1. **绝对禁止**：任何开场白、介绍、总结、结束语
-        2. **绝对禁止**：时间提示、章节划分、主持人自我介绍
-        3. **格式要求**：只能是两个人的对话，一问一答
-        4. **风格要求**：像两个朋友在咖啡馆聊天的自然对话
-        5. **内容深度**：深入讨论视频的核心观点，不是简单复述
-        6. **语言风格**：口语化、自然、有思考深度
+格式：
+[A]: 提问（关注英语学习难点）
+[B]: 解答（简单易懂，举例说明）
 
-        两个角色设定：
-        - A（好奇提问者）：提出关键问题，表达真实困惑，推动对话深入
-        - B（深度解析者）：提供深刻见解，用简单例子解释复杂概念
+要求：
+- 直接开始对话，无开场结束
+- 重点讲解英语表达和文化背景
+- 口语化、自然对话风格
+- 提供实用学习建议
 
-        输出格式（严格）：
-        [A]: 自然的提问或观点
-        [B]: 深入的回答和分析
-        
-        直接从第一句对话开始，最后一句对话结束。不要有任何其他内容。
-        对话长度控制在{word_count}字左右，保持{podcast_minutes}分钟的收听体验。
-        
-        记住：要像真实的人类对话，避免任何"播客腔"或"AI腔"。
-        
-        参数说明（保持兼容性）：
-        - 目标语言: {target_language}
-        - 对话风格: {conversation_style}
+直接输出对话内容：
         """
         
         try:
@@ -412,14 +407,17 @@ class YouTubePodcastGenerator:
             return script
         except Exception as e:
             self._log(f"播客脚本生成失败: {e}")
+            # 简化的备用脚本
             return f"""
-[主播助手]: 大家好，欢迎收听全球视野英语学习播客。今天我们要讨论的是YouTube视频《{video_info['title']}》。
+[A]: 今天这个视频《{video_info['title']}》很有意思，你觉得对英语学习者来说主要价值在哪里？
 
-[学习导师]: 这个视频来自{video_info['channel_title']}频道，时长{video_info['duration']}。让我们一起来了解其中的精彩内容。
+[B]: 我觉得最大的价值是可以学习到真实的英语表达。这类视频用词都比较地道，语速也适中。
 
-[主播助手]: 建议大家先听我们的中文导读，然后再观看原版视频，这样能更好地理解内容。
+[A]: 那具体应该怎么学呢？直接看可能有点困难。
 
-[学习导师]: 好的，今天的播客就到这里。记得点击原视频链接深入学习！
+[B]: 建议先听咱们的中文导读理解大意，然后再看英文原版，这样学习效果会更好。
+
+[A]: 这确实是个不错的学习方法，既能了解内容又能提高英语水平。
 """
 
     def generate_local_audio(self, script: str, output_path: str, tts_engine: str = "gtts", dual_speaker: bool = True) -> bool:
@@ -548,12 +546,26 @@ class YouTubePodcastGenerator:
         # 优先使用第一个可用的语音ID
         voice_id = available_voice_ids[0]
         
-        audio_generator = self.elevenlabs_client.text_to_speech.convert(
-            voice_id=voice_id,  # 使用经过验证的语音ID
-            text=text,
-            model_id="eleven_multilingual_v2",  # 多语言模型
-            voice_settings=voice_settings
-        )
+        try:
+            # 使用正确的ElevenLabs API调用方式
+            if hasattr(self.elevenlabs_client, 'text_to_speech'):
+                audio_generator = self.elevenlabs_client.text_to_speech.convert(
+                    voice_id=voice_id,
+                    text=text,
+                    model_id="eleven_multilingual_v2",
+                    voice_settings=voice_settings
+                )
+            else:
+                # 使用兼容的API方法
+                from elevenlabs import generate, Voice
+                audio_generator = generate(
+                    text=text,
+                    voice=Voice(voice_id=voice_id),
+                    model="eleven_multilingual_v2"
+                )
+        except (AttributeError, ImportError):
+            # 如果API方法不可用，抛出错误
+            raise RuntimeError("ElevenLabs API方法不兼容，请检查库版本")
         
         # 保存音频文件
         with open(output_path, 'wb') as f:
@@ -587,12 +599,26 @@ class YouTubePodcastGenerator:
                 voice_settings = self._get_speaker_settings(speaker, voice_config)
                 voice_id = self._get_speaker_voice_id(speaker, voice_config)
                 
-                audio_generator = self.elevenlabs_client.text_to_speech.convert(
-                    voice_id=voice_id,
-                    text=segment_text,
-                    model_id="eleven_multilingual_v2",
-                    voice_settings=voice_settings
-                )
+                try:
+                    # 使用正确的ElevenLabs API调用方式
+                    if hasattr(self.elevenlabs_client, 'text_to_speech'):
+                        audio_generator = self.elevenlabs_client.text_to_speech.convert(
+                            voice_id=voice_id,
+                            text=segment_text,
+                            model_id="eleven_multilingual_v2",
+                            voice_settings=voice_settings
+                        )
+                    else:
+                        # 使用兼容的API方法
+                        from elevenlabs import generate, Voice
+                        audio_generator = generate(
+                            text=segment_text,
+                            voice=Voice(voice_id=voice_id),
+                            model="eleven_multilingual_v2"
+                        )
+                except (AttributeError, ImportError):
+                    # 如果API方法不可用，抛出错误
+                    raise RuntimeError("ElevenLabs API方法不兼容，请检查库版本")
                 
                 # 收集音频数据
                 audio_data = b''.join(chunk for chunk in audio_generator)
@@ -605,9 +631,13 @@ class YouTubePodcastGenerator:
             # 合并音频片段
             if MARKDOWN_AUDIO_TOOLS_AVAILABLE:
                 combined_audio = self._merge_dialogue_segments(audio_segments)
-                combined_audio.export(output_path, format="wav")
-                self._log(f"✅ 双人对话音频生成成功: {output_path}")
-                return True
+                if combined_audio:
+                    combined_audio.export(output_path, format="wav")
+                    self._log(f"✅ 双人对话音频生成成功: {output_path}")
+                    return True
+                else:
+                    self._log("⚠️ 音频合并失败，切换到单人模式")
+                    return self._generate_single_speaker_audio(text, output_path)
             else:
                 self._log("⚠️ pydub未安装，无法合并音频，切换到单人模式")
                 return self._generate_single_speaker_audio(text, output_path)
@@ -677,7 +707,6 @@ class YouTubePodcastGenerator:
         
         dialogue_segments = []
         lines = text.split('\n')
-        current_speaker = 'A'  # 默认说话者
         
         for line in lines:
             line = line.strip()
@@ -710,9 +739,13 @@ class YouTubePodcastGenerator:
         
         return dialogue_segments
     
-    def _get_speaker_settings(self, speaker: str, voice_config: Dict[str, Any]) -> 'VoiceSettings':
+    def _get_speaker_settings(self, speaker: str, voice_config: Dict[str, Any]):
         """获取说话者的语音设置"""
-        from elevenlabs import VoiceSettings
+        try:
+            from elevenlabs import VoiceSettings
+        except ImportError:
+            # 如果ElevenLabs不可用，返回None
+            return None
         
         combination = voice_config.get('voice_combinations', {}).get('chinese_podcast', {})
         speaker_key = 'speaker_a' if speaker == 'A' else 'speaker_b'
@@ -733,10 +766,14 @@ class YouTubePodcastGenerator:
         return combination.get(speaker_key, {}).get('voice_id', 
             "21m00Tcm4TlvDq8ikWAM" if speaker == 'A' else "TxGEqnHWrfWFTfGW9XjX")
     
-    def _merge_dialogue_segments(self, audio_segments: List[bytes]) -> 'AudioSegment':
+    def _merge_dialogue_segments(self, audio_segments: List[bytes]):
         """合并对话音频片段"""
-        from pydub import AudioSegment
-        import io
+        try:
+            from pydub import AudioSegment
+            import io
+        except ImportError:
+            self._log("pydub未安装，无法合并音频片段")
+            return None
         
         combined_audio = AudioSegment.empty()
         
@@ -1098,34 +1135,27 @@ class YouTubePodcastGenerator:
         """
         self._log("开始生成中文导读")
         
+        # 简化的导读生成prompt
         prompt = f"""
-        请为以下英文YouTube视频生成一篇中文导读文章，用于英语学习：
+为YouTube视频生成英语学习导读：
 
-        视频标题: {video_info['title']}
-        视频描述: {video_info['description'][:500]}...
-        频道: {video_info['channel_title']}
-        时长: {video_info['duration']}
-        
-        请生成以下内容：
-        1. 25-35字符的中文标题（前缀：【英语学习】）
-        2. 50-60字的文章摘要
-        3. 4-5个要点的内容大纲
-        4. 英语学习建议（关键词汇、表达方式、文化背景）
-        5. 3-5个相关标签
-        
-        要求：
-        - 强调全球视野和学习价值
-        - 内容要吸引中文读者
-        - 突出英语学习的实用性
-        - 保持客观和专业的语调
-        
-        请以JSON格式返回，包含以下字段：
-        - title: 文章标题
-        - excerpt: 文章摘要  
-        - outline: 内容大纲（数组）
-        - learning_tips: 学习建议对象，包含vocabulary、expressions、cultural_context
-        - tags: 标签数组
-        - difficulty_level: 难度级别（初级/中级/高级）
+视频：{video_info['title']} | {video_info['channel_title']} | {video_info['duration']}
+
+请生成JSON格式：
+{{
+  "title": "【英语学习】{video_info['title'][:20]}的简短标题",
+  "excerpt": "学习价值描述(50字内)",
+  "outline": ["3-4个要点"],
+  "learning_tips": {{
+    "vocabulary": ["5个关键英语词汇"],
+    "expressions": ["3个实用表达"],
+    "cultural_context": "1-2句文化背景"
+  }},
+  "tags": ["英语学习", "相关话题"],
+  "difficulty_level": "初级/中级/高级"
+}}
+
+重点：实用性、易理解、有学习价值
         """
         
         try:
@@ -1200,6 +1230,201 @@ class YouTubePodcastGenerator:
             self._log(f"缩略图下载失败: {e}")
             return ""
     
+    def create_audio_video(self, audio_path: str, thumbnail_path: str, output_path: str) -> bool:
+        """
+        将音频和缩略图合成为视频文件，用于YouTube上传
+        
+        Args:
+            audio_path: 音频文件路径
+            thumbnail_path: 缩略图路径
+            output_path: 输出视频路径
+            
+        Returns:
+            是否成功生成视频
+        """
+        try:
+            
+            # 检查文件是否存在
+            if not os.path.exists(audio_path):
+                self._log(f"音频文件不存在: {audio_path}")
+                return False
+                
+            if not os.path.exists(thumbnail_path):
+                self._log(f"缩略图不存在: {thumbnail_path}")
+                return False
+            
+            self._log("开始生成音频视频文件")
+            
+            # 使用ffmpeg将音频和图片合成视频
+            ffmpeg_cmd = [
+                'ffmpeg', '-y',  # -y 覆盖输出文件
+                '-loop', '1',  # 循环图片
+                '-i', thumbnail_path,  # 输入图片
+                '-i', audio_path,  # 输入音频
+                '-c:v', 'libx264',  # 视频编码
+                '-c:a', 'aac',  # 音频编码
+                '-b:a', '192k',  # 音频比特率
+                '-pix_fmt', 'yuv420p',  # 像素格式
+                '-shortest',  # 以最短的输入为准
+                output_path
+            ]
+            
+            result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True, timeout=300)
+            
+            if result.returncode == 0:
+                self._log(f"✅ 音频视频生成成功: {output_path}")
+                return True
+            else:
+                self._log(f"ffmpeg错误: {result.stderr}")
+                # 尝试备用方案 - 使用moviepy
+                return self._create_audio_video_fallback(audio_path, thumbnail_path, output_path)
+                
+        except subprocess.TimeoutExpired:
+            self._log("ffmpeg执行超时，尝试备用方案")
+            return self._create_audio_video_fallback(audio_path, thumbnail_path, output_path)
+        except FileNotFoundError:
+            self._log("ffmpeg未安装，使用备用方案")
+            return self._create_audio_video_fallback(audio_path, thumbnail_path, output_path)
+        except Exception as e:
+            self._log(f"音频视频生成失败: {e}")
+            return False
+    
+    def _create_audio_video_fallback(self, audio_path: str, thumbnail_path: str, output_path: str) -> bool:
+        """使用moviepy作为备用方案生成音频视频"""
+        try:
+            # 动态导入moviepy以避免必须依赖
+            if not MOVIEPY_AVAILABLE:
+                raise ImportError("MoviePy not available")
+            from moviepy.editor import AudioFileClip, ImageClip
+            
+            self._log("使用moviepy生成音频视频")
+            
+            # 加载音频和图片
+            audio_clip = AudioFileClip(audio_path)
+            image_clip = ImageClip(thumbnail_path).set_duration(audio_clip.duration)
+            
+            # 设置视频分辨率
+            image_clip = image_clip.resize(height=720)  # 720p
+            
+            # 合成视频
+            video_clip = image_clip.set_audio(audio_clip)
+            
+            # 导出视频
+            video_clip.write_videofile(
+                output_path,
+                fps=1,  # 静态图片，低帧率即可
+                codec='libx264',
+                audio_codec='aac'
+            )
+            
+            # 清理资源
+            audio_clip.close()
+            image_clip.close()
+            video_clip.close()
+            
+            self._log(f"✅ moviepy音频视频生成成功: {output_path}")
+            return True
+            
+        except ImportError:
+            self._log("moviepy未安装，无法生成音频视频。请安装: pip install moviepy")
+            return False
+        except Exception as e:
+            self._log(f"moviepy生成失败: {e}")
+            return False
+    
+    def upload_to_youtube(self, video_path: str, _video_info: Dict[str, Any], 
+                         content_guide: Dict[str, Any], youtube_url: str) -> Optional[str]:
+        """
+        上传视频到YouTube
+        
+        Args:
+            video_path: 视频文件路径
+            video_info: 原始视频信息
+            content_guide: 导读内容
+            youtube_url: 原始YouTube链接
+            
+        Returns:
+            上传成功后的YouTube视频ID，失败返回None
+        """
+        if not self.youtube:
+            self._log("YouTube API未配置，无法上传")
+            return None
+            
+        try:
+            # 准备视频元数据
+            title = f"{content_guide['title']} | 中文播客导读"
+            description = f"""
+🎧 中文播客导读：{content_guide['excerpt']}
+
+📚 学习要点：
+{chr(10).join([f"• {point}" for point in content_guide['outline']])}
+
+🔤 关键词汇：
+{' | '.join(content_guide['learning_tips']['vocabulary'])}
+
+💬 常用表达：
+{' | '.join(content_guide['learning_tips']['expressions'])}
+
+🏛️ 文化背景：
+{content_guide['learning_tips']['cultural_context']}
+
+🌍 原视频链接：{youtube_url}
+
+---
+这是基于YouTube英文视频生成的中文学习播客，帮助中文用户理解英语内容，拓展全球视野。
+
+#英语学习 #播客 #全球视野 #中文导读
+            """.strip()
+            
+            # 准备上传参数
+            body = {
+                'snippet': {
+                    'title': title[:100],  # YouTube标题限制
+                    'description': description[:5000],  # YouTube描述限制
+                    'tags': content_guide['tags'] + ['英语学习播客', '中文导读', '全球视野'],
+                    'categoryId': '27',  # Education类别
+                    'defaultLanguage': 'zh-CN',
+                    'defaultAudioLanguage': 'zh-CN'
+                },
+                'status': {
+                    'privacyStatus': 'public',  # 或者使用 'unlisted' 进行测试
+                    'selfDeclaredMadeForKids': False
+                }
+            }
+            
+            self._log("开始上传到YouTube...")
+            
+            # 执行上传
+            from googleapiclient.http import MediaFileUpload
+            
+            media = MediaFileUpload(
+                video_path,
+                chunksize=-1,  # 一次性上传
+                resumable=True,
+                mimetype='video/*'
+            )
+            
+            request = self.youtube.videos().insert(
+                part=','.join(body.keys()),
+                body=body,
+                media_body=media
+            )
+            
+            response = request.execute()
+            
+            if 'id' in response:
+                video_id = response['id']
+                youtube_link = f"https://www.youtube.com/watch?v={video_id}"
+                self._log(f"✅ YouTube上传成功: {youtube_link}")
+                return video_id
+            else:
+                self._log("YouTube上传失败：未返回视频ID")
+                return None
+                
+        except Exception as e:
+            self._log(f"YouTube上传失败: {e}")
+            return None
+
     def save_audio_file(self, temp_audio_path: str, video_id: str) -> str:
         """
         保存音频文件到指定位置
@@ -1228,7 +1453,8 @@ class YouTubePodcastGenerator:
             return temp_audio_path
     
     def create_jekyll_article(self, video_info: Dict[str, Any], content_guide: Dict[str, Any], 
-                            youtube_url: str, audio_path: Optional[str] = None, thumbnail_path: str = "") -> str:
+                            youtube_url: str, audio_path: Optional[str] = None, thumbnail_path: str = "",
+                            youtube_video_id: Optional[str] = None) -> str:
         """
         创建Jekyll格式的文章
         
@@ -1238,6 +1464,7 @@ class YouTubePodcastGenerator:
             youtube_url: YouTube链接
             audio_path: 音频文件路径
             thumbnail_path: 缩略图路径
+            youtube_video_id: YouTube播客视频ID（可选）
             
         Returns:
             文章文件路径
@@ -1271,18 +1498,28 @@ header:
 <!-- more -->
 
 ## 🎧 中文播客导读
-{f'''<audio controls>
+{f'''<!-- YouTube播客优先显示 -->
+{f"<iframe width='560' height='315' src='https://www.youtube.com/embed/{youtube_video_id}' frameborder='0' allowfullscreen></iframe>" if youtube_video_id else ""}
+
+{f"🎙️ **[在YouTube上收听完整播客](https://www.youtube.com/watch?v={youtube_video_id})**" if youtube_video_id else ""}
+
+<!-- 本地音频备用 -->
+<audio controls>
   <source src="{audio_relative}" type="audio/mpeg">
   您的浏览器不支持音频播放。
 </audio>
 
-*建议配合原视频食用，通过中文播客快速理解英文内容精华*''' if audio_relative else '''
-> ⚠️ **音频生成失败**：本次未能生成音频文件，但播客文本脚本已保存在 `assets/audio/` 目录中。
+*建议配合原视频观看，通过中文播客快速理解英文内容精华*''' if audio_relative else f'''
+{f"<iframe width='560' height='315' src='https://www.youtube.com/embed/{youtube_video_id}' frameborder='0' allowfullscreen></iframe>" if youtube_video_id else ""}
+
+{f"🎙️ **[在YouTube上收听完整播客](https://www.youtube.com/watch?v={youtube_video_id})**" if youtube_video_id else ""}
+
+{"" if youtube_video_id else """> ⚠️ **音频生成失败**：本次未能生成音频文件，但播客文本脚本已保存在 `assets/audio/` 目录中。
 > 
 > 建议：
 > 1. 查看文本脚本了解播客内容结构
 > 2. 直接观看英文原视频进行学习
-> 3. 可考虑安装 eSpeak TTS 引擎以支持本地音频生成
+> 3. 可考虑安装 eSpeak TTS 引擎以支持本地音频生成"""}
 '''}
 
 ## 📋 内容大纲
@@ -1335,7 +1572,8 @@ header:
     
     def generate_from_youtube(self, youtube_url: str, custom_title: str = "", 
                             tts_model: str = "elevenlabs", target_language: str = "zh-CN",
-                            conversation_style: str = "casual,informative") -> Dict[str, str]:
+                            conversation_style: str = "casual,informative", 
+                            upload_to_youtube: bool = False) -> Dict[str, str]:
         """
         从YouTube链接生成完整的播客学习资料
         
@@ -1345,6 +1583,7 @@ header:
             tts_model: TTS模型 ("edge", "openai", "elevenlabs", "geminimulti")
             target_language: 目标语言 ("zh-CN", "en-US", "ja-JP", "ko-KR")
             conversation_style: 对话风格
+            upload_to_youtube: 是否上传播客到YouTube
             
         Returns:
             生成结果字典
@@ -1436,9 +1675,42 @@ header:
             if not thumbnail_path:
                 self._log("缩略图下载失败")
             
-            # 6. 创建Jekyll文章
+            # 6. YouTube上传（可选）
+            youtube_video_id = None
+            if upload_to_youtube and audio_path and thumbnail_path:
+                self._log("🔄 开始YouTube上传流程...")
+                
+                # 生成视频文件
+                today = datetime.now()
+                safe_title = self._generate_safe_filename(video_info['title'])
+                video_filename = f"youtube-{today.strftime('%Y%m%d')}-{safe_title}-podcast.mp4"
+                temp_video_path = os.path.join(".tmp", "output", "videos", video_filename)
+                
+                # 确保输出目录存在
+                os.makedirs(os.path.dirname(temp_video_path), exist_ok=True)
+                
+                # 创建音频视频
+                if self.create_audio_video(audio_path, thumbnail_path, temp_video_path):
+                    # 上传到YouTube
+                    youtube_video_id = self.upload_to_youtube(
+                        temp_video_path, video_info, content_guide, youtube_url
+                    )
+                    
+                    if youtube_video_id:
+                        self._log(f"✅ YouTube播客上传成功: https://www.youtube.com/watch?v={youtube_video_id}")
+                        # 清理临时视频文件
+                        try:
+                            os.remove(temp_video_path)
+                        except:
+                            pass
+                    else:
+                        self._log("⚠️ YouTube上传失败，播客仍保存在本地")
+                else:
+                    self._log("⚠️ 音频视频生成失败，跳过YouTube上传")
+            
+            # 7. 创建Jekyll文章（更新以包含YouTube链接）
             article_path = self.create_jekyll_article(
-                video_info, content_guide, youtube_url, audio_path, thumbnail_path
+                video_info, content_guide, youtube_url, audio_path, thumbnail_path, youtube_video_id
             )
             
             result = {
@@ -1447,7 +1719,9 @@ header:
                 'audio_path': audio_path,
                 'thumbnail_path': thumbnail_path,
                 'video_title': video_info['title'],
-                'article_title': content_guide['title']
+                'article_title': content_guide['title'],
+                'youtube_video_id': youtube_video_id,
+                'youtube_podcast_url': f"https://www.youtube.com/watch?v={youtube_video_id}" if youtube_video_id else None
             }
             
             self._log("YouTube播客生成完成！")

@@ -147,6 +147,20 @@ This section records critical architectural adjustments for the project:
 - **Test Isolation**: Each test should be independent and not rely on external state
 - **Cleanup**: Remove temporary test files after testing completion, maintain clean project structure
 
+### Virtual Environment Usage (CRITICAL)
+- **Virtual Environment Location**: `venv/` directory in project root
+- **Activation Command**: `source venv/bin/activate` (Linux/Mac) or `venv\Scripts\activate` (Windows)
+- **Requirements**: All dependencies listed in `requirements.txt`
+- **Python Version**: Python 3.8+ required
+- **Important**: ALWAYS activate virtual environment before:
+  - Running `run.py` or any project scripts
+  - Installing dependencies with `pip install`
+  - Running tests with `pytest`
+  - Using any Python development tools
+- **Verification**: Check activation with `which python` - should point to `venv/bin/python`
+- **Deactivation**: Use `deactivate` command when done
+- **IDE Configuration**: Ensure VS Code/PyCharm uses `venv/bin/python` as interpreter
+
 ### Git Workflow
 - **Commits**: Use descriptive commit messages following conventional commit format
 - **Branching**: Work on feature branches, merge to main after testing
