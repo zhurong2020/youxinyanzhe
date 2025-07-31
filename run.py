@@ -726,7 +726,8 @@ def handle_youtube_podcast_menu(pipeline):
             # YouTube上传选项
             upload_to_youtube = False
             youtube_key = os.getenv('YOUTUBE_API_KEY')
-            if youtube_key:
+            pipeline.log(f"YouTube API Key 检查: {'已配置' if youtube_key else '未配置'}", level="debug")
+            if youtube_key and youtube_key.strip():
                 print("\n📤 播客存储选项:")
                 print("1. 仅本地存储 (assets/audio/)")
                 print("2. 上传到YouTube (推荐，节省空间)")
@@ -1083,12 +1084,22 @@ def update_env_file(key, value=None):
         
         for line in env_lines:
             line_stripped = line.strip()
-            if line_stripped.startswith(f'{key}=') and not line_stripped.startswith('#'):
-                # 找到了要更新的key
+            
+            # 检查是否是目标key的行（包括注释掉的）
+            if (line_stripped.startswith(f'{key}=') or 
+                line_stripped.startswith(f'# {key}=') or
+                line_stripped.startswith(f'#{key}=')):
+                
                 key_found = True
                 if value is not None:
+                    # 启用并设置新值
                     updated_lines.append(f'{key}={value}\n')
-                # 如果value为None，跳过这行（删除）
+                else:
+                    # 注释掉该行（保留原值作为备份）
+                    if not line_stripped.startswith('#'):
+                        updated_lines.append(f'# {line}')
+                    else:
+                        updated_lines.append(line)  # 已经是注释，保持不变
             else:
                 updated_lines.append(line)
         
@@ -1105,6 +1116,55 @@ def update_env_file(key, value=None):
     except Exception as e:
         print(f"❌ 更新.env文件失败: {e}")
         return False
+
+
+def create_export_script(config_type="default"):
+    """创建环境变量导出脚本，用于在WSL命令行中设置环境变量
+    
+    Args:
+        config_type: 配置类型 ("default", "qwen", "kimi")
+    """
+    script_path = Path(".tmp/set_llm_env.sh")
+    script_path.parent.mkdir(exist_ok=True)
+    
+    try:
+        with open(script_path, 'w', encoding='utf-8') as f:
+            f.write("#!/bin/bash\n")
+            f.write("# LLM引擎环境变量设置脚本\n")
+            f.write("# 使用方法: source .tmp/set_llm_env.sh\n\n")
+            
+            if config_type == "qwen":
+                f.write("# 设置千问3-code引擎\n")
+                f.write("export ANTHROPIC_BASE_URL='https://dashscope.aliyuncs.com/api/v2'\n")
+                f.write("export ANTHROPIC_AUTH_TOKEN='sk-258b0d7d3f39412f93b43df2e9446b43'\n")
+                f.write("unset ANTHROPIC_API_KEY\n")
+                f.write("echo '✅ 已设置千问3-code引擎环境变量'\n")
+            elif config_type == "kimi":
+                f.write("# 设置Kimi K2引擎\n")
+                f.write("export ANTHROPIC_BASE_URL='https://api.moonshot.ai/anthropic'\n")
+                f.write("export ANTHROPIC_AUTH_TOKEN='sk-qAvR9EygbSliadXY3OTnxPIqruyF27uPQQakXyOWVQOxH1D5'\n")
+                f.write("unset ANTHROPIC_API_KEY\n")
+                f.write("echo '✅ 已设置Kimi K2引擎环境变量'\n")
+            else:  # default
+                f.write("# 恢复Claude Pro默认模式\n")
+                f.write("unset ANTHROPIC_BASE_URL\n")
+                f.write("unset ANTHROPIC_AUTH_TOKEN\n")
+                f.write("unset ANTHROPIC_API_KEY\n")
+                f.write("echo '✅ 已恢复Claude Pro默认模式'\n")
+            
+            f.write("\n# 显示当前配置\n")
+            f.write("echo '📊 当前LLM引擎配置:'\n")
+            f.write("echo \"ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:-'未设置 (默认)'}\"\n")
+            f.write("echo \"ANTHROPIC_AUTH_TOKEN: ${ANTHROPIC_AUTH_TOKEN:0:8}...${ANTHROPIC_AUTH_TOKEN: -8}\" 2>/dev/null || echo \"ANTHROPIC_AUTH_TOKEN: 未设置\"\n")
+            f.write("echo \"ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:0:8}...${ANTHROPIC_API_KEY: -4}\" 2>/dev/null || echo \"ANTHROPIC_API_KEY: 未设置\"\n")
+        
+        # 设置执行权限
+        script_path.chmod(0o755)
+        return str(script_path)
+        
+    except Exception as e:
+        print(f"❌ 创建导出脚本失败: {e}")
+        return None
 
 def handle_llm_engine_menu(pipeline):
     """处理LLM引擎切换菜单"""
@@ -1157,9 +1217,10 @@ def handle_llm_engine_menu(pipeline):
     print("4. 查看引擎配置详情")
     print("5. 测试当前引擎连接")
     print("6. 重置引擎配置")
+    print("7. 生成WSL环境变量设置脚本")
     print("0. 返回主菜单")
     
-    sub_choice = input("\n请输入选项 (1-6/0): ").strip()
+    sub_choice = input("\n请输入选项 (1-7/0): ").strip()
     pipeline.log(f"LLM引擎切换 - 用户选择: {sub_choice}", level="info", force=True)
     
     if sub_choice == "1":
@@ -1180,6 +1241,9 @@ def handle_llm_engine_menu(pipeline):
             for var in env_vars_to_clear:
                 update_env_file(var, None)  # 删除.env文件中的配置
             
+            # 生成WSL导出脚本
+            script_path = create_export_script("default")
+            
             print("✅ 已恢复Claude Pro模式")
             print("📝 配置详情：")
             print("   • 使用模式: Claude Pro订阅 ($20/月)")
@@ -1189,10 +1253,16 @@ def handle_llm_engine_menu(pipeline):
             if cleared_vars:
                 print("   • 已清除的运行时配置:", ", ".join(cleared_vars))
             print("   • 📁 已从.env文件中移除相关配置")
+            
+            if script_path:
+                print(f"   • 🚀 WSL导出脚本: {script_path}")
+            
             print("\n⚠️  重要提示：")
             print("   • 当前run.py进程中配置已生效")
             print("   • Claude Code终端需要重启才能完全生效")
-            print("   • 建议：关闭并重新打开Claude Code终端")
+            print("   • 建议方案1：关闭并重新打开Claude Code终端")
+            if script_path:
+                print(f"   • 建议方案2：在WSL中运行: source {script_path}")
             
             pipeline.log("LLM引擎恢复到Claude Pro模式，已持久化到.env文件", level="info", force=True)
             
@@ -1221,16 +1291,25 @@ def handle_llm_engine_menu(pipeline):
             update_env_file('ANTHROPIC_BASE_URL', qwen_base_url)
             update_env_file('ANTHROPIC_AUTH_TOKEN', qwen_api_key)
             
+            # 生成WSL导出脚本
+            script_path = create_export_script("qwen")
+            
             print("✅ 已切换到千问3-code引擎")
             print("📝 配置详情：")
             print(f"   • ANTHROPIC_BASE_URL: {qwen_base_url}")
             print(f"   • ANTHROPIC_AUTH_TOKEN: {qwen_api_key[:8]}...{qwen_api_key[-8:]}")
             print("   • ANTHROPIC_API_KEY: 🚫 已清除")
             print("   • 📁 配置已持久化到.env文件")
+            
+            if script_path:
+                print(f"   • 🚀 WSL导出脚本: {script_path}")
+            
             print("\n⚠️  重要提示：")
             print("   • 当前run.py进程中配置已生效")
             print("   • Claude Code终端需要重启才能完全生效")
-            print("   • 建议：关闭并重新打开Claude Code终端")
+            print("   • 建议方案1：关闭并重新打开Claude Code终端")
+            if script_path:
+                print(f"   • 建议方案2：在WSL中运行: source {script_path}")
             
             pipeline.log("LLM引擎切换到千问3-code，已持久化到.env文件", level="info", force=True)
             
@@ -1259,6 +1338,9 @@ def handle_llm_engine_menu(pipeline):
             update_env_file('ANTHROPIC_BASE_URL', kimi_base_url)
             update_env_file('ANTHROPIC_AUTH_TOKEN', kimi_api_key)
             
+            # 生成WSL导出脚本
+            script_path = create_export_script("kimi")
+            
             print("✅ 已切换到Kimi K2引擎")
             print("📝 配置详情：")
             print(f"   • ANTHROPIC_BASE_URL: {kimi_base_url}")
@@ -1268,10 +1350,16 @@ def handle_llm_engine_menu(pipeline):
             print("   • 定价: $0.6/M输入, $2.5/M输出")
             print("   • SWE-Bench得分: 65.8%")
             print("   • 📁 配置已持久化到.env文件")
+            
+            if script_path:
+                print(f"   • 🚀 WSL导出脚本: {script_path}")
+            
             print("\n⚠️  重要提示：")
             print("   • 当前run.py进程中配置已生效")
             print("   • Claude Code终端需要重启才能完全生效")
-            print("   • 建议：关闭并重新打开Claude Code终端")
+            print("   • 建议方案1：关闭并重新打开Claude Code终端")
+            if script_path:
+                print(f"   • 建议方案2：在WSL中运行: source {script_path}")
             
             pipeline.log("LLM引擎切换到Kimi K2，已持久化到.env文件", level="info", force=True)
             
@@ -1417,6 +1505,111 @@ def handle_llm_engine_menu(pipeline):
                 pipeline.log(f"LLM引擎配置重置失败: {e}", level="error", force=True)
         else:
             print("已取消重置操作")
+    
+    elif sub_choice == "7":
+        # 生成WSL环境变量设置脚本
+        print("\n🚀 生成WSL环境变量设置脚本")
+        print("="*40)
+        print("📋 功能说明：")
+        print("   • 生成可在WSL命令行中执行的环境变量设置脚本")
+        print("   • 解决Claude Code终端重启才能生效的问题")
+        print("   • 支持所有引擎模式的快速切换")
+        
+        print("\n请选择要生成的脚本类型：")
+        print("1. Claude Pro默认模式脚本")
+        print("2. 千问3-code引擎脚本")
+        print("3. Kimi K2引擎脚本")
+        print("4. 生成所有脚本")
+        print("0. 返回上级菜单")
+        
+        script_choice = input("\n请输入选项 (1-4/0): ").strip()
+        
+        if script_choice == "0":
+            pass  # 返回上级菜单
+        elif script_choice == "1":
+            script_path = create_export_script("default")
+            if script_path:
+                print(f"✅ Claude Pro默认模式脚本已生成: {script_path}")
+                print(f"💡 使用方法: source {script_path}")
+                pipeline.log(f"生成Claude Pro模式WSL脚本: {script_path}", level="info", force=True)
+        elif script_choice == "2":
+            script_path = create_export_script("qwen")
+            if script_path:
+                # 为千问脚本创建单独文件
+                qwen_script = Path(".tmp/set_qwen_env.sh")
+                with open(script_path, 'r') as f:
+                    content = f.read()
+                with open(qwen_script, 'w') as f:
+                    f.write(content)
+                qwen_script.chmod(0o755)
+                print(f"✅ 千问3-code引擎脚本已生成: {qwen_script}")
+                print(f"💡 使用方法: source {qwen_script}")
+                pipeline.log(f"生成千问3-code模式WSL脚本: {qwen_script}", level="info", force=True)
+        elif script_choice == "3":
+            script_path = create_export_script("kimi")
+            if script_path:
+                # 为Kimi脚本创建单独文件
+                kimi_script = Path(".tmp/set_kimi_env.sh")
+                with open(script_path, 'r') as f:
+                    content = f.read()
+                with open(kimi_script, 'w') as f:
+                    f.write(content)
+                kimi_script.chmod(0o755)
+                print(f"✅ Kimi K2引擎脚本已生成: {kimi_script}")
+                print(f"💡 使用方法: source {kimi_script}")
+                pipeline.log(f"生成Kimi K2模式WSL脚本: {kimi_script}", level="info", force=True)
+        elif script_choice == "4":
+            # 生成所有脚本
+            scripts = {}
+            scripts['default'] = create_export_script("default")
+            scripts['qwen'] = create_export_script("qwen")  
+            scripts['kimi'] = create_export_script("kimi")
+            
+            # 创建单独的命名脚本
+            if scripts['default']:
+                default_script = Path(".tmp/set_claude_pro_env.sh")
+                with open(scripts['default'], 'r') as f:
+                    content = f.read()
+                with open(default_script, 'w') as f:
+                    f.write(content)
+                default_script.chmod(0o755)
+                scripts['default_named'] = default_script
+                
+            if scripts['qwen']:
+                qwen_script = Path(".tmp/set_qwen_env.sh")
+                with open(scripts['qwen'], 'r') as f:
+                    content = f.read()
+                with open(qwen_script, 'w') as f:
+                    f.write(content)
+                qwen_script.chmod(0o755)
+                scripts['qwen_named'] = qwen_script
+                
+            if scripts['kimi']:
+                kimi_script = Path(".tmp/set_kimi_env.sh")
+                with open(scripts['kimi'], 'r') as f:
+                    content = f.read()
+                with open(kimi_script, 'w') as f:
+                    f.write(content)
+                kimi_script.chmod(0o755)
+                scripts['kimi_named'] = kimi_script
+            
+            print("✅ 所有引擎脚本已生成完成")
+            print("📁 脚本位置:")
+            if scripts.get('default_named'):
+                print(f"   • Claude Pro: {scripts['default_named']}")
+            if scripts.get('qwen_named'):
+                print(f"   • 千问3-code: {scripts['qwen_named']}")
+            if scripts.get('kimi_named'):
+                print(f"   • Kimi K2: {scripts['kimi_named']}")
+            
+            print("\n💡 使用方法:")
+            print("   • 切换到Claude Pro: source .tmp/set_claude_pro_env.sh")
+            print("   • 切换到千问3-code: source .tmp/set_qwen_env.sh")
+            print("   • 切换到Kimi K2: source .tmp/set_kimi_env.sh")
+            
+            pipeline.log("生成所有LLM引擎WSL脚本", level="info", force=True)
+        else:
+            print("❌ 无效的选择")
     
     input("\n按Enter键返回主菜单...")
 
