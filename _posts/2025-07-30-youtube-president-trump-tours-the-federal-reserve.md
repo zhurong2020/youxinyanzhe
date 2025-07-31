@@ -8,8 +8,8 @@ date: 2025-07-30
 excerpt: 本视频为白宫在2025年7月24日发布的。您可以通过这个视频学习英文。
 header:
   overlay_filter: 0.5
-  overlay_image: '{{ site.baseurl }}/assets/images/posts/2025/07/youtube-20250730-president-trump-tours-the-federal-reserve-thumbnail.jpg'
-  teaser: '{{ site.baseurl }}/assets/images/posts/2025/07/youtube-20250730-president-trump-tours-the-federal-reserve-thumbnail.jpg'
+  overlay_image: https://1drv.ms/i/c/5644dab129afda10/IQTsKliZzOU0S7QUZnlRGwblARGCaUcf9CiE_n-EXtQoTUo
+  teaser: https://1drv.ms/i/c/5644dab129afda10/IQTsKliZzOU0S7QUZnlRGwblARGCaUcf9CiE_n-EXtQoTUo
 last_modified_at: '2025-07-30 20:51:14'
 layout: single
 related: true
