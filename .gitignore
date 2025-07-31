@@ -45,6 +45,11 @@ coverage.xml
 .build/
 .tmp/
 
+# YouTube OAuth凭据（敏感信息）
+config/youtube_oauth_credentials.json
+config/youtube_oauth_token.json
+youtube_videos/
+
 # 数据文件（包含敏感信息和缓存）
 _data/image_mappings.yml
 _data/github_releases.json

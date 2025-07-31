@@ -19,6 +19,8 @@ beautifulsoup4>=4.12.3 # 用于从HTML中提取文本
 # YouTube播客生成器专用依赖
 gradio-client>=0.8.0  # Podcastfy API客户端
 google-api-python-client>=2.0.0  # YouTube Data API (可选)
+google-auth-oauthlib>=1.0.0  # Google OAuth2认证流程
+google-auth-httplib2>=0.2.0  # Google API HTTP认证传输
 gtts>=2.3.0  # Google Text-to-Speech (高质量中文语音)
 pydub>=0.25.0  # 音频格式转换
 pygame>=2.1.0  # 音频处理支持
