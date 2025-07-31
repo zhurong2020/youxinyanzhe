@@ -57,15 +57,17 @@ def main():
         print("7. 文章更新工具")
         print("8. 调试和维护工具")
         print("9. LLM引擎切换")
+        print("10. ElevenLabs语音测试")
         print("\n0. 退出")
         
-        choice = input("\n请输入选项 (1-9/0): ").strip()
+        choice = input("\n请输入选项 (1-10/0): ").strip()
         
         # 记录用户选择的操作
         choice_names = {
             '1': '处理现有草稿', '2': '重新发布已发布文章', '3': '生成测试文章',
             '4': '内容变现管理', '5': '系统状态检查', '6': 'YouTube播客生成器',
-            '7': '文章更新工具', '8': '调试和维护工具', '9': 'LLM引擎切换', '0': '退出'
+            '7': '文章更新工具', '8': '调试和维护工具', '9': 'LLM引擎切换', 
+            '10': 'ElevenLabs语音测试', '0': '退出'
         }
         operation_name = choice_names.get(choice, '无效选择')
         pipeline.log(f"用户选择操作: {choice} ({operation_name})", level="info", force=True)
@@ -130,6 +132,10 @@ def main():
         elif choice == "9":
             # LLM引擎切换
             handle_llm_engine_menu(pipeline)
+            continue  # 返回主菜单
+        elif choice == "10":
+            # ElevenLabs语音测试
+            handle_elevenlabs_menu(pipeline)
             continue  # 返回主菜单
         elif choice == "0":
             print("👋 再见！")
@@ -626,11 +632,36 @@ def handle_youtube_podcast_menu(pipeline):
             youtube_url = input("\n请输入YouTube视频链接: ").strip()
             if not youtube_url:
                 print("❌ YouTube链接不能为空")
+                input("按Enter键返回菜单...")
                 return
             
             # 验证YouTube链接格式
             if not ("youtube.com" in youtube_url or "youtu.be" in youtube_url):
                 print("❌ 请输入有效的YouTube链接")
+                print("✅ 支持的格式:")
+                print("   • https://www.youtube.com/watch?v=VIDEO_ID")
+                print("   • https://youtu.be/VIDEO_ID")
+                print("   • https://www.youtube.com/embed/VIDEO_ID")
+                input("按Enter键返回菜单...")
+                return
+            
+            # 进一步验证URL格式
+            import re
+            youtube_patterns = [
+                r'(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)',
+                r'youtube\.com\/v\/([^&\n?#]+)'
+            ]
+            
+            video_id_found = False
+            for pattern in youtube_patterns:
+                if re.search(pattern, youtube_url):
+                    video_id_found = True
+                    break
+            
+            if not video_id_found:
+                print("❌ 无法从URL中提取视频ID，请检查链接格式")
+                print("✅ 正确示例: https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                input("按Enter键返回菜单...")
                 return
             
             custom_title = input("请输入自定义标题 (可选，留空使用自动生成): ").strip()
@@ -1352,6 +1383,208 @@ def handle_llm_engine_menu(pipeline):
             print("已取消重置操作")
     
     input("\n按Enter键返回主菜单...")
+
+
+def handle_elevenlabs_menu(pipeline):
+    """处理ElevenLabs语音测试菜单"""
+    import subprocess
+    
+    while True:
+        print("\n" + "="*50)
+        print("🎙️ ElevenLabs语音测试工具")
+        print("="*50)
+        print("🔧 测试工具：")
+        print("1. API权限检查")
+        print("2. 声音测试器（完整功能）")
+        print("3. 双人对话功能测试")
+        print("\n📊 信息查看：")
+        print("4. 查看配置状态")
+        print("5. 查看测试结果")
+        print("\n📖 帮助文档：")
+        print("6. 快速开始指南")
+        print("7. 功能使用说明")
+        print("\n0. 返回主菜单")
+        
+        choice = input("\n请输入选项 (1-7/0): ").strip()
+        
+        if choice == "0":
+            break
+        elif choice == "1":
+            # API权限检查
+            print("\n🔍 执行ElevenLabs API权限检查...")
+            pipeline.log("执行ElevenLabs API权限检查", level="info", force=True)
+            try:
+                result = subprocess.run(
+                    ["python", "scripts/tools/elevenlabs_permission_check.py"],
+                    capture_output=False,
+                    text=True
+                )
+                if result.returncode != 0:
+                    print("⚠️ 权限检查执行异常，请检查ElevenLabs配置")
+                    pipeline.log(f"ElevenLabs权限检查异常，返回码: {result.returncode}", level="warning", force=True)
+            except Exception as e:
+                print(f"❌ 执行权限检查失败: {e}")
+                pipeline.log(f"ElevenLabs权限检查失败: {e}", level="error", force=True)
+                
+        elif choice == "2":
+            # 声音测试器
+            print("\n🎙️ 启动ElevenLabs声音测试器...")
+            print("💡 提示: 推荐选择以下测试选项:")
+            print("   • 选项2: 获取可用TTS模型")
+            print("   • 选项4: 创建双人对话播客测试")
+            print("   • 选项7: 完整测试流程")
+            print()
+            pipeline.log("启动ElevenLabs声音测试器", level="info", force=True)
+            try:
+                subprocess.run(["python", "scripts/tools/elevenlabs_voice_tester.py"])
+            except Exception as e:
+                print(f"❌ 启动声音测试器失败: {e}")
+                pipeline.log(f"ElevenLabs声音测试器启动失败: {e}", level="error", force=True)
+                
+        elif choice == "3":
+            # 双人对话功能测试
+            print("\n🎭 执行双人对话功能测试...")
+            pipeline.log("执行ElevenLabs双人对话功能测试", level="info", force=True)
+            try:
+                result = subprocess.run(
+                    ["python", "scripts/tools/test_dual_voice_podcast.py"],
+                    capture_output=False,
+                    text=True
+                )
+                if result.returncode == 0:
+                    print("\n✅ 双人对话功能测试完成")
+                    pipeline.log("ElevenLabs双人对话功能测试成功", level="info", force=True)
+                else:
+                    print("\n⚠️ 双人对话功能测试异常")
+                    pipeline.log(f"ElevenLabs双人对话功能测试异常，返回码: {result.returncode}", level="warning", force=True)
+            except Exception as e:
+                print(f"❌ 执行双人对话测试失败: {e}")
+                pipeline.log(f"ElevenLabs双人对话测试失败: {e}", level="error", force=True)
+                
+        elif choice == "4":
+            # 查看配置状态
+            print("\n📊 ElevenLabs配置状态")
+            print("="*40)
+            
+            # 检查环境变量
+            elevenlabs_key = os.getenv('ELEVENLABS_API_KEY', '')
+            print(f"🔑 API密钥: {'✅ 已配置 (' + elevenlabs_key[:10] + '...)' if elevenlabs_key else '❌ 未配置'}")
+            
+            # 检查配置文件
+            config_file = Path("config/elevenlabs_voices.yml")
+            template_file = Path("config/elevenlabs_voices_template.yml")
+            
+            print(f"📄 配置文件: {'✅ 存在' if config_file.exists() else '❌ 不存在'}")
+            print(f"📄 模板文件: {'✅ 存在' if template_file.exists() else '❌ 不存在'}")
+            
+            # 检查测试结果目录
+            test_dir = Path("tests/elevenlabs_voice_tests")
+            print(f"📁 测试目录: {'✅ 存在' if test_dir.exists() else '❌ 不存在'}")
+            
+            if test_dir.exists():
+                test_files = list(test_dir.glob("*"))
+                print(f"📊 测试文件: {len(test_files)} 个")
+                
+            # 检查依赖库
+            print("\n📦 依赖库状态:")
+            try:
+                import elevenlabs
+                print("✅ elevenlabs: 已安装")
+            except ImportError:
+                print("❌ elevenlabs: 未安装")
+                
+            try:
+                import pydub
+                print("✅ pydub: 已安装 (音频合并支持)")
+            except ImportError:
+                print("❌ pydub: 未安装 (影响双人对话功能)")
+                
+            try:
+                import yaml
+                print("✅ PyYAML: 已安装 (配置文件支持)")
+            except ImportError:
+                print("❌ PyYAML: 未安装 (将使用默认配置)")
+                
+        elif choice == "5":
+            # 查看测试结果
+            print("\n📊 ElevenLabs测试结果")
+            print("="*40)
+            
+            test_dir = Path("tests/elevenlabs_voice_tests")
+            if not test_dir.exists():
+                print("❌ 测试目录不存在，请先运行测试")
+            else:
+                test_files = list(test_dir.glob("*"))
+                if not test_files:
+                    print("📝 测试目录为空，请先运行测试")
+                else:
+                    print(f"📁 测试目录: {test_dir}")
+                    print(f"📊 文件总数: {len(test_files)}")
+                    print("\n📄 测试文件列表:")
+                    
+                    for file in sorted(test_files):
+                        if file.is_file():
+                            size = file.stat().st_size
+                            if size > 1024:
+                                size_str = f"{size/1024:.1f}KB"
+                            else:
+                                size_str = f"{size}B"
+                            print(f"   • {file.name} ({size_str})")
+                        else:
+                            print(f"   📁 {file.name}/")
+            
+            # 检查主要测试音频文件
+            main_test_files = [
+                "tests/dual_voice_test.wav",
+                "tests/single_voice_test.wav"
+            ]
+            
+            print("\n🎧 主要测试音频:")
+            for test_file in main_test_files:
+                file_path = Path(test_file)
+                if file_path.exists():
+                    size = file_path.stat().st_size
+                    size_str = f"{size/1024:.1f}KB" if size > 1024 else f"{size}B"
+                    print(f"   ✅ {file_path.name} ({size_str})")
+                else:
+                    print(f"   ❌ {file_path.name} (不存在)")
+                    
+        elif choice == "6":
+            # 快速开始指南
+            print("\n📖 显示快速开始指南...")
+            guide_file = Path("ELEVENLABS_QUICKSTART.md")
+            if guide_file.exists():
+                try:
+                    with open(guide_file, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    print("\n" + "="*60)
+                    print(content)
+                    print("="*60)
+                except Exception as e:
+                    print(f"❌ 读取指南失败: {e}")
+            else:
+                print("❌ 快速开始指南文件不存在")
+                
+        elif choice == "7":
+            # 功能使用说明
+            print("\n📖 显示功能使用说明...")
+            status_file = Path("ELEVENLABS_STATUS.md")
+            if status_file.exists():
+                try:
+                    with open(status_file, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    print("\n" + "="*60)
+                    print(content)
+                    print("="*60)
+                except Exception as e:
+                    print(f"❌ 读取说明失败: {e}")
+            else:
+                print("❌ 功能使用说明文件不存在")
+        else:
+            print("❌ 无效的选择，请重新输入")
+        
+        if choice in ["6", "7"]:
+            input("\n按Enter键继续...")
 
 
 if __name__ == "__main__":
