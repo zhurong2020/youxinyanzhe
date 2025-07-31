@@ -10,7 +10,7 @@
 
 - 📝 **智能内容处理** - AI驱动的内容生成与优化
 - 🚀 **多平台发布** - GitHub Pages、微信公众号、WordPress
-- 🎧 **音频生成** - 自动创建文章播客版本
+- 🎧 **高质量音频生成** - ElevenLabs双人对话播客，媲美NotebookLM
 - 🎬 **YouTube播客生成器** - 将英文YouTube视频转换为中文学习播客
 - 📊 **发布状态管理** - 跟踪多平台发布状态
 - 💰 **内容变现** - 集成打赏和内容付费系统
@@ -42,7 +42,8 @@ python run.py
 | **配置指南** | [Gemini配置](docs/setup/gemini_setup.md) | AI模型配置说明 |
 | | [TTS设置](docs/setup/tts_setup.md) | 文本转语音配置 |
 | | [YouTube播客设置](docs/setup/youtube_podcast_setup.md) | YouTube播客完整配置 |
-| **功能指南** | [ElevenLabs集成](docs/guides/elevenlabs_integration_guide.md) | 高质量语音合成 |
+| **功能指南** | [双人对话播客](docs/guides/dual_voice_podcast_guide.md) | ElevenLabs双人对话功能 |
+| | [ElevenLabs语音测试](docs/guides/elevenlabs_voice_testing_guide.md) | 语音测试和配置指南 |
 | | [YouTube TTS升级](docs/guides/youtube_tts_upgrade_guide.md) | TTS引擎升级指南 |
 | **系统文档** | [集成指南](docs/INTEGRATION_GUIDE.md) | 系统集成和配置说明 |
 | | [变现系统](docs/REWARD_SYSTEM.md) | 内容变现功能详解 |
