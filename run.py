@@ -723,8 +723,26 @@ def handle_youtube_podcast_menu(pipeline):
             else:
                 conversation_style = style_map.get(style_choice, "casual,informative")
             
+            # YouTube上传选项
+            upload_to_youtube = False
+            youtube_key = os.getenv('YOUTUBE_API_KEY')
+            if youtube_key:
+                print("\n📤 播客存储选项:")
+                print("1. 仅本地存储 (assets/audio/)")
+                print("2. 上传到YouTube (推荐，节省空间)")
+                
+                upload_choice = input("请选择存储方式 (1-2，默认1): ").strip()
+                if upload_choice == "2":
+                    upload_to_youtube = True
+                    print("✅ 将上传播客到YouTube")
+                else:
+                    print("📁 播客将保存在本地")
+            else:
+                print("\n💡 提示：配置YOUTUBE_API_KEY可启用YouTube播客上传功能")
+            
             print(f"\n🔄 开始处理YouTube视频...")
             print(f"📝 语言: {target_language}, TTS: {tts_model}")
+            print(f"📤 存储: {'YouTube' if upload_to_youtube else '本地'}")
             print("📝 这可能需要1-3分钟，请耐心等待...")
             
             # 导入并使用YouTube播客生成器
@@ -752,7 +770,8 @@ def handle_youtube_podcast_menu(pipeline):
                     custom_title, 
                     tts_model, 
                     target_language,
-                    conversation_style
+                    conversation_style,
+                    upload_to_youtube
                 )
                 
                 if result['status'] == 'success':
@@ -762,6 +781,11 @@ def handle_youtube_podcast_menu(pipeline):
                     print(f"🖼️  缩略图: {result['thumbnail_path']}")
                     print(f"📺 原视频: {result['video_title']}")
                     print(f"📝 文章标题: {result['article_title']}")
+                    
+                    # 显示YouTube播客信息
+                    if result.get('youtube_video_id'):
+                        print(f"🎭 YouTube播客: {result['youtube_podcast_url']}")
+                        print("✨ 播客已上传到YouTube，节省本地存储空间！")
                     
                     pipeline.log(f"YouTube播客生成成功: {result['article_title']}", level="info", force=True)
                     
@@ -941,8 +965,11 @@ def handle_debug_menu(pipeline):
                     # 直接使用pytest
                     print("\n🔄 使用pytest运行测试...")
                     pipeline.log("开始执行: 使用pytest运行测试 - python -m pytest tests/ -v", level="info", force=True)
-                    result = subprocess.run([sys.executable, "-m", "pytest", "tests/", "-v"], 
-                                          capture_output=True, text=True)
+                    result = subprocess.run(
+                        [sys.executable, "-m", "pytest", "tests/", "-v"], 
+                        capture_output=True, 
+                        text=True
+                    )
                     if result.returncode == 0:
                         pipeline.log("执行成功: pytest测试", level="info", force=True)
                     else:
