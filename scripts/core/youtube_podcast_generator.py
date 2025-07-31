@@ -9,7 +9,7 @@ import re
 import json
 import requests
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Tuple
 import logging
 from dotenv import load_dotenv
 
@@ -308,15 +308,36 @@ class YouTubePodcastGenerator:
         格式化学习项目（关键词汇、常用表达等）
         
         Args:
-            items: 可能是字符串或数组
+            items: 可能是字符串、数组或字典
             
         Returns:
             格式化后的字符串
         """
         try:
-            if isinstance(items, list):
-                # 如果是数组，用逗号和空格连接
-                return ', '.join(items)
+            if isinstance(items, dict):
+                # 如果是字典，检查是否包含提示信息
+                if 'tip' in items and 'words' in items:
+                    # 新格式：{'tip': '...', 'words': [...]}
+                    formatted_items = []
+                    for word in items['words']:
+                        formatted_items.append(f"**{word}**")
+                    return f"{items['tip']}\n\n" + " | ".join(formatted_items)
+                elif 'tip' in items and 'expressions' in items:
+                    # 表达格式：{'tip': '...', 'expressions': [...]}
+                    formatted_items = []
+                    for expr in items['expressions']:
+                        formatted_items.append(f"**{expr}**")
+                    return f"{items['tip']}\n\n" + " | ".join(formatted_items)
+                elif 'tip' in items and 'context' in items:
+                    # 文化背景格式：{'tip': '...', 'context': [...]}
+                    context_items = "\n".join([f"- {item}" for item in items['context']])
+                    return f"{items['tip']}\n\n{context_items}"
+                else:
+                    # 其他字典格式，转换为键值对显示
+                    return "\n".join([f"**{k}**: {v}" for k, v in items.items()])
+            elif isinstance(items, list):
+                # 如果是数组，格式化为带标记的列表
+                return " | ".join([f"**{item}**" for item in items])
             elif isinstance(items, str):
                 # 如果是字符串，直接返回
                 return items
@@ -401,7 +422,7 @@ class YouTubePodcastGenerator:
 [学习导师]: 好的，今天的播客就到这里。记得点击原视频链接深入学习！
 """
 
-    def generate_local_audio(self, script: str, output_path: str, tts_engine: str = "gtts") -> bool:
+    def generate_local_audio(self, script: str, output_path: str, tts_engine: str = "gtts", dual_speaker: bool = True) -> bool:
         """
         使用本地TTS生成音频，支持多种TTS引擎
         
@@ -409,32 +430,49 @@ class YouTubePodcastGenerator:
             script: 播客脚本
             output_path: 输出音频文件路径
             tts_engine: TTS引擎选择 ("gtts", "elevenlabs", "espeak", "pyttsx3")
+            dual_speaker: 是否启用双人对话模式（仅ElevenLabs支持）
         """
-        # 移除角色标签
-        script = re.sub(r'\[.*?\]:\s*', '', script)
-
-        # 使用markdown-it-py和BeautifulSoup进行可靠的文本清理
-        if MARKDOWN_AUDIO_TOOLS_AVAILABLE:
-            try:
-                from markdown_it import MarkdownIt
-                from bs4 import BeautifulSoup
-                md = MarkdownIt()
-                html = md.render(script)
-                soup = BeautifulSoup(html, 'html.parser')
-                clean_text = soup.get_text()
-            except ImportError:
-                # Fallback to basic regex cleaning
-                self._log("Markdown/Audio tools import failed. Using basic text cleaning.")
-                clean_text = re.sub(r'<[^>]+>', '', script)
+        # 检测是否包含对话格式
+        has_dialogue_format = bool(re.search(r'[\[【].*?[\]】][:：]\s*', script) or 
+                                 re.search(r'^[AB甲乙主持人嘉宾][:：]\s*', script, re.MULTILINE))
+        
+        # 决定是否使用双人模式
+        use_dual_speaker = dual_speaker and has_dialogue_format and tts_engine == "elevenlabs"
+        
+        if use_dual_speaker:
+            self._log("🎭 检测到对话格式，启用双人对话模式")
+            # 保留对话标记用于双人模式解析
+            clean_text = script
         else:
-            # Fallback to basic regex cleaning if libraries are not available
-            self._log("Markdown/Audio tools not found. Using basic text cleaning.")
-            clean_text = re.sub(r'<[^>]+>', '', script) # Basic HTML tag removal
+            self._log("🎙️ 使用单人播音模式")
+            # 移除角色标签
+            script = re.sub(r'\[.*?\]:\s*', '', script)
+            clean_text = script
 
-        # 移除多余的空白
-        clean_text = re.sub(r'\s+', ' ', clean_text).strip()
+        # 对于非双人模式，进行文本清理
+        if not use_dual_speaker:
+            # 使用markdown-it-py和BeautifulSoup进行可靠的文本清理
+            if MARKDOWN_AUDIO_TOOLS_AVAILABLE:
+                try:
+                    from markdown_it import MarkdownIt
+                    from bs4 import BeautifulSoup
+                    md = MarkdownIt()
+                    html = md.render(clean_text)
+                    soup = BeautifulSoup(html, 'html.parser')
+                    clean_text = soup.get_text()
+                except ImportError:
+                    # Fallback to basic regex cleaning
+                    self._log("Markdown/Audio tools import failed. Using basic text cleaning.")
+                    clean_text = re.sub(r'<[^>]+>', '', clean_text)
+            else:
+                # Fallback to basic regex cleaning if libraries are not available
+                self._log("Markdown/Audio tools not found. Using basic text cleaning.")
+                clean_text = re.sub(r'<[^>]+>', '', clean_text) # Basic HTML tag removal
 
-        self._log(f"🎧 开始音频生成 - 引擎: {tts_engine}, 文本长度: {len(clean_text)}字符")
+            # 移除多余的空白
+            clean_text = re.sub(r'\s+', ' ', clean_text).strip()
+
+        self._log(f"🎧 开始音频生成 - 引擎: {tts_engine}, 模式: {'双人对话' if use_dual_speaker else '单人播音'}, 文本长度: {len(clean_text)}字符")
         
         # 对于超长文本，gTTS库会自动分块处理，无需人为截断
         if len(clean_text) > 5000:
@@ -442,7 +480,7 @@ class YouTubePodcastGenerator:
         
         # 1. 优先尝试ElevenLabs（最高音质）
         if tts_engine == "elevenlabs":
-            if self._generate_elevenlabs_audio(clean_text, output_path):
+            if self._generate_elevenlabs_audio(clean_text, output_path, dual_speaker=use_dual_speaker):
                 return True
             self._log("ElevenLabs失败，尝试其他引擎")
         
@@ -465,46 +503,256 @@ class YouTubePodcastGenerator:
         self._log("所有TTS引擎都失败了", "error")
         return False
     
-    def _generate_elevenlabs_audio(self, text: str, output_path: str) -> bool:
+    def _generate_elevenlabs_audio(self, text: str, output_path: str, dual_speaker: bool = False) -> bool:
         """使用ElevenLabs生成高质量AI语音（优化中文自然度）"""
         if not self.elevenlabs_available or not self.elevenlabs_client:
             self._log("ElevenLabs API未配置或库未安装")
             return False
             
         try:
-            self._log("🎙️ 使用ElevenLabs生成高质量AI语音（优化版）")
-            
-            # 为中文播客优化参数，减少机器人感
-            if ELEVENLABS_AVAILABLE:
-                from elevenlabs import VoiceSettings
-                voice_settings = VoiceSettings(
-                    stability=0.35,  # 更低稳定性，增加自然变化，减少机器人感
-                    similarity_boost=0.85,  # 保持声音特征
-                    style=0.6,  # 增强表现力，让语调更自然
-                    use_speaker_boost=True
-                )
+            if dual_speaker:
+                return self._generate_dual_speaker_audio(text, output_path)
             else:
-                self._log("ElevenLabs库不可用")
-                return False
-            
-            audio_generator = self.elevenlabs_client.text_to_speech.convert(
-                voice_id="Xb7hH8MSUJpSbSDYjk0o",  # 中文优化女声，更自然
-                text=text,
-                model_id="eleven_multilingual_v2",  # 多语言模型
-                voice_settings=voice_settings
-            )
-            
-            # 保存音频文件
-            with open(output_path, 'wb') as f:
-                for chunk in audio_generator:
-                    f.write(chunk)
-            
-            self._log(f"✅ ElevenLabs音频生成成功: {output_path}")
-            return True
-            
+                return self._generate_single_speaker_audio(text, output_path)
+                
         except Exception as e:
             self._log(f"❌ ElevenLabs音频生成失败: {e}", "error")
             return False
+    
+    def _generate_single_speaker_audio(self, text: str, output_path: str) -> bool:
+        """生成单人音频"""
+        self._log("🎙️ 使用ElevenLabs生成单人音频（优化版）")
+        
+        # 为中文播客优化参数，减少机器人感
+        if ELEVENLABS_AVAILABLE:
+            from elevenlabs import VoiceSettings
+            voice_settings = VoiceSettings(
+                stability=0.35,  # 更低稳定性，增加自然变化，减少机器人感
+                similarity_boost=0.85,  # 保持声音特征
+                style=0.6,  # 增强表现力，让语调更自然
+                use_speaker_boost=True
+            )
+        else:
+            self._log("ElevenLabs库不可用")
+            return False
+        
+        # 使用可靠的中文语音ID（已验证的公开语音）
+        available_voice_ids = [
+            "21m00Tcm4TlvDq8ikWAM",  # Rachel - 英文女声（多语言支持）
+            "AZnzlk1XvdvUeBnXmlld",  # Domi - 多语言女声
+            "EXAVITQu4vr4xnSDxMaL",  # Bella - 多语言女声
+            "MF3mGyEYCl7XYWbV9V6O",  # Elli - 多语言女声
+            "TxGEqnHWrfWFTfGW9XjX",  # Josh - 多语言男声
+        ]
+        
+        # 优先使用第一个可用的语音ID
+        voice_id = available_voice_ids[0]
+        
+        audio_generator = self.elevenlabs_client.text_to_speech.convert(
+            voice_id=voice_id,  # 使用经过验证的语音ID
+            text=text,
+            model_id="eleven_multilingual_v2",  # 多语言模型
+            voice_settings=voice_settings
+        )
+        
+        # 保存音频文件
+        with open(output_path, 'wb') as f:
+            for chunk in audio_generator:
+                f.write(chunk)
+        
+        self._log(f"✅ ElevenLabs单人音频生成成功: {output_path}")
+        return True
+    
+    def _generate_dual_speaker_audio(self, text: str, output_path: str) -> bool:
+        """生成双人对话音频"""
+        self._log("🎭 使用ElevenLabs生成双人对话音频")
+        
+        try:
+            # 加载声音配置
+            voice_config = self._load_voice_config()
+            
+            # 解析对话内容，分离不同说话者
+            dialogue_segments = self._parse_dialogue(text)
+            
+            if len(dialogue_segments) < 2:
+                self._log("⚠️ 文本不包含对话格式，切换到单人模式")
+                return self._generate_single_speaker_audio(text, output_path)
+            
+            # 生成每个对话片段的音频
+            audio_segments = []
+            for i, (speaker, segment_text) in enumerate(dialogue_segments):
+                self._log(f"   🎤 生成对话片段 {i+1}/{len(dialogue_segments)}: {segment_text[:30]}...")
+                
+                # 根据说话者选择声音配置
+                voice_settings = self._get_speaker_settings(speaker, voice_config)
+                voice_id = self._get_speaker_voice_id(speaker, voice_config)
+                
+                audio_generator = self.elevenlabs_client.text_to_speech.convert(
+                    voice_id=voice_id,
+                    text=segment_text,
+                    model_id="eleven_multilingual_v2",
+                    voice_settings=voice_settings
+                )
+                
+                # 收集音频数据
+                audio_data = b''.join(chunk for chunk in audio_generator)
+                audio_segments.append(audio_data)
+                
+                # 避免API限流
+                import time
+                time.sleep(0.5)
+            
+            # 合并音频片段
+            if MARKDOWN_AUDIO_TOOLS_AVAILABLE:
+                combined_audio = self._merge_dialogue_segments(audio_segments)
+                combined_audio.export(output_path, format="wav")
+                self._log(f"✅ 双人对话音频生成成功: {output_path}")
+                return True
+            else:
+                self._log("⚠️ pydub未安装，无法合并音频，切换到单人模式")
+                return self._generate_single_speaker_audio(text, output_path)
+                
+        except Exception as e:
+            self._log(f"❌ 双人对话音频生成失败: {e}")
+            self._log("🔄 切换到单人模式")
+            return self._generate_single_speaker_audio(text, output_path)
+    
+    def _load_voice_config(self) -> Dict[str, Any]:
+        """加载声音配置"""
+        config_path = "config/elevenlabs_voices.yml"
+        
+        try:
+            import yaml
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = yaml.safe_load(f)
+                return config.get('elevenlabs_voices', {})
+        except ImportError:
+            self._log("⚠️ PyYAML未安装，使用默认配置")
+            return self._get_default_voice_config()
+        except Exception as e:
+            self._log(f"⚠️ 无法加载声音配置文件: {e}，使用默认配置")
+            return self._get_default_voice_config()
+    
+    def _get_default_voice_config(self) -> Dict[str, Any]:
+        """获取默认声音配置"""
+        return {
+            "voice_combinations": {
+                "chinese_podcast": {
+                    "speaker_a": {
+                        "voice_id": "21m00Tcm4TlvDq8ikWAM",  # Rachel
+                        "name": "Rachel",
+                        "role": "主持人",
+                        "settings": {
+                            "stability": 0.4,
+                            "similarity_boost": 0.8,
+                            "style": 0.6
+                        }
+                    },
+                    "speaker_b": {
+                        "voice_id": "TxGEqnHWrfWFTfGW9XjX",  # Josh
+                        "name": "Josh",
+                        "role": "嘉宾",
+                        "settings": {
+                            "stability": 0.35,
+                            "similarity_boost": 0.85,
+                            "style": 0.5
+                        }
+                    }
+                }
+            }
+        }
+    
+    def _parse_dialogue(self, text: str) -> List[Tuple[str, str]]:
+        """解析对话文本，分离不同说话者"""
+        import re
+        
+        # 常见的对话分隔符模式
+        patterns = [
+            r'^\[(.*?)\][：:]\s*(.+)$',      # [角色]: 内容
+            r'^【(.*?)】[：:]\s*(.+)$',      # 【角色】: 内容
+            r'^(A|甲|主持人)[：:]\s*(.+)$',  # A: 内容
+            r'^(B|乙|嘉宾)[：:]\s*(.+)$',   # B: 内容
+            r'^([^：:]+)[：:]\s*(.+)$',     # 通用格式: 说话者: 内容
+        ]
+        
+        dialogue_segments = []
+        lines = text.split('\n')
+        current_speaker = 'A'  # 默认说话者
+        
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+                
+            matched = False
+            for pattern in patterns:
+                match = re.match(pattern, line)
+                if match:
+                    speaker_raw = match.group(1).strip()
+                    content = match.group(2).strip()
+                    
+                    # 标准化说话者标识
+                    if speaker_raw in ['A', '甲', '主持人', '主播助手', '主持', '播音员']:
+                        speaker = 'A'
+                    elif speaker_raw in ['B', '乙', '嘉宾', '学习导师', '专家', '分析师']:
+                        speaker = 'B'
+                    else:
+                        speaker = 'A' if len(dialogue_segments) % 2 == 0 else 'B'
+                    
+                    dialogue_segments.append((speaker, content))
+                    matched = True
+                    break
+            
+            if not matched:
+                # 如果没有匹配到格式，交替分配给不同说话者
+                speaker = 'A' if len(dialogue_segments) % 2 == 0 else 'B'
+                dialogue_segments.append((speaker, line))
+        
+        return dialogue_segments
+    
+    def _get_speaker_settings(self, speaker: str, voice_config: Dict[str, Any]) -> 'VoiceSettings':
+        """获取说话者的语音设置"""
+        from elevenlabs import VoiceSettings
+        
+        combination = voice_config.get('voice_combinations', {}).get('chinese_podcast', {})
+        speaker_key = 'speaker_a' if speaker == 'A' else 'speaker_b'
+        settings = combination.get(speaker_key, {}).get('settings', {})
+        
+        return VoiceSettings(
+            stability=settings.get('stability', 0.4),
+            similarity_boost=settings.get('similarity_boost', 0.8),
+            style=settings.get('style', 0.6),
+            use_speaker_boost=True
+        )
+    
+    def _get_speaker_voice_id(self, speaker: str, voice_config: Dict[str, Any]) -> str:
+        """获取说话者的声音ID"""
+        combination = voice_config.get('voice_combinations', {}).get('chinese_podcast', {})
+        speaker_key = 'speaker_a' if speaker == 'A' else 'speaker_b'
+        
+        return combination.get(speaker_key, {}).get('voice_id', 
+            "21m00Tcm4TlvDq8ikWAM" if speaker == 'A' else "TxGEqnHWrfWFTfGW9XjX")
+    
+    def _merge_dialogue_segments(self, audio_segments: List[bytes]) -> 'AudioSegment':
+        """合并对话音频片段"""
+        from pydub import AudioSegment
+        import io
+        
+        combined_audio = AudioSegment.empty()
+        
+        for i, audio_data in enumerate(audio_segments):
+            # 将bytes数据转换为AudioSegment
+            audio_io = io.BytesIO(audio_data)
+            segment = AudioSegment.from_file(audio_io, format="mp3")
+            
+            # 添加适当的停顿
+            if i > 0:
+                pause = AudioSegment.silent(duration=600)  # 0.6秒停顿
+                combined_audio += pause
+            
+            combined_audio += segment
+        
+        return combined_audio
 
     def _generate_gtts_audio(self, text: str, output_path: str) -> bool:
         """使用Google Text-to-Speech生成高质量音频并加速"""
@@ -730,11 +978,18 @@ class YouTubePodcastGenerator:
                 if not s:
                     return ""
                 # 转换为字符串并严格清理所有控制字符
-                s_str = str(s)
+                s_str = str(s).strip()
                 # 移除所有控制字符包括换行符、制表符等
-                cleaned = re.sub(r'[\x00-\x1f\x7f-\x9f\n\r\t\v\f]', '', s_str)
-                # 只保留可打印的ASCII字符和基本中文字符  
-                cleaned = re.sub(r'[^\x20-\x7e\u4e00-\u9fff]', '', cleaned)
+                cleaned = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', s_str)
+                # 特殊处理URL - 移除换行但保留基本字符
+                if 'youtube.com' in s_str or 'youtu.be' in s_str:
+                    # 对于URL，更严格地清理
+                    cleaned = re.sub(r'[\r\n\t\v\f]', '', cleaned)
+                    # 只保留ASCII字符用于URL
+                    cleaned = re.sub(r'[^\x20-\x7e]', '', cleaned)
+                else:
+                    # 对于其他字符串，保留中文字符
+                    cleaned = re.sub(r'[^\x20-\x7e\u4e00-\u9fff]', '', cleaned)
                 # 规范化空白字符
                 cleaned = re.sub(r'\s+', ' ', cleaned.strip())
                 # 限制长度并确保结果有效

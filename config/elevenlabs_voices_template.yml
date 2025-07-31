@@ -1,0 +1,132 @@
+# ElevenLabs声音配置文件
+# 使用 scripts/tools/elevenlabs_voice_tester.py 测试后生成实际配置
+# 复制此文件为 elevenlabs_voices.yml 后使用
+
+elevenlabs_voices:
+  # API基础设置
+  api_settings:
+    model_id: "eleven_multilingual_v2"  # 推荐使用多语言模型
+    default_settings:
+      stability: 0.4              # 声音稳定性 (0.0-1.0)
+      similarity_boost: 0.8       # 相似度增强 (0.0-1.0)  
+      style: 0.6                  # 语音风格 (0.0-1.0)
+      use_speaker_boost: true     # 启用说话者增强
+
+  # 播客声音组合配置
+  voice_combinations:
+    # 中文播客组合 (默认)
+    chinese_podcast:
+      description: "中文播客推荐组合 - 一男一女，声音区别明显"
+      speaker_a:
+        voice_id: "21m00Tcm4TlvDq8ikWAM"  # Rachel - 清晰女声
+        name: "Rachel"
+        role: "主持人"
+        character: "专业、亲切、引导性强"
+        settings:
+          stability: 0.4
+          similarity_boost: 0.8
+          style: 0.6
+      
+      speaker_b:
+        voice_id: "TxGEqnHWrfWFTfGW9XjX"  # Josh - 温和男声
+        name: "Josh"  
+        role: "嘉宾"
+        character: "深度、分析、专业"
+        settings:
+          stability: 0.35
+          similarity_boost: 0.85
+          style: 0.5
+
+    # 专业讨论组合
+    professional:
+      description: "专业讨论组合 - 适合严肃话题"
+      speaker_a:
+        voice_id: "EXAVITQu4vr4xnSDxMaL"  # Bella - 专业女声
+        name: "Bella"
+        role: "分析师"
+        character: "理性、逻辑、权威"
+        settings:
+          stability: 0.5
+          similarity_boost: 0.9
+          style: 0.4
+      
+      speaker_b:
+        voice_id: "MF3mGyEYCl7XYWbV9V6O"  # Elli - 知性女声
+        name: "Elli"
+        role: "专家"
+        character: "深入、细致、专业"
+        settings:
+          stability: 0.45
+          similarity_boost: 0.85
+          style: 0.5
+
+    # 轻松聊天组合
+    casual:
+      description: "轻松聊天组合 - 适合日常话题"
+      speaker_a:
+        voice_id: "AZnzlk1XvdvUeBnXmlld"  # Domi - 亲切女声
+        name: "Domi"
+        role: "朋友A"
+        character: "亲切、活泼、互动性强"
+        settings:
+          stability: 0.35
+          similarity_boost: 0.75
+          style: 0.7
+      
+      speaker_b:
+        voice_id: "TxGEqnHWrfWFTfGW9XjX"  # Josh - 友好男声  
+        name: "Josh"
+        role: "朋友B"
+        character: "友好、幽默、轻松"
+        settings:
+          stability: 0.3
+          similarity_boost: 0.8
+          style: 0.6
+
+  # 预设可用声音库 (需要通过测试脚本验证)
+  known_voices:
+    # 官方预设声音 (通常可用)
+    "21m00Tcm4TlvDq8ikWAM":
+      name: "Rachel"
+      gender: "female"
+      language: "multilingual"
+      description: "清晰、专业的女性声音，适合主持"
+      category: "premade"
+      
+    "TxGEqnHWrfWFTfGW9XjX":
+      name: "Josh"  
+      gender: "male"
+      language: "multilingual"
+      description: "温和、友好的男性声音，适合对话"
+      category: "premade"
+      
+    "EXAVITQu4vr4xnSDxMaL":
+      name: "Bella"
+      gender: "female" 
+      language: "multilingual"
+      description: "专业、权威的女性声音"
+      category: "premade"
+      
+    "MF3mGyEYCl7XYWbV9V6O":
+      name: "Elli"
+      gender: "female"
+      language: "multilingual" 
+      description: "知性、优雅的女性声音"
+      category: "premade"
+      
+    "AZnzlk1XvdvUeBnXmlld":
+      name: "Domi"
+      gender: "female"
+      language: "multilingual"
+      description: "亲切、活泼的女性声音"
+      category: "premade"
+
+  # 使用说明
+  usage_notes:
+    - "使用前请运行 python scripts/tools/elevenlabs_voice_tester.py 测试声音"
+    - "根据测试结果更新 voice_combinations 中的 voice_id"
+    - "调整 settings 参数来优化声音效果"
+    - "stability: 较高值 = 更稳定但可能较机械"
+    - "similarity_boost: 较高值 = 更接近原始声音"
+    - "style: 较高值 = 更有表现力和情感"
+    - "不同组合适合不同类型的内容和听众"

@@ -1,0 +1,28 @@
+elevenlabs_voices:
+  api_settings:
+    default_settings:
+      similarity_boost: 0.8
+      stability: 0.4
+      style: 0.6
+      use_speaker_boost: true
+    model_id: eleven_multilingual_v2
+  available_voices: {}
+  voice_combinations:
+    chinese_podcast:
+      description: 中文播客推荐组合
+      speaker_a:
+        name: Rachel
+        role: 主持人
+        settings:
+          similarity_boost: 0.8
+          stability: 0.4
+          style: 0.6
+        voice_id: 21m00Tcm4TlvDq8ikWAM
+      speaker_b:
+        name: Josh
+        role: 嘉宾
+        settings:
+          similarity_boost: 0.85
+          stability: 0.35
+          style: 0.5
+        voice_id: TxGEqnHWrfWFTfGW9XjX
