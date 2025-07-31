@@ -217,6 +217,15 @@ def main():
             print(f"✅ 处理完成! 成功发布到: {platforms_str}")
             pipeline.log(f"发布成功 - 平台: {platforms_str}", level="info", force=True)
             
+            # 检查是否有微信发布指导文件生成
+            if 'wechat' in result.get('successful_platforms', []):
+                guidance_dir = Path(".tmp/output/wechat_guides")
+                if guidance_dir.exists():
+                    latest_files = sorted(guidance_dir.glob("*_guide.md"), key=lambda p: p.stat().st_mtime, reverse=True)
+                    if latest_files:
+                        print(f"📧 微信发布指导文件: {latest_files[0]}")
+                        print("💡 请按照指导文件完成微信公众号手动发布")
+            
             # 显示内容变现结果
             if result.get('monetization'):
                 monetization = result['monetization']
