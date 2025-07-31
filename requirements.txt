@@ -24,6 +24,7 @@ pydub>=0.25.0  # 音频格式转换
 pygame>=2.1.0  # 音频处理支持
 pyttsx3>=2.90  # 本地TTS引擎（备用）
 elevenlabs>=1.0.0  # ElevenLabs TTS API (高质量语音合成)
+moviepy>=1.0.3  # 音频视频合成 (可选，用于YouTube上传)
 
 # 微信内容变现系统新增依赖
 weasyprint>=60.0  # PDF生成
