@@ -24,18 +24,16 @@ ENV/
 
 # 注意：.env文件包含敏感信息，已排除在版本控制之外
 
-# 日志
-logs/
+# 日志文件（构建目录.build/logs/已在下方.build/中排除）
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# 测试
+# 测试（htmlcov/现在在.build/目录下，已在下方.build/中排除）
 tests/test_data/
 .pytest_cache/
 .coverage
-htmlcov/
 .tox/
 .nox/
 .coverage.*
