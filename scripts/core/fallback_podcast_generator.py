@@ -381,6 +381,36 @@ class FallbackPodcastGenerator:
             self.logger.error(f"缩略图下载失败: {e}")
             return ""
     
+    def _generate_safe_filename(self, title: str, max_length: int = 50) -> str:
+        """
+        从标题生成安全的文件名
+        
+        Args:
+            title: 原始标题
+            max_length: 最大长度
+            
+        Returns:
+            安全的文件名
+        """
+        # 移除特殊字符，只保留字母、数字、中文和连字符
+        safe_title = re.sub(r'[^\w\u4e00-\u9fa5\s-]', '', title)
+        
+        # 将空格替换为连字符
+        safe_title = re.sub(r'\s+', '-', safe_title.strip())
+        
+        # 移除多余的连字符
+        safe_title = re.sub(r'-+', '-', safe_title)
+        
+        # 限制长度
+        if len(safe_title) > max_length:
+            safe_title = safe_title[:max_length].rstrip('-')
+        
+        # 如果结果为空，使用默认名称
+        if not safe_title:
+            safe_title = "youtube-video"
+            
+        return safe_title.lower()
+    
     def create_jekyll_article(self, video_info: Dict[str, Any], content_guide: Dict[str, Any], 
                             youtube_url: str, script: str, audio_path: str, thumbnail_path: str) -> str:
         """创建Jekyll格式的文章"""

@@ -40,6 +40,7 @@ tests/test_data/
 nosetests.xml
 coverage.xml
 *.cover
+.mypy_cache/
 
 # 构建和运行时目录
 .build/
@@ -92,7 +93,7 @@ vendor/
 
 # IDE
 .idea/
-.vscode/
+# .vscode/ - keeping for now to help with Python path resolution
 *.sublime-project
 *.sublime-workspace
 .project

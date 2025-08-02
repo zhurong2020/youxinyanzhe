@@ -18,7 +18,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # 导入ContentPipeline类
-from scripts.content_pipeline import ContentPipeline
+from scripts.core.content_pipeline import ContentPipeline
 
 # 初始化控制台
 console = Console()

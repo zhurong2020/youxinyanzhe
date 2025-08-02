@@ -10,7 +10,7 @@ from pathlib import Path
 project_root = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, project_root)
 
-from scripts.content_pipeline import ContentPipeline
+from scripts.core.content_pipeline import ContentPipeline
 
 def test_wechat_draft():
     """测试微信草稿保存功能"""
