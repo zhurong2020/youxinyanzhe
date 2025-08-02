@@ -102,7 +102,7 @@ class RewardSystemManager:
             return False, {"error": error_msg}
     
     def send_reward_to_user(self, user_email: str, article_title: str, 
-                           user_name: str = None) -> Tuple[bool, str]:
+                           user_name: Optional[str] = None) -> Tuple[bool, str]:
         """
         向用户发送奖励内容包
         
@@ -141,7 +141,7 @@ class RewardSystemManager:
             return False, error_msg
     
     def add_pending_request(self, user_email: str, article_title: str, 
-                           wechat_user_id: str = None, user_name: str = None) -> bool:
+                           wechat_user_id: Optional[str] = None, user_name: Optional[str] = None) -> bool:
         """
         添加待处理的奖励请求
         

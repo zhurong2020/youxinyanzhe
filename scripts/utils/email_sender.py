@@ -257,7 +257,7 @@ class EmailSender:
             self.logger.error(f"保存邮件记录失败: {e}")
     
     def send_reward_package(self, recipient_email: str, article_title: str, 
-                          download_url: str, user_name: str = None) -> Tuple[bool, str]:
+                          download_url: str, user_name: Optional[str] = None) -> Tuple[bool, str]:
         """
         发送奖励内容包邮件
         
@@ -348,7 +348,7 @@ class EmailSender:
             self.logger.error(error_msg)
             return False, error_msg
     
-    def get_send_records(self, article_title: str = None) -> List[Dict]:
+    def get_send_records(self, article_title: Optional[str] = None) -> List[Dict]:
         """获取发送记录"""
         records = self._load_email_records()
         if article_title:

@@ -108,7 +108,7 @@ class PackageCreator:
             with open(article_file, 'r', encoding='utf-8') as f:
                 post = frontmatter.load(f)
             
-            article_title = post.metadata.get('title', article_file.stem)
+            article_title = str(post.metadata.get('title', article_file.stem))
             article_date = str(post.metadata.get('date', ''))
             
             self.logger.info(f"开始创建内容包: {article_title}")
@@ -143,7 +143,7 @@ class PackageCreator:
                     temp_path, article_title, article_date
                 )
                 
-                if package_success:
+                if package_success and package_path:
                     result = {
                         "package_path": str(package_path),
                         "title": article_title,

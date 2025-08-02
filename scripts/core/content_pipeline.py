@@ -3,20 +3,15 @@ import re
 import yaml
 import logging
 import subprocess
-import shutil
 import frontmatter
 import json
-import time
-import uuid
 import tempfile
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.console import Console
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple, Any, Union, Set
+from typing import List, Dict, Optional, Tuple
 from datetime import datetime
 import google.generativeai as genai
-from google.generativeai.client import configure
-from google.generativeai.generative_models import GenerativeModel
 from google.generativeai.types import GenerationConfig, BlockedPromptException
 from google.api_core.exceptions import ResourceExhausted
 import argparse
@@ -344,7 +339,7 @@ class ContentPipeline:
             raise ValueError("GEMINI_API_KEY not found in environment variables")
         
         try:
-            configure(api_key=api_key)
+            genai.configure(api_key=api_key)
             
             # 使用配置文件中的模型名称
             model_name = self.config["content_processing"]["gemini"]["model"]
@@ -353,7 +348,7 @@ class ContentPipeline:
             else:
                 self.log(f"使用配置的模型: {model_name}", level="debug")
             # 创建模型实例
-            self.model = GenerativeModel(model_name)
+            self.model = genai.GenerativeModel(model_name)
             
             # 测试连接
             try:
@@ -1070,7 +1065,7 @@ class ContentPipeline:
 """
             
             # 调用API生成摘要
-            model = GenerativeModel(self.config['content_processing']['gemini']['model'])
+            model = genai.GenerativeModel(self.config['content_processing']['gemini']['model'])
             response = model.generate_content(
                 prompt,
                 generation_config=GenerationConfig(
@@ -1592,18 +1587,19 @@ class ContentPipeline:
             
             # 添加重试机制
             max_retries = 2
+            response = None
+            # 配置安全设置以允许技术内容生成
+            safety_settings = [
+                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_ONLY_HIGH"},
+            ]
+            
             for attempt in range(max_retries):
                 if attempt > 0:
                     print(f"⚠️ 第{attempt + 1}次尝试生成...")
                     logging.info(f"重试生成测试文章，第{attempt + 1}次尝试")
-                
-                # 配置安全设置以允许技术内容生成
-                safety_settings = [
-                    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-                    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-                    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-                    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_ONLY_HIGH"},
-                ]
                 
                 response = self.model.generate_content(
                     prompt,

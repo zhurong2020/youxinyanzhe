@@ -14,7 +14,7 @@ import google.generativeai as genai
 from google.api_core import exceptions
 
 # 现在导入本地模块
-from scripts.content_pipeline import ContentPipeline
+from scripts.core.content_pipeline import ContentPipeline
 from scripts import setup_logger
 
 # 设置测试日志

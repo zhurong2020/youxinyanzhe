@@ -1,7 +1,7 @@
 import pytest
 import logging
 from pathlib import Path
-from scripts.content_pipeline import ContentPipeline
+from scripts.core.content_pipeline import ContentPipeline
 import os
 from dotenv import load_dotenv
 from scripts import setup_logger
