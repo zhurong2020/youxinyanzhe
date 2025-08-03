@@ -19,20 +19,8 @@ import requests
 from dotenv import load_dotenv
 
 # 导入本地模块
-try:
-    from .wechat_publisher import WechatPublisher
-except ImportError:
-    from scripts.core.wechat_publisher import WechatPublisher
-
-# 内容变现系统（可选导入）
-RewardSystemManager = None
-try:
-    from ..utils.reward_system_manager import RewardSystemManager
-except ImportError:
-    try:
-        from scripts.utils.reward_system_manager import RewardSystemManager
-    except ImportError:
-        pass  # 内容变现系统模块不可用
+from .wechat_publisher import WechatPublisher
+from ..utils.reward_system_manager import RewardSystemManager
 
 class PublishingStatusManager:
     """发布状态管理器"""
@@ -164,7 +152,7 @@ class ContentPipeline:
             
             # 初始化内容变现系统管理器（可选）
             self.reward_manager = None
-            if RewardSystemManager:
+            if self.reward_manager:
                 try:
                     self.reward_manager = RewardSystemManager()
                     self.logger.debug("内容变现系统管理器初始化成功")
@@ -717,7 +705,7 @@ class ContentPipeline:
                             'total_platforms': len(platforms),
                             'published_platforms': [],
                             'article_name': draft_path.stem,
-                            'error': f'front matter解析失败: {str(e)}'
+                            'error': f'front matter解析失败: {str(e)}',
                         }
                 
                 # 2. 图片处理步骤（已移除Cloudflare Images功能）
@@ -911,7 +899,7 @@ class ContentPipeline:
                 'total_platforms': len(platforms),
                 'published_platforms': [],
                 'article_name': draft_path.stem,
-                'error': str(e)
+                'error': str(e),
             }
     
     def _preprocess_content(self, text: str) -> str:
@@ -1465,6 +1453,7 @@ class ContentPipeline:
                 if not content.startswith('---'):
                     self.log("❌ 无法修复front matter格式", level="error")
                     return False
+                    
             except Exception as e:
                 self.log(f"❌ 解析front matter失败: {str(e)}", level="error")
                 return False

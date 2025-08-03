@@ -266,10 +266,11 @@ class FallbackPodcastGenerator:
             # 设置语音属性
             voices = engine.getProperty('voices')
             # 尝试设置中文语音（如果可用）
-            for voice in voices:
-                if 'chinese' in voice.name.lower() or 'mandarin' in voice.name.lower():
-                    engine.setProperty('voice', voice.id)
-                    break
+            if voices:
+                for voice in voices:
+                    if 'chinese' in voice.name.lower() or 'mandarin' in voice.name.lower():
+                        engine.setProperty('voice', voice.id)
+                        break
             
             # 设置语速和音量
             engine.setProperty('rate', 150)  # 语速

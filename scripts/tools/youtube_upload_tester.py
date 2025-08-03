@@ -212,7 +212,7 @@ class YouTubeUploadTester:
         
         return None
     
-    def create_default_thumbnail(self, title: str) -> Path:
+    def create_default_thumbnail(self, title: str) -> Optional[Path]:
         """创建默认缩略图"""
         try:
             from PIL import Image, ImageDraw, ImageFont
@@ -254,7 +254,7 @@ class YouTubeUploadTester:
         """文本换行"""
         words = text.split()
         lines = []
-        current_line = []
+        current_line: List[str] = []
         
         for word in words:
             if len(' '.join(current_line + [word])) <= width:
