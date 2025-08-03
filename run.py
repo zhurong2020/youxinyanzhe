@@ -39,7 +39,7 @@ def main():
     session_id = int(time.time() * 1000) % 100000  # 简短的会话 ID
     pipeline.log(f"===== 用户会话开始 [{session_id}] =====", level="info", force=True)
     
-    session_count = 1  # 记录操作次数
+    # session_count = 1  # 记录操作次数 - 暂未使用
     
     while True:  # 主循环，支持返回主菜单
         # 选择操作
@@ -186,7 +186,7 @@ def main():
         
         # 询问是否返回主菜单
         pipeline.log("未选择发布平台或文章已全部发布，返回主菜单", level="info", force=True)
-        back_to_menu = input("\n按Enter键返回主菜单...")
+        input("\n按Enter键返回主菜单...")
         main()  # 重新开始主循环
         return
     
@@ -1185,7 +1185,7 @@ def handle_llm_engine_menu(pipeline):
     
     # 检查当前状态
     current_base_url = os.getenv('ANTHROPIC_BASE_URL', '')
-    current_auth_token = os.getenv('ANTHROPIC_AUTH_TOKEN', '')
+    # current_auth_token = os.getenv('ANTHROPIC_AUTH_TOKEN', '')  # 暂未使用
     current_api_key = os.getenv('ANTHROPIC_API_KEY', '')
     
     if current_base_url and 'dashscope.aliyuncs.com' in current_base_url:

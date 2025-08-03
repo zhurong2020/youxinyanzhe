@@ -1,0 +1,33 @@
+{
+    "include": [
+        "scripts",
+        "tests",
+        "*.py"
+    ],
+    "exclude": [
+        ".vscode",
+        ".git",
+        "**/__pycache__",
+        "venv",
+        ".build",
+        ".tmp"
+    ],
+    "extraPaths": [
+        "scripts",
+        "tests"
+    ],
+    "pythonVersion": "3.12",
+    "pythonPlatform": "Linux",
+    "venvPath": ".",
+    "venv": "venv",
+    "typeCheckingMode": "basic",
+    "reportMissingImports": "warning",
+    "reportMissingTypeStubs": "none",
+    "reportUnusedImport": "information",
+    "reportUnusedVariable": "information",
+    "reportDuplicateImport": "warning",
+    "reportOptionalMemberAccess": "none",
+    "reportGeneralTypeIssues": "warning",
+    "reportOptionalSubscript": "none",
+    "reportOptionalIterable": "none"
+}
