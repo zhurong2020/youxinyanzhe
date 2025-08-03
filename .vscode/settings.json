@@ -1,0 +1,16 @@
+{
+    "python.defaultInterpreterPath": "./venv/bin/python",
+    "python.analysis.extraPaths": ["./scripts", "./tests"],
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.autoSearchPaths": true,
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.stubPath": "./venv/lib/python*/site-packages",
+    "python.analysis.include": ["scripts", "tests", "*.py"],
+    "python.linting.enabled": false,
+    "python.linting.pylintEnabled": false,
+    "python.linting.mypyEnabled": false,
+    "python.terminal.activateEnvironment": true,
+    "python.analysis.importFormat": "absolute",
+    "pylance.insidersChannel": "off"
+}
