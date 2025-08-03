@@ -29,7 +29,8 @@ def setup_logging():
 
 logger = setup_logging()
 
-from utils.github_release_manager import create_github_manager
+# 导入GitHub Release管理器，修正导入路径以匹配新的项目结构
+from scripts.utils.github_release_manager import create_github_manager
 
 
 def main():

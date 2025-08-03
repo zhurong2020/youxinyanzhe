@@ -13,10 +13,9 @@ import re
 project_root = Path(__file__).parent.parent.parent
 load_dotenv(project_root / '.env')
 
-# 导入并修复gradio_client
+# 导入并修复gradio_client，移除未使用的re导入以清理代码
 from gradio_client import Client
 import httpx
-import re
 
 # 保存原始的httpx.stream方法
 original_httpx_stream = httpx.stream

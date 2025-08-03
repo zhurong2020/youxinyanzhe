@@ -12,12 +12,12 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import argparse
 
-# 导入项目模块
-sys.path.append(str(Path(__file__).parent))
+# 修正导入路径以匹配新的项目结构，使用相对导入
 
-from github_release_manager import create_github_manager
-from email_sender import create_email_sender
-from package_creator import create_package_creator
+
+from .github_release_manager import create_github_manager
+from .email_sender import create_email_sender
+from .package_creator import create_package_creator
 
 
 class RewardSystemManager:

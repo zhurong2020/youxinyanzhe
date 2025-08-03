@@ -241,7 +241,7 @@ class GitHubReleaseManager:
         return f"reward-{clean_title}-{timestamp}"
     
     def create_release(self, article_title: str, package_path: str, 
-                      article_date: str = None) -> Tuple[bool, Dict]:
+                      article_date: Optional[str] = None) -> Tuple[bool, Dict]:
         """
         创建Release并上传内容包
         

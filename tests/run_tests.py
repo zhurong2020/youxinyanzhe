@@ -23,7 +23,8 @@ def main():
     print("\n1. 运行 Gemini API 连接测试")
     print("-"*50)
     try:
-        from tests.test_gemini_connection import test_gemini_connection
+        # 修正导入路径，从test_gemini模块导入连接测试函数
+        from tests.test_gemini import test_gemini_connection
         connection_success = test_gemini_connection()
         
         if not connection_success:
