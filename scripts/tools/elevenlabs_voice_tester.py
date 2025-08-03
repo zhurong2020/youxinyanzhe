@@ -192,7 +192,12 @@ class ElevenLabsVoiceTester:
             # 检查客户端是否有models相关方法
             if hasattr(self.client, 'models'):
                 try:
-                    models = self.client.models.get_all()
+                    # ElevenLabs API v2.8.1+ 使用不同的方法
+                    try:
+                        models = list(self.client.models.get_all())
+                    except AttributeError:
+                        # 如果get_all不存在，尝试其他方法
+                        models = self.client.models.get()
                     print(f"✅ 找到 {len(models)} 个可用模型")
                     for model in models:
                         model_info = {
@@ -215,7 +220,7 @@ class ElevenLabsVoiceTester:
             # 如果没有获取到模型，使用已知的模型列表
             if not models_info:
                 print("   📝 使用已知模型列表:")
-                known_models = {
+                known_models: Dict[str, Dict[str, Any]] = {
                     "eleven_multilingual_v2": {
                         "name": "Multilingual v2",
                         "description": "最新的多语言模型，支持28种语言",
@@ -258,7 +263,7 @@ class ElevenLabsVoiceTester:
             print(f"❌ 获取模型列表失败: {e}")
             return {}
     
-    def test_voice_quality(self, voice_id: str, voice_name: str, test_text: str = None) -> bool:
+    def test_voice_quality(self, voice_id: str, voice_name: str, test_text: Optional[str] = None) -> bool:
         """测试特定声音的质量"""
         if not test_text:
             test_text = self.test_texts['chinese']

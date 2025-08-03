@@ -320,6 +320,16 @@ class PackageCreator:
         categories = post.metadata.get('categories', [])
         tags = post.metadata.get('tags', [])
         
+        # 确保categories和tags是字符串列表
+        if categories and not isinstance(categories, list):
+            categories = [str(categories)]
+        if tags and not isinstance(tags, list):
+            tags = [str(tags)]
+        
+        # 转换所有元素为字符串，确保类型安全
+        categories = [str(cat) for cat in (categories if categories and hasattr(categories, '__iter__') and not isinstance(categories, str) else [])]
+        tags = [str(tag) for tag in (tags if tags and hasattr(tags, '__iter__') and not isinstance(tags, str) else [])]
+        
         # 转换Markdown为HTML
         html_body = markdown2.markdown(
             post.content,
@@ -407,7 +417,7 @@ class PackageCreator:
         
         return images_info
     
-    def _get_image_extension(self, url: str, headers: Dict) -> str:
+    def _get_image_extension(self, url: str, headers) -> str:
         """从URL或headers获取图片扩展名"""
         # 先从URL路径尝试
         parsed_url = urlparse(url)
@@ -475,7 +485,7 @@ class PackageCreator:
         content = "# 🔗 链接汇总\n\n"
         
         # 按分类组织链接
-        categories = {}
+        categories: Dict[str, List[Dict]] = {}
         for link in links_info:
             category = link["category"]
             if category not in categories:

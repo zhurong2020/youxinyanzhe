@@ -39,9 +39,9 @@ header:
         content_text = re.sub(pattern, replacement, content_text)
 
         # 处理 front matter 中的图片
-        if 'header' in post and 'image' in post['header']:
-            if local_name in post['header']['image']:
-                post['header']['image'] = cloudflare_url
+        if hasattr(post, 'metadata') and 'header' in post.metadata and 'image' in post.metadata['header']:
+            if local_name in post.metadata['header']['image']:
+                post.metadata['header']['image'] = cloudflare_url
 
     # 更新内容
     post.content = content_text
@@ -76,11 +76,11 @@ excerpt: "这是一个测试摘要，包含'单引号'和\"双引号\"。"
     post = frontmatter.loads(content)
     
     # 验证解析结果
-    assert post['layout'] == 'single'
-    assert post['title'] == '测试文章'
-    assert '测试' in post['categories']
-    assert 'YAML' in post['tags']
-    assert 'excerpt' in post
+    assert post.metadata['layout'] == 'single'
+    assert post.metadata['title'] == '测试文章'
+    assert '测试' in post.metadata['categories']
+    assert 'YAML' in post.metadata['tags']
+    assert 'excerpt' in post.metadata
     
     # 测试重新序列化
     from collections import OrderedDict
@@ -191,10 +191,10 @@ excerpt: |
                 replaced = True
 
         # 处理 front matter 中的图片
-        if 'header' in post and 'image' in post['header']:
-            header_image = post['header']['image']
+        if hasattr(post, 'metadata') and 'header' in post.metadata and 'image' in post.metadata['header']:
+            header_image = post.metadata['header']['image']
             if local_name in header_image:
-                post['header']['image'] = cloudflare_url
+                post.metadata['header']['image'] = cloudflare_url
 
     # 更新内容
     post.content = content_text
