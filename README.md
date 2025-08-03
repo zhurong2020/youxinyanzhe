@@ -56,9 +56,14 @@ python run.py
 | **配置指南** | [Gemini配置](docs/setup/gemini_setup.md) | AI模型配置说明 |
 | | [TTS设置](docs/setup/tts_setup.md) | 文本转语音配置 |
 | | [YouTube播客设置](docs/setup/youtube_podcast_setup.md) | YouTube播客完整配置 |
+| | [YouTube OAuth设置](docs/setup/YOUTUBE_OAUTH_SETUP.md) | YouTube上传OAuth2配置 |
+| | [Google OAuth修复](docs/setup/GOOGLE_OAUTH_VERIFICATION_FIX.md) | OAuth验证问题解决方案 |
 | **功能指南** | [双人对话播客](docs/guides/dual_voice_podcast_guide.md) | ElevenLabs双人对话功能 |
 | | [ElevenLabs语音测试](docs/guides/elevenlabs_voice_testing_guide.md) | 语音测试和配置指南 |
 | | [YouTube TTS升级](docs/guides/youtube_tts_upgrade_guide.md) | TTS引擎升级指南 |
+| | [YouTube上传完整指南](docs/guides/YOUTUBE_COMPLETE_GUIDE.md) | YouTube上传功能完整指南 |
+| | [YouTube上传解决方案](docs/guides/YOUTUBE_SOLUTIONS.md) | 常见问题和解决方案 |
+| | [YouTube上传故障修复](docs/guides/YOUTUBE_UPLOAD_FIX.md) | 上传故障排查和修复 |
 | **系统文档** | [集成指南](docs/INTEGRATION_GUIDE.md) | 系统集成和配置说明 |
 | | [变现系统](docs/REWARD_SYSTEM.md) | 内容变现功能详解 |
 | | [项目路线图](docs/ROADMAP.md) | 功能规划和发展方向 |
@@ -71,8 +76,13 @@ youxinyanzhe/
 ├── 📁 _posts/          # Jekyll文章
 ├── 📁 assets/          # 静态资源(图片、音频、CSS)
 ├── 📁 scripts/         # 核心业务脚本
+│   ├── 📁 core/        # 核心业务逻辑
+│   ├── 📁 utils/       # 工具和辅助函数
+│   └── 📁 tools/       # 独立工具和测试脚本
 ├── 📁 config/          # 配置文件
 ├── 📁 docs/            # 项目文档
+│   ├── 📁 setup/       # 安装配置指南
+│   └── 📁 guides/      # 功能使用指南
 ├── 📁 tests/           # 测试文件
 ├── 📁 .build/          # 构建和运行时文件
 └── 📁 .tmp/            # 临时文件和输出
