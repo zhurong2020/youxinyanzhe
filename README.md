@@ -54,17 +54,13 @@ python run.py
 | | [项目结构](docs/PROJECT_STRUCTURE.md) | 详细的目录结构说明 |
 | | [开发指南](docs/DEVELOPMENT.md) | 开发环境和贡献指南 |
 | **配置指南** | [Gemini配置](docs/setup/gemini_setup.md) | AI模型配置说明 |
-| | [TTS设置](docs/setup/tts_setup.md) | 文本转语音配置 |
+| | [TTS完整配置](docs/setup/tts_comprehensive_setup.md) | 语音系统完整配置指南 |
 | | [YouTube播客设置](docs/setup/youtube_podcast_setup.md) | YouTube播客完整配置 |
 | | [YouTube OAuth设置](docs/setup/YOUTUBE_OAUTH_SETUP.md) | YouTube上传OAuth2配置 |
 | | [Google OAuth修复](docs/setup/GOOGLE_OAUTH_VERIFICATION_FIX.md) | OAuth验证问题解决方案 |
-| **功能指南** | [双人对话播客](docs/guides/dual_voice_podcast_guide.md) | ElevenLabs双人对话功能 |
-| | [ElevenLabs语音测试](docs/guides/elevenlabs_voice_testing_guide.md) | 语音测试和配置指南 |
-| | [YouTube TTS升级](docs/guides/youtube_tts_upgrade_guide.md) | TTS引擎升级指南 |
-| | [YouTube上传完整指南](docs/guides/YOUTUBE_COMPLETE_GUIDE.md) | YouTube上传功能完整指南 |
+| **功能指南** | [YouTube上传完整指南](docs/guides/YOUTUBE_COMPLETE_GUIDE.md) | YouTube上传功能完整指南 |
 | | [YouTube上传解决方案](docs/guides/YOUTUBE_SOLUTIONS.md) | 常见问题和解决方案 |
-| | [YouTube上传故障修复](docs/guides/YOUTUBE_UPLOAD_FIX.md) | 上传故障排查和修复 |
-| **系统文档** | [集成指南](docs/INTEGRATION_GUIDE.md) | 系统集成和配置说明 |
+| **系统文档** |
 | | [变现系统](docs/REWARD_SYSTEM.md) | 内容变现功能详解 |
 | | [项目路线图](docs/ROADMAP.md) | 功能规划和发展方向 |
 | | [更新日志](docs/CHANGELOG.md) | 版本更新和变更记录 |
