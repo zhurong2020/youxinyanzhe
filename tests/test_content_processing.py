@@ -3,6 +3,7 @@ import yaml
 import pytest
 import frontmatter
 from pathlib import Path
+from typing import Dict, Any, cast
 
 def test_image_url_replacement():
     """测试图片URL替换功能"""
@@ -39,9 +40,10 @@ header:
         content_text = re.sub(pattern, replacement, content_text)
 
         # 处理 front matter 中的图片
-        if hasattr(post, 'metadata') and 'header' in post.metadata and 'image' in post.metadata['header']:
-            if local_name in post.metadata['header']['image']:
-                post.metadata['header']['image'] = cloudflare_url
+        metadata = cast(Dict[str, Any], post.metadata)
+        if hasattr(post, 'metadata') and 'header' in metadata and 'image' in metadata['header']:
+            if local_name in str(metadata['header']['image']):
+                metadata['header']['image'] = cloudflare_url
 
     # 更新内容
     post.content = content_text
@@ -76,11 +78,12 @@ excerpt: "这是一个测试摘要，包含'单引号'和\"双引号\"。"
     post = frontmatter.loads(content)
     
     # 验证解析结果
-    assert post.metadata['layout'] == 'single'
-    assert post.metadata['title'] == '测试文章'
-    assert '测试' in post.metadata['categories']
-    assert 'YAML' in post.metadata['tags']
-    assert 'excerpt' in post.metadata
+    metadata = cast(Dict[str, Any], post.metadata)
+    assert metadata['layout'] == 'single'
+    assert metadata['title'] == '测试文章'
+    assert '测试' in metadata['categories']
+    assert 'YAML' in metadata['tags']
+    assert 'excerpt' in metadata
     
     # 测试重新序列化
     from collections import OrderedDict
@@ -191,10 +194,11 @@ excerpt: |
                 replaced = True
 
         # 处理 front matter 中的图片
-        if hasattr(post, 'metadata') and 'header' in post.metadata and 'image' in post.metadata['header']:
-            header_image = post.metadata['header']['image']
-            if local_name in header_image:
-                post.metadata['header']['image'] = cloudflare_url
+        metadata = cast(Dict[str, Any], post.metadata)
+        if hasattr(post, 'metadata') and 'header' in metadata and 'image' in metadata['header']:
+            header_image = metadata['header']['image']
+            if local_name in str(header_image):
+                metadata['header']['image'] = cloudflare_url
 
     # 更新内容
     post.content = content_text

@@ -23,8 +23,10 @@ def test_content_guide_generation():
     print("🧪 测试内容导读生成...")
     
     # 设置API
-    genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    from google.generativeai.client import configure
+    from google.generativeai.generative_models import GenerativeModel
+    configure(api_key=os.getenv('GEMINI_API_KEY'))
+    model = GenerativeModel('gemini-1.5-flash')
     
     # 模拟视频信息
     video_info = {
@@ -95,8 +97,10 @@ def test_podcast_script_generation():
     print("\n🎧 测试播客脚本生成...")
     
     # 设置API
-    genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    from google.generativeai.client import configure
+    from google.generativeai.generative_models import GenerativeModel
+    configure(api_key=os.getenv('GEMINI_API_KEY'))
+    model = GenerativeModel('gemini-1.5-flash')
     
     # 模拟视频信息
     video_info = {

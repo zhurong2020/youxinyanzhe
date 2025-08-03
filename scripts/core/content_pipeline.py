@@ -12,6 +12,8 @@ from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 from datetime import datetime
 import google.generativeai as genai
+from google.generativeai.client import configure
+from google.generativeai.generative_models import GenerativeModel
 from google.generativeai.types import GenerationConfig, BlockedPromptException
 from google.api_core.exceptions import ResourceExhausted
 import argparse
@@ -327,7 +329,7 @@ class ContentPipeline:
             raise ValueError("GEMINI_API_KEY not found in environment variables")
         
         try:
-            genai.configure(api_key=api_key)
+            configure(api_key=api_key)
             
             # 使用配置文件中的模型名称
             model_name = self.config["content_processing"]["gemini"]["model"]
@@ -336,7 +338,7 @@ class ContentPipeline:
             else:
                 self.log(f"使用配置的模型: {model_name}", level="debug")
             # 创建模型实例
-            self.model = genai.GenerativeModel(model_name)
+            self.model = GenerativeModel(model_name)
             
             # 测试连接
             try:
@@ -1053,7 +1055,7 @@ class ContentPipeline:
 """
             
             # 调用API生成摘要
-            model = genai.GenerativeModel(self.config['content_processing']['gemini']['model'])
+            model = GenerativeModel(self.config['content_processing']['gemini']['model'])
             response = model.generate_content(
                 prompt,
                 generation_config=GenerationConfig(

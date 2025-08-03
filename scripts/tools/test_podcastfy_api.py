@@ -36,7 +36,7 @@ def test_podcastfy_connection():
         try:
             api_info = client.view_api()
             print(f"\n📋 API信息:")
-            if hasattr(api_info, '__iter__'):
+            if api_info is not None and hasattr(api_info, '__iter__') and not isinstance(api_info, (str, bytes)):
                 for i, info in enumerate(api_info):
                     print(f"  {i}: {info}")
             else:
