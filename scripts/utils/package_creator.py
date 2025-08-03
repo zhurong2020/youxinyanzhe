@@ -60,6 +60,9 @@ class PackageCreator:
 
 ## 🔗 在线资源链接
 
+### 🎬 视频/音频资源
+{youtube_links}
+
 ### 官方信息来源
 {official_links}
 
@@ -135,7 +138,7 @@ class PackageCreator:
                 
                 # 4. 生成资料清单
                 self._create_resource_list(
-                    article_title, article_date, images_info, links_info, temp_path
+                    article_title, article_date, images_info, links_info, temp_path, post.content
                 )
                 
                 # 5. 创建ZIP文件
@@ -513,7 +516,7 @@ class PackageCreator:
             f.write(content)
     
     def _create_resource_list(self, title: str, date: str, images_info: List[Dict], 
-                            links_info: List[Dict], temp_path: Path) -> None:
+                            links_info: List[Dict], temp_path: Path, article_content: str = "") -> None:
         """创建资料清单文件"""
         # 生成图片列表
         image_list = ""
@@ -539,6 +542,11 @@ class PackageCreator:
         if not additional_links:
             additional_links = "- 无扩展资料\n"
         
+        # 提取YouTube链接
+        youtube_links = self._extract_youtube_links(article_content)
+        if not youtube_links:
+            youtube_links = "- 无视频/音频资源\n"
+        
         # 生成资料清单
         content = self.resource_list_template.format(
             title=title,
@@ -546,6 +554,7 @@ class PackageCreator:
             generated_at=datetime.now().strftime("%Y年%m月%d日 %H:%M"),
             article_filename=self._safe_filename(title),
             image_list=image_list,
+            youtube_links=youtube_links,
             official_links=official_links,
             additional_links=additional_links
         )
@@ -553,6 +562,53 @@ class PackageCreator:
         readme_file = temp_path / "资料清单.md"
         with open(readme_file, 'w', encoding='utf-8') as f:
             f.write(content)
+    
+    def _extract_youtube_links(self, content: str) -> str:
+        """提取文章中的YouTube链接"""
+        youtube_links = ""
+        
+        # 1. 从YouTube iframe嵌入代码中提取
+        iframe_pattern = re.compile(r'<iframe[^>]*src="https://www\.youtube\.com/embed/([^"]*)"[^>]*>', re.IGNORECASE)
+        iframe_matches = iframe_pattern.findall(content)
+        
+        for video_id in iframe_matches:
+            youtube_url = f"https://www.youtube.com/watch?v={video_id}"
+            youtube_links += f"- 🎧 [中文播客导读]({youtube_url}) - AI生成的中文讲解版本\n"
+        
+        # 2. 从常规链接中提取
+        link_pattern = re.compile(r'\[([^\]]*)\]\((https://(?:www\.)?youtube\.com/watch\?v=[^)]*)\)', re.IGNORECASE)
+        link_matches = link_pattern.findall(content)
+        
+        for link_text, youtube_url in link_matches:
+            if "youtube.com/watch" in youtube_url.lower():
+                youtube_links += f"- 🎬 [{link_text}]({youtube_url}) - 原始视频资源\n"
+        
+        # 3. 查找本地音频文件对应的YouTube映射
+        try:
+            # 导入映射管理器
+            import sys
+            project_root = Path(__file__).parent.parent.parent
+            sys.path.insert(0, str(project_root))
+            from scripts.utils.youtube_link_mapper import YouTubeLinkMapper
+            
+            mapper = YouTubeLinkMapper()
+            
+            # 提取音频文件路径
+            audio_pattern = re.compile(r'{{ site\.baseurl }}/assets/audio/([^"]*\.mp3)', re.IGNORECASE)
+            audio_matches = audio_pattern.findall(content)
+            
+            for audio_file in audio_matches:
+                audio_path = f"assets/audio/{audio_file}"
+                mapping_info = mapper.get_mapping_info(audio_path)
+                if mapping_info:
+                    youtube_url = mapping_info["youtube_url"]
+                    title = mapping_info.get("title", "音频内容")
+                    youtube_links += f"- 🎧 [{title}]({youtube_url}) - 从本地音频上传\n"
+                    
+        except Exception as e:
+            self.logger.debug(f"查找YouTube映射时出错: {e}")
+        
+        return youtube_links
     
     def _create_zip_package(self, temp_path: Path, title: str, date: str) -> Tuple[bool, Optional[Path]]:
         """创建ZIP文件"""

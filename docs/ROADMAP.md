@@ -4,7 +4,7 @@
 
 ## 📅 文档信息
 - **创建日期**: 2025-07-19
-- **最后更新**: 2025-07-19
+- **最后更新**: 2025-08-03
 - **维护者**: Rong Zhu
 
 ---
@@ -205,6 +205,93 @@
 - 新增: `scripts/article_sync.py` - 核心同步逻辑
 - 修改: `run.py` - 添加菜单选项4（文章同步管理）
 - 日志格式: `[SYNC] posts→archived: article.md`
+
+### Phase 4.5: B站视频上传系统 (规划中 - v1.1)
+
+#### 国内用户友好的视频分发方案
+**目标**: 为国内用户提供B站平台的音频视频上传支持，解决YouTube访问限制问题
+
+**背景分析**:
+- YouTube在国内访问困难，影响用户体验
+- B站是国内主流视频平台，用户基数庞大
+- 双平台分发可覆盖更广泛的用户群体
+
+**功能规划**:
+
+- **4.5.1 B站认证集成**:
+  - Cookie认证方式（推荐，简单易用）
+  - B站开放平台API（备选，需企业资质）
+  - 账号状态检查（等级、实名认证、绑定手机）
+
+- **4.5.2 内容上传功能**:
+  ```python
+  # B站上传器核心架构
+  class BilibiliUploader:
+      def __init__(self):
+          self.auth_method = "cookie"  # 或 "api"
+          self.default_category = "科学科普"
+          self.default_tags = ["英语学习", "国际资讯", "教育", "AI生成"]
+      
+      def upload_audio_as_video(self, audio_file, title, description):
+          # 1. 音频转视频（添加静态背景图）
+          # 2. 检查内容审核要求
+          # 3. 上传到B站
+          # 4. 返回B站链接
+  ```
+
+- **4.5.3 双平台同步上传**:
+  - YouTube + B站同时上传
+  - 平台特异性优化（标题、描述、标签）
+  - 上传状态统一管理
+  - 链接替换智能选择（基于用户地区或设置）
+
+- **4.5.4 内容审核适配**:
+  - 敏感词过滤和替换
+  - 标题和描述优化
+  - 分区选择策略（知识>科学科普）
+  - 审核失败自动重试机制
+
+**技术挑战**:
+1. **认证稳定性**: Cookie有效期管理和自动刷新
+2. **内容审核**: 政治、经济类内容的审核规避
+3. **API限制**: 上传频率和文件大小限制
+4. **错误处理**: 网络异常和上传失败的重试机制
+
+**实现方案**:
+```yaml
+# config/bilibili_config.yml
+bilibili:
+  auth_method: "cookie"
+  cookie: "${BILIBILI_COOKIE}"
+  default_settings:
+    category: "科学科普"
+    tags: ["英语学习", "国际资讯", "教育"]
+    privacy: "public"
+    enable_comment: true
+    enable_danmaku: false
+  upload_settings:
+    max_retries: 3
+    chunk_size: "10MB"
+    timeout: 300
+```
+
+**用户体验优化**:
+- 上传进度实时显示
+- 平台选择偏好设置
+- 批量上传支持
+- 上传历史和链接管理
+
+**实施时间线**:
+- 📅 **Week 1-2**: B站API调研和认证测试
+- 📅 **Week 3-4**: 核心上传功能开发
+- 📅 **Week 5-6**: 双平台集成和测试
+- 📅 **Week 7**: 用户体验优化和文档完善
+
+**依赖条件**:
+- ✅ YouTube上传系统已完成
+- 🔲 B站账号认证和权限申请
+- 🔲 内容审核规则详细调研
+- 🔲 第三方库选型和测试
 
 ### Phase 5: 未来功能设想
 
