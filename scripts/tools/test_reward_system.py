@@ -10,8 +10,8 @@ import logging
 from pathlib import Path
 from dotenv import load_dotenv
 
-# 添加项目路径
-sys.path.append(str(Path(__file__).parent))
+# 修正导入路径以匹配新的项目结构，移除未使用的sys.path.append
+
 
 def test_environment():
     """测试环境配置"""
@@ -82,7 +82,7 @@ def test_smtp_connection():
     print("\n🔍 测试邮件SMTP连接...")
     
     try:
-        from email_sender import create_email_sender
+        from ..utils.email_sender import create_email_sender
         sender = create_email_sender()
         success, message = sender.test_connection()
         
@@ -102,7 +102,7 @@ def test_github_access():
     print("\n🔍 测试GitHub API访问...")
     
     try:
-        from github_release_manager import create_github_manager
+        from ..utils.github_release_manager import create_github_manager
         manager = create_github_manager()
         
         # 测试获取统计信息
@@ -134,7 +134,7 @@ def test_package_creator():
     print("\n🔍 测试内容包创建器...")
     
     try:
-        from package_creator import create_package_creator
+        from ..utils.package_creator import create_package_creator
         creator = create_package_creator()
         
         # 检查输出目录是否可创建
@@ -177,7 +177,7 @@ def test_system_integration():
     print("\n🔍 测试系统整合...")
     
     try:
-        from reward_system_manager import RewardSystemManager
+        from scripts.utils.reward_system_manager import RewardSystemManager
         manager = RewardSystemManager()
         
         # 获取系统统计
