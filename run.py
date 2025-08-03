@@ -58,16 +58,17 @@ def main():
         print("8. 调试和维护工具")
         print("9. LLM引擎切换")
         print("10. ElevenLabs语音测试")
+        print("11. YouTube音频上传")
         print("\n0. 退出")
         
-        choice = input("\n请输入选项 (1-10/0): ").strip()
+        choice = input("\n请输入选项 (1-11/0): ").strip()
         
         # 记录用户选择的操作
         choice_names = {
             '1': '处理现有草稿', '2': '重新发布已发布文章', '3': '生成测试文章',
             '4': '内容变现管理', '5': '系统状态检查', '6': 'YouTube播客生成器',
             '7': '文章更新工具', '8': '调试和维护工具', '9': 'LLM引擎切换', 
-            '10': 'ElevenLabs语音测试', '0': '退出'
+            '10': 'ElevenLabs语音测试', '11': 'YouTube音频上传', '0': '退出'
         }
         operation_name = choice_names.get(choice, '无效选择')
         pipeline.log(f"用户选择操作: {choice} ({operation_name})", level="info", force=True)
@@ -136,6 +137,10 @@ def main():
         elif choice == "10":
             # ElevenLabs语音测试
             handle_elevenlabs_menu(pipeline)
+            continue  # 返回主菜单
+        elif choice == "11":
+            # YouTube音频上传
+            handle_youtube_upload_menu(pipeline)
             continue  # 返回主菜单
         elif choice == "0":
             print("👋 再见！")
@@ -1816,6 +1821,229 @@ def handle_elevenlabs_menu(pipeline):
         
         if choice in ["6", "7"]:
             input("\n按Enter键继续...")
+
+
+def handle_youtube_upload_menu(pipeline):
+    """处理YouTube音频上传菜单"""
+    print("\n" + "="*40)
+    print("🎬 YouTube音频上传")
+    print("="*40)
+    print("📋 功能说明：")
+    print("   • 扫描assets/audio/目录下的音频文件")
+    print("   • 自动生成缩略图(音频+静态图片)")
+    print("   • 上传到YouTube(不公开，通过链接访问)")
+    print("   • 支持FFmpeg和MoviePy双重备用方案")
+    
+    # 检查OAuth配置状态
+    try:
+        from pathlib import Path
+        credentials_file = Path("config/youtube_oauth_credentials.json")
+        token_file = Path("config/youtube_oauth_token.json")
+        
+        oauth_status = "✅ 已配置" if (credentials_file.exists() and token_file.exists()) else "❌ 需要配置"
+        print(f"\n🔐 OAuth认证状态: {oauth_status}")
+        
+        if not (credentials_file.exists() and token_file.exists()):
+            print("💡 请先完成OAuth认证配置:")
+            print("   1. 查看文档: YOUTUBE_OAUTH_SETUP.md")
+            print("   2. 或运行: python check_oauth_status.py")
+            input("\n按Enter键返回主菜单...")
+            return
+            
+    except Exception as e:
+        print(f"❌ 配置检查失败: {e}")
+        input("\n按Enter键返回主菜单...")
+        return
+    
+    print("\n请选择上传方式：")
+    print("1. 扫描并显示音频文件")
+    print("2. 单个文件上传")
+    print("3. 批量上传所有文件")
+    print("4. 检查配置状态")
+    print("5. 使用说明")
+    print("0. 返回主菜单")
+    
+    sub_choice = input("\n请输入选项 (1-5/0): ").strip()
+    pipeline.log(f"YouTube音频上传 - 用户选择: {sub_choice}", level="info", force=True)
+    
+    if sub_choice == "1":
+        # 扫描并显示音频文件
+        try:
+            script_path = Path("scripts/tools/youtube_upload_tester.py")
+            print("\n📁 扫描音频文件...")
+            
+            # 使用Python执行扫描功能
+            import sys
+            sys.path.insert(0, str(Path(__file__).parent))
+            from scripts.tools.youtube_upload_tester import YouTubeUploadTester
+            
+            tester = YouTubeUploadTester()
+            audio_files = tester.scan_audio_files()
+            tester.display_audio_list(audio_files)
+            
+        except Exception as e:
+            print(f"❌ 操作失败: {e}")
+            pipeline.log(f"YouTube上传 - 扫描文件失败: {e}", level="error", force=True)
+            
+    elif sub_choice == "2":
+        # 单个文件上传
+        try:
+            print("\n🎯 单个文件上传模式")
+            print("💡 使用方法: python upload_single.py [文件编号]")
+            print("例如: python upload_single.py 2")
+            
+            # 先显示文件列表
+            import sys
+            sys.path.insert(0, str(Path(__file__).parent))
+            from scripts.tools.youtube_upload_tester import YouTubeUploadTester
+            
+            tester = YouTubeUploadTester()
+            audio_files = tester.scan_audio_files()
+            
+            if not audio_files:
+                print("❌ 未找到音频文件")
+                input("\n按Enter键继续...")
+                return
+                
+            print(f"\n📁 找到 {len(audio_files)} 个音频文件:")
+            for i, file_info in enumerate(audio_files, 1):
+                size_mb = file_info['size'] / (1024 * 1024)
+                print(f"{i}. {file_info['name']} ({size_mb:.1f}MB)")
+            
+            file_choice = input(f"\n请选择要上传的文件 (1-{len(audio_files)}, 0=取消): ").strip()
+            
+            if file_choice == "0":
+                print("❌ 取消上传")
+                return
+                
+            try:
+                file_index = int(file_choice)
+                if not (1 <= file_index <= len(audio_files)):
+                    print(f"❌ 请输入 1-{len(audio_files)} 之间的数字")
+                    input("\n按Enter键继续...")
+                    return
+                    
+                selected_file = audio_files[file_index - 1]
+                print(f"\n🎯 选择上传: {selected_file['name']}")
+                print(f"📊 文件大小: {selected_file['size'] / (1024 * 1024):.1f}MB")
+                
+                confirm = input("确认上传到YouTube? (y/N): ").strip().lower()
+                if confirm not in ['y', 'yes']:
+                    print("❌ 取消上传")
+                    return
+                
+                print("\n🚀 开始上传流程...")
+                pipeline.log(f"YouTube上传 - 开始上传文件: {selected_file['name']}", level="info", force=True)
+                
+                result = tester.process_single_file(selected_file, show_details=True)
+                
+                if result:
+                    print("\n🎉 上传成功!")
+                    print("💡 视频已设置为不公开，可通过链接访问")
+                    pipeline.log(f"YouTube上传 - 上传成功: {selected_file['name']}", level="info", force=True)
+                else:
+                    print("\n❌ 上传失败")
+                    pipeline.log(f"YouTube上传 - 上传失败: {selected_file['name']}", level="error", force=True)
+                    
+            except ValueError:
+                print("❌ 请输入有效数字")
+                
+        except Exception as e:
+            print(f"❌ 操作失败: {e}")
+            pipeline.log(f"YouTube上传 - 单个上传失败: {e}", level="error", force=True)
+            
+    elif sub_choice == "3":
+        # 批量上传所有文件
+        try:
+            print("\n📊 批量上传模式")
+            
+            import sys
+            sys.path.insert(0, str(Path(__file__).parent))
+            from scripts.tools.youtube_upload_tester import YouTubeUploadTester
+            
+            tester = YouTubeUploadTester()
+            audio_files = tester.scan_audio_files()
+            
+            if not audio_files:
+                print("❌ 未找到音频文件")
+                input("\n按Enter键继续...")
+                return
+                
+            print(f"📁 找到 {len(audio_files)} 个音频文件")
+            total_size = sum(f['size'] for f in audio_files) / (1024 * 1024)
+            print(f"📊 总大小: {total_size:.1f}MB")
+            
+            confirm = input(f"\n确认批量上传所有 {len(audio_files)} 个文件? (y/N): ").strip().lower()
+            if confirm not in ['y', 'yes']:
+                print("❌ 取消批量上传")
+                return
+            
+            print("\n🚀 开始批量上传...")
+            pipeline.log(f"YouTube上传 - 开始批量上传 {len(audio_files)} 个文件", level="info", force=True)
+            
+            success_count = 0
+            for i, file_info in enumerate(audio_files, 1):
+                print(f"\n🔄 处理文件 {i}/{len(audio_files)}: {file_info['name']}")
+                result = tester.process_single_file(file_info, show_details=False)
+                if result:
+                    success_count += 1
+                    print(f"   ✅ 上传成功")
+                else:
+                    print(f"   ❌ 上传失败")
+            
+            print(f"\n📊 批量上传完成: {success_count}/{len(audio_files)} 成功")
+            pipeline.log(f"YouTube上传 - 批量上传完成: {success_count}/{len(audio_files)} 成功", level="info", force=True)
+            
+        except Exception as e:
+            print(f"❌ 操作失败: {e}")
+            pipeline.log(f"YouTube上传 - 批量上传失败: {e}", level="error", force=True)
+            
+    elif sub_choice == "4":
+        # 检查配置状态
+        try:
+            script_path = Path("check_oauth_status.py")
+            print("\n🔍 检查YouTube OAuth配置状态...")
+            result = execute_script_with_logging(
+                pipeline, script_path, [], 
+                "YouTube配置状态检查"
+            )
+            print(result.stdout)
+            if result.stderr:
+                print(f"❌ 错误: {result.stderr}")
+        except Exception as e:
+            print(f"❌ 操作失败: {e}")
+            
+    elif sub_choice == "5":
+        # 使用说明
+        print("\n📖 YouTube音频上传使用说明")
+        print("="*50)
+        print("🔧 系统要求:")
+        print("   • Google Cloud项目已创建")
+        print("   • YouTube Data API v3已启用")
+        print("   • OAuth2凭据已配置")
+        print("   • FFmpeg或MoviePy可用")
+        
+        print("\n📋 使用流程:")
+        print("   1. 首次使用需要完成OAuth认证")
+        print("   2. 音频文件放在assets/audio/目录")
+        print("   3. 选择单个或批量上传模式")
+        print("   4. 系统自动生成视频并上传")
+        print("   5. 获取YouTube链接(不公开)")
+        
+        print("\n💡 支持的音频格式:")
+        print("   • MP3, WAV, M4A, AAC")
+        print("   • 建议文件大小<50MB")
+        
+        print("\n🔗 相关文档:")
+        print("   • YOUTUBE_OAUTH_SETUP.md - OAuth设置指南")
+        print("   • YOUTUBE_COMPLETE_GUIDE.md - 完整使用说明")
+        
+    elif sub_choice == "0":
+        return
+    else:
+        print("❌ 无效的选择，请重新输入")
+    
+    input("\n按Enter键继续...")
 
 
 if __name__ == "__main__":
