@@ -32,6 +32,20 @@ cp .env.example .env
 python run.py
 ```
 
+## 📋 系统依赖
+
+### 必需依赖
+- **Python 3.8+** - 核心运行环境
+- **pip packages** - 详见 `requirements.txt`
+
+### 可选依赖（推荐安装）
+- **FFmpeg** - 高性能音视频处理
+  - **Windows**: 下载 [FFmpeg官网](https://ffmpeg.org/download.html#build-windows)
+  - **macOS**: `brew install ffmpeg`
+  - **Linux**: `sudo apt install ffmpeg` 或 `sudo yum install ffmpeg`
+
+> 💡 **智能降级策略**: 如果未安装FFmpeg，系统将自动使用MoviePy作为备用方案，确保所有功能正常运行。
+
 ## 📚 完整文档
 
 | 文档类型 | 文档 | 描述 |
