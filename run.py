@@ -966,6 +966,8 @@ def handle_debug_menu(pipeline):
                     # 直接使用pytest
                     print("\n🔄 使用pytest运行测试...")
                     pipeline.log("开始执行: 使用pytest运行测试 - python -m pytest tests/ -v", level="info", force=True)
+                    # 确保 subprocess 可用（解决 Pylance 作用域检测问题）
+                    import subprocess
                     result = subprocess.run(
                         [sys.executable, "-m", "pytest", "tests/", "-v"], 
                         capture_output=True, 
