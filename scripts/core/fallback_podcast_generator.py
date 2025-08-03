@@ -268,10 +268,11 @@ class FallbackPodcastGenerator:
             # 设置语音属性
             voices = engine.getProperty('voices')
             # 尝试设置中文语音（如果可用）
-            if voices and hasattr(voices, '__iter__'):
+            # pyttsx3 的 getProperty('voices') 可能返回 None 或 list，需要类型检查
+            if voices and isinstance(voices, (list, tuple)):
                 for voice in voices:
                     if hasattr(voice, 'name') and hasattr(voice, 'id'):
-                        if 'chinese' in voice.name.lower() or 'mandarin' in voice.name.lower():
+                        if 'chinese' in str(voice.name).lower() or 'mandarin' in str(voice.name).lower():
                             engine.setProperty('voice', voice.id)
                             break
             

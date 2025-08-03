@@ -218,7 +218,8 @@ class YouTubeVideoGenerator:
     def create_video_fallback(self, audio_path: Path, thumbnail_path: Path, output_path: Path) -> bool:
         """使用moviepy作为备用方案"""
         try:
-            from moviepy.editor import AudioFileClip, ImageClip
+            # 条件导入 MoviePy - 仅在需要时加载，避免 Pylance 导入警告
+            from moviepy.editor import AudioFileClip, ImageClip  # type: ignore[import]
             
             print("🔄 使用moviepy生成视频...")
             
