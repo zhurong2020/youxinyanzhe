@@ -327,8 +327,15 @@ class PackageCreator:
             tags = [str(tags)]
         
         # 转换所有元素为字符串，确保类型安全
-        categories = [str(cat) for cat in (categories if categories and hasattr(categories, '__iter__') and not isinstance(categories, str) else [])]
-        tags = [str(tag) for tag in (tags if tags and hasattr(tags, '__iter__') and not isinstance(tags, str) else [])]
+        if categories and isinstance(categories, (list, tuple)):
+            categories = [str(cat) for cat in categories]
+        else:
+            categories = []
+        
+        if tags and isinstance(tags, (list, tuple)):
+            tags = [str(tag) for tag in tags]
+        else:
+            tags = []
         
         # 转换Markdown为HTML
         html_body = markdown2.markdown(

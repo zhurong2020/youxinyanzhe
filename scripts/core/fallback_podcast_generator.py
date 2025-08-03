@@ -20,6 +20,8 @@ load_dotenv()
 # 第三方库导入
 try:
     import google.generativeai as genai
+    from google.generativeai.client import configure
+    from google.generativeai.generative_models import GenerativeModel
     from googleapiclient.discovery import build
 except ImportError as e:
     print(f"请安装必要的依赖: pip install google-generativeai google-api-python-client")
@@ -73,9 +75,9 @@ class FallbackPodcastGenerator:
         """设置API连接"""
         # 设置Gemini API
         if 'GEMINI_API_KEY' in self.config:
-            genai.configure(api_key=self.config['GEMINI_API_KEY'])
+            configure(api_key=self.config['GEMINI_API_KEY'])
             # 使用与主系统一致的模型配置
-            self.gemini_model = genai.GenerativeModel('gemini-2.5-flash')
+            self.gemini_model = GenerativeModel('gemini-2.5-flash')
             self.logger.info("Gemini API 配置完成")
         else:
             raise ValueError("需要GEMINI_API_KEY配置")
@@ -266,11 +268,12 @@ class FallbackPodcastGenerator:
             # 设置语音属性
             voices = engine.getProperty('voices')
             # 尝试设置中文语音（如果可用）
-            if voices:
+            if voices and hasattr(voices, '__iter__'):
                 for voice in voices:
-                    if 'chinese' in voice.name.lower() or 'mandarin' in voice.name.lower():
-                        engine.setProperty('voice', voice.id)
-                        break
+                    if hasattr(voice, 'name') and hasattr(voice, 'id'):
+                        if 'chinese' in voice.name.lower() or 'mandarin' in voice.name.lower():
+                            engine.setProperty('voice', voice.id)
+                            break
             
             # 设置语速和音量
             engine.setProperty('rate', 150)  # 语速

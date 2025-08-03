@@ -37,8 +37,10 @@ def gemini_model():
     
     # 获取可用模型列表
     try:
-        genai.configure(api_key=api_key)
-        models = genai.list_models()
+        from google.generativeai.client import configure
+        from google.generativeai.models import list_models
+        configure(api_key=api_key)
+        models = list_models()
         model_names = [model.name for model in models]
         logging.info(f"Available models: {model_names}")
         
@@ -77,7 +79,8 @@ def gemini_model():
         logging.info(f"Using model: {model_name}")
         
         # 创建模型实例
-        model = genai.GenerativeModel(model_name)
+        from google.generativeai.generative_models import GenerativeModel
+        model = GenerativeModel(model_name)
         
         # 测试连接
         response = model.generate_content("Hello, how are you?")

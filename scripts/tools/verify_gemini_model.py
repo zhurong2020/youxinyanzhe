@@ -25,11 +25,13 @@ def main():
     
     try:
         # 配置API
-        genai.configure(api_key=api_key)
+        from google.generativeai.client import configure
+        configure(api_key=api_key)
         
         # 获取可用模型列表
         print("🔍 正在获取可用模型列表...")
-        models = list(genai.list_models())
+        from google.generativeai.models import list_models
+        models = list(list_models())
         model_names = [model.name for model in models]
         
         print(f"📋 共找到 {len(model_names)} 个可用模型:")
@@ -53,7 +55,8 @@ def main():
             test_model = available_target_models[0]
             print(f"\n🧪 测试模型: {test_model}")
             
-            model = genai.GenerativeModel(test_model)
+            from google.generativeai.generative_models import GenerativeModel
+            model = GenerativeModel(test_model)
             response = model.generate_content("简单介绍一下Gemini AI模型")
             
             if response.text:

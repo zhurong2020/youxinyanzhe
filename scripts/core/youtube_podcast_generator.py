@@ -52,6 +52,7 @@ try:
     import moviepy.editor  # type: ignore
     MOVIEPY_AVAILABLE = True
 except ImportError:
+    moviepy = None  # type: ignore
     MOVIEPY_AVAILABLE = False
 
 
@@ -711,7 +712,7 @@ class YouTubePodcastGenerator:
             r'^([^：:]+)[：:]\s*(.+)$',     # 通用格式: 说话者: 内容
         ]
         
-        dialogue_segments = []
+        dialogue_segments: List[Tuple[str, str]] = []
         lines = text.split('\n')
         
         for line in lines:
