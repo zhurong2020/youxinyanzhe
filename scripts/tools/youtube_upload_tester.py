@@ -578,6 +578,16 @@ class YouTubeUploadTester:
             if self.youtube_available:
                 video_id = self.upload_to_youtube(video_path, title, description)
                 if video_id:
+                    # 记录YouTube链接映射
+                    try:
+                        from scripts.utils.youtube_link_mapper import YouTubeLinkMapper
+                        mapper = YouTubeLinkMapper()
+                        # 使用相对于项目根目录的路径
+                        relative_audio_path = str(file_info['path'].relative_to(Path(__file__).parent.parent.parent))
+                        mapper.add_mapping(relative_audio_path, video_id, title)
+                    except Exception as e:
+                        print(f"⚠️ 记录YouTube映射失败: {e}")
+                    
                     # 清理临时视频文件
                     try:
                         video_path.unlink()

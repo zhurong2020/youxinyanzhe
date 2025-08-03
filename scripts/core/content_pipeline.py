@@ -1460,6 +1460,16 @@ class ContentPipeline:
                 self.log(f"❌ 解析front matter失败: {str(e)}", level="error")
                 return False
             
+            # 在保存前替换音频链接为YouTube嵌入
+            try:
+                from scripts.utils.audio_link_replacer import AudioLinkReplacer
+                replacer = AudioLinkReplacer()
+                content, replaced_count = replacer.replace_audio_links(content, draft_path.stem)
+                if replaced_count > 0:
+                    self.log(f"🎬 已替换 {replaced_count} 个音频链接为YouTube嵌入", level="info", force=True)
+            except Exception as e:
+                self.log(f"⚠️ 音频链接替换失败: {e}", level="warning")
+            
             # 保存文件
             with open(publish_path, 'w', encoding='utf-8') as f:
                 f.write(content)
