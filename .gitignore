@@ -101,3 +101,8 @@ vendor/
 .settings/
 *.iml
 *.Zone.Identifier
+
+# Custom configuration files
+config/elevenlabs_voices.yml
+config/gemini_config.yml
+.claude/
