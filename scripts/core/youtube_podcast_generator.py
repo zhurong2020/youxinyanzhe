@@ -1591,9 +1591,9 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             
             media = MediaFileUpload(
                 video_path,
-                chunksize=-1,  # 一次性上传
+                chunksize=10*1024*1024,  # 10MB chunks instead of all at once
                 resumable=True,
-                mimetype='video/*'
+                mimetype='video/mp4'
             )
             
             request = self.youtube.videos().insert(
@@ -1602,15 +1602,36 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
                 media_body=media
             )
             
-            response = request.execute()
+            self._log(f"开始分块上传视频，文件大小: {media.size()} bytes")
             
-            if 'id' in response:
+            # 可恢复上传的循环
+            response = None
+            retry_count = 0
+            max_retries = 3
+            
+            while response is None and retry_count < max_retries:
+                try:
+                    self._log(f"尝试上传 (第{retry_count + 1}次/共{max_retries}次)...")
+                    status, response = request.next_chunk()
+                    if status:
+                        self._log(f"上传进度: {int(status.progress() * 100)}%")
+                    
+                except Exception as upload_error:
+                    retry_count += 1
+                    if retry_count >= max_retries:
+                        raise upload_error
+                    else:
+                        self._log(f"上传失败，准备重试: {upload_error}")
+                        import time
+                        time.sleep(2 ** retry_count)  # 指数退避
+            
+            if response and isinstance(response, dict) and 'id' in response:
                 video_id = response['id']
                 youtube_link = f"https://www.youtube.com/watch?v={video_id}"
                 self._log(f"✅ YouTube上传成功: {youtube_link}")
                 return video_id
             else:
-                self._log("YouTube上传失败：未返回视频ID")
+                self._log(f"YouTube上传失败：未返回视频ID，response: {response}")
                 return None
                 
         except Exception as e:
