@@ -126,7 +126,7 @@ toc_icon: "crown"
     </div>
   </div>
 
-  <div class="feature__item--right">
+  <div class="feature__item">
     <div class="archive__item">
       <div class="archive__item-body">
         <h2 class="archive__item-title">季度会员 🔥</h2>
@@ -143,23 +143,23 @@ toc_icon: "crown"
       </div>
     </div>
   </div>
-</div>
 
-<div class="feature__item--center">
-  <div class="archive__item">
-    <div class="archive__item-body">
-      <h2 class="archive__item-title">年度会员 ⭐</h2>
-      <div class="archive__item-excerpt">
-        <p><strong>￥180 / 365天</strong></p>
-        <p><small>对应 Buy Me Coffee: 5杯 ($25)</small></p>
-        <p><em style="color: #28a745;">💰 超值优惠：每月仅￥15 (57%折扣)</em></p>
-        <ul>
-          <li>✅ 全部内容访问</li>
-          <li>✅ VIP专享资源</li>
-          <li>✅ 一对一咨询机会</li>
-          <li>✅ 专属讨论群</li>
-          <li>✅ 定制化工具</li>
-        </ul>
+  <div class="feature__item feature__item--highlight">
+    <div class="archive__item">
+      <div class="archive__item-body">
+        <h2 class="archive__item-title">年度会员 ⭐</h2>
+        <div class="archive__item-excerpt">
+          <p><strong>￥180 / 365天</strong></p>
+          <p><small>对应 Buy Me Coffee: 5杯 ($25)</small></p>
+          <p><em style="color: #28a745;">💰 超值优惠：每月仅￥15 (57%折扣)</em></p>
+          <ul>
+            <li>✅ 全部内容访问</li>
+            <li>✅ VIP专享资源</li>
+            <li>✅ 一对一咨询机会</li>
+            <li>✅ 专属讨论群</li>
+            <li>✅ 定制化工具</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -338,15 +338,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .feature__wrapper {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    grid-gap: 1em;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-gap: 1.5em;
     margin: 2em 0;
 }
 
-.feature__item--center {
-    grid-column: 1 / -1;
-    max-width: 400px;
-    margin: 0 auto;
+.feature__item--highlight {
+    border: 2px solid #28a745;
+    border-radius: 8px;
+    position: relative;
+}
+
+.feature__item--highlight::before {
+    content: "推荐";
+    position: absolute;
+    top: -10px;
+    right: 15px;
+    background: #28a745;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
 }
 
 .archive__item-title {
