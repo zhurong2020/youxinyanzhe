@@ -633,11 +633,12 @@ def handle_youtube_podcast_menu(pipeline):
     
     print("\n请选择操作：")
     print("1. 生成YouTube播客学习文章")
-    print("2. 查看配置状态")
-    print("3. 使用说明和示例")
+    print("2. 上传已生成的播客视频")
+    print("3. 查看配置状态")
+    print("4. 使用说明和示例")
     print("0. 返回主菜单")
     
-    sub_choice = input("\n请输入选项 (1-3/0): ").strip()
+    sub_choice = input("\n请输入选项 (1-4/0): ").strip()
     pipeline.log(f"YouTube播客生成器 - 用户选择: {sub_choice}", level="info", force=True)
     
     if sub_choice == "1":
@@ -818,6 +819,151 @@ def handle_youtube_podcast_menu(pipeline):
             print(f"❌ 操作失败: {e}")
             
     elif sub_choice == "2":
+        # 上传已生成的播客视频
+        print("\n🎬 上传已生成的播客视频")
+        print("="*40)
+        
+        # 检查.tmp/output/videos目录下的视频文件
+        videos_dir = Path(".tmp/output/videos")
+        if not videos_dir.exists():
+            print("❌ 视频输出目录不存在")
+            input("\n按Enter键返回菜单...")
+            return
+            
+        video_files = list(videos_dir.glob("*.mp4"))
+        if not video_files:
+            print("❌ 未找到已生成的播客视频文件")
+            print("💡 请先使用选项1生成播客文章和视频")
+            input("\n按Enter键返回菜单...")
+            return
+            
+        print(f"📁 找到 {len(video_files)} 个播客视频文件:")
+        for i, video_file in enumerate(video_files, 1):
+            file_size = video_file.stat().st_size / (1024*1024)  # MB
+            from datetime import datetime
+            modified_time = datetime.fromtimestamp(video_file.stat().st_mtime)
+            print(f"  {i}. {video_file.name}")
+            print(f"     大小: {file_size:.1f}MB | 生成时间: {modified_time.strftime('%Y-%m-%d %H:%M:%S')}")
+            
+        try:
+            choice = input(f"\n请选择要上传的视频 (1-{len(video_files)}): ").strip()
+            if not choice.isdigit() or not (1 <= int(choice) <= len(video_files)):
+                print("❌ 无效的选择")
+                input("\n按Enter键返回菜单...")
+                return
+                
+            selected_video = video_files[int(choice) - 1]
+            print(f"\n📤 准备上传视频: {selected_video.name}")
+            
+            # 从文件名解析信息
+            video_name = selected_video.stem
+            # 格式: youtube-YYYYMMDD-title-podcast
+            if video_name.startswith("youtube-") and video_name.endswith("-podcast"):
+                base_name = video_name[8:-8]  # 移除youtube-前缀和-podcast后缀
+                date_part = base_name[:8]
+                title_part = base_name[9:]  # 跳过日期和连字符
+                
+                # 查找对应的文章文件获取详细信息
+                draft_file = Path(f"_drafts/2025-{date_part[:2]}-{date_part[2:4]}-youtube-{title_part}.md")
+                if draft_file.exists():
+                    print(f"✅ 找到对应的文章文件: {draft_file.name}")
+                    
+                    # 导入YouTube播客生成器来处理上传
+                    try:
+                        from scripts.core.youtube_podcast_generator import YouTubePodcastGenerator
+                        
+                        config = {
+                            'GEMINI_API_KEY': os.getenv('GEMINI_API_KEY'),
+                            'YOUTUBE_API_KEY': os.getenv('YOUTUBE_API_KEY'),
+                            'ELEVENLABS_API_KEY': os.getenv('ELEVENLABS_API_KEY')
+                        }
+                        
+                        generator = YouTubePodcastGenerator(config, pipeline)
+                        
+                        # 读取文章获取视频信息
+                        with open(draft_file, 'r', encoding='utf-8') as f:
+                            content = f.read()
+                            
+                        # 简单解析前置元数据
+                        import re
+                        title_match = re.search(r'title:\s*"([^"]+)"', content)
+                        youtube_match = re.search(r'\[([^\]]+)\]\(https://www\.youtube\.com/watch\?v=([^)]+)\)', content)
+                        
+                        if title_match and youtube_match:
+                            article_title = title_match.group(1)
+                            original_title = youtube_match.group(1)
+                            video_id = youtube_match.group(2)
+                            
+                            print(f"📺 原视频: {original_title}")
+                            print(f"📝 文章标题: {article_title}")
+                            print(f"🆔 视频ID: {video_id}")
+                            
+                            # 准备上传参数
+                            video_info = {
+                                'title': original_title,
+                                'id': video_id
+                            }
+                            
+                            content_guide = {
+                                'title': article_title,
+                                'excerpt': '通过播客学习英语，理解全球视野',
+                                'outline': ['核心观点', '语言学习', '文化背景'],
+                                'learning_tips': {
+                                    'vocabulary': ['关键词汇'],
+                                    'expressions': ['常用表达'],
+                                    'cultural_context': '文化背景信息'
+                                },
+                                'tags': ['英语学习', '播客', '全球视野']
+                            }
+                            
+                            youtube_url = f"https://www.youtube.com/watch?v={video_id}"
+                            
+                            confirm = input("\n确认上传到YouTube？(y/N): ").strip().lower()
+                            if confirm in ['y', 'yes']:
+                                print("🚀 开始上传到YouTube...")
+                                video_upload_id = generator.upload_to_youtube(
+                                    str(selected_video), video_info, content_guide, youtube_url
+                                )
+                                
+                                if video_upload_id:
+                                    youtube_link = f"https://www.youtube.com/watch?v={video_upload_id}"
+                                    print(f"✅ 上传成功!")
+                                    print(f"🔗 YouTube链接: {youtube_link}")
+                                    
+                                    # 更新文章中的YouTube链接
+                                    updated_content = content.replace(
+                                        "<!-- YouTube播客优先显示 -->",
+                                        f'<iframe width="560" height="315" src="https://www.youtube.com/embed/{video_upload_id}" frameborder="0" allowfullscreen></iframe>'
+                                    )
+                                    
+                                    with open(draft_file, 'w', encoding='utf-8') as f:
+                                        f.write(updated_content)
+                                    
+                                    print("📝 文章已更新，添加了YouTube播放器")
+                                else:
+                                    print("❌ 上传失败，请检查OAuth认证配置")
+                            else:
+                                print("❌ 已取消上传")
+                        else:
+                            print("❌ 无法解析文章中的视频信息")
+                    except ImportError as e:
+                        print(f"❌ 导入YouTube模块失败: {e}")
+                    except Exception as e:
+                        print(f"❌ 上传过程失败: {e}")
+                        pipeline.log(f"YouTube视频上传失败: {e}", level="error", force=True)
+                else:
+                    print(f"❌ 未找到对应的文章文件: {draft_file}")
+            else:
+                print("❌ 无法识别的视频文件名格式")
+                
+        except ValueError:
+            print("❌ 请输入有效的数字")
+        except Exception as e:
+            print(f"❌ 操作失败: {e}")
+            
+        input("\n按Enter键返回菜单...")
+        
+    elif sub_choice == "3":
         # 查看配置状态
         print("\n🔍 配置状态检查")
         print("="*40)
@@ -862,7 +1008,7 @@ def handle_youtube_podcast_menu(pipeline):
             path = Path(dir_path)
             print(f"{dir_path}: {'✅ 存在' if path.exists() else '❌ 不存在'}")
             
-    elif sub_choice == "3":
+    elif sub_choice == "4":
         # 使用说明和示例
         print("\n📖 YouTube播客生成器使用说明")
         print("="*40)
