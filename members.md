@@ -97,10 +97,9 @@ toc: false
         <div class="archive__item-excerpt">
           <p><strong>￥5 / 7天</strong></p>
           <ul>
-            <li>✅ 基础投资策略</li>
+            <li>✅ 基础策略</li>
             <li>✅ 技术教程</li>
             <li>✅ 部分代码</li>
-            <li>❌ VIP专享内容</li>
           </ul>
         </div>
       </div>
@@ -114,10 +113,9 @@ toc: false
         <div class="archive__item-excerpt">
           <p><strong>￥35 / 30天</strong></p>
           <ul>
-            <li>✅ 全部投资策略</li>
-            <li>✅ 完整技术方案</li>
-            <li>✅ 深度分析</li>
-            <li>❌ VIP专享内容</li>
+            <li>✅ 全部策略</li>
+            <li>✅ 技术方案</li>
+            <li>✅ 基础资料</li>
           </ul>
         </div>
       </div>
@@ -131,10 +129,9 @@ toc: false
         <div class="archive__item-excerpt">
           <p><strong>￥108 / 90天</strong></p>
           <ul>
-            <li>✅ 全部内容访问</li>
-            <li>✅ VIP专享资源</li>
-            <li>✅ 投资组合</li>
-            <li>✅ 直播答疑</li>
+            <li>✅ 全部资料</li>
+            <li>✅ 资料打包</li>
+            <li>✅ 持仓分享</li>
           </ul>
         </div>
       </div>
@@ -147,13 +144,10 @@ toc: false
         <h2 class="archive__item-title">年度会员 ⭐</h2>
         <div class="archive__item-excerpt">
           <p><strong>￥180 / 365天</strong></p>
-          <p><em style="color: #28a745;">💰 每月仅￥15</em></p>
           <ul>
-            <li>✅ 全部内容访问</li>
-            <li>✅ VIP专享资源</li>
-            <li>✅ 一对一咨询</li>
-            <li>✅ 专属讨论群</li>
-            <li>✅ 定制化工具</li>
+            <li>✅ 标的推荐</li>
+            <li>✅ 收费频道</li>
+            <li>✅ 交易软件</li>
           </ul>
         </div>
       </div>
@@ -334,8 +328,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .feature__wrapper {
     display: grid;
-    grid-template-columns: repeat(4, minmax(160px, 1fr));
-    grid-gap: 1em;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 0.8em;
     margin: 2em 0;
     width: 100%;
 }
@@ -392,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .feature__item {
-    min-height: 280px;
+    min-height: 220px;
 }
 
 .archive__item {
@@ -405,7 +399,7 @@ document.addEventListener('DOMContentLoaded', function() {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 1em;
+    padding: 0.8em;
 }
 
 /* 会员卡片响应式布局 */
