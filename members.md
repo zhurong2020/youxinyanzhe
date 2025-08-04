@@ -149,6 +149,7 @@ toc: false
             <li>✅ 收费频道</li>
             <li>✅ 交易软件</li>
           </ul>
+          <p style="font-size: 0.6em; color: #dc3545; margin-top: 0.3em;">⚠️ 投资有风险</p>
         </div>
       </div>
     </div>
@@ -329,9 +330,10 @@ document.addEventListener('DOMContentLoaded', function() {
 .feature__wrapper {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-gap: 0.8em;
+    grid-gap: 0.5em;
     margin: 2em 0;
     width: 100%;
+    max-width: none;
 }
 
 .feature__item--highlight {
@@ -355,22 +357,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .archive__item-title {
     color: #2c3e50;
-    margin-bottom: 0.3em;
-    font-size: 1.1em;
+    margin-bottom: 0.2em;
+    font-size: 1em;
 }
 
 .archive__item-excerpt {
-    font-size: 0.85em;
-    line-height: 1.3;
+    font-size: 0.75em;
+    line-height: 1.2;
 }
 
 .archive__item-excerpt p {
-    margin-bottom: 0.4em;
+    margin-bottom: 0.3em;
 }
 
 .archive__item-excerpt small {
-    font-size: 0.8em;
-    line-height: 1.2;
+    font-size: 0.7em;
+    line-height: 1.1;
 }
 
 .archive__item-excerpt ul {
@@ -380,13 +382,13 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .archive__item-excerpt li {
-    padding: 0.15em 0;
-    font-size: 0.9em;
-    line-height: 1.2;
+    padding: 0.1em 0;
+    font-size: 0.8em;
+    line-height: 1.1;
 }
 
 .feature__item {
-    min-height: 220px;
+    min-height: 180px;
 }
 
 .archive__item {
@@ -399,7 +401,7 @@ document.addEventListener('DOMContentLoaded', function() {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 0.8em;
+    padding: 0.5em;
 }
 
 /* 会员卡片响应式布局 */
