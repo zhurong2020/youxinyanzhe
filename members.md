@@ -334,8 +334,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .feature__wrapper {
     display: grid;
-    grid-template-columns: repeat(4, minmax(200px, 1fr));
-    grid-gap: 1.2em;
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
+    grid-gap: 1em;
     margin: 2em 0;
     width: 100%;
 }
@@ -409,14 +409,14 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 /* 会员卡片响应式布局 */
-@media (max-width: 1000px) {
+@media (max-width: 800px) {
     .feature__wrapper {
         grid-template-columns: repeat(2, 1fr) !important;
         grid-gap: 1.2em !important;
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 500px) {
     .feature__wrapper {
         grid-template-columns: 1fr !important;
         grid-gap: 1em !important;
