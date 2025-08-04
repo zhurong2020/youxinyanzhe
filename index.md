@@ -195,14 +195,16 @@ intro:
 <div style="clear: both; margin-top: 3em;"></div>
 
 <div class="subscription-container" style="margin-top: 3em; padding-top: 2em; border-top: 1px solid #eaeaea;">
-  <div class="subscribe-section" style="text-align: center; padding: 2em 1em; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); margin: 2em 0; border-radius: 15px;">
+  <!-- 标题和描述 -->
+  <div style="text-align: center; margin-bottom: 2em;">
     <h2 style="margin: 0 0 0.8em 0; color: #2c3e50;">获取内容更新</h2>
-    <p style="margin-bottom: 2em; color: #6c757d; max-width: 600px; margin-left: auto; margin-right: auto;">
+    <p style="margin-bottom: 0; color: #6c757d; max-width: 600px; margin-left: auto; margin-right: auto;">
       选择最适合您的方式，获取最新文章、深度分析和独家内容
     </p>
-    
-    <!-- 三个选项的网格布局 -->
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5em; max-width: 1200px; margin: 0 auto;">
+  </div>
+  
+  <!-- 三个选项的网格布局 - 优化宽度使用 -->
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5em; max-width: 1500px; margin: 0 auto; padding: 0 0.5em;">
       
       <!-- 免费RSS订阅 -->
       <div style="background: white; padding: 1.5em; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); border: 1px solid #e9ecef;">
@@ -229,8 +231,8 @@ intro:
           <p style="color: #6c757d; font-size: 0.9em; margin-bottom: 1em;">重要文章发布时邮件提醒</p>
         </div>
         <form action="https://formspree.io/f/xpwqvvop" method="POST" style="width: 100%;">
-          <input type="email" name="email" placeholder="您的邮箱地址" required style="width: 100%; padding: 0.7em; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 0.8em; box-sizing: border-box;">
-          <button type="submit" class="btn btn--primary" style="width: 100%;">
+          <input type="email" name="email" placeholder="您的邮箱地址" required style="width: 100%; padding: 0.8em; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 0.8em; box-sizing: border-box; font-size: 14px;">
+          <button type="submit" class="btn btn--primary" style="width: 100%; padding: 0.8em;">
             <i class="fas fa-envelope"></i> 订阅邮件
           </button>
           <input type="hidden" name="_subject" value="新订阅 - 有心言者">
@@ -277,29 +279,39 @@ intro:
         </a>
       </div>
       
-    </div>
-    
-    <!-- 底部说明 -->
-    <div style="margin-top: 2em; padding-top: 1.5em; border-top: 1px solid #dee2e6;">
-      <p style="color: #6c757d; font-size: 0.9em; margin: 0;">
-        💡 <strong>建议</strong>：先尝试免费订阅了解内容质量，满意后再升级为付费会员获得深度资源
-      </p>
-    </div>
+  </div>
+  
+  <!-- 底部说明 -->
+  <div style="margin-top: 2em; padding-top: 1.5em; border-top: 1px solid #dee2e6; text-align: center;">
+    <p style="color: #6c757d; font-size: 0.9em; margin: 0; max-width: 800px; margin-left: auto; margin-right: auto;">
+      💡 <strong>建议</strong>：先尝试免费订阅了解内容质量，满意后再升级为付费会员获得深度资源
+    </p>
   </div>
 </div>
 
 <style>
 /* 订阅区域响应式布局 */
+@media (max-width: 1200px) {
+  .subscription-container > div:nth-child(2) {
+    max-width: 1200px !important;
+    gap: 2em !important;
+  }
+}
+
 @media (max-width: 1024px) {
-  .subscribe-section > div:first-of-type {
+  .subscription-container > div:nth-child(2) {
     grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.5em !important;
+    max-width: 900px !important;
   }
 }
 
 @media (max-width: 768px) {
-  .subscribe-section > div:first-of-type {
+  .subscription-container > div:nth-child(2) {
     grid-template-columns: 1fr !important;
-    gap: 1em !important;
+    gap: 1.2em !important;
+    padding: 0 0.5em !important;
+    max-width: 500px !important;
   }
 }
 </style>
