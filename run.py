@@ -543,7 +543,16 @@ def handle_system_check_menu(pipeline):
                 print("❌ ElevenLabs库未安装")
                 print("💡 请运行: pip install elevenlabs")
             except Exception as api_error:
-                print(f"❌ ElevenLabs API错误: {api_error}")
+                error_str = str(api_error)
+                if "missing_permissions" in error_str and "user_read" in error_str:
+                    print("❌ ElevenLabs API密钥权限不足")
+                    print("💡 API密钥缺少'user_read'权限，无法读取用户配额信息")
+                    print("💡 请在ElevenLabs官网重新生成具有完整权限的API密钥")
+                elif "401" in error_str:
+                    print("❌ ElevenLabs API密钥无效或已过期")
+                    print("💡 请检查API密钥是否正确配置在.env文件中")
+                else:
+                    print(f"❌ ElevenLabs API错误: {api_error}")
             
         except Exception as e:
             print(f"❌ ElevenLabs配额检查失败: {e}")
@@ -632,7 +641,16 @@ def handle_system_check_menu(pipeline):
                 except ImportError:
                     print("❌ ElevenLabs库未安装")
                 except Exception as api_error:
-                    print(f"❌ ElevenLabs API错误: {api_error}")
+                    error_str = str(api_error)
+                    if "missing_permissions" in error_str and "user_read" in error_str:
+                        print("❌ ElevenLabs API密钥权限不足")
+                        print("💡 API密钥缺少'user_read'权限，无法读取用户配额信息")
+                        print("💡 请在ElevenLabs官网重新生成具有完整权限的API密钥")
+                    elif "401" in error_str:
+                        print("❌ ElevenLabs API密钥无效或已过期")
+                        print("💡 请检查API密钥是否正确配置在.env文件中")
+                    else:
+                        print(f"❌ ElevenLabs API错误: {api_error}")
             
         except Exception as e:
             print(f"❌ ElevenLabs配额检查失败: {e}")

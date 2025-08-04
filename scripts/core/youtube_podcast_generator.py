@@ -1579,53 +1579,6 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             self._log(f"moviepy生成失败: {e}")
             return False
     
-    def upload_to_youtube(self, video_path: str, video_info: Dict[str, Any], 
-                         content_guide: Dict[str, Any], youtube_url: str) -> Optional[str]:
-        """
-        上传视频到YouTube
-        
-        Args:
-            video_path: 视频文件路径
-            video_info: 原始视频信息
-            content_guide: 导读内容
-            youtube_url: 原始YouTube链接
-            
-        Returns:
-            上传成功后的YouTube视频ID，失败返回None
-        """
-        if not self.youtube:
-            self._log("YouTube API未配置，无法上传")
-            return None
-            
-        # 检查是否使用OAuth认证（只有OAuth可以上传）
-        # 新版本Google API客户端的OAuth检查方式
-        try:
-            if hasattr(self.youtube, '_http') and hasattr(self.youtube._http, 'credentials'):
-                # 新版本API客户端
-                oauth_configured = True
-                self._log("✅ 检测到OAuth认证（新版API客户端）")
-            elif hasattr(self.youtube, '_http') and hasattr(self.youtube._http, '_credentials'):
-                # 旧版本API客户端
-                oauth_configured = True
-                self._log("✅ 检测到OAuth认证（旧版API客户端）")
-            else:
-                # 检查是否是使用developerKey构建的（API Key模式）
-                if hasattr(self.youtube, '_developerKey'):
-                    oauth_configured = False
-                    self._log("❌ 检测到API Key模式，上传需要OAuth认证")
-                else:
-                    # 无法确定认证类型，假设是OAuth
-                    oauth_configured = True
-                    self._log("⚠️ 无法确定认证类型，尝试继续上传")
-            
-            if not oauth_configured:
-                self._log("YouTube上传需要OAuth认证，当前仅配置了API Key，无法上传")
-                self._log("请运行: python scripts/tools/youtube_oauth_setup.py 配置OAuth认证")
-                return None
-        except Exception as auth_check_error:
-            self._log(f"OAuth认证检查出错，尝试继续上传: {auth_check_error}")
-            # 如果检查失败，尝试继续上传，让上传API自己报错
-    
     def check_elevenlabs_quota(self):
         """
         检查ElevenLabs API配额状态
