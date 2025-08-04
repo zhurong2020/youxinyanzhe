@@ -950,7 +950,13 @@ def handle_youtube_podcast_menu(pipeline):
                                     
                                     print("📝 文章已更新，添加了YouTube播放器")
                                 else:
-                                    print("❌ 上传失败，请检查OAuth认证配置")
+                                    print("❌ 上传失败")
+                                    print("💡 可能的原因：")
+                                    print("   • 网络连接问题（文件较大，上传超时）")
+                                    print("   • YouTube服务器临时不可用")
+                                    print("   • OAuth权限不足")
+                                    print("📋 请查看日志获取详细错误信息：")
+                                    print("   tail -20 .build/logs/pipeline.log")
                             else:
                                 print("❌ 已取消上传")
                         else:
