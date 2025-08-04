@@ -98,8 +98,8 @@ toc: false
           <p><strong>￥5 / 7天</strong></p>
           <ul>
             <li>✅ 基础投资策略</li>
-            <li>✅ 技术教程进阶版</li>
-            <li>✅ 部分代码资源</li>
+            <li>✅ 技术教程</li>
+            <li>✅ 部分代码</li>
             <li>❌ VIP专享内容</li>
           </ul>
         </div>
@@ -113,11 +113,10 @@ toc: false
         <h2 class="archive__item-title">月度会员</h2>
         <div class="archive__item-excerpt">
           <p><strong>￥35 / 30天</strong></p>
-          <p><small>对应 Buy Me Coffee: 1杯 ($5)</small></p>
           <ul>
             <li>✅ 全部投资策略</li>
             <li>✅ 完整技术方案</li>
-            <li>✅ 马斯克帝国深度分析</li>
+            <li>✅ 深度分析</li>
             <li>❌ VIP专享内容</li>
           </ul>
         </div>
@@ -131,12 +130,11 @@ toc: false
         <h2 class="archive__item-title">季度会员 🔥</h2>
         <div class="archive__item-excerpt">
           <p><strong>￥108 / 90天</strong></p>
-          <p><small>对应 Buy Me Coffee: 3杯 ($15)</small></p>
           <ul>
             <li>✅ 全部内容访问</li>
             <li>✅ VIP专享资源</li>
-            <li>✅ 个人投资组合</li>
-            <li>✅ 月度直播答疑</li>
+            <li>✅ 投资组合</li>
+            <li>✅ 直播答疑</li>
           </ul>
         </div>
       </div>
@@ -149,12 +147,11 @@ toc: false
         <h2 class="archive__item-title">年度会员 ⭐</h2>
         <div class="archive__item-excerpt">
           <p><strong>￥180 / 365天</strong></p>
-          <p><small>对应 Buy Me Coffee: 5杯 ($25)</small></p>
-          <p><em style="color: #28a745;">💰 超值优惠：每月仅￥15 (57%折扣)</em></p>
+          <p><em style="color: #28a745;">💰 每月仅￥15</em></p>
           <ul>
             <li>✅ 全部内容访问</li>
             <li>✅ VIP专享资源</li>
-            <li>✅ 一对一咨询机会</li>
+            <li>✅ 一对一咨询</li>
             <li>✅ 专属讨论群</li>
             <li>✅ 定制化工具</li>
           </ul>
