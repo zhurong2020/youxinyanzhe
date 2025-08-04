@@ -3,6 +3,7 @@ layout: single
 title: "会员信息登记"
 permalink: /member-signup/
 author_profile: true
+classes: wide
 header:
   overlay_color: "#000"
   overlay_filter: "0.5"
