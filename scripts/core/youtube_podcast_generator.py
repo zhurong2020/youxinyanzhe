@@ -127,21 +127,27 @@ class YouTubePodcastGenerator:
                     token_data = json.load(f)
                     
                 # 检查token是否有效（简单检查）
-                if 'access_token' in token_data:
+                if 'access_token' in token_data or 'token' in token_data:
                     from google.auth.transport.requests import Request
                     from google.oauth2.credentials import Credentials
                     
                     creds = Credentials.from_authorized_user_info(token_data)
+                    self._log(f"OAuth令牌状态: valid={creds.valid}, has_refresh={bool(creds.refresh_token)}")
+                    
                     if creds.valid or creds.refresh_token:
                         if not creds.valid and creds.refresh_token:
+                            self._log("🔄 刷新过期的OAuth令牌...")
                             creds.refresh(Request())
                             # 保存刷新后的token
                             with open(oauth_token_path, 'w') as f:
-                                json.dump(json.loads(creds.to_json()), f)
+                                json.dump(json.loads(creds.to_json()), f, indent=2)
+                            self._log("✅ OAuth令牌刷新成功")
                         
                         self.youtube = build('youtube', 'v3', credentials=creds)
                         self._log("✅ YouTube OAuth 配置完成 (支持上传)")
                         youtube_configured = True
+                    else:
+                        self._log("❌ OAuth令牌无效且无法刷新")
         except Exception as e:
             self._log(f"YouTube OAuth配置失败: {e}")
             
@@ -1508,10 +1514,33 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             return None
             
         # 检查是否使用OAuth认证（只有OAuth可以上传）
-        if not hasattr(self.youtube, '_http') or not hasattr(self.youtube._http, '_credentials'):
-            self._log("YouTube上传需要OAuth认证，当前仅配置了API Key，无法上传")
-            self._log("请运行: python scripts/tools/youtube_oauth_setup.py 配置OAuth认证")
-            return None
+        # 新版本Google API客户端的OAuth检查方式
+        try:
+            if hasattr(self.youtube, '_http') and hasattr(self.youtube._http, 'credentials'):
+                # 新版本API客户端
+                oauth_configured = True
+                self._log("✅ 检测到OAuth认证（新版API客户端）")
+            elif hasattr(self.youtube, '_http') and hasattr(self.youtube._http, '_credentials'):
+                # 旧版本API客户端
+                oauth_configured = True
+                self._log("✅ 检测到OAuth认证（旧版API客户端）")
+            else:
+                # 检查是否是使用developerKey构建的（API Key模式）
+                if hasattr(self.youtube, '_developerKey'):
+                    oauth_configured = False
+                    self._log("❌ 检测到API Key模式，上传需要OAuth认证")
+                else:
+                    # 无法确定认证类型，假设是OAuth
+                    oauth_configured = True
+                    self._log("⚠️ 无法确定认证类型，尝试继续上传")
+            
+            if not oauth_configured:
+                self._log("YouTube上传需要OAuth认证，当前仅配置了API Key，无法上传")
+                self._log("请运行: python scripts/tools/youtube_oauth_setup.py 配置OAuth认证")
+                return None
+        except Exception as auth_check_error:
+            self._log(f"OAuth认证检查出错，尝试继续上传: {auth_check_error}")
+            # 如果检查失败，尝试继续上传，让上传API自己报错
             
         try:
             # 准备视频元数据
