@@ -113,12 +113,46 @@ class YouTubePodcastGenerator:
         else:
             raise ValueError("需要GEMINI_API_KEY配置")
         
-        # 设置YouTube API
-        if 'YOUTUBE_API_KEY' in self.config:
+        # 设置YouTube API - 支持OAuth和API Key两种认证方式
+        youtube_configured = False
+        
+        # 尝试OAuth认证（用于上传）
+        try:
+            from googleapiclient.errors import HttpError
+            import json
+            
+            oauth_token_path = "config/youtube_oauth_token.json"
+            if os.path.exists(oauth_token_path):
+                with open(oauth_token_path, 'r') as f:
+                    token_data = json.load(f)
+                    
+                # 检查token是否有效（简单检查）
+                if 'access_token' in token_data:
+                    from google.auth.transport.requests import Request
+                    from google.oauth2.credentials import Credentials
+                    
+                    creds = Credentials.from_authorized_user_info(token_data)
+                    if creds.valid or creds.refresh_token:
+                        if not creds.valid and creds.refresh_token:
+                            creds.refresh(Request())
+                            # 保存刷新后的token
+                            with open(oauth_token_path, 'w') as f:
+                                json.dump(json.loads(creds.to_json()), f)
+                        
+                        self.youtube = build('youtube', 'v3', credentials=creds)
+                        self._log("✅ YouTube OAuth 配置完成 (支持上传)")
+                        youtube_configured = True
+        except Exception as e:
+            self._log(f"YouTube OAuth配置失败: {e}")
+            
+        # 如果OAuth失败，尝试API Key（仅用于读取）
+        if not youtube_configured and 'YOUTUBE_API_KEY' in self.config:
             self.youtube = build('youtube', 'v3', developerKey=self.config['YOUTUBE_API_KEY'])
-            self._log("✅ YouTube API 配置完成")
-        else:
-            self._log("未配置YOUTUBE_API_KEY，将使用基础视频信息提取")
+            self._log("✅ YouTube API 配置完成 (仅支持读取)")
+            youtube_configured = True
+            
+        if not youtube_configured:
+            self._log("未配置YouTube认证，将使用基础视频信息提取")
             self.youtube = None
         
         # 设置ElevenLabs API  
@@ -380,8 +414,69 @@ class YouTubePodcastGenerator:
             podcast_minutes = 5
             word_count = 1000
         
-        # 简化的英语学习播客prompt
-        prompt = f"""
+        # 根据目标语言生成不同的prompt
+        if target_language.startswith("en"):
+            prompt = f"""
+Generate a {podcast_minutes}-minute English podcast dialogue about the YouTube video "{video_info['title']}".
+
+Focus: Explain language points, cultural background, learning value
+Audience: English language learners
+Length: {word_count} words
+
+Format:
+[A]: Questions (focus on English learning points)
+[B]: Answers (simple and clear, with examples)
+
+Requirements:
+- Start dialogue directly, no intro/outro
+- Focus on English expressions and cultural background
+- Conversational, natural dialogue style
+- Provide practical learning suggestions
+
+Output dialogue content directly:
+        """
+        elif target_language.startswith("ja"):
+            prompt = f"""
+YouTube動画「{video_info['title']}」について{podcast_minutes}分間の日本語学習ポッドキャスト対話を生成してください。
+
+重点：言語のポイント、文化的背景、学習価値を説明
+対象：日本語学習者
+長さ：{word_count}文字
+
+形式：
+[A]: 質問（学習のポイントに焦点）
+[B]: 回答（シンプルで分かりやすく、例を挙げて）
+
+要求：
+- 対話を直接開始、導入・終了なし
+- 表現と文化的背景に重点
+- 会話的で自然な対話スタイル
+- 実用的な学習アドバイスを提供
+
+対話内容を直接出力：
+        """
+        elif target_language.startswith("ko"):
+            prompt = f"""
+YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 한국어 학습 팟캐스트 대화를 생성하세요.
+
+초점: 언어 포인트, 문화적 배경, 학습 가치 설명
+대상: 한국어 학습자
+길이: {word_count}자
+
+형식:
+[A]: 질문 (학습 포인트에 초점)
+[B]: 답변 (간단하고 명확하며 예시 포함)
+
+요구사항:
+- 대화를 직접 시작, 도입/결말 없음
+- 표현과 문화적 배경에 중점
+- 대화적이고 자연스러운 대화 스타일
+- 실용적인 학습 조언 제공
+
+대화 내용을 직접 출력:
+        """
+        else:
+            prompt = f"""
 为YouTube视频《{video_info['title']}》生成{podcast_minutes}分钟中文学习播客对话。
 
 重点：解释英语难点、文化背景、学习价值
@@ -408,8 +503,45 @@ class YouTubePodcastGenerator:
             return script
         except Exception as e:
             self._log(f"播客脚本生成失败: {e}")
-            # 简化的备用脚本
-            return f"""
+            # 根据目标语言生成备用脚本
+            if target_language.startswith("en"):
+                return f"""
+[A]: Today's video "{video_info['title']}" is quite interesting. What do you think is the main value for English learners?
+
+[B]: I think the biggest value is learning authentic English expressions. These videos use natural vocabulary and have appropriate speaking pace.
+
+[A]: So how should we approach learning from it? Watching directly might be challenging.
+
+[B]: I suggest first understanding the main ideas through our guide, then watching the original English version. This approach works better for learning.
+
+[A]: That's indeed a good learning method, helping us understand content while improving English skills.
+"""
+            elif target_language.startswith("ja"):
+                return f"""
+[A]: 今日の動画「{video_info['title']}」はとても興味深いですね。日本語学習者にとっての主な価値は何だと思いますか？
+
+[B]: 最大の価値は本物の日本語表現を学習できることだと思います。このような動画は自然な語彙を使用し、適切な話速を持っています。
+
+[A]: では、どのように学習に取り組むべきでしょうか？直接見るのは難しいかもしれません。
+
+[B]: まず私たちのガイドを通じて大意を理解し、その後で日本語のオリジナル版を見ることをお勧めします。この方法の方が学習効果が高いです。
+
+[A]: それは確かに良い学習方法ですね。内容を理解しながら日本語スキルも向上させることができます。
+"""
+            elif target_language.startswith("ko"):
+                return f"""
+[A]: 오늘 영상 "{video_info['title']}"이 정말 흥미롭네요. 한국어 학습자들에게 주요 가치는 무엇이라고 생각하세요?
+
+[B]: 가장 큰 가치는 진정한 한국어 표현을 배울 수 있다는 것이라고 생각합니다. 이런 영상들은 자연스러운 어휘를 사용하고 적절한 말하기 속도를 가지고 있어요.
+
+[A]: 그럼 어떻게 학습에 접근해야 할까요? 직접 보는 것은 어려울 수 있어요.
+
+[B]: 먼저 우리 가이드를 통해 주요 내용을 이해한 후, 한국어 원본을 보는 것을 추천합니다. 이 방법이 학습 효과가 더 좋아요.
+
+[A]: 정말 좋은 학습 방법이네요. 내용을 이해하면서 한국어 실력도 향상시킬 수 있어요.
+"""
+            else:
+                return f"""
 [A]: 今天这个视频《{video_info['title']}》很有意思，你觉得对英语学习者来说主要价值在哪里？
 
 [B]: 我觉得最大的价值是可以学习到真实的英语表达。这类视频用词都比较地道，语速也适中。
@@ -810,8 +942,18 @@ class YouTubePodcastGenerator:
             temp_path = None
             for attempt in range(max_retries):
                 try:
+                    # 根据target_language设置语言
+                    lang_code = 'zh-CN'  # 默认中文
+                    if hasattr(self, 'current_target_language'):
+                        if self.current_target_language.startswith('en'):
+                            lang_code = 'en'
+                        elif self.current_target_language.startswith('ja'):
+                            lang_code = 'ja'
+                        elif self.current_target_language.startswith('ko'):
+                            lang_code = 'ko'
+                    
                     # 创建gTTS对象
-                    tts = gTTS(text=text, lang='zh-CN', slow=False)
+                    tts = gTTS(text=text, lang=lang_code, slow=False)
                     
                     # 保存到临时文件
                     temp_path = output_path.replace('.wav', '_temp.mp3')
@@ -1043,7 +1185,15 @@ class YouTubePodcastGenerator:
             clean_url = clean_string(youtube_url)
             clean_style = clean_string(custom_style)
             clean_language = clean_string(target_language)
-            clean_instructions = clean_string(f"请生成一个关于YouTube视频的中文播客，目标语言是{clean_language}，内容要适合英语学习者收听")
+            # 根据目标语言生成不同的指令
+            if target_language.startswith("en"):
+                clean_instructions = clean_string(f"Generate an English podcast about this YouTube video for language learners, target language: {clean_language}")
+            elif target_language.startswith("ja"):
+                clean_instructions = clean_string(f"日本語でYouTube動画についてのポッドキャストを生成してください、対象言語: {clean_language}")
+            elif target_language.startswith("ko"):
+                clean_instructions = clean_string(f"이 YouTube 동영상에 대한 한국어 팟캐스트를 생성하세요, 대상 언어: {clean_language}")
+            else:
+                clean_instructions = clean_string(f"请生成一个关于YouTube视频的中文播客，目标语言是{clean_language}，内容要适合英语学习者收听")
             
             self._log(f"🔍 清理后的URL: {clean_url}")
             self._log(f"🔍 URL长度: {len(clean_url)}, URL字符检查: {repr(clean_url)}")
@@ -1357,6 +1507,12 @@ class YouTubePodcastGenerator:
             self._log("YouTube API未配置，无法上传")
             return None
             
+        # 检查是否使用OAuth认证（只有OAuth可以上传）
+        if not hasattr(self.youtube, '_http') or not hasattr(self.youtube._http, '_credentials'):
+            self._log("YouTube上传需要OAuth认证，当前仅配置了API Key，无法上传")
+            self._log("请运行: python scripts/tools/youtube_oauth_setup.py 配置OAuth认证")
+            return None
+            
         try:
             # 准备视频元数据
             title = f"{content_guide['title']} | 中文播客导读"
@@ -1596,6 +1752,8 @@ header:
             生成结果字典
         """
         try:
+            # 保存当前目标语言供TTS使用
+            self.current_target_language = target_language
             self._log(f"开始处理YouTube视频: {youtube_url}")
             
             # 1. 提取视频ID
