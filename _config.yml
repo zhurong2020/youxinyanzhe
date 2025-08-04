@@ -177,6 +177,8 @@ main:
     url: /categories/全球视野/
   - title: "💰 投资理财"
     url: /categories/投资理财/
+  - title: "👑 会员专区"
+    url: /members/
   - title: "关于"
     url: /about/
 

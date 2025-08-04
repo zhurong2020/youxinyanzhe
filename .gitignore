@@ -46,6 +46,9 @@ coverage.xml
 .build/
 .tmp/
 
+# 会员系统数据（包含敏感用户信息）
+.tmp/member_data/
+
 # YouTube OAuth凭据（敏感信息）
 config/youtube_oauth_credentials.json
 config/youtube_oauth_token.json
