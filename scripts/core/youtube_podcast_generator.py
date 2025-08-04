@@ -721,13 +721,17 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
         self._log(f"✅ ElevenLabs单人音频生成成功: {output_path}")
         return True
     
-    def _generate_dual_speaker_audio(self, text: str, output_path: str) -> bool:
+    def _generate_dual_speaker_audio(self, text: str, output_path: str, language: str = "chinese") -> bool:
         """生成双人对话音频"""
         self._log("🎭 使用ElevenLabs生成双人对话音频")
         
         try:
             # 加载声音配置
             voice_config = self._load_voice_config()
+            
+            # 根据语言选择最佳组合
+            selected_combination = self._select_best_voice_combination(voice_config, language)
+            self._log(f"📻 使用语音组合: {selected_combination}")
             
             # 解析对话内容，分离不同说话者
             dialogue_segments = self._parse_dialogue(text)
@@ -736,14 +740,19 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
                 self._log("⚠️ 文本不包含对话格式，切换到单人模式")
                 return self._generate_single_speaker_audio(text, output_path)
             
+            # 获取Pro账户优化的模型设置
+            api_settings = voice_config.get('api_settings', {})
+            model_id = api_settings.get('model_id', 'eleven_multilingual_v2')
+            self._log(f"🤖 使用模型: {model_id}")
+            
             # 生成每个对话片段的音频
             audio_segments = []
             for i, (speaker, segment_text) in enumerate(dialogue_segments):
                 self._log(f"   🎤 生成对话片段 {i+1}/{len(dialogue_segments)}: {segment_text[:30]}...")
                 
                 # 根据说话者选择声音配置
-                voice_settings = self._get_speaker_settings(speaker, voice_config)
-                voice_id = self._get_speaker_voice_id(speaker, voice_config)
+                voice_settings = self._get_speaker_settings(speaker, voice_config, language)
+                voice_id = self._get_speaker_voice_id(speaker, voice_config, language)
                 
                 try:
                     # 使用正确的ElevenLabs API调用方式
@@ -798,13 +807,31 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
     
     def _load_voice_config(self) -> Dict[str, Any]:
         """加载声音配置"""
-        config_path = "config/elevenlabs_voices.yml"
+        # 优先使用Pro账户配置
+        pro_config_path = "config/elevenlabs_voices_pro.yml"
+        standard_config_path = "config/elevenlabs_voices.yml"
         
         try:
             import yaml
-            with open(config_path, 'r', encoding='utf-8') as f:
-                config = yaml.safe_load(f)
-                return config.get('elevenlabs_voices', {})
+            
+            # 首先尝试加载Pro配置
+            if Path(pro_config_path).exists():
+                with open(pro_config_path, 'r', encoding='utf-8') as f:
+                    config = yaml.safe_load(f)
+                    self._log("✅ 使用ElevenLabs Pro账户优化配置")
+                    return config.get('elevenlabs_voices', {})
+            
+            # 回退到标准配置
+            elif Path(standard_config_path).exists():
+                with open(standard_config_path, 'r', encoding='utf-8') as f:
+                    config = yaml.safe_load(f)
+                    self._log("✅ 使用标准ElevenLabs配置")
+                    return config.get('elevenlabs_voices', {})
+            
+            else:
+                self._log("⚠️ 未找到配置文件，使用默认配置")
+                return self._get_default_voice_config()
+                
         except ImportError:
             self._log("⚠️ PyYAML未安装，使用默认配置")
             return self._get_default_voice_config()
@@ -888,7 +915,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
         
         return dialogue_segments
     
-    def _get_speaker_settings(self, speaker: str, voice_config: Dict[str, Any]):
+    def _get_speaker_settings(self, speaker: str, voice_config: Dict[str, Any], language: str = "chinese"):
         """获取说话者的语音设置"""
         try:
             from elevenlabs import VoiceSettings
@@ -896,20 +923,59 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             # 如果ElevenLabs不可用，返回None
             return None
         
-        combination = voice_config.get('voice_combinations', {}).get('chinese_podcast', {})
+        # 根据语言选择最佳语音组合
+        combination_key = self._select_best_voice_combination(voice_config, language)
+        combination = voice_config.get('voice_combinations', {}).get(combination_key, {})
+        
         speaker_key = 'speaker_a' if speaker == 'A' else 'speaker_b'
         settings = combination.get(speaker_key, {}).get('settings', {})
         
+        # 使用Pro账户优化设置
+        default_settings = voice_config.get('api_settings', {}).get('default_settings', {})
+        
         return VoiceSettings(
-            stability=settings.get('stability', 0.4),
-            similarity_boost=settings.get('similarity_boost', 0.8),
-            style=settings.get('style', 0.6),
-            use_speaker_boost=True
+            stability=settings.get('stability', default_settings.get('stability', 0.35)),
+            similarity_boost=settings.get('similarity_boost', default_settings.get('similarity_boost', 0.9)),
+            style=settings.get('style', default_settings.get('style', 0.7)),
+            use_speaker_boost=settings.get('use_speaker_boost', default_settings.get('use_speaker_boost', True))
         )
     
-    def _get_speaker_voice_id(self, speaker: str, voice_config: Dict[str, Any]) -> str:
+    def _select_best_voice_combination(self, voice_config: Dict[str, Any], language: str) -> str:
+        """根据语言选择最佳语音组合"""
+        combinations = voice_config.get('voice_combinations', {})
+        recommendations = voice_config.get('usage_recommendations', {})
+        
+        # 根据语言内容选择推荐组合
+        if language.startswith('zh') or language == 'chinese':
+            if 'chinese_content' in recommendations:
+                primary = recommendations['chinese_content'].get('primary', 'chinese_podcast_pro')
+                if primary in combinations:
+                    return primary
+            # 回退选项
+            if 'chinese_podcast_pro' in combinations:
+                return 'chinese_podcast_pro'
+            else:
+                return 'chinese_podcast'
+                
+        elif language.startswith('en') or language == 'english':
+            if 'english_content' in recommendations:
+                primary = recommendations['english_content'].get('primary', 'english_podcast_pro')
+                if primary in combinations:
+                    return primary
+            # 回退选项
+            if 'english_podcast_pro' in combinations:
+                return 'english_podcast_pro'
+            else:
+                return 'chinese_podcast'  # Rachel和Josh也适合英文
+        
+        # 默认选择
+        return 'chinese_podcast'
+    
+    def _get_speaker_voice_id(self, speaker: str, voice_config: Dict[str, Any], language: str = "chinese") -> str:
         """获取说话者的声音ID"""
-        combination = voice_config.get('voice_combinations', {}).get('chinese_podcast', {})
+        # 根据语言选择最佳语音组合
+        combination_key = self._select_best_voice_combination(voice_config, language)
+        combination = voice_config.get('voice_combinations', {}).get(combination_key, {})
         speaker_key = 'speaker_a' if speaker == 'A' else 'speaker_b'
         
         return combination.get(speaker_key, {}).get('voice_id', 

@@ -442,7 +442,7 @@ def handle_system_check_menu(pipeline):
     print("📋 功能说明：")
     print("   • 检查微信发布系统状态和输出文件")
     print("   • 检查GitHub Token有效性和过期时间")
-    print("   • 检查ElevenLabs TTS服务配额状态")
+    print("   • 检查ElevenLabs TTS服务配额状态和Pro功能")
     print("   • 验证系统各组件工作状态")
     
     print("\n请选择检查项目：")
@@ -488,7 +488,24 @@ def handle_system_check_menu(pipeline):
     elif sub_choice == "3":
         # ElevenLabs配额检查
         try:
-            print("\n🔍 检查ElevenLabs配额状态...")
+            print("\n🔍 检查ElevenLabs配额状态和Pro功能...")
+            
+            # 检查Pro配置文件
+            import yaml
+            pro_config_path = Path("config/elevenlabs_voices_pro.yml")
+            standard_config_path = Path("config/elevenlabs_voices.yml")
+            
+            if pro_config_path.exists():
+                with open(pro_config_path, 'r', encoding='utf-8') as f:
+                    config = yaml.safe_load(f)
+                print("✅ 检测到ElevenLabs Pro配置文件")
+                pro_features = config.get('elevenlabs_voices', {}).get('pro_features', {})
+                if pro_features.get('enabled'):
+                    print("🌟 Pro功能: 语音增强、高级控制、商业许可等")
+            elif standard_config_path.exists():
+                print("✅ 使用标准ElevenLabs配置")
+            else:
+                print("⚠️ 未找到ElevenLabs配置文件")
             
             # 直接检查ElevenLabs配额，不依赖完整的YouTubePodcastGenerator
             import os
