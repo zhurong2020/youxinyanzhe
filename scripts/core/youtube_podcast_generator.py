@@ -177,6 +177,9 @@ class YouTubePodcastGenerator:
                     raise ImportError("ElevenLabs library not available")
                 self.elevenlabs_available = True
                 self._log("✅ ElevenLabs API 配置完成")
+                
+                # 检查配额状态
+                self.check_elevenlabs_quota()
             except Exception as e:
                 self._log(f"ElevenLabs API 配置失败: {e}", "warning")
                 self.elevenlabs_available = False
@@ -1622,8 +1625,100 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
         except Exception as auth_check_error:
             self._log(f"OAuth认证检查出错，尝试继续上传: {auth_check_error}")
             # 如果检查失败，尝试继续上传，让上传API自己报错
+    
+    def check_elevenlabs_quota(self):
+        """
+        检查ElevenLabs API配额状态
+        """
+        if not self.elevenlabs_available or not self.elevenlabs_client:
+            return
             
         try:
+            # ElevenLabs API 获取用户信息和配额
+            user_info = self.elevenlabs_client.user.get()
+            
+            if hasattr(user_info, 'subscription'):
+                subscription = user_info.subscription
+                
+                # 获取配额信息
+                character_count = getattr(subscription, 'character_count', 0)
+                character_limit = getattr(subscription, 'character_limit', 0)
+                remaining_characters = character_limit - character_count
+                
+                # 计算使用百分比
+                usage_percentage = (character_count / character_limit * 100) if character_limit > 0 else 0
+                
+                self._log(f"📊 ElevenLabs配额状态:")
+                self._log(f"   已使用: {character_count:,} characters")
+                self._log(f"   总配额: {character_limit:,} characters")
+                self._log(f"   剩余额度: {remaining_characters:,} characters")
+                self._log(f"   使用率: {usage_percentage:.1f}%")
+                
+                # 配额预警
+                if usage_percentage > 90:
+                    self._log("⚠️ ElevenLabs配额即将用完！", "warning")
+                elif usage_percentage > 75:
+                    self._log("⚠️ ElevenLabs配额使用率较高", "warning")
+                    
+                # 估算剩余可生成的音频时长（粗略估算：每分钟约100字符）
+                estimated_minutes = remaining_characters // 100
+                if estimated_minutes < 10:
+                    self._log(f"⚠️ 预计剩余可生成音频约{estimated_minutes}分钟", "warning")
+                else:
+                    self._log(f"💡 预计剩余可生成音频约{estimated_minutes}分钟")
+                    
+        except Exception as e:
+            self._log(f"获取ElevenLabs配额信息失败: {e}", "warning")
+            
+    def upload_to_youtube(self, video_path: str, video_info: Dict[str, Any], 
+                         content_guide: Dict[str, Any], youtube_url: str) -> Optional[str]:
+        """
+        上传视频到YouTube
+        
+        Args:
+            video_path: 视频文件路径
+            video_info: 原始视频信息
+            content_guide: 导读内容
+            youtube_url: 原始YouTube链接
+            
+        Returns:
+            上传成功后的YouTube视频ID，失败返回None
+        """
+        if not self.youtube:
+            self._log("YouTube API未配置，无法上传")
+            return None
+            
+        # 检查是否使用OAuth认证（只有OAuth可以上传）
+        # 新版本Google API客户端的OAuth检查方式
+        try:
+            if hasattr(self.youtube, '_http') and hasattr(self.youtube._http, 'credentials'):
+                # 新版本API客户端
+                oauth_configured = True
+                self._log("✅ 检测到OAuth认证（新版API客户端）")
+            elif hasattr(self.youtube, '_http') and hasattr(self.youtube._http, '_credentials'):
+                # 旧版本API客户端
+                oauth_configured = True
+                self._log("✅ 检测到OAuth认证（旧版API客户端）")
+            else:
+                # 检查是否是使用developerKey构建的（API Key模式）
+                if hasattr(self.youtube, '_developerKey'):
+                    oauth_configured = False
+                    self._log("❌ 检测到API Key模式，上传需要OAuth认证")
+                else:
+                    # 无法确定认证类型，假设是OAuth
+                    oauth_configured = True
+                    self._log("⚠️ 无法确定认证类型，尝试继续上传")
+            
+            if not oauth_configured:
+                self._log("YouTube上传需要OAuth认证，当前仅配置了API Key，无法上传")
+                self._log("请运行: python scripts/tools/youtube_oauth_setup.py 配置OAuth认证")
+                return None
+        except Exception as auth_check_error:
+            self._log(f"OAuth认证检查出错，尝试继续上传: {auth_check_error}")
+            # 如果检查失败，尝试继续上传，让上传API自己报错
+            
+        try:
+    
             # 准备视频元数据
             title = f"{content_guide['title']} | 中文播客导读"
             description = f"""

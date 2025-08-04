@@ -347,6 +347,26 @@ This section records critical architectural adjustments for the project:
 
 ## 10. Document Update History
 
+### 2025-08-04: ElevenLabs配额检查功能集成 ✅
+- **配额监控功能**:
+  - ✅ 新增ElevenLabs API配额检查方法check_elevenlabs_quota()
+  - ✅ 系统状态检查菜单新增"3. ElevenLabs配额检查"选项
+  - ✅ 综合系统检查自动包含ElevenLabs配额状态
+  - ✅ 配额状态实时显示：已使用/总配额/剩余额度/使用率
+- **用户体验优化**:
+  - ✅ 智能配额预警系统（75%/90%阈值警报）
+  - ✅ 预估剩余可生成音频时长（基于每分钟约100字符估算）
+  - ✅ 配额不足时提供明确的解决方案指导
+- **文档完善**:
+  - ✅ 更新youtube_podcast_setup.md添加配额检查使用说明
+  - ✅ 新增ElevenLabs配额不足错误的故障排除指南
+  - ✅ 更新维护检查命令包含配额状态检查
+- **技术实现**:
+  - YouTubePodcastGenerator初始化时自动检查配额状态
+  - 通过ElevenLabs API获取实时用户订阅和配额信息
+  - 错误处理确保配额检查失败时不影响核心功能
+  - 集成到run.py系统状态检查菜单提供用户友好界面
+
 ### 2025-08-04: YouTube播客生成器多语言支持和OAuth认证修复 ✅
 - **多语言播客生成修复**:  
   - ✅ 修复播客脚本生成语言逻辑，现在正确支持中文、英文、日文、韩文四种语言

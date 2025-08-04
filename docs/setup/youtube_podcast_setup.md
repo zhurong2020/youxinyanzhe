@@ -225,7 +225,17 @@ ImportError: No module named 'gradio_client'
 ```
 **解决**: 检查网络连接，系统会自动使用本地TTS生成音频
 
-**5. YouTube API相关错误**
+**5. ElevenLabs配额不足错误**
+```
+❌ ElevenLabs API quota exceeded
+```
+**解决**: 
+- 使用 `python run.py` → 菜单5 → 选项3 检查ElevenLabs配额状态
+- 等待配额重置（通常为月度重置）
+- 或升级ElevenLabs订阅计划
+- 系统会自动显示预估剩余可生成音频时长
+
+**6. YouTube API相关错误**
 
 **"API key not valid" 错误**
 - 检查API密钥是否正确复制  
@@ -276,6 +286,7 @@ YouTube链接 → 视频信息提取 → 播客生成 → 导读生成 → Jekyl
 - **语言**: 最佳效果为英文视频
 - **网络**: 需要稳定的国际网络连接
 - **API配额**: Gemini API有每日调用限制
+- **TTS配额**: ElevenLabs有字符使用限制，可通过系统状态检查查看剩余额度
 
 ### 最佳实践
 1. **视频选择**: 选择高质量的英文教育或商业内容
@@ -293,6 +304,9 @@ pip install --upgrade -r requirements.txt
 
 # 检查配置状态
 python run.py # 选择菜单6 → 2
+
+# 检查ElevenLabs配额状态
+python run.py # 选择菜单5 → 3
 ```
 
 ### 配置文件位置

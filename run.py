@@ -7,6 +7,7 @@ import sys
 import argparse
 import logging
 import subprocess
+import yaml
 from pathlib import Path
 from dotenv import load_dotenv
 from scripts.core.content_pipeline import ContentPipeline
@@ -441,15 +442,17 @@ def handle_system_check_menu(pipeline):
     print("📋 功能说明：")
     print("   • 检查微信发布系统状态和输出文件")
     print("   • 检查GitHub Token有效性和过期时间")
+    print("   • 检查ElevenLabs TTS服务配额状态")
     print("   • 验证系统各组件工作状态")
     
     print("\n请选择检查项目：")
     print("1. 微信系统状态检查")
     print("2. GitHub Token状态检查")
-    print("3. 综合系统检查")
+    print("3. ElevenLabs配额检查")
+    print("4. 综合系统检查")
     print("0. 返回主菜单")
     
-    sub_choice = input("\n请输入选项 (1-3/0): ").strip()
+    sub_choice = input("\n请输入选项 (1-4/0): ").strip()
     pipeline.log(f"系统状态检查 - 用户选择: {sub_choice}", level="info", force=True)
     
     if sub_choice == "1":
@@ -483,6 +486,24 @@ def handle_system_check_menu(pipeline):
             print(f"❌ 操作失败: {e}")
             
     elif sub_choice == "3":
+        # ElevenLabs配额检查
+        try:
+            print("\n🔍 检查ElevenLabs配额状态...")
+            from scripts.core.youtube_podcast_generator import YouTubePodcastGenerator
+            
+            # 读取配置
+            config_path = Path("config/gemini_config.yml")
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = yaml.safe_load(f)
+            
+            # 创建临时generator来检查配额
+            temp_generator = YouTubePodcastGenerator(config, pipeline)
+            temp_generator.check_elevenlabs_quota()
+            
+        except Exception as e:
+            print(f"❌ ElevenLabs配额检查失败: {e}")
+            
+    elif sub_choice == "4":
         # 综合系统检查
         print("\n🔄 正在进行综合系统检查...")
         
@@ -509,6 +530,25 @@ def handle_system_check_menu(pipeline):
             print(result.stdout)
         except Exception as e:
             print(f"❌ GitHub Token检查失败: {e}")
+        
+        print("\n" + "-"*40)
+        
+        # 检查ElevenLabs配额
+        try:
+            print("\n🔍 检查ElevenLabs配额状态...")
+            from scripts.core.youtube_podcast_generator import YouTubePodcastGenerator
+            
+            # 读取配置
+            config_path = Path("config/gemini_config.yml")
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = yaml.safe_load(f)
+            
+            # 创建临时generator来检查配额
+            temp_generator = YouTubePodcastGenerator(config, pipeline)
+            temp_generator.check_elevenlabs_quota()
+            
+        except Exception as e:
+            print(f"❌ ElevenLabs配额检查失败: {e}")
     
     input("\n按Enter键返回主菜单...")
 
@@ -997,6 +1037,30 @@ def handle_youtube_podcast_menu(pipeline):
         print(f"GEMINI_API_KEY: {'✅ 已配置' if gemini_key else '❌ 未配置'}")
         print(f"YOUTUBE_API_KEY: {'✅ 已配置' if youtube_key else '⚠️  未配置 (可选)'}")
         print(f"ELEVENLABS_API_KEY: {'✅ 已配置' if elevenlabs_key else '⚠️  未配置 (可选，但推荐)'}")
+        
+        # ElevenLabs配额检查
+        if elevenlabs_key:
+            print(f"\n📊 ElevenLabs配额检查")
+            print("-" * 30)
+            try:
+                from scripts.core.youtube_podcast_generator import YouTubePodcastGenerator
+                
+                config = {
+                    'GEMINI_API_KEY': gemini_key,
+                    'YOUTUBE_API_KEY': youtube_key,
+                    'ELEVENLABS_API_KEY': elevenlabs_key
+                }
+                
+                # 创建临时实例仅用于配额检查
+                temp_generator = YouTubePodcastGenerator(config, pipeline)
+                if temp_generator.elevenlabs_available:
+                    print("✅ ElevenLabs配额信息已显示在上方日志中")
+                else:
+                    print("⚠️  ElevenLabs API配置失败，无法查询配额")
+                    
+            except Exception as e:
+                print(f"❌ 配额检查失败: {e}")
+                pipeline.log(f"ElevenLabs配额检查异常: {e}", level="error", force=True)
         
         # 检查依赖
         try:
