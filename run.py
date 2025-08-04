@@ -489,16 +489,61 @@ def handle_system_check_menu(pipeline):
         # ElevenLabs配额检查
         try:
             print("\n🔍 检查ElevenLabs配额状态...")
-            from scripts.core.youtube_podcast_generator import YouTubePodcastGenerator
             
-            # 读取配置
-            config_path = Path("config/gemini_config.yml")
-            with open(config_path, 'r', encoding='utf-8') as f:
-                config = yaml.safe_load(f)
+            # 直接检查ElevenLabs配额，不依赖完整的YouTubePodcastGenerator
+            import os
+            elevenlabs_api_key = os.getenv('ELEVENLABS_API_KEY')
             
-            # 创建临时generator来检查配额
-            temp_generator = YouTubePodcastGenerator(config, pipeline)
-            temp_generator.check_elevenlabs_quota()
+            if not elevenlabs_api_key:
+                print("❌ 未配置ElevenLabs API密钥")
+                print("💡 请在.env文件中设置ELEVENLABS_API_KEY")
+                return
+                
+            try:
+                from elevenlabs import ElevenLabs
+                elevenlabs_client = ElevenLabs(api_key=elevenlabs_api_key.strip())
+                
+                # 获取用户信息和配额
+                user_info = elevenlabs_client.user.get()
+                
+                if hasattr(user_info, 'subscription'):
+                    subscription = user_info.subscription
+                    
+                    # 获取配额信息
+                    character_count = getattr(subscription, 'character_count', 0)
+                    character_limit = getattr(subscription, 'character_limit', 0)
+                    remaining_characters = character_limit - character_count
+                    
+                    # 计算使用百分比
+                    usage_percentage = (character_count / character_limit * 100) if character_limit > 0 else 0
+                    
+                    print(f"📊 ElevenLabs配额状态:")
+                    print(f"   已使用: {character_count:,} characters")
+                    print(f"   总配额: {character_limit:,} characters")
+                    print(f"   剩余额度: {remaining_characters:,} characters")
+                    print(f"   使用率: {usage_percentage:.1f}%")
+                    
+                    # 配额预警
+                    if usage_percentage > 90:
+                        print("⚠️ ElevenLabs配额即将用完！")
+                    elif usage_percentage > 75:
+                        print("⚠️ ElevenLabs配额使用率较高")
+                        
+                    # 估算剩余可生成的音频时长（粗略估算：每分钟约100字符）
+                    estimated_minutes = remaining_characters // 100
+                    if estimated_minutes < 10:
+                        print(f"⚠️ 预计剩余可生成音频约{estimated_minutes}分钟")
+                    else:
+                        print(f"💡 预计剩余可生成音频约{estimated_minutes}分钟")
+                        
+                else:
+                    print("❌ 无法获取ElevenLabs订阅信息")
+                    
+            except ImportError:
+                print("❌ ElevenLabs库未安装")
+                print("💡 请运行: pip install elevenlabs")
+            except Exception as api_error:
+                print(f"❌ ElevenLabs API错误: {api_error}")
             
         except Exception as e:
             print(f"❌ ElevenLabs配额检查失败: {e}")
@@ -536,16 +581,58 @@ def handle_system_check_menu(pipeline):
         # 检查ElevenLabs配额
         try:
             print("\n🔍 检查ElevenLabs配额状态...")
-            from scripts.core.youtube_podcast_generator import YouTubePodcastGenerator
             
-            # 读取配置
-            config_path = Path("config/gemini_config.yml")
-            with open(config_path, 'r', encoding='utf-8') as f:
-                config = yaml.safe_load(f)
+            # 直接检查ElevenLabs配额，不依赖完整的YouTubePodcastGenerator
+            import os
+            elevenlabs_api_key = os.getenv('ELEVENLABS_API_KEY')
             
-            # 创建临时generator来检查配额
-            temp_generator = YouTubePodcastGenerator(config, pipeline)
-            temp_generator.check_elevenlabs_quota()
+            if not elevenlabs_api_key:
+                print("❌ 未配置ElevenLabs API密钥")
+            else:
+                try:
+                    from elevenlabs import ElevenLabs
+                    elevenlabs_client = ElevenLabs(api_key=elevenlabs_api_key.strip())
+                    
+                    # 获取用户信息和配额
+                    user_info = elevenlabs_client.user.get()
+                    
+                    if hasattr(user_info, 'subscription'):
+                        subscription = user_info.subscription
+                        
+                        # 获取配额信息
+                        character_count = getattr(subscription, 'character_count', 0)
+                        character_limit = getattr(subscription, 'character_limit', 0)
+                        remaining_characters = character_limit - character_count
+                        
+                        # 计算使用百分比
+                        usage_percentage = (character_count / character_limit * 100) if character_limit > 0 else 0
+                        
+                        print(f"📊 ElevenLabs配额状态:")
+                        print(f"   已使用: {character_count:,} characters")
+                        print(f"   总配额: {character_limit:,} characters")
+                        print(f"   剩余额度: {remaining_characters:,} characters")
+                        print(f"   使用率: {usage_percentage:.1f}%")
+                        
+                        # 配额预警
+                        if usage_percentage > 90:
+                            print("⚠️ ElevenLabs配额即将用完！")
+                        elif usage_percentage > 75:
+                            print("⚠️ ElevenLabs配额使用率较高")
+                            
+                        # 估算剩余可生成的音频时长（粗略估算：每分钟约100字符）
+                        estimated_minutes = remaining_characters // 100
+                        if estimated_minutes < 10:
+                            print(f"⚠️ 预计剩余可生成音频约{estimated_minutes}分钟")
+                        else:
+                            print(f"💡 预计剩余可生成音频约{estimated_minutes}分钟")
+                            
+                    else:
+                        print("❌ 无法获取ElevenLabs订阅信息")
+                        
+                except ImportError:
+                    print("❌ ElevenLabs库未安装")
+                except Exception as api_error:
+                    print(f"❌ ElevenLabs API错误: {api_error}")
             
         except Exception as e:
             print(f"❌ ElevenLabs配额检查失败: {e}")
