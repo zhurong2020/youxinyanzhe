@@ -854,17 +854,26 @@ def handle_youtube_podcast_menu(pipeline):
                 
             selected_video = video_files[int(choice) - 1]
             print(f"\n📤 准备上传视频: {selected_video.name}")
+            pipeline.log(f"准备上传播客视频: {selected_video.name}", level="info", force=True)
             
             # 从文件名解析信息
             video_name = selected_video.stem
+            pipeline.log(f"解析视频文件名: {video_name}", level="debug", force=True)
             # 格式: youtube-YYYYMMDD-title-podcast
             if video_name.startswith("youtube-") and video_name.endswith("-podcast"):
                 base_name = video_name[8:-8]  # 移除youtube-前缀和-podcast后缀
                 date_part = base_name[:8]
                 title_part = base_name[9:]  # 跳过日期和连字符
                 
+                pipeline.log(f"解析结果 - base_name: {base_name}, date_part: {date_part}, title_part: {title_part}", level="debug", force=True)
+                
                 # 查找对应的文章文件获取详细信息
-                draft_file = Path(f"_drafts/2025-{date_part[:2]}-{date_part[2:4]}-youtube-{title_part}.md")
+                # date_part格式: YYYYMMDD (例如: 20250804)
+                year = date_part[:4]    # 2025
+                month = date_part[4:6]  # 08
+                day = date_part[6:8]    # 04
+                draft_file = Path(f"_drafts/{year}-{month}-{day}-youtube-{title_part}.md")
+                pipeline.log(f"查找文章文件: {draft_file}", level="debug", force=True)
                 if draft_file.exists():
                     print(f"✅ 找到对应的文章文件: {draft_file.name}")
                     
@@ -953,8 +962,14 @@ def handle_youtube_podcast_menu(pipeline):
                         pipeline.log(f"YouTube视频上传失败: {e}", level="error", force=True)
                 else:
                     print(f"❌ 未找到对应的文章文件: {draft_file}")
+                    pipeline.log(f"未找到对应的文章文件: {draft_file}", level="error", force=True)
+                    print(f"💡 预期的文章文件路径: {draft_file}")
+                    print("💡 请检查文章文件是否存在于_drafts目录下")
             else:
                 print("❌ 无法识别的视频文件名格式")
+                pipeline.log(f"无法识别的视频文件名格式: {video_name}", level="error", force=True)
+                print(f"💡 预期格式: youtube-YYYYMMDD-title-podcast")
+                print(f"💡 实际格式: {video_name}")
                 
         except ValueError:
             print("❌ 请输入有效的数字")
