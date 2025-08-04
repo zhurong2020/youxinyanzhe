@@ -9,9 +9,7 @@ header:
   overlay_filter: "0.5"
   overlay_image: /assets/images/members-bg.jpg
 excerpt: "深度内容，专业分析，助力您的学习和投资之路"
-toc: true
-toc_label: "会员内容"
-toc_icon: "crown"
+toc: false
 ---
 
 <div id="member-auth-section">

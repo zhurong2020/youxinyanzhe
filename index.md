@@ -152,106 +152,6 @@ intro:
 }
 </style>
 
-<!-- 会员专区入口 -->
-<div class="member-cta-section" style="margin: 3em 0; padding: 2em; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; text-align: center; color: white; position: relative; overflow: hidden;">
-  
-  <!-- 背景装饰 -->
-  <div style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; opacity: 0.3;"></div>
-  <div style="position: absolute; bottom: -30px; left: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; opacity: 0.2;"></div>
-  
-  <div style="position: relative; z-index: 1;">
-    <h2 style="color: white; margin: 0 0 0.5em 0; font-size: 2em;">👑 会员专区</h2>
-    <p style="color: rgba(255,255,255,0.95); font-size: 1.1em; margin: 0 0 1.5em 0; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
-      <strong>解锁深度内容，获得专享资源</strong><br>
-      投资策略代码、技术实现方案、马斯克帝国商业分析、个人投资组合分享
-    </p>
-    
-    <!-- 价格亮点 -->
-    <div style="display: flex; justify-content: center; align-items: center; gap: 2em; margin: 1.5em 0; flex-wrap: wrap;">
-      <div style="background: rgba(255,255,255,0.2); padding: 0.8em 1.2em; border-radius: 25px; backdrop-filter: blur(10px);">
-        <span style="font-size: 0.9em; opacity: 0.9;">月度会员</span><br>
-        <strong style="font-size: 1.2em;">¥35/月</strong>
-      </div>
-      <div style="background: rgba(255,255,255,0.3); padding: 0.8em 1.2em; border-radius: 25px; backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.5); position: relative;">
-        <div style="position: absolute; top: -8px; right: -8px; background: #ffc107; color: #333; padding: 2px 6px; border-radius: 10px; font-size: 0.7em; font-weight: bold;">推荐</div>
-        <span style="font-size: 0.9em; opacity: 0.9;">年度会员</span><br>
-        <strong style="font-size: 1.2em;">¥180/年</strong>
-        <div style="font-size: 0.8em; opacity: 0.8; margin-top: 2px;">仅¥15/月 (57%折扣)</div>
-      </div>
-      <div style="background: rgba(255,255,255,0.2); padding: 0.8em 1.2em; border-radius: 25px; backdrop-filter: blur(10px);">
-        <span style="font-size: 0.9em; opacity: 0.9;">对应Buy Me Coffee</span><br>
-        <strong style="font-size: 1em;">1-5杯咖啡</strong>
-      </div>
-    </div>
-    
-    <!-- 核心价值主张 -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1em; margin: 2em 0; max-width: 800px; margin-left: auto; margin-right: auto;">
-      <div style="background: rgba(255,255,255,0.15); padding: 1em; border-radius: 10px; backdrop-filter: blur(5px);">
-        <div style="font-size: 1.5em; margin-bottom: 0.3em;">📊</div>
-        <strong>量化投资策略</strong><br>
-        <small style="opacity: 0.9;">完整代码 + 回测数据</small>
-      </div>
-      <div style="background: rgba(255,255,255,0.15); padding: 1em; border-radius: 10px; backdrop-filter: blur(5px);">
-        <div style="font-size: 1.5em; margin-bottom: 0.3em;">🔧</div>
-        <strong>技术实现方案</strong><br>
-        <small style="opacity: 0.9;">配置文件 + 部署脚本</small>
-      </div>
-      <div style="background: rgba(255,255,255,0.15); padding: 1em; border-radius: 10px; backdrop-filter: blur(5px);">
-        <div style="font-size: 1.5em; margin-bottom: 0.3em;">🚀</div>
-        <strong>商业深度分析</strong><br>
-        <small style="opacity: 0.9;">财务模型 + 投资评估</small>
-      </div>
-      <div style="background: rgba(255,255,255,0.15); padding: 1em; border-radius: 10px; backdrop-filter: blur(5px);">
-        <div style="font-size: 1.5em; margin-bottom: 0.3em;">💎</div>
-        <strong>个人投资组合</strong><br>
-        <small style="opacity: 0.9;">实际持仓 + 决策思考</small>
-      </div>
-    </div>
-    
-    <!-- 行动按钮 -->
-    <div style="margin-top: 2em;">
-      <a href="{{ site.baseurl }}/members/" class="btn btn--success btn--large" style="margin-right: 15px; padding: 0.8em 2em; font-size: 1.1em; border-radius: 25px; background: #28a745; border: none; transform: scale(1); transition: all 0.3s ease;">
-        <i class="fas fa-crown"></i> 立即访问会员专区
-      </a>
-      <a href="{{ site.baseurl }}/member-signup/" class="btn btn--inverse btn--large" style="padding: 0.8em 2em; font-size: 1.1em; border-radius: 25px; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); color: white; transition: all 0.3s ease;">
-        <i class="fas fa-user-plus"></i> 会员注册
-      </a>
-    </div>
-    
-    <p style="font-size: 0.9em; margin-top: 1.5em; opacity: 0.8;">
-      💡 支持微信公众号打赏付费，与Buy Me Coffee价格完美对应
-    </p>
-  </div>
-</div>
-
-<style>
-.member-cta-section .btn:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-}
-
-@media (max-width: 768px) {
-  .member-cta-section {
-    margin: 2em 0 !important;
-    padding: 1.5em 1em !important;
-  }
-  
-  .member-cta-section h2 {
-    font-size: 1.5em !important;
-  }
-  
-  .member-cta-section > div > div:nth-child(4) {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.8em !important;
-  }
-  
-  .member-cta-section .btn {
-    display: block !important;
-    margin: 0.5em 0 !important;
-    width: 100% !important;
-  }
-}
-</style>
 
 <div class="latest-posts">
   <h2 class="archive__subtitle">最新文章</h2>
@@ -295,38 +195,95 @@ intro:
 <div style="clear: both; margin-top: 3em;"></div>
 
 <div class="subscription-container" style="margin-top: 3em; padding-top: 2em; border-top: 1px solid #eaeaea;">
-  <div class="subscribe-section" style="text-align: center; padding: 1em 0; background-color: #f3f6f6; margin: 2em 0; border-radius: 5px;">
-    <h2 style="margin: 0 0 0.5em 0;">订阅更新</h2>
-    <p style="margin-bottom: 1.5em;">选择您喜欢的方式获取最新文章和独家内容的通知。</p>
+  <div class="subscribe-section" style="text-align: center; padding: 2em 1em; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); margin: 2em 0; border-radius: 15px;">
+    <h2 style="margin: 0 0 0.8em 0; color: #2c3e50;">获取内容更新</h2>
+    <p style="margin-bottom: 2em; color: #6c757d; max-width: 600px; margin-left: auto; margin-right: auto;">
+      选择最适合您的方式，获取最新文章、深度分析和独家内容
+    </p>
     
-    <!-- 选项1: RSS订阅 -->
-    <div class="rss-buttons">
-      <h3 style="font-size: 1.2em; margin-bottom: 0.5em;">选项1: RSS订阅（推荐）</h3>
-      <p style="margin-bottom: 1em;">使用RSS阅读器自动获取更新通知，无需等待邮件。</p>
-      <a href="{{ site.baseurl }}/feed.xml" class="btn btn--success" style="margin-right: 10px;">
-        <i class="fas fa-rss"></i> 订阅RSS
-      </a>
-      <a href="https://feedly.com/i/subscription/feed/{{ site.url }}{{ site.baseurl }}/feed.xml" class="btn btn--info" target="_blank" style="margin-right: 10px;">
-        通过Feedly订阅
-      </a>
-      <a href="https://www.inoreader.com/?add_feed={{ site.url }}{{ site.baseurl }}/feed.xml" class="btn btn--info" target="_blank">
-        通过Inoreader订阅
-      </a>
+    <!-- 三个选项的网格布局 -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5em; max-width: 1000px; margin: 0 auto;">
+      
+      <!-- 免费RSS订阅 -->
+      <div style="background: white; padding: 1.5em; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); border: 1px solid #e9ecef;">
+        <div style="margin-bottom: 1em;">
+          <i class="fas fa-rss" style="font-size: 2em; color: #ff6600; margin-bottom: 0.5em;"></i>
+          <h3 style="margin: 0 0 0.5em 0; color: #2c3e50;">免费RSS订阅</h3>
+          <p style="color: #6c757d; font-size: 0.9em; margin-bottom: 1em;">自动获取所有公开文章更新</p>
+        </div>
+        <a href="{{ site.baseurl }}/feed.xml" class="btn btn--success" style="width: 100%; margin-bottom: 0.5em;">
+          <i class="fas fa-rss"></i> 直接订阅
+        </a>
+        <div style="font-size: 0.8em; color: #6c757d;">
+          或使用：
+          <a href="https://feedly.com/i/subscription/feed/{{ site.url }}{{ site.baseurl }}/feed.xml" target="_blank" style="color: #28a745;">Feedly</a> | 
+          <a href="https://www.inoreader.com/?add_feed={{ site.url }}{{ site.baseurl }}/feed.xml" target="_blank" style="color: #28a745;">Inoreader</a>
+        </div>
+      </div>
+      
+      <!-- 免费邮件订阅 -->
+      <div style="background: white; padding: 1.5em; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); border: 1px solid #e9ecef;">
+        <div style="margin-bottom: 1em;">
+          <i class="fas fa-envelope" style="font-size: 2em; color: #007bff; margin-bottom: 0.5em;"></i>
+          <h3 style="margin: 0 0 0.5em 0; color: #2c3e50;">免费邮件通知</h3>
+          <p style="color: #6c757d; font-size: 0.9em; margin-bottom: 1em;">重要文章发布时邮件提醒</p>
+        </div>
+        <form action="https://formspree.io/f/xpwqvvop" method="POST" style="width: 100%;">
+          <input type="email" name="email" placeholder="您的邮箱地址" required style="width: 100%; padding: 0.7em; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 0.8em; box-sizing: border-box;">
+          <button type="submit" class="btn btn--primary" style="width: 100%;">
+            <i class="fas fa-envelope"></i> 订阅邮件
+          </button>
+          <input type="hidden" name="_subject" value="新订阅 - 有心言者">
+          <input type="hidden" name="_next" value="https://zhurong2020.github.io/youxinyanzhe/thanks/">
+        </form>
+        <p style="font-size: 0.7em; color: #6c757d; margin-top: 0.8em;">
+          隐私保护，仅重要更新
+        </p>
+      </div>
+      
+      <!-- 付费会员订阅 -->
+      <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 1.5em; border-radius: 12px; box-shadow: 0 4px 15px rgba(40,167,69,0.3); color: white; position: relative;">
+        <div style="position: absolute; top: -8px; right: 12px; background: #ffc107; color: #333; padding: 3px 8px; border-radius: 12px; font-size: 0.7em; font-weight: bold;">
+          升级版
+        </div>
+        <div style="margin-bottom: 1em;">
+          <i class="fas fa-crown" style="font-size: 2em; color: #ffc107; margin-bottom: 0.5em;"></i>
+          <h3 style="margin: 0 0 0.5em 0; color: white;">付费会员专区</h3>
+          <p style="color: rgba(255,255,255,0.9); font-size: 0.9em; margin-bottom: 1em;">深度内容 + 专享资源 + 投资策略</p>
+        </div>
+        
+        <!-- 会员特色亮点 -->
+        <div style="background: rgba(255,255,255,0.15); padding: 0.8em; border-radius: 8px; margin-bottom: 1em; text-align: left;">
+          <div style="font-size: 0.85em; line-height: 1.4;">
+            ✅ 量化投资策略代码<br>
+            ✅ 技术实现完整方案<br>
+            ✅ 个人投资组合分享<br>
+            ✅ 商业深度分析报告
+          </div>
+        </div>
+        
+        <!-- 价格信息 -->
+        <div style="background: rgba(255,255,255,0.2); padding: 0.8em; border-radius: 8px; margin-bottom: 1em; backdrop-filter: blur(5px);">
+          <div style="font-size: 0.9em; opacity: 0.9;">起步价格</div>
+          <div style="font-size: 1.3em; font-weight: bold; margin: 0.2em 0;">¥35/月</div>
+          <div style="font-size: 0.8em; opacity: 0.8;">年度会员仅¥15/月 (57%折扣)</div>
+        </div>
+        
+        <a href="{{ site.baseurl }}/members/" class="btn btn--inverse" style="width: 100%; margin-bottom: 0.5em; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white;">
+          <i class="fas fa-crown"></i> 了解会员权益
+        </a>
+        <a href="{{ site.baseurl }}/member-signup/" class="btn" style="width: 100%; background: #ffc107; color: #333; border: none;">
+          <i class="fas fa-user-plus"></i> 立即注册会员
+        </a>
+      </div>
+      
     </div>
     
-    <!-- 选项2: 邮件订阅 -->
-    <div>
-      <h3 style="font-size: 1.2em; margin-bottom: 0.5em;">选项2: 邮件订阅</h3>
-      <p style="margin-bottom: 1em;">输入您的邮箱地址，我们会在发布重要内容时通知您。</p>
-      <form action="https://formspree.io/f/xpwqvvop" method="POST" class="subscription-form-flex" style="max-width: 400px; margin: 0 auto;">
-        <div class="form-flex-container">
-          <input type="email" name="email" placeholder="您的邮箱地址" required class="email-input">
-          <button type="submit" class="btn btn--primary subscribe-btn">订阅</button>
-        </div>
-        <input type="hidden" name="_subject" value="新订阅 - 有心言者">
-        <input type="hidden" name="_next" value="https://zhurong2020.github.io/youxinyanzhe/thanks/">
-      </form>
-      <p style="font-size: 0.8em; margin-top: 1em; color: #666;">我们尊重您的隐私，绝不会分享您的邮箱地址。邮件通知仅用于重要更新。</p>
+    <!-- 底部说明 -->
+    <div style="margin-top: 2em; padding-top: 1.5em; border-top: 1px solid #dee2e6;">
+      <p style="color: #6c757d; font-size: 0.9em; margin: 0;">
+        💡 <strong>建议</strong>：先尝试免费订阅了解内容质量，满意后再升级为付费会员获得深度资源
+      </p>
     </div>
   </div>
 </div>
