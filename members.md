@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .feature__wrapper {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     grid-gap: 1.5em;
     margin: 2em 0;
 }
@@ -373,5 +373,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .archive__item-excerpt li {
     padding: 0.25em 0;
+}
+
+/* 会员卡片响应式布局 */
+@media (max-width: 1200px) {
+    .feature__wrapper {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .feature__wrapper {
+        grid-template-columns: 1fr !important;
+        grid-gap: 1em !important;
+    }
 }
 </style>

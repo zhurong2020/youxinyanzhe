@@ -202,7 +202,7 @@ intro:
     </p>
     
     <!-- 三个选项的网格布局 -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5em; max-width: 1000px; margin: 0 auto;">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5em; max-width: 1200px; margin: 0 auto;">
       
       <!-- 免费RSS订阅 -->
       <div style="background: white; padding: 1.5em; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); border: 1px solid #e9ecef;">
@@ -287,3 +287,19 @@ intro:
     </div>
   </div>
 </div>
+
+<style>
+/* 订阅区域响应式布局 */
+@media (max-width: 1024px) {
+  .subscribe-section > div:first-of-type {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .subscribe-section > div:first-of-type {
+    grid-template-columns: 1fr !important;
+    gap: 1em !important;
+  }
+}
+</style>
