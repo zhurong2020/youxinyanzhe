@@ -10,6 +10,7 @@ import json
 import requests
 import subprocess
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, Any, Optional, List, Tuple
 import logging
 from dotenv import load_dotenv
@@ -1418,15 +1419,21 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             
             self._log("开始生成音频视频文件")
             
+            # 第一步：音频预处理和压缩优化
+            optimized_audio_path = self._optimize_audio_for_video(audio_path)
+            if not optimized_audio_path:
+                self._log("音频优化失败，使用原始音频")
+                optimized_audio_path = audio_path
+            
             # 使用ffmpeg将音频和图片合成视频
             ffmpeg_cmd = [
                 'ffmpeg', '-y',  # -y 覆盖输出文件
                 '-loop', '1',  # 循环图片
                 '-i', thumbnail_path,  # 输入图片
-                '-i', audio_path,  # 输入音频
+                '-i', optimized_audio_path,  # 输入优化后的音频
                 '-c:v', 'libx264',  # 视频编码
-                '-c:a', 'aac',  # 音频编码
-                '-b:a', '192k',  # 音频比特率
+                '-c:a', 'aac',  # 音频编码 (会重新编码优化过的音频)
+                '-b:a', '96k',  # 降低音频比特率以进一步压缩
                 '-pix_fmt', 'yuv420p',  # 像素格式
                 '-shortest',  # 以最短的输入为准
                 output_path
@@ -1451,6 +1458,80 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
         except Exception as e:
             self._log(f"音频视频生成失败: {e}")
             return False
+    
+    def _optimize_audio_for_video(self, audio_path: str) -> Optional[str]:
+        """
+        优化音频文件以减小视频大小
+        使用高质量音频压缩参数，包含音频处理链
+        
+        Args:
+            audio_path: 原始音频文件路径
+            
+        Returns:
+            优化后的音频文件路径，失败返回None
+        """
+        try:
+            # 生成优化后的音频文件路径
+            path_obj = Path(audio_path)
+            optimized_filename = f"{path_obj.stem}_optimized.mp3"
+            optimized_path = path_obj.parent / optimized_filename
+            
+            self._log(f"🔄 开始优化音频文件: {audio_path}")
+            
+            # 使用专业的音频压缩命令
+            # 音频处理链说明：
+            # - highpass=100: 高通滤波器，去除100Hz以下的低频噪音
+            # - lowpass=7000: 低通滤波器，去除7kHz以上的高频，适合语音
+            # - compand: 动态压缩，平衡音量
+            # - volume=1.8: 增加音量
+            # - loudnorm: 标准化响度，符合播放标准
+            audio_filter = (
+                "highpass=f=100,"
+                "lowpass=f=7000,"
+                "compand=attacks=0.05:decays=0.2:points=-80/-80|-62/-62|-26/-26|-15/-15|-10/-8|0/-7,"
+                "volume=1.8,"
+                "loudnorm=I=-18:LRA=7:TP=-2"
+            )
+            
+            ffmpeg_cmd = [
+                'ffmpeg', '-y',  # 覆盖输出文件
+                '-i', audio_path,  # 输入文件
+                '-af', audio_filter,  # 音频滤镜链
+                '-codec:a', 'libmp3lame',  # MP3编码器
+                '-b:a', '96k',  # 96kbps比特率，适合语音
+                '-ar', '44100',  # 采样率
+                '-ac', '2',  # 双声道
+                str(optimized_path)
+            ]
+            
+            self._log("执行音频优化命令...")
+            result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True, timeout=300)
+            
+            if result.returncode == 0 and optimized_path.exists():
+                # 检查文件大小压缩效果
+                original_size = Path(audio_path).stat().st_size
+                optimized_size = optimized_path.stat().st_size
+                compression_ratio = (1 - optimized_size / original_size) * 100
+                
+                self._log(f"✅ 音频优化成功:")
+                self._log(f"   原始大小: {original_size / 1024 / 1024:.1f}MB")
+                self._log(f"   优化大小: {optimized_size / 1024 / 1024:.1f}MB")
+                self._log(f"   压缩率: {compression_ratio:.1f}%")
+                
+                return str(optimized_path)
+            else:
+                self._log(f"音频优化失败: {result.stderr}")
+                return None
+                
+        except subprocess.TimeoutExpired:
+            self._log("音频优化超时")
+            return None
+        except FileNotFoundError:
+            self._log("ffmpeg未找到，跳过音频优化")
+            return None
+        except Exception as e:
+            self._log(f"音频优化异常: {e}")
+            return None
     
     def _create_audio_video_fallback(self, audio_path: str, thumbnail_path: str, output_path: str) -> bool:
         """使用moviepy作为备用方案生成音频视频"""
