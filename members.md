@@ -340,6 +340,9 @@ document.addEventListener('DOMContentLoaded', function() {
     grid-template-columns: repeat(4, 1fr);
     grid-gap: 1.5em;
     margin: 2em 0;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .feature__item--highlight {
@@ -378,7 +381,16 @@ document.addEventListener('DOMContentLoaded', function() {
 /* 会员卡片响应式布局 */
 @media (max-width: 1200px) {
     .feature__wrapper {
+        max-width: 1200px !important;
+        grid-gap: 1.3em !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .feature__wrapper {
         grid-template-columns: repeat(2, 1fr) !important;
+        grid-gap: 1.2em !important;
+        max-width: 700px !important;
     }
 }
 
@@ -386,6 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .feature__wrapper {
         grid-template-columns: 1fr !important;
         grid-gap: 1em !important;
+        max-width: 500px !important;
     }
 }
 </style>
