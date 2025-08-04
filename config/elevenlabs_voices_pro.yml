@@ -1,0 +1,176 @@
+elevenlabs_voices:
+  # Pro账户优化设置
+  api_settings:
+    default_settings:
+      similarity_boost: 0.9        # Pro账户可用更高相似度设置
+      stability: 0.35              # 更低稳定性获得更自然效果
+      style: 0.7                   # 更高风格化程度
+      use_speaker_boost: true      # Pro账户专属功能，提升语音清晰度
+    model_id: eleven_multilingual_v2  # 多语言模型，支持中英文
+    turbo_mode: false            # 关闭快速模式，使用高质量模式
+    output_format: mp3_44100_128 # 高质量音频输出格式
+
+  # Pro账户专属高质量语音组合
+  voice_combinations:
+    # 现有组合（保持兼容性）
+    chinese_podcast:
+      description: 标准中文播客组合
+      speaker_a:
+        voice_id: "21m00Tcm4TlvDq8ikWAM"  # Rachel - 清晰女声
+        name: "Rachel"
+        role: "主持人"
+        settings:
+          stability: 0.4
+          similarity_boost: 0.8
+          style: 0.6
+          use_speaker_boost: true
+      speaker_b:
+        voice_id: "TxGEqnHWrfWFTfGW9XjX"  # Josh - 温和男声
+        name: "Josh"
+        role: "嘉宾"
+        settings:
+          stability: 0.35
+          similarity_boost: 0.85
+          style: 0.5
+          use_speaker_boost: true
+
+    # Pro账户专业中文播客组合
+    chinese_podcast_pro:
+      description: Pro账户专业中文播客组合
+      speaker_a:
+        voice_id: "EXAVITQu4vr4xnSDxMaL"  # Bella - 专业女声，适合中文
+        name: "Bella"
+        role: "主持人"
+        settings:
+          stability: 0.3           # 更低稳定性，更自然
+          similarity_boost: 0.95   # 最高相似度
+          style: 0.8               # 高风格化
+          use_speaker_boost: true
+      speaker_b:
+        voice_id: "VR6AewLTigWG4xSOukaG"  # Arnold - 磁性男声
+        name: "Arnold"
+        role: "嘉宾"
+        settings:
+          stability: 0.35
+          similarity_boost: 0.9
+          style: 0.7
+          use_speaker_boost: true
+
+    # 英文专业播客组合
+    english_podcast_pro:
+      description: Pro账户英文专业播客组合
+      speaker_a:
+        voice_id: "2EiwWnXFnvU5JabPnv8n"  # Clyde - 专业男声
+        name: "Clyde"
+        role: "Host"
+        settings:
+          stability: 0.25          # 极低稳定性，最自然效果
+          similarity_boost: 0.95
+          style: 0.85
+          use_speaker_boost: true
+      speaker_b:
+        voice_id: "21m00Tcm4TlvDq8ikWAM"  # Rachel - 清晰女声
+        name: "Rachel"
+        role: "Guest"
+        settings:
+          stability: 0.3
+          similarity_boost: 0.9
+          style: 0.8
+          use_speaker_boost: true
+
+    # 新闻播报专业组合
+    news_broadcast_pro:
+      description: 新闻播报专业组合
+      speaker_a:
+        voice_id: "onwK4e9ZLuTAKqWW03F9"  # Daniel - 新闻播音员风格
+        name: "Daniel"
+        role: "主播"
+        settings:
+          stability: 0.4           # 新闻需要更稳定
+          similarity_boost: 0.9
+          style: 0.6               # 适中的风格化
+          use_speaker_boost: true
+
+    # 对话教学组合
+    educational_dialogue:
+      description: 教育对话组合
+      speaker_a:
+        voice_id: "pNInz6obpgDQGcFmaJgB"  # Adam - 教师风格
+        name: "Adam"
+        role: "老师"
+        settings:
+          stability: 0.35
+          similarity_boost: 0.85
+          style: 0.7
+          use_speaker_boost: true
+      speaker_b:
+        voice_id: "XB0fDUnXU5powFXDhCwa"  # Charlotte - 学生风格
+        name: "Charlotte"
+        role: "学生"
+        settings:
+          stability: 0.4
+          similarity_boost: 0.8
+          style: 0.6
+          use_speaker_boost: true
+
+  # Pro账户推荐语音库（基于常见高质量语音）
+  recommended_voices:
+    premium_quality:
+      # 专业级英文语音
+      - voice_id: "2EiwWnXFnvU5JabPnv8n"  # Clyde
+        name: "Clyde"
+        language: "English"
+        style: "Professional, Narrator"
+        quality: "Premium"
+      - voice_id: "21m00Tcm4TlvDq8ikWAM"  # Rachel
+        name: "Rachel"
+        language: "English"
+        style: "Clear, Conversational"
+        quality: "Premium"
+      - voice_id: "onwK4e9ZLuTAKqWW03F9"  # Daniel
+        name: "Daniel"
+        language: "English"
+        style: "News, British"
+        quality: "Premium"
+      
+      # 多语言支持语音
+      - voice_id: "EXAVITQu4vr4xnSDxMaL"  # Bella
+        name: "Bella"
+        language: "Multilingual"
+        style: "Young, Conversational"
+        quality: "Premium"
+      - voice_id: "VR6AewLTigWG4xSOukaG"  # Arnold
+        name: "Arnold"
+        language: "English"
+        style: "Middle-aged, Crisp"
+        quality: "Premium"
+
+  # Pro账户功能配置
+  pro_features:
+    voice_cloning: true          # Pro账户支持语音克隆
+    instant_voice_cloning: true  # 即时语音克隆
+    professional_voice_cloning: true  # 专业语音克隆
+    voice_mixing: true           # 语音混合
+    advanced_controls: true      # 高级控制选项
+    priority_queue: true         # 优先队列处理
+    commercial_license: true     # 商业使用许可
+
+  # 使用建议
+  usage_recommendations:
+    chinese_content:
+      primary: "chinese_podcast_pro"    # 主要推荐
+      alternative: "chinese_podcast"    # 备选方案
+      settings_note: "中文内容建议使用多语言模型和较高的style设置"
+    
+    english_content:
+      primary: "english_podcast_pro"
+      alternative: "chinese_podcast"    # Rachel/Josh也适合英文
+      settings_note: "英文内容可以使用更低的stability获得更自然效果"
+    
+    educational_content:
+      primary: "educational_dialogue"
+      settings_note: "教育内容建议使用稍高的stability确保清晰度"
+    
+    news_content:
+      primary: "news_broadcast_pro"
+      settings_note: "新闻内容需要权威感，使用适中的风格化设置"

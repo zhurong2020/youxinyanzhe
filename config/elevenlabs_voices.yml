@@ -1,28 +1,91 @@
 elevenlabs_voices:
+  # Pro账户优化设置
   api_settings:
     default_settings:
-      similarity_boost: 0.8
-      stability: 0.4
-      style: 0.6
-      use_speaker_boost: true
-    model_id: eleven_multilingual_v2
+      similarity_boost: 0.9        # Pro账户可用更高相似度设置
+      stability: 0.35              # 更低稳定性获得更自然效果
+      style: 0.7                   # 更高风格化程度
+      use_speaker_boost: true      # Pro账户专属功能，提升语音清晰度
+    model_id: eleven_multilingual_v2  # 多语言模型，支持中英文
+    turbo_mode: false            # 关闭快速模式，使用高质量模式
+    output_format: mp3_44100_128 # 高质量音频输出格式
+
   available_voices: {}
+  
   voice_combinations:
+    # 标准组合（保持兼容性）
     chinese_podcast:
-      description: 中文播客推荐组合
+      description: 标准中文播客组合
       speaker_a:
         name: Rachel
         role: 主持人
         settings:
-          similarity_boost: 0.8
-          stability: 0.4
-          style: 0.6
+          similarity_boost: 0.9    # Pro设置
+          stability: 0.35          # Pro设置
+          style: 0.7               # Pro设置
+          use_speaker_boost: true  # Pro功能
         voice_id: 21m00Tcm4TlvDq8ikWAM
       speaker_b:
         name: Josh
         role: 嘉宾
         settings:
           similarity_boost: 0.85
-          stability: 0.35
-          style: 0.5
+          stability: 0.3           # 更自然
+          style: 0.65
+          use_speaker_boost: true
         voice_id: TxGEqnHWrfWFTfGW9XjX
+
+    # Pro账户专业组合
+    chinese_podcast_pro:
+      description: Pro账户专业中文播客组合
+      speaker_a:
+        voice_id: "EXAVITQu4vr4xnSDxMaL"  # Bella - 适合中文的专业女声
+        name: "Bella"
+        role: "主持人"
+        settings:
+          stability: 0.25          # 极低稳定性，最自然效果
+          similarity_boost: 0.95   # 最高相似度
+          style: 0.8               # 高风格化
+          use_speaker_boost: true
+      speaker_b:
+        voice_id: "VR6AewLTigWG4xSOukaG"  # Arnold - 磁性男声
+        name: "Arnold"
+        role: "嘉宾"
+        settings:
+          stability: 0.3
+          similarity_boost: 0.9
+          style: 0.75
+          use_speaker_boost: true
+
+    # 英文专业组合
+    english_podcast_pro:
+      description: Pro账户英文专业播客组合
+      speaker_a:
+        voice_id: "2EiwWnXFnvU5JabPnv8n"  # Clyde - 专业男声
+        name: "Clyde"
+        role: "Host"
+        settings:
+          stability: 0.2           # 超低稳定性
+          similarity_boost: 0.95
+          style: 0.85
+          use_speaker_boost: true
+      speaker_b:
+        voice_id: "21m00Tcm4TlvDq8ikWAM"  # Rachel - 清晰女声
+        name: "Rachel"
+        role: "Guest"
+        settings:
+          stability: 0.25
+          similarity_boost: 0.9
+          style: 0.8
+          use_speaker_boost: true
+
+  # Pro账户功能标识
+  pro_features:
+    enabled: true
+    voice_cloning: true
+    instant_voice_cloning: true
+    professional_voice_cloning: true
+    voice_mixing: true
+    advanced_controls: true
+    priority_queue: true
+    commercial_license: true
