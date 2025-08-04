@@ -337,8 +337,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .feature__wrapper {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-gap: 1.5em;
+    grid-template-columns: repeat(4, minmax(200px, 1fr));
+    grid-gap: 1.2em;
     margin: 2em 0;
     width: 100%;
 }
@@ -364,36 +364,69 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .archive__item-title {
     color: #2c3e50;
-    margin-bottom: 0.5em;
+    margin-bottom: 0.3em;
+    font-size: 1.1em;
+}
+
+.archive__item-excerpt {
+    font-size: 0.85em;
+    line-height: 1.3;
+}
+
+.archive__item-excerpt p {
+    margin-bottom: 0.4em;
+}
+
+.archive__item-excerpt small {
+    font-size: 0.8em;
+    line-height: 1.2;
 }
 
 .archive__item-excerpt ul {
     list-style: none;
     padding-left: 0;
+    margin-bottom: 0;
 }
 
 .archive__item-excerpt li {
-    padding: 0.25em 0;
+    padding: 0.15em 0;
+    font-size: 0.9em;
+    line-height: 1.2;
+}
+
+.feature__item {
+    min-height: 280px;
+}
+
+.archive__item {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.archive__item-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
 }
 
 /* 会员卡片响应式布局 */
-@media (max-width: 1200px) {
-    .feature__wrapper {
-        grid-gap: 1.3em !important;
-    }
-}
-
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
     .feature__wrapper {
         grid-template-columns: repeat(2, 1fr) !important;
         grid-gap: 1.2em !important;
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
     .feature__wrapper {
         grid-template-columns: 1fr !important;
         grid-gap: 1em !important;
+    }
+    
+    .feature__item {
+        min-height: auto !important;
     }
 }
 </style>
