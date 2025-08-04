@@ -32,16 +32,16 @@ excerpt: "完成付费后，请填写以下信息以便我们为您发放访问�
       <label for="memberLevel"><i class="fas fa-crown"></i> 选择会员等级 *</label>
       <select id="memberLevel" name="memberLevel" required>
         <option value="">请选择会员等级</option>
-        <option value="experience">体验会员 (￥5/7天)</option>
-        <option value="monthly">月度会员 (￥35/30天) - 对应1杯咖啡($5)</option>
-        <option value="quarterly">季度会员 (￥108/90天) - 对应3杯咖啡($15)</option>
-        <option value="yearly">年度会员 (￥180/365天) - 对应5杯咖啡($25)</option>
+        <option value="experience">体验会员 (￥35/7天) - SA报告体验</option>
+        <option value="monthly">月度会员 (￥108/30天) - SA精选+量化评级</option>
+        <option value="quarterly">季度会员 (￥288/90天) - 专家分析+组合诊断</option>
+        <option value="yearly">年度会员 (￥720/365天) - 网格软件+策略代码</option>
       </select>
     </div>
 
     <div class="form-group">
       <label for="paymentAmount"><i class="fas fa-yen-sign"></i> 打赏金额 *</label>
-      <input type="number" id="paymentAmount" name="paymentAmount" required placeholder="请输入实际打赏金额" min="5">
+      <input type="number" id="paymentAmount" name="paymentAmount" required placeholder="请输入实际打赏金额" min="35">
       <small>用于核对支付记录，确保准确发放对应等级访问码</small>
     </div>
 
@@ -209,10 +209,10 @@ document.getElementById('memberSignupForm').addEventListener('submit', function(
     
     // 验证金额与会员等级匹配
     const levelPrices = {
-        'experience': 5,
-        'monthly': 35,
-        'quarterly': 108,
-        'yearly': 180
+        'experience': 35,
+        'monthly': 108,
+        'quarterly': 288,
+        'yearly': 720
     };
     
     if (parseInt(data.paymentAmount) < levelPrices[data.memberLevel]) {
@@ -280,10 +280,10 @@ window.onclick = function(event) {
 document.getElementById('memberLevel').addEventListener('change', function() {
     const paymentAmount = document.getElementById('paymentAmount');
     const levelPrices = {
-        'experience': 5,
-        'monthly': 35,
-        'quarterly': 108,
-        'yearly': 180
+        'experience': 35,
+        'monthly': 108,
+        'quarterly': 288,
+        'yearly': 720
     };
     
     if (this.value && levelPrices[this.value]) {

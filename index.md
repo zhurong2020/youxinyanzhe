@@ -251,24 +251,24 @@ intro:
         <div style="margin-bottom: 1em;">
           <i class="fas fa-crown" style="font-size: 2em; color: #ffc107; margin-bottom: 0.5em;"></i>
           <h3 style="margin: 0 0 0.5em 0; color: white;">付费会员专区</h3>
-          <p style="color: rgba(255,255,255,0.9); font-size: 0.9em; margin-bottom: 1em;">深度内容 + 专享资源 + 投资策略</p>
+          <p style="color: rgba(255,255,255,0.9); font-size: 0.9em; margin-bottom: 1em;">Seeking Alpha精选 + 网格交易软件 + 量化策略</p>
         </div>
         
         <!-- 会员特色亮点 -->
         <div style="background: rgba(255,255,255,0.15); padding: 0.8em; border-radius: 8px; margin-bottom: 1em; text-align: left;">
           <div style="font-size: 0.85em; line-height: 1.4;">
-            ✅ 量化投资策略代码<br>
-            ✅ 技术实现完整方案<br>
-            ✅ 个人投资组合分享<br>
-            ✅ 商业深度分析报告
+            ✅ SA专家投资者报告<br>
+            ✅ 网格交易量化软件<br>
+            ✅ Python策略代码库<br>
+            ✅ 1对1投资策略咨询
           </div>
         </div>
         
         <!-- 价格信息 -->
         <div style="background: rgba(255,255,255,0.2); padding: 0.8em; border-radius: 8px; margin-bottom: 1em; backdrop-filter: blur(5px);">
           <div style="font-size: 0.9em; opacity: 0.9;">起步价格</div>
-          <div style="font-size: 1.3em; font-weight: bold; margin: 0.2em 0;">¥35/月</div>
-          <div style="font-size: 0.8em; opacity: 0.8;">年度会员仅¥15/月 (57%折扣)</div>
+          <div style="font-size: 1.3em; font-weight: bold; margin: 0.2em 0;">¥108/月</div>
+          <div style="font-size: 0.8em; opacity: 0.8;">年度会员仅¥60/月 (44%折扣)</div>
         </div>
         
         <a href="{{ site.baseurl }}/members/" class="btn btn--inverse" style="width: 100%; margin-bottom: 0.5em; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white;">
