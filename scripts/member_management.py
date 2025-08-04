@@ -28,10 +28,10 @@ class MemberManager:
         
         # 会员等级配置
         self.member_levels = {
-            'experience': {'code': 'VIP1', 'days': 7, 'price': 5, 'name': '体验会员'},
-            'monthly': {'code': 'VIP2', 'days': 30, 'price': 35, 'name': '月度会员'},
-            'quarterly': {'code': 'VIP3', 'days': 90, 'price': 108, 'name': '季度会员'},
-            'yearly': {'code': 'VIP4', 'days': 365, 'price': 180, 'name': '年度会员'}
+            'experience': {'code': 'VIP1', 'days': 7, 'price': 35, 'name': '体验会员'},
+            'monthly': {'code': 'VIP2', 'days': 30, 'price': 108, 'name': '月度会员'},
+            'quarterly': {'code': 'VIP3', 'days': 90, 'price': 288, 'name': '季度会员'},
+            'yearly': {'code': 'VIP4', 'days': 365, 'price': 720, 'name': '年度会员'}
         }
         
         # 邮件配置（需要在环境变量中设置）
