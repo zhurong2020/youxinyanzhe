@@ -347,6 +347,28 @@ This section records critical architectural adjustments for the project:
 
 ## 10. Document Update History
 
+### 2025-08-04: YouTube播客生成器多语言支持和OAuth认证修复 ✅
+- **多语言播客生成修复**:  
+  - ✅ 修复播客脚本生成语言逻辑，现在正确支持中文、英文、日文、韩文四种语言
+  - ✅ 修复TTS语音合成语言适配，根据target_language自动选择对应语言
+  - ✅ 修复备用脚本生成，针对不同语言提供对应的对话内容
+  - ✅ 在generate_from_youtube方法中保存当前目标语言供TTS使用
+- **YouTube上传OAuth认证优化**:
+  - ✅ 增强YouTube API配置，支持OAuth和API Key两种认证方式
+  - ✅ 添加OAuth token自动刷新机制，无需重复认证
+  - ✅ 在上传前检查认证类型，只允许OAuth用户上传
+  - ✅ 提供清晰的错误提示和scripts/tools/youtube_oauth_setup.py工具指引
+- **文档完善**:
+  - ✅ 更新youtube_podcast_setup.md，新增多语言选择和OAuth设置说明
+  - ✅ 添加外部工具使用指南，包括OAuth设置工具路径
+  - ✅ 完善故障排除部分，涵盖语言生成和认证问题解决方案
+  - ✅ 明确OAuth认证持久性和自动管理特性
+- **技术改进**:
+  - 播客脚本prompt根据目标语言动态生成（中/英/日/韩）
+  - TTS引擎智能语言适配（gTTS支持en/zh-CN/ja/ko）
+  - YouTube API双重认证支持（OAuth用于上传，API Key用于读取）
+  - 自动token刷新和错误恢复机制
+
 ### 2025-08-04: 多级会员验证系统完整实现与价格优化 ✅
 - **会员系统核心功能**:
   - ✅ 完整的多级会员验证系统（体验、月度、季度、年度）

@@ -94,8 +94,40 @@ YOUTUBE_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 1. 运行主程序：`python run.py`
 2. 选择 `6. YouTube播客生成器`
 3. 选择 `1. 生成YouTube播客学习文章`
-4. 输入YouTube视频链接
-5. 等待1-3分钟自动处理
+4. **选择播客语言**：
+   - `1. 中文播客`（默认，为中文用户学习英语）
+   - `2. 英文播客`（为英语学习者提供英文内容）
+   - `3. 日文播客`（为日语学习者）
+   - `4. 韩文播客`（为韩语学习者）
+5. 输入YouTube视频链接
+6. 等待1-3分钟自动处理
+
+### YouTube视频上传功能（可选）
+
+**如果需要将生成的播客上传到YouTube**，需要先配置OAuth认证：
+
+#### 一次性OAuth设置
+```bash
+# 运行OAuth设置工具
+python scripts/tools/youtube_oauth_setup.py
+```
+
+该工具会引导你完成：
+1. Google Cloud项目创建
+2. YouTube Data API启用
+3. OAuth客户端设置
+4. 浏览器认证流程
+
+#### OAuth认证特点
+- ✅ **一次认证，长期使用**：认证完成后会自动保存token
+- ✅ **自动刷新**：系统会自动管理token过期和刷新
+- ✅ **无需重复认证**：除非手动撤销权限，否则永久有效
+
+#### OAuth状态检查
+生成播客时，系统会自动检查认证状态：
+- **有OAuth认证**：支持自动上传到YouTube
+- **仅API Key**：只能获取视频信息，无法上传
+- **无认证**：使用基础功能
 
 ### 验证配置
 
@@ -208,6 +240,21 @@ ImportError: No module named 'gradio_client'
 - 检查API密钥的应用限制设置
 - 确保服务器IP地址被允许访问
 
+**6. 播客语言问题**
+
+**生成的播客语言不正确**
+- ✅ **已修复**：系统现在正确支持多语言播客生成
+- 选择"英文播客"会生成真正的英文对话内容
+- TTS引擎会自动适配选择的语言
+
+**YouTube上传认证错误**
+```
+HttpError 401: "API keys are not supported by this API"
+```
+- ✅ **已修复**：系统现在区分读取和上传权限
+- **解决方案**：运行 `python scripts/tools/youtube_oauth_setup.py` 配置OAuth认证
+- **说明**：YouTube上传需要OAuth认证，API Key仅支持读取功能
+
 ## 🔧 技术架构
 
 ### 核心组件
@@ -252,6 +299,20 @@ python run.py # 选择菜单6 → 2
 - 主配置：`config/youtube_podcast_config.yml`
 - 环境变量：`.env`
 - 日志文件：`.build/logs/pipeline.log`
+- OAuth凭据：`config/youtube_oauth_credentials.json`（需手动配置）
+- OAuth令牌：`config/youtube_oauth_token.json`（自动生成）
+
+### 外部工具
+```bash
+# OAuth认证设置（一次性）
+python scripts/tools/youtube_oauth_setup.py
+
+# 单独测试YouTube上传
+python scripts/tools/youtube_upload_tester.py
+
+# YouTube视频生成工具
+python scripts/tools/youtube_video_generator.py
+```
 
 ## 💡 技术支持
 
