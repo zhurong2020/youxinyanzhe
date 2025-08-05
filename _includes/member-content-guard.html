@@ -30,7 +30,7 @@
 </div>
 
 <script>
-// 检查会员访问权限
+// 检查会员访问权限（支持管理员访问码）
 (function() {
   const pageRequiredTier = '{{ page.member_tier }}';
   const memberLevel = localStorage.getItem('memberLevel');
@@ -41,7 +41,8 @@
     'experience': 1,
     'monthly': 2,
     'quarterly': 3,
-    'yearly': 4
+    'yearly': 4,
+    'admin': 999  // 管理员最高权限
   };
   
   // 检查是否有效会员
@@ -56,7 +57,15 @@
       
       if (userWeight >= requiredWeight) {
         // 权限足够，隐藏限制提示
-        document.querySelector('.member-content-guard').style.display = 'none';
+        const memberGuard = document.querySelector('.member-content-guard');
+        if (memberGuard) {
+          memberGuard.style.display = 'none';
+        }
+        
+        // 如果是管理员，添加管理员标识
+        if (memberLevel === 'admin') {
+          addAdminBadge();
+        }
         return;
       }
     }
@@ -68,5 +77,29 @@
     memberGuard.style.display = 'block';
   }
 })();
+
+// 添加管理员标识
+function addAdminBadge() {
+  // 避免重复添加
+  if (document.querySelector('.admin-badge')) return;
+  
+  const badge = document.createElement('div');
+  badge.className = 'admin-badge';
+  badge.innerHTML = '🔧 管理员模式';
+  badge.style.cssText = `
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(220,53,69,0.3);
+  `;
+  document.body.appendChild(badge);
+}
 </script>
 {% endif %}
