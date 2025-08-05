@@ -7,9 +7,10 @@ comments: true
 date: 2025-08-04
 excerpt: 深入了解Russiagate事件，掌握其核心法律与政治术语。本视频将助您提升理解美国政治新闻报道的能力，并熟悉相关辩论中的常用表达。
 header:
-  teaser: '{{ site.baseurl }}/assets/images/posts/2025/08/youtube-20250804-russiagate-looks-like-a-broad-criminal-conspiracy-thumbnail.jpg'
+  teaser: /assets/images/posts/2025/08/youtube-20250804-russiagate-looks-like-a-broad-criminal-conspiracy-thumbnail.jpg
 last_modified_at: '2025-08-05 15:15:06'
-layout: single
+layout: member-post
+member_tier: experience
 related: true
 share: true
 tags:

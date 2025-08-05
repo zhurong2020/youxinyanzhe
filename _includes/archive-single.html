@@ -1,0 +1,57 @@
+{% comment %}
+自定义文章列表项 - 添加会员标识支持
+{% endcomment %}
+
+{% if post.header.teaser %}
+  {% capture teaser %}{{ post.header.teaser }}{% endcapture %}
+{% else %}
+  {% assign teaser = site.teaser %}
+{% endif %}
+
+{% if post.id %}
+  {% assign title = post.title | markdownify | remove: "<p>" | remove: "</p>" %}
+{% else %}
+  {% assign title = post.title %}
+{% endif %}
+
+<div class="{{ include.type | default: 'list' }}__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    {% if include.type == "grid" and teaser %}
+      <div class="archive__item-teaser">
+        <img src="{{ teaser | relative_url }}" alt="">
+        
+        {% comment %}添加会员标识{% endcomment %}
+        {% if post.member_tier and post.member_tier != 'free' %}
+          <div class="member-badge" style="position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #ffc107, #ff8c00); color: #333; padding: 3px 8px; border-radius: 12px; font-size: 0.7em; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 10;">
+            {% case post.member_tier %}
+              {% when 'experience' %}🔑 VIP1
+              {% when 'monthly' %}👑 VIP2
+              {% when 'quarterly' %}💎 VIP3
+              {% when 'yearly' %}⭐ VIP4
+            {% endcase %}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      {% if post.link %}
+        <a href="{{ post.link }}">{{ title }} <span class="link-arrow">→</span></a> <a href="{{ post.url | relative_url }}" rel="permalink"><i class="fas fa-link" aria-hidden="true" title="permalink"></i><span class="sr-only">Permalink</span></a>
+      {% else %}
+        <a href="{{ post.url | relative_url }}" rel="permalink">{{ title }}</a>
+      {% endif %}
+      {% comment %}在标题后添加会员标识（非网格布局）{% endcomment %}
+      {% if include.type != "grid" and post.member_tier and post.member_tier != 'free' %}
+        <span class="member-inline-badge" style="margin-left: 8px; background: linear-gradient(135deg, #ffc107, #ff8c00); color: #333; padding: 2px 6px; border-radius: 8px; font-size: 0.6em; font-weight: bold;">
+          {% case post.member_tier %}
+            {% when 'experience' %}🔑 VIP1
+            {% when 'monthly' %}👑 VIP2
+            {% when 'quarterly' %}💎 VIP3
+            {% when 'yearly' %}⭐ VIP4
+          {% endcase %}
+        </span>
+      {% endif %}
+    </h2>
+    {% include page__meta.html type=include.type %}
+    {% if post.excerpt %}<p class="archive__item-excerpt" itemprop="description">{{ post.excerpt | markdownify | strip_html | truncate: 160 }}</p>{% endif %}
+  </article>
+</div>
