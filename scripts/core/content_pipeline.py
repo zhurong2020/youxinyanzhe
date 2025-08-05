@@ -636,6 +636,48 @@ class ContentPipeline:
                 
         return selected_platforms
     
+    def select_member_tier(self) -> Optional[str]:
+        """让用户选择文章的会员分级"""
+        print("\n👥 会员分级选项：")
+        print("  1. 免费内容 - 所有用户可访问")
+        print("  2. 体验会员 (VIP1) - ¥35/7天")
+        print("  3. 月度会员 (VIP2) - ¥108/30天")
+        print("  4. 季度会员 (VIP3) - ¥288/90天")
+        print("  5. 年度会员 (VIP4) - ¥720/365天")
+        print("  0. 跳过设置")
+        
+        tier_mapping = {
+            '1': 'free',
+            '2': 'experience', 
+            '3': 'monthly',
+            '4': 'quarterly',
+            '5': 'yearly'
+        }
+        
+        try:
+            choice = input("\n请选择会员分级 (1-5，默认为1): ").strip()
+            
+            if choice == '0':
+                print("⏭️  跳过会员分级设置")
+                return None
+            elif choice in tier_mapping:
+                tier = tier_mapping[choice]
+                tier_names = {
+                    'free': '免费内容',
+                    'experience': '体验会员',
+                    'monthly': '月度会员', 
+                    'quarterly': '季度会员',
+                    'yearly': '年度会员'
+                }
+                print(f"✅ 已设置为 {tier_names[tier]}")
+                return tier
+            else:
+                print("✅ 默认设置为免费内容")
+                return 'free'
+        except (EOFError, KeyboardInterrupt):
+            print("\n✅ 默认设置为免费内容")
+            return 'free'
+
     def ask_monetization_preference(self) -> bool:
         """询问用户是否启用内容变现功能"""
         if not self.reward_manager:
@@ -658,7 +700,7 @@ class ContentPipeline:
             print("\n⏭️  跳过内容变现功能")
             return False
     
-    def process_draft(self, draft_path: Path, platforms: List[str], enable_monetization: bool = False) -> dict:
+    def process_draft(self, draft_path: Path, platforms: List[str], enable_monetization: bool = False, member_tier: Optional[str] = None) -> dict:
         """处理草稿文件"""
         try:
             self.log(f"============================== 开始处理草稿 ==============================", force=True)
@@ -709,6 +751,21 @@ class ContentPipeline:
                             'article_name': draft_path.stem,
                             'error': f'front matter解析失败: {str(e)}',
                         }
+                
+                # 添加会员分级信息
+                if member_tier:
+                    post['member_tier'] = member_tier
+                    # 如果不是免费内容，使用会员文章布局
+                    if member_tier != 'free':
+                        post['layout'] = 'member-post'
+                    tier_names = {
+                        'free': '免费内容',
+                        'experience': '体验会员',
+                        'monthly': '月度会员', 
+                        'quarterly': '季度会员',
+                        'yearly': '年度会员'
+                    }
+                    self.log(f"设置会员分级: {tier_names.get(member_tier, member_tier)}", level="info")
                 
                 # 2. 图片处理步骤（已移除Cloudflare Images功能）
                 progress.update(progress.add_task("🖼️ 图片处理（跳过）", total=1), completed=True)
