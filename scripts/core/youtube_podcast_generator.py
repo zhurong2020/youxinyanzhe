@@ -1362,24 +1362,49 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             # 修改Podcastfy参数，实现NotebookLM风格的纯对话
             notebooklm_instructions = f"生成NotebookLM风格的纯对话播客，要求：1. 绝对禁止开场白、介绍、总结、结束语；2. 只能是两个人的自然对话，一问一答；3. 像真实朋友聊天，深入讨论视频内容；4. 不要任何欢迎来到播客等话语；5. 直接开始讨论，自然结束；6. 保持口语化、真实、有深度的对话风格；目标语言：{target_language}"
             
+            # 清理notebooklm_instructions并验证所有即将传递的参数
+            clean_instructions = clean_string(notebooklm_instructions)
+            
+            # 完整的参数验证
+            final_params = {
+                'urls_input': clean_url,
+                'gemini_key': clean_string(self.config['GEMINI_API_KEY']),
+                'user_instructions': clean_instructions,
+                'conversation_style': clean_string("natural,deep,conversational"),
+                'roles_person1': clean_string("A"),
+                'roles_person2': clean_string("B"),
+                'dialogue_structure': clean_string("对话"),
+                'podcast_name': clean_string(""),
+                'podcast_tagline': clean_string("")
+            }
+            
+            for param_name, param_value in final_params.items():
+                if any(ord(c) < 32 or ord(c) == 127 for c in str(param_value)):
+                    self._log(f"⚠️ 最终参数{param_name}包含控制字符: {repr(param_value)}", "warning")
+                    # 对于URL参数，记录详细信息
+                    if param_name == 'urls_input':
+                        for i, char in enumerate(str(param_value)):
+                            if ord(char) < 32 or ord(char) == 127:
+                                self._log(f"   位置{i}: {repr(char)} (ASCII {ord(char)})", "warning")
+            
             result = self.podcastfy_client.predict(
                 text_input="",
-                urls_input=clean_url,
+                urls_input=final_params['urls_input'],
                 pdf_files=[],
                 image_files=[],
-                gemini_key=clean_string(self.config['GEMINI_API_KEY']),
+                gemini_key=final_params['gemini_key'],
                 openai_key="",  # 使用Edge TTS，不需要OpenAI密钥
                 elevenlabs_key=clean_string(self.config.get('ELEVENLABS_API_KEY', "")),
                 word_count=1200,  # 更精炼的对话长度
-                conversation_style=clean_string("natural,deep,conversational"),
-                roles_person1=clean_string("A"),  # 简化角色名
-                roles_person2=clean_string("B"),
-                dialogue_structure=clean_string("对话"),  # 禁用结构化的章节
-                podcast_name=clean_string(""),  # 禁用播客名称
-                podcast_tagline=clean_string(""),  # 禁用标语
+                conversation_style=final_params['conversation_style'],
+                roles_person1=final_params['roles_person1'],
+                roles_person2=final_params['roles_person2'],
+                dialogue_structure=final_params['dialogue_structure'],
+                podcast_name=final_params['podcast_name'],
+                podcast_tagline=final_params['podcast_tagline'],
                 tts_model="elevenlabs",  # 优先使用ElevenLabs获得最佳音质
                 creativity_level=0.8,  # 增加创造力，使对话更自然
-                user_instructions=clean_string(notebooklm_instructions),
+                user_instructions=final_params['user_instructions'],
                 api_name="/process_inputs"
             )
             
