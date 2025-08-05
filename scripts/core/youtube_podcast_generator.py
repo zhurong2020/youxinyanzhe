@@ -597,7 +597,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
 [A]: 这确实是个不错的学习方法，既能了解内容又能提高英语水平。
 """
 
-    def generate_local_audio(self, script: str, output_path: str, tts_engine: str = "gtts", dual_speaker: bool = True) -> bool:
+    def generate_local_audio(self, script: str, output_path: str, tts_engine: str = "gtts", dual_speaker: bool = True, target_language: str = "zh-CN") -> bool:
         """
         使用本地TTS生成音频，支持多种TTS引擎
         
@@ -606,6 +606,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             output_path: 输出音频文件路径
             tts_engine: TTS引擎选择 ("gtts", "elevenlabs", "espeak", "pyttsx3")
             dual_speaker: 是否启用双人对话模式（仅ElevenLabs支持）
+            target_language: 目标语言 ("zh-CN", "en-US", "ja-JP", "ko-KR")
         """
         # 检测是否包含对话格式
         has_dialogue_format = bool(re.search(r'[\[【].*?[\]】][:：]\s*', script) or 
@@ -655,7 +656,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
         
         # 1. 优先尝试ElevenLabs（最高音质）
         if tts_engine == "elevenlabs":
-            if self._generate_elevenlabs_audio(clean_text, output_path, dual_speaker=use_dual_speaker):
+            if self._generate_elevenlabs_audio(clean_text, output_path, dual_speaker=use_dual_speaker, target_language=target_language):
                 return True
             self._log("ElevenLabs失败，尝试其他引擎")
         
@@ -678,7 +679,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
         self._log("所有TTS引擎都失败了", "error")
         return False
     
-    def _generate_elevenlabs_audio(self, text: str, output_path: str, dual_speaker: bool = False) -> bool:
+    def _generate_elevenlabs_audio(self, text: str, output_path: str, dual_speaker: bool = False, target_language: str = "zh-CN") -> bool:
         """使用ElevenLabs生成高质量AI语音（优化中文自然度）"""
         if not self.elevenlabs_available or not self.elevenlabs_client:
             self._log("ElevenLabs API未配置或库未安装")
@@ -686,7 +687,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             
         try:
             if dual_speaker:
-                return self._generate_dual_speaker_audio(text, output_path)
+                return self._generate_dual_speaker_audio(text, output_path, target_language)
             else:
                 return self._generate_single_speaker_audio(text, output_path)
                 
@@ -755,7 +756,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
         self._log(f"✅ ElevenLabs单人音频生成成功: {output_path}")
         return True
     
-    def _generate_dual_speaker_audio(self, text: str, output_path: str, language: str = "chinese") -> bool:
+    def _generate_dual_speaker_audio(self, text: str, output_path: str, language: str = "zh-CN") -> bool:
         """生成双人对话音频"""
         self._log("🎭 使用ElevenLabs生成双人对话音频")
         
@@ -987,8 +988,14 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
         combinations = voice_config.get('voice_combinations', {})
         recommendations = voice_config.get('usage_recommendations', {})
         
+        # 标准化语言代码识别
+        is_chinese = (language.startswith('zh') or 
+                     language.lower() in ['chinese', 'zh-cn', 'zh-tw'])
+        is_english = (language.startswith('en') or 
+                     language.lower() in ['english', 'en-us', 'en-gb'])
+        
         # 根据语言内容选择推荐组合
-        if language.startswith('zh') or language == 'chinese':
+        if is_chinese:
             if 'chinese_content' in recommendations:
                 primary = recommendations['chinese_content'].get('primary', 'chinese_podcast_pro')
                 if primary in combinations:
@@ -999,7 +1006,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             else:
                 return 'chinese_podcast'
                 
-        elif language.startswith('en') or language == 'english':
+        elif is_english:
             if 'english_content' in recommendations:
                 primary = recommendations['english_content'].get('primary', 'english_podcast_pro')
                 if primary in combinations:
@@ -1010,7 +1017,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             else:
                 return 'chinese_podcast'  # Rachel和Josh也适合英文
         
-        # 默认选择
+        # 默认选择（包括日语、韩语等其他语言）
         return 'chinese_podcast'
     
     def _get_speaker_voice_id(self, speaker: str, voice_config: Dict[str, Any], language: str = "chinese") -> str:
@@ -2044,7 +2051,13 @@ header:
             self._log(f"视频标题: {video_info['title']}")
             
             # 3. 生成播客
-            self._log("正在生成中文播客（预计1-3分钟）...")
+            language_name = {
+                "zh-CN": "中文",
+                "en-US": "英文", 
+                "ja-JP": "日文",
+                "ko-KR": "韩文"
+            }.get(target_language, target_language)
+            self._log(f"正在生成{language_name}播客（预计1-3分钟）...")
             temp_audio_path = self.generate_podcast(youtube_url, conversation_style, target_language)
             
             # 检查是否使用备用模式
@@ -2095,7 +2108,7 @@ header:
                             self._log("🎯 智能选择Google TTS（高质量）")
                     
                     self._log(f"🔄 步骤4/4: 开始音频生成（使用{tts_engine}引擎，可能需要1-2分钟）...", "info", True)
-                    if self.generate_local_audio(script, audio_path, tts_engine):
+                    if self.generate_local_audio(script, audio_path, tts_engine, dual_speaker=True, target_language=target_language):
                         self._log(f"✅ 本地音频生成成功: {audio_path}", "info", True)
                     else:
                         raise Exception("所有TTS引擎都不可用")
