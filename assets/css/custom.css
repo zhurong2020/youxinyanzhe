@@ -396,6 +396,74 @@ a.btn.btn--primary {
   }
 }
 
+/* YouTube响应式视频容器样式 */
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9宽高比 */
+  height: 0;
+  overflow: hidden;
+  max-width: 100%;
+  background: #000;
+  margin: 1.5em 0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 8px;
+}
+
+/* 会员内容提示样式 */
+.member-content-notice {
+  background: linear-gradient(135deg, #e3f2fd, #f1f8e9);
+  border-left: 4px solid #2196f3;
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.9em;
+}
+
+.member-content-notice code {
+  background: rgba(33, 150, 243, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+/* 优化音频播放器样式 */
+audio {
+  width: 100%;
+  margin: 1em 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* 平台标签样式 */
+.platform-tag {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+.platform-tag.youtube {
+  background: linear-gradient(135deg, #ff0000, #cc0000);
+}
+
+.platform-tag.unlisted {
+  background: linear-gradient(135deg, #ffa726, #ff9800);
+}
+
 @media (max-width: 700px) {
   .grid__wrapper {
     grid-template-columns: 1fr; /* 小屏幕显示单列 */
@@ -403,6 +471,16 @@ a.btn.btn--primary {
   
   .grid__item .archive__item-teaser {
     height: 200px; /* 单列时图片可以稍大一些 */
+  }
+  
+  /* 移动设备上的视频容器优化 */
+  .video-container {
+    margin: 1em 0;
+    border-radius: 4px;
+  }
+  
+  .video-container iframe {
+    border-radius: 4px;
   }
 }
 

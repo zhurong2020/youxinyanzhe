@@ -1522,13 +1522,13 @@ def create_export_script(config_type="default"):
             if config_type == "qwen":
                 f.write("# 设置千问3-code引擎\n")
                 f.write("export ANTHROPIC_BASE_URL='https://dashscope.aliyuncs.com/api/v2'\n")
-                f.write("export ANTHROPIC_AUTH_TOKEN='sk-258b0d7d3f39412f93b43df2e9446b43'\n")
+                f.write("export ANTHROPIC_AUTH_TOKEN='YOUR_ANTHROPIC_API_KEY_HERE'\n")
                 f.write("unset ANTHROPIC_API_KEY\n")
                 f.write("echo '✅ 已设置千问3-code引擎环境变量'\n")
             elif config_type == "kimi":
                 f.write("# 设置Kimi K2引擎\n")
                 f.write("export ANTHROPIC_BASE_URL='https://api.moonshot.ai/anthropic'\n")
-                f.write("export ANTHROPIC_AUTH_TOKEN='sk-qAvR9EygbSliadXY3OTnxPIqruyF27uPQQakXyOWVQOxH1D5'\n")
+                f.write("export ANTHROPIC_AUTH_TOKEN='YOUR_KIMI_API_KEY_HERE'\n")
                 f.write("unset ANTHROPIC_API_KEY\n")
                 f.write("echo '✅ 已设置Kimi K2引擎环境变量'\n")
             else:  # default
@@ -1661,7 +1661,7 @@ def handle_llm_engine_menu(pipeline):
         print("\n🔄 切换到千问3-code引擎...")
         try:
             # 设置千问配置
-            qwen_api_key = "sk-258b0d7d3f39412f93b43df2e9446b43"
+            qwen_api_key = os.getenv('QWEN_API_KEY', 'YOUR_QWEN_API_KEY_HERE')
             qwen_base_url = "https://dashscope.aliyuncs.com/api/v2"
             
             # 清除Claude配置（运行时）
@@ -1708,7 +1708,7 @@ def handle_llm_engine_menu(pipeline):
         print("\n🔄 切换到Kimi K2引擎...")
         try:
             # 设置Kimi K2配置
-            kimi_api_key = "sk-qAvR9EygbSliadXY3OTnxPIqruyF27uPQQakXyOWVQOxH1D5"
+            kimi_api_key = os.getenv('KIMI_API_KEY', 'YOUR_KIMI_API_KEY_HERE')
             kimi_base_url = "https://api.moonshot.ai/anthropic"
             
             # 清除其他配置（运行时）

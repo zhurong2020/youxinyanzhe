@@ -71,7 +71,7 @@ python scripts/member_management.py generate --level monthly --email user@exampl
 
 **验证访问码**：
 ```bash
-python scripts/member_management.py validate --code VIP2_20250831_A7K9
+python scripts/member_management.py validate --code VIP2_YYYYMMDD_XXXX
 ```
 
 **导出会员数据**：
@@ -95,7 +95,7 @@ python scripts/member_management.py export
 - `EXPIRY`：过期日期（YYYYMMDD）
 - `RANDOM`：4位随机字符串
 
-示例：`VIP3_20250831_B2M5`（季度会员，2025年8月31日过期）
+示例：`VIP3_YYYYMMDD_XXXX`（季度会员，指定日期过期）
 
 ## 内容创作指南
 
