@@ -104,15 +104,20 @@ class YouTubePodcastGenerator:
     
     def setup_apis(self):
         """设置API连接"""
-        # 设置Gemini API
-        if 'GEMINI_API_KEY' in self.config:
-            genai.configure(api_key=self.config['GEMINI_API_KEY'])  # type: ignore
+        # 设置Gemini API - 从环境变量或配置获取
+        import os
+        gemini_key = self.config.get('GEMINI_API_KEY') or os.getenv('GEMINI_API_KEY')
+        
+        if gemini_key:
+            genai.configure(api_key=gemini_key)  # type: ignore
             # 使用与主系统一致的模型配置（从配置文件读取）
             model_name = "gemini-2.5-flash"  # 默认模型
             self.gemini_model = genai.GenerativeModel(model_name)  # type: ignore
             self._log(f"✅ Gemini配置完成 - 模型: {model_name}", "info")
         else:
-            raise ValueError("需要GEMINI_API_KEY配置")
+            # 对于某些功能（如查看文件列表），不强制要求Gemini API
+            self._log("⚠️ 未配置GEMINI_API_KEY，AI功能将不可用", "warning")
+            self.gemini_model = None
         
         # 设置YouTube API - 支持OAuth和API Key两种认证方式
         youtube_configured = False
@@ -1594,6 +1599,64 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             self._log(f"音频视频生成失败: {e}")
             return False
     
+    def _create_audio_video_without_optimization(self, audio_path: str, thumbnail_path: str, output_path: str) -> bool:
+        """
+        将已优化的音频和缩略图合成为视频文件，不进行重复优化
+        
+        Args:
+            audio_path: 已优化的音频文件路径
+            thumbnail_path: 缩略图路径
+            output_path: 输出视频路径
+            
+        Returns:
+            是否成功生成视频
+        """
+        try:
+            # 检查文件是否存在
+            if not os.path.exists(audio_path):
+                self._log(f"音频文件不存在: {audio_path}")
+                return False
+                
+            if not os.path.exists(thumbnail_path):
+                self._log(f"缩略图不存在: {thumbnail_path}")
+                return False
+            
+            self._log("开始生成音频视频文件（使用已优化音频）")
+            
+            # 直接使用已优化的音频，不再重复优化
+            # 使用ffmpeg将音频和图片合成视频
+            ffmpeg_cmd = [
+                'ffmpeg', '-y',  # -y 覆盖输出文件
+                '-loop', '1',  # 循环图片
+                '-i', thumbnail_path,  # 输入图片
+                '-i', audio_path,  # 输入已优化的音频
+                '-c:v', 'libx264',  # 视频编码
+                '-c:a', 'copy',  # 音频直接复制，不重新编码
+                '-pix_fmt', 'yuv420p',  # 像素格式
+                '-shortest',  # 以最短的输入为准
+                output_path
+            ]
+            
+            result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True, timeout=300)
+            
+            if result.returncode == 0:
+                self._log(f"✅ 音频视频生成成功: {output_path}")
+                return True
+            else:
+                self._log(f"ffmpeg错误: {result.stderr}")
+                # 尝试备用方案 - 使用moviepy
+                return self._create_audio_video_fallback(audio_path, thumbnail_path, output_path)
+                
+        except subprocess.TimeoutExpired:
+            self._log("ffmpeg执行超时，尝试备用方案")
+            return self._create_audio_video_fallback(audio_path, thumbnail_path, output_path)
+        except FileNotFoundError:
+            self._log("ffmpeg未安装，使用备用方案")
+            return self._create_audio_video_fallback(audio_path, thumbnail_path, output_path)
+        except Exception as e:
+            self._log(f"音频视频生成失败: {e}")
+            return False
+    
     def _optimize_audio_for_video(self, audio_path: str) -> Optional[str]:
         """
         优化音频文件以减小视频大小
@@ -1711,6 +1774,730 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             self._log(f"moviepy生成失败: {e}")
             return False
     
+    def list_audio_files(self) -> List[str]:
+        """
+        列出assets/audio目录中的所有音频文件
+        
+        Returns:
+            音频文件路径列表
+        """
+        audio_dir = Path(self.audio_dir)
+        if not audio_dir.exists():
+            self._log(f"音频目录不存在: {audio_dir}")
+            return []
+        
+        # 支持的音频格式
+        audio_extensions = ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac']
+        audio_files = []
+        
+        for ext in audio_extensions:
+            audio_files.extend(audio_dir.glob(f"*{ext}"))
+        
+        # 按修改时间排序（最新的在前）
+        audio_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+        
+        return [str(f) for f in audio_files]
+    
+    def select_audio_file(self) -> Optional[str]:
+        """
+        让用户选择要上传的音频文件
+        
+        Returns:
+            选择的音频文件路径，如果取消则返回None
+        """
+        audio_files = self.list_audio_files()
+        
+        if not audio_files:
+            print("❌ 未找到任何音频文件")
+            return None
+        
+        print("\n🎵 可上传的音频文件:")
+        for i, file_path in enumerate(audio_files, 1):
+            file_obj = Path(file_path)
+            file_size = file_obj.stat().st_size / (1024 * 1024)  # MB
+            mod_time = datetime.fromtimestamp(file_obj.stat().st_mtime).strftime('%Y-%m-%d %H:%M')
+            print(f"  {i}. {file_obj.name} ({file_size:.1f}MB, {mod_time})")
+        
+        print("  0. 取消")
+        
+        try:
+            choice = input(f"\n请选择音频文件 (1-{len(audio_files)}): ").strip()
+            
+            if choice == '0':
+                return None
+            
+            idx = int(choice) - 1
+            if 0 <= idx < len(audio_files):
+                selected_file = audio_files[idx]
+                print(f"✅ 已选择: {Path(selected_file).name}")
+                return selected_file
+            else:
+                print("❌ 无效选择")
+                return None
+                
+        except (ValueError, KeyboardInterrupt):
+            print("❌ 操作取消")
+            return None
+    
+    def select_cover_image(self, audio_file_path: str) -> Optional[str]:
+        """
+        为音频文件选择或生成封面图片
+        
+        Args:
+            audio_file_path: 音频文件路径
+            
+        Returns:
+            封面图片路径，如果取消则返回None
+        """
+        print("\n🖼️ 封面图片选项:")
+        print("  1. 使用默认播客封面")
+        print("  2. 从现有图片中选择")
+        print("  3. 生成纯色背景封面")
+        print("  0. 取消")
+        
+        try:
+            choice = input("\n请选择封面类型 (1-3): ").strip()
+            
+            if choice == '0':
+                return None
+            elif choice == '1':
+                return self._create_default_cover(audio_file_path)
+            elif choice == '2':
+                return self._select_existing_image()
+            elif choice == '3':
+                return self._create_simple_cover(audio_file_path)
+            else:
+                print("❌ 无效选择，使用默认封面")
+                return self._create_default_cover(audio_file_path)
+                
+        except (ValueError, KeyboardInterrupt):
+            print("❌ 操作取消")
+            return None
+    
+    def _create_default_cover(self, audio_file_path: str) -> str:
+        """
+        创建默认播客封面
+        
+        Args:
+            audio_file_path: 音频文件路径
+            
+        Returns:
+            封面图片路径
+        """
+        try:
+            from PIL import Image, ImageDraw, ImageFont
+        except ImportError:
+            self._log("PIL未安装，使用纯色封面。请安装: pip install pillow")
+            return self._create_solid_color_cover(audio_file_path)
+        
+        audio_name = Path(audio_file_path).stem
+        cover_path = f"assets/images/posts/{datetime.now().strftime('%Y/%m')}/{audio_name}-cover.jpg"
+        
+        # 确保目录存在
+        Path(cover_path).parent.mkdir(parents=True, exist_ok=True)
+        
+        # 创建720x720的正方形封面
+        img = Image.new('RGB', (720, 720), color='#1a1a2e')
+        draw = ImageDraw.Draw(img)
+        
+        # 添加渐变背景效果
+        for y in range(720):
+            alpha = y / 720
+            color = (
+                int(26 + alpha * 20),    # R: 26 -> 46
+                int(32 + alpha * 30),    # G: 32 -> 62  
+                int(46 + alpha * 40)     # B: 46 -> 86
+            )
+            draw.line([(0, y), (720, y)], fill=color)
+        
+        # 添加文字
+        try:
+            # 尝试使用系统字体
+            font_large = ImageFont.truetype("/System/Library/Fonts/Arial.ttf", 48)
+            font_small = ImageFont.truetype("/System/Library/Fonts/Arial.ttf", 24)
+        except:
+            try:
+                font_large = ImageFont.truetype("arial.ttf", 48)
+                font_small = ImageFont.truetype("arial.ttf", 24)
+            except:
+                font_large = ImageFont.load_default()
+                font_small = ImageFont.load_default()
+        
+        # 绘制标题
+        title = "Audio Podcast"
+        subtitle = audio_name.replace('-', ' ').title()
+        
+        # 居中绘制文字
+        title_bbox = draw.textbbox((0, 0), title, font=font_large)
+        title_width = title_bbox[2] - title_bbox[0]
+        draw.text(((720 - title_width) // 2, 280), title, fill='white', font=font_large)
+        
+        subtitle_bbox = draw.textbbox((0, 0), subtitle, font=font_small)
+        subtitle_width = subtitle_bbox[2] - subtitle_bbox[0]
+        draw.text(((720 - subtitle_width) // 2, 350), subtitle, fill='#cccccc', font=font_small)
+        
+        # 保存图片
+        img.save(cover_path, 'JPEG', quality=85)
+        self._log(f"✅ 默认封面创建成功: {cover_path}")
+        
+        return cover_path
+    
+    def _create_solid_color_cover(self, audio_file_path: str) -> str:
+        """
+        创建纯色封面（PIL不可用时的备用方案）
+        
+        Args:
+            audio_file_path: 音频文件路径
+            
+        Returns:
+            封面图片路径
+        """
+        # 使用ffmpeg创建纯色封面
+        audio_name = Path(audio_file_path).stem
+        cover_path = f"assets/images/posts/{datetime.now().strftime('%Y/%m')}/{audio_name}-cover.jpg"
+        
+        Path(cover_path).parent.mkdir(parents=True, exist_ok=True)
+        
+        try:
+            ffmpeg_cmd = [
+                'ffmpeg', '-y',
+                '-f', 'lavfi',
+                '-i', 'color=c=#1a1a2e:size=720x720:d=1',
+                '-vframes', '1',
+                cover_path
+            ]
+            
+            result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True, timeout=30)
+            
+            if result.returncode == 0:
+                self._log(f"✅ 纯色封面创建成功: {cover_path}")
+                return cover_path
+            else:
+                raise Exception(f"ffmpeg失败: {result.stderr}")
+                
+        except Exception as e:
+            self._log(f"封面创建失败: {e}")
+            # 返回一个占位符路径
+            return "assets/images/header-test.jpg"
+    
+    def _select_existing_image(self) -> Optional[str]:
+        """
+        从现有图片中选择封面
+        
+        Returns:
+            选择的图片路径，如果取消则返回None
+        """
+        # 查找assets/images目录中的图片文件
+        image_extensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif']
+        image_files = []
+        
+        images_dir = Path("assets/images")
+        if images_dir.exists():
+            for ext in image_extensions:
+                image_files.extend(images_dir.rglob(f"*{ext}"))
+        
+        if not image_files:
+            print("❌ 未找到任何图片文件")
+            return None
+        
+        # 筛选最近2个月的图片（2025年7月和8月）
+        from datetime import datetime
+        current_year = datetime.now().year
+        recent_months = [7, 8]  # 7月和8月
+        
+        filtered_images = []
+        for img_path in image_files:
+            # 检查路径中是否包含2025年的7月或8月
+            path_str = str(img_path)
+            if (f"/{current_year}/07/" in path_str or f"/{current_year}/08/" in path_str or
+                f"posts/{current_year}/07/" in path_str or f"posts/{current_year}/08/" in path_str):
+                filtered_images.append(img_path)
+        
+        if not filtered_images:
+            print("❌ 未找到最近2个月的图片文件")
+            return None
+        
+        # 按修改时间排序，限制显示数量
+        filtered_images.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+        image_files = filtered_images[:30]  # 显示最新的30张图片
+        
+        print("\n🖼️ 可选择的图片文件:")
+        for i, img_path in enumerate(image_files, 1):
+            relative_path = str(img_path).replace("assets/images/", "")
+            print(f"  {i}. {relative_path}")
+        
+        print("  0. 取消")
+        
+        try:
+            choice = input(f"\n请选择图片 (1-{len(image_files)}): ").strip()
+            
+            if choice == '0':
+                return None
+            
+            idx = int(choice) - 1
+            if 0 <= idx < len(image_files):
+                selected_image = str(image_files[idx])
+                print(f"✅ 已选择: {selected_image}")
+                return selected_image
+            else:
+                print("❌ 无效选择")
+                return None
+                
+        except (ValueError, KeyboardInterrupt):
+            print("❌ 操作取消")
+            return None
+    
+    def _create_simple_cover(self, audio_file_path: str) -> str:
+        """
+        创建简单的纯色背景封面
+        
+        Args:
+            audio_file_path: 音频文件路径
+            
+        Returns:
+            封面图片路径
+        """
+        return self._create_solid_color_cover(audio_file_path)
+    
+    def upload_audio_to_youtube(self) -> Dict[str, Any]:
+        """
+        完整的音频上传YouTube流程
+        
+        Returns:
+            上传结果字典，包含状态信息和YouTube链接等信息
+        """
+        self._log("开始音频上传YouTube流程")
+        
+        # 1. 选择音频文件
+        audio_file = self.select_audio_file()
+        if not audio_file:
+            self._log("未选择音频文件，取消上传")
+            return {'success': False, 'cancelled': True, 'message': '用户取消操作'}
+        
+        # 2. 选择封面图片
+        cover_image = self.select_cover_image(audio_file)
+        if not cover_image:
+            self._log("未选择封面图片，取消上传")
+            return {'success': False, 'cancelled': True, 'message': '用户取消操作'}
+        
+        # 3. 收集上传信息
+        upload_info = self._collect_upload_info(audio_file)
+        if not upload_info:
+            self._log("未收集到上传信息，取消上传")
+            return {'success': False, 'cancelled': True, 'message': '用户取消操作'}
+        
+        try:
+            # 4. 优化音频
+            self._log("优化音频文件...")
+            print("\n🎵 正在优化音频文件...")
+            optimized_audio = self._optimize_audio_for_video(audio_file)
+            if not optimized_audio:
+                self._log("音频优化失败，使用原始音频")
+                optimized_audio = audio_file
+            
+            # 5. 生成视频文件
+            self._log("生成视频文件...")
+            print("\n🎬 正在生成视频文件...")
+            audio_name = Path(audio_file).stem
+            video_path = f".tmp/videos/{audio_name}.mp4"
+            Path(video_path).parent.mkdir(parents=True, exist_ok=True)
+            
+            success = self._create_audio_video_without_optimization(optimized_audio, cover_image, video_path)
+            if not success:
+                self._log("视频生成失败")
+                return {'success': False, 'cancelled': False, 'message': '视频生成失败'}
+            
+            # 6. 上传到YouTube
+            self._log("上传到YouTube...")
+            
+            # 构造video_info和content_guide以兼容现有上传方法
+            video_info = {
+                'title': upload_info['title'],
+                'description': upload_info['description'],
+                'id': audio_name
+            }
+            
+            content_guide = {
+                'title': upload_info['title'],
+                'excerpt': upload_info['description'],
+                'outline': [
+                    "音频内容播客",
+                    "高质量音频体验", 
+                    "便于学习和收听"
+                ],
+                'tags': ["音频播客", "学习资源", "高质量音频"],
+                'learning_tips': {
+                    'vocabulary': ["audio", "podcast", "content"],
+                    'expressions': ["high quality", "easy listening"],
+                    'cultural_context': "音频播客在全球范围内越来越受欢迎，成为获取信息和娱乐的重要方式。"
+                }
+            }
+            
+            youtube_video_id = self.upload_to_youtube(
+                video_path, video_info, content_guide, ""
+            )
+            
+            if youtube_video_id:
+                youtube_url = f"https://www.youtube.com/watch?v={youtube_video_id}"
+                self._log(f"✅ 上传成功! YouTube链接: {youtube_url}")
+                
+                # 7. 清理临时文件
+                try:
+                    Path(video_path).unlink()
+                    if optimized_audio != audio_file:
+                        Path(optimized_audio).unlink()
+                except:
+                    pass
+                
+                return {
+                    'success': True,
+                    'youtube_url': youtube_url,
+                    'youtube_video_id': youtube_video_id,
+                    'title': upload_info['title'],
+                    'description': upload_info['description'],
+                    'audio_file': audio_file,
+                    'cover_image': cover_image
+                }
+            else:
+                self._log("YouTube上传失败")
+                return {'success': False, 'cancelled': False, 'message': 'YouTube上传失败'}
+                
+        except Exception as e:
+            self._log(f"上传过程中出现错误: {e}")
+            return {'success': False, 'cancelled': False, 'message': f'上传过程中出现错误: {e}'}
+    
+    def _collect_upload_info(self, audio_file: str) -> Optional[Dict[str, str]]:
+        """
+        收集YouTube上传所需的信息
+        
+        Args:
+            audio_file: 音频文件路径
+            
+        Returns:
+            包含标题和描述的字典，取消时返回None
+        """
+        audio_name = Path(audio_file).stem
+        
+        print(f"\n📝 为音频文件 '{audio_name}' 设置YouTube上传信息:")
+        
+        # 检查并提示终端编码设置
+        import sys
+        if sys.stdout.encoding.lower() not in ['utf-8', 'utf8']:
+            print(f"⚠️  提示：当前终端编码为 {sys.stdout.encoding}，建议设置为UTF-8以获得更好的中文支持")
+            print("   可尝试运行: export LANG=zh_CN.UTF-8 或 export LC_ALL=zh_CN.UTF-8")
+        
+        try:
+            # 默认标题（基于文件名）
+            default_title = audio_name.replace('-', ' ').replace('_', ' ').title()
+            title = input(f"视频标题 (默认: {default_title}): ").strip()
+            if not title:
+                title = default_title
+            
+            # 描述
+            print("\n视频描述 (多行输入，输入空行结束):")
+            print("💡 提示：如果遇到中文删除问题，可以在外部编辑器中准备文本后粘贴")
+            description_lines = []
+            while True:
+                try:
+                    line = input()
+                    if not line:
+                        break
+                    description_lines.append(line)
+                except (UnicodeDecodeError, KeyboardInterrupt):
+                    print("\n输入中断，使用默认描述")
+                    break
+            
+            description = '\n'.join(description_lines) if description_lines else f"音频播客: {title}"
+            
+            # 确认信息
+            print(f"\n📋 上传信息确认:")
+            print(f"标题: {title}")
+            print(f"描述: {description}")
+            
+            confirm = input("\n确认上传? (y/N): ").strip().lower()
+            if confirm in ['y', 'yes']:
+                return {
+                    'title': title,
+                    'description': description
+                }
+            else:
+                print("取消上传")
+                return None
+                
+        except (KeyboardInterrupt, EOFError):
+            print("\n操作取消")
+            return None
+    
+    def integrate_youtube_link_to_post(self, upload_result: Dict[str, Any]) -> bool:
+        """
+        将YouTube链接集成到相关博文中
+        
+        Args:
+            upload_result: 上传结果字典
+            
+        Returns:
+            是否成功集成到博文
+        """
+        if not upload_result or not upload_result.get('success'):
+            return False
+        
+        # 查找可能相关的博文
+        related_posts = self._find_related_posts(upload_result['audio_file'])
+        
+        if not related_posts:
+            print("❌ 未找到相关博文")
+            return False
+        
+        print(f"\n📝 找到 {len(related_posts)} 篇草稿博文:")
+        for i, post_path in enumerate(related_posts, 1):
+            post_name = Path(post_path).stem
+            # 移除日期前缀以便显示
+            display_name = post_name[11:] if len(post_name) > 10 and post_name[10] == '-' else post_name
+            print(f"  {i}. {display_name}")
+        
+        print("  0. 取消集成")
+        
+        try:
+            choice = input(f"\n请选择要集成YouTube链接的博文 (1-{len(related_posts)}): ").strip()
+            
+            if choice == '0':
+                return False
+            
+            idx = int(choice) - 1
+            if 0 <= idx < len(related_posts):
+                selected_post = related_posts[idx]
+                return self._add_youtube_link_to_post(selected_post, upload_result)
+            else:
+                print("❌ 无效选择")
+                return False
+                
+        except (ValueError, KeyboardInterrupt):
+            print("❌ 操作取消")
+            return False
+    
+    def _find_related_posts(self, audio_file: str) -> List[str]:
+        """
+        查找与音频文件相关的博文，使用多种匹配策略
+        
+        Args:
+            audio_file: 音频文件路径
+            
+        Returns:
+            相关博文路径列表
+        """
+        audio_name = Path(audio_file).stem.lower()
+        
+        # 只查找_drafts目录中的文件（草稿）
+        search_dirs = ['_drafts']
+        all_posts = []
+        exact_matches = []
+        partial_matches = []
+        
+        for search_dir in search_dirs:
+            posts_dir = Path(search_dir)
+            if posts_dir.exists():
+                for post_file in posts_dir.glob('*.md'):
+                    post_name = post_file.stem.lower()
+                    all_posts.append((str(post_file), post_name))
+                    
+                    # 精确匹配策略
+                    if self._is_exact_match(audio_name, post_name):
+                        exact_matches.append(str(post_file))
+                    # 部分匹配策略  
+                    elif self._is_partial_match(audio_name, post_name):
+                        partial_matches.append(str(post_file))
+        
+        # 如果没有找到任何匹配，返回所有草稿博文供用户选择
+        if not exact_matches and not partial_matches:
+            print(f"🔍 音频文件名: {Path(audio_file).stem}")
+            print("💡 未找到直接匹配的博文，将显示所有草稿博文")
+            # 按修改时间排序，返回最近的20篇
+            all_posts.sort(key=lambda x: Path(x[0]).stat().st_mtime, reverse=True)
+            return [post[0] for post in all_posts[:20]]
+        
+        # 优先返回精确匹配，然后是部分匹配
+        result = exact_matches + partial_matches
+        
+        # 按修改时间排序
+        result.sort(key=lambda x: Path(x).stat().st_mtime, reverse=True)
+        
+        return result[:15]  # 限制显示最多15篇
+    
+    def _is_exact_match(self, audio_name: str, post_name: str) -> bool:
+        """
+        精确匹配策略：检查音频文件名的关键部分是否在博文名中
+        """
+        # 清理音频文件名
+        audio_clean = audio_name.replace('youtube-', '').replace('-script', '').replace('-optimized', '')
+        audio_clean = audio_clean.replace('_', '-')
+        
+        # 移除日期前缀（如果存在）
+        if len(post_name) > 10 and post_name[10] == '-':
+            post_clean = post_name[11:]
+        else:
+            post_clean = post_name
+        
+        # 检查音频文件名是否包含在博文名中，或者反之
+        return audio_clean in post_clean or post_clean in audio_clean
+    
+    def _is_partial_match(self, audio_name: str, post_name: str) -> bool:
+        """
+        部分匹配策略：检查关键词重叠度
+        """
+        # 清理和分词
+        audio_clean = audio_name.replace('youtube-', '').replace('-script', '').replace('-optimized', '')
+        audio_words = set(audio_clean.split('-'))
+        
+        # 移除日期前缀
+        if len(post_name) > 10 and post_name[10] == '-':
+            post_clean = post_name[11:]
+        else:
+            post_clean = post_name
+        
+        post_words = set(post_clean.split('-'))
+        
+        # 移除常见的停用词
+        stop_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'as', 'is', 'was', 'are', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did'}
+        audio_words = audio_words - stop_words
+        post_words = post_words - stop_words
+        
+        # 过滤掉过短的词
+        audio_words = {word for word in audio_words if len(word) > 2}
+        post_words = {word for word in post_words if len(word) > 2}
+        
+        if not audio_words or not post_words:
+            return False
+        
+        # 计算重叠度
+        common_words = audio_words.intersection(post_words)
+        overlap_ratio = len(common_words) / min(len(audio_words), len(post_words))
+        
+        # 如果重叠度超过50%，认为相关
+        return overlap_ratio >= 0.5
+    
+    def _is_related_post(self, audio_name: str, post_name: str) -> bool:
+        """
+        判断音频文件和博文是否相关
+        
+        Args:
+            audio_name: 音频文件名（小写）
+            post_name: 博文文件名（小写）
+            
+        Returns:
+            是否相关
+        """
+        # 移除常见前缀和后缀
+        audio_clean = audio_name.replace('youtube-', '').replace('-script', '').replace('-optimized', '')
+        post_clean = post_name
+        
+        # 如果移除日期前缀
+        if len(post_clean) > 10 and post_clean[10] == '-':
+            post_clean = post_clean[11:]
+        
+        # 分割为单词
+        audio_words = set(audio_clean.split('-'))
+        post_words = set(post_clean.split('-'))
+        
+        # 计算交集
+        common_words = audio_words.intersection(post_words)
+        
+        # 如果有3个或以上公共单词，或公共单词占比超过50%，认为相关
+        if len(common_words) >= 3:
+            return True
+        
+        if len(audio_words) > 0:
+            overlap_ratio = len(common_words) / len(audio_words)
+            if overlap_ratio >= 0.5:
+                return True
+        
+        return False
+    
+    def _add_youtube_link_to_post(self, post_path: str, upload_result: Dict[str, Any]) -> bool:
+        """
+        将YouTube链接添加到博文中
+        
+        Args:
+            post_path: 博文文件路径
+            upload_result: 上传结果字典
+            
+        Returns:
+            是否成功添加
+        """
+        try:
+            import frontmatter
+            
+            with open(post_path, 'r', encoding='utf-8') as f:
+                post = frontmatter.load(f)
+            
+            content = post.content
+            youtube_url = upload_result['youtube_url']
+            title = upload_result['title']
+            
+            # 检查是否已经包含此YouTube链接，避免重复添加
+            if youtube_url in content:
+                self._log(f"⚠️ YouTube链接已存在于博文中: {Path(post_path).name}")
+                print(f"⚠️ YouTube链接已存在于博文中，跳过添加")
+                return True
+            
+            # 构造YouTube播客区块
+            youtube_section = f"""
+## 🎧 播客收听 (YouTube版)
+
+<iframe width='560' height='315' src='https://www.youtube.com/embed/{upload_result['youtube_video_id']}' frameborder='0' allowfullscreen></iframe>
+
+**标题**: [{title}]({youtube_url})  
+**平台**: YouTube | **类型**: 音频播客
+"""
+            
+            # 总是追加到文末
+            post.content = content + '\n' + youtube_section
+            
+            # 保存修改后的文件
+            # 使用frontmatter.dumps()生成字符串，然后写入文件
+            content_str = frontmatter.dumps(post, default_flow_style=False, allow_unicode=True)
+            with open(post_path, 'w', encoding='utf-8') as f:
+                f.write(content_str)
+            
+            self._log(f"✅ YouTube链接已添加到博文: {Path(post_path).name}")
+            print(f"✅ YouTube链接已集成到博文: {Path(post_path).name}")
+            
+            return True
+            
+        except Exception as e:
+            self._log(f"添加YouTube链接到博文失败: {e}")
+            print(f"❌ 集成失败: {e}")
+            return False
+    
+    def _find_insert_position(self, content: str) -> int:
+        """
+        在博文内容中找到合适的插入位置
+        
+        Args:
+            content: 博文内容
+            
+        Returns:
+            插入位置的行号，-1表示添加到末尾
+        """
+        lines = content.split('\n')
+        
+        # 查找已有的播客部分
+        for i, line in enumerate(lines):
+            if '🎧' in line or '播客' in line or 'podcast' in line.lower():
+                # 在现有播客部分之后插入
+                return i + 1
+        
+        # 查找"更多"标记之后
+        for i, line in enumerate(lines):
+            if '<!-- more -->' in line:
+                return i + 2
+        
+        # 默认添加到第一个二级标题之前
+        for i, line in enumerate(lines):
+            if line.startswith('## ') and i > 0:
+                return i
+        
+        return -1
+
     def check_elevenlabs_quota(self):
         """
         检查ElevenLabs API配额状态
@@ -1869,13 +2656,26 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             response = None
             retry_count = 0
             max_retries = 3
+            last_progress = 0
+            
+            print("\n📤 开始上传到YouTube...")
+            print("上传进度:")
             
             while response is None and retry_count < max_retries:
                 try:
-                    self._log(f"尝试上传 (第{retry_count + 1}次/共{max_retries}次)...")
+                    if retry_count > 0:
+                        self._log(f"尝试上传 (第{retry_count + 1}次/共{max_retries}次)...")
                     status, response = request.next_chunk()
                     if status:
-                        self._log(f"上传进度: {int(status.progress() * 100)}%")
+                        progress = int(status.progress() * 100)
+                        if progress > last_progress:
+                            # 显示简单的进度条
+                            bar_length = 30
+                            filled_length = int(bar_length * progress // 100)
+                            bar = '█' * filled_length + '░' * (bar_length - filled_length)
+                            print(f"\r[{bar}] {progress}% ", end='', flush=True)
+                            last_progress = progress
+                        self._log(f"上传进度: {progress}%")
                     
                 except Exception as upload_error:
                     retry_count += 1
@@ -1887,6 +2687,11 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
                         time.sleep(2 ** retry_count)  # 指数退避
             
             if response and isinstance(response, dict) and 'id' in response:
+                # 确保进度条显示100%
+                bar_length = 30
+                filled_bar = '█' * bar_length
+                print(f"\r[{filled_bar}] 100% ")  # 强制显示100%
+                print(f"✅ 上传完成！")  # 完成进度条显示
                 video_id = response['id']
                 youtube_link = f"https://www.youtube.com/watch?v={video_id}"
                 self._log(f"✅ YouTube上传成功: {youtube_link}")
