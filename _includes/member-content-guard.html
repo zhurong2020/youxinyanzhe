@@ -1,0 +1,72 @@
+{% comment %}
+会员内容访问控制
+使用方法: {% include member-content-guard.html tier="monthly" %}
+{% endcomment %}
+
+{% if page.member_tier and page.member_tier != 'free' %}
+<div class="member-content-guard" data-tier="{{ page.member_tier }}">
+  <div class="notice--warning">
+    <h4><i class="fas fa-lock"></i> 会员专享内容</h4>
+    <p>此内容需要 
+      {% case page.member_tier %}
+        {% when 'experience' %}体验会员 (VIP1)
+        {% when 'monthly' %}月度会员 (VIP2) 
+        {% when 'quarterly' %}季度会员 (VIP3)
+        {% when 'yearly' %}年度会员 (VIP4)
+      {% endcase %}
+      及以上权限才能查看。
+    </p>
+    {% unless page.layout contains 'members' %}
+    <p>
+      <a href="{{ '/members/' | relative_url }}" class="btn btn--primary">
+        <i class="fas fa-key"></i> 前往会员专区
+      </a>
+      <a href="{{ '/member-signup/' | relative_url }}" class="btn btn--info">
+        <i class="fas fa-user-plus"></i> 加入会员
+      </a>
+    </p>
+    {% endunless %}
+  </div>
+</div>
+
+<script>
+// 检查会员访问权限
+(function() {
+  const pageRequiredTier = '{{ page.member_tier }}';
+  const memberLevel = localStorage.getItem('memberLevel');
+  const memberExpiry = localStorage.getItem('memberExpiry');
+  
+  // 会员等级权重映射
+  const tierWeight = {
+    'experience': 1,
+    'monthly': 2,
+    'quarterly': 3,
+    'yearly': 4
+  };
+  
+  // 检查是否有效会员
+  if (memberLevel && memberExpiry) {
+    const expiryDate = new Date(memberExpiry);
+    const now = new Date();
+    
+    if (expiryDate > now) {
+      // 检查等级权限
+      const userWeight = tierWeight[memberLevel] || 0;
+      const requiredWeight = tierWeight[pageRequiredTier] || 0;
+      
+      if (userWeight >= requiredWeight) {
+        // 权限足够，隐藏限制提示
+        document.querySelector('.member-content-guard').style.display = 'none';
+        return;
+      }
+    }
+  }
+  
+  // 权限不足，显示限制提示
+  const memberGuard = document.querySelector('.member-content-guard');
+  if (memberGuard) {
+    memberGuard.style.display = 'block';
+  }
+})();
+</script>
+{% endif %}

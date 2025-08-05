@@ -9,12 +9,12 @@ header:
 ---
 
 ## 📺 原始视频
-**YouTube链接**: [Russiagate looks like a ‘broad criminal conspiracy': Gregg Jarrett](https://www.youtube.com/watch?v=_NNRLJJxrLY)  
-**时长**: 8分钟13秒 | **难度**: 中级 | **频道**: Fox News
+**Fox News的YouTube链接**: [Russiagate looks like a ‘broad criminal conspiracy': Gregg Jarrett](https://www.youtube.com/watch?v=_NNRLJJxrLY)  
+**时长**: 8分钟12秒 | **难度**: 中级 | **频道**: Fox News
 
 <!-- more -->
 
-## 🎧 中文播客导读
+## 🎧 AI导读(英文)
 <!-- YouTube播客优先显示 -->
 <iframe width='560' height='315' src='https://www.youtube.com/embed/bnWqPwv-6Q4' frameborder='0' allowfullscreen></iframe>
 

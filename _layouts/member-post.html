@@ -1,0 +1,67 @@
+---
+layout: single
+---
+
+{% comment %}
+会员文章布局 - 继承自single布局，添加会员权限控制
+{% endcomment %}
+
+{% if page.member_tier and page.member_tier != 'free' %}
+  {% include member-content-guard.html %}
+  
+  <div id="member-restricted-content" style="display: none;">
+    {{ content }}
+  </div>
+  
+  <script>
+  // 会员内容显示控制
+  (function() {
+    const pageRequiredTier = '{{ page.member_tier }}';
+    const memberLevel = localStorage.getItem('memberLevel');
+    const memberExpiry = localStorage.getItem('memberExpiry');
+    
+    // 会员等级权重映射
+    const tierWeight = {
+      'experience': 1,
+      'monthly': 2,
+      'quarterly': 3,
+      'yearly': 4
+    };
+    
+    // 检查是否有效会员
+    let hasAccess = false;
+    if (memberLevel && memberExpiry) {
+      const expiryDate = new Date(memberExpiry);
+      const now = new Date();
+      
+      if (expiryDate > now) {
+        // 检查等级权限
+        const userWeight = tierWeight[memberLevel] || 0;
+        const requiredWeight = tierWeight[pageRequiredTier] || 0;
+        
+        if (userWeight >= requiredWeight) {
+          hasAccess = true;
+        }
+      }
+    }
+    
+    if (hasAccess) {
+      // 有权限：隐藏限制提示，显示内容
+      const guard = document.querySelector('.member-content-guard');
+      const content = document.getElementById('member-restricted-content');
+      
+      if (guard) guard.style.display = 'none';
+      if (content) content.style.display = 'block';
+    } else {
+      // 无权限：显示限制提示，隐藏内容
+      const guard = document.querySelector('.member-content-guard');
+      const content = document.getElementById('member-restricted-content');
+      
+      if (guard) guard.style.display = 'block';
+      if (content) content.style.display = 'none';
+    }
+  })();
+  </script>
+{% else %}
+  {{ content }}
+{% endif %}

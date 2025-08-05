@@ -203,9 +203,16 @@ def main():
     enable_monetization = pipeline.ask_monetization_preference()
     pipeline.log(f"内容变现功能: {'启用' if enable_monetization else '跳过'}", level="info", force=True)
     
+    # 选择会员分级
+    member_tier = pipeline.select_member_tier()
+    if member_tier:
+        pipeline.log(f"会员分级: {member_tier}", level="info", force=True)
+    else:
+        pipeline.log("跳过会员分级设置", level="info", force=True)
+    
     # 处理并发布
     pipeline.log(f"开始发布处理 - 文章: {draft.name}, 平台: {', '.join(platforms)}", level="info", force=True)
-    result = pipeline.process_draft(draft, platforms, enable_monetization=enable_monetization)
+    result = pipeline.process_draft(draft, platforms, enable_monetization=enable_monetization, member_tier=member_tier)
     
     # 处理返回结果（兼容旧的布尔值和新的字典格式）
     if isinstance(result, bool):
