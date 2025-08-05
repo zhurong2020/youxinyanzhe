@@ -22,7 +22,10 @@ def complete_oauth_with_code(auth_code):
         from googleapiclient.discovery import build
         
         # 权限范围
-        SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
+        SCOPES = [
+            'https://www.googleapis.com/auth/youtube.readonly',
+            'https://www.googleapis.com/auth/youtube.upload'
+        ]
         
         credentials_file = project_root / "config" / "youtube_oauth_credentials.json"
         token_file = project_root / "config" / "youtube_oauth_token.json"
@@ -36,7 +39,7 @@ def complete_oauth_with_code(auth_code):
             str(credentials_file), SCOPES
         )
         
-        # 设置redirect_uri为localhost:8080（匹配你的URL）
+        # 设置redirect_uri为localhost:8080（匹配Google Cloud Console配置）
         flow.redirect_uri = 'http://localhost:8080/'
         
         print(f"✅ 使用授权码: {auth_code[:20]}...")
