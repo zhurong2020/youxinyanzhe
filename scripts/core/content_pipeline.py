@@ -840,24 +840,44 @@ class ContentPipeline:
                     self.log(f"已更新发布状态: {successful_platforms}", level="info", force=True)
                     progress.update(task, completed=True)
                 
-                # 7. 归档草稿（仅当首次发布且全部成功时）
-                published_platforms = self.status_manager.get_published_platforms(draft_path.stem)
-                all_enabled_platforms = [name for name, config in self.config["platforms"].items() 
-                                        if config.get("enabled", False)]
-                
-                # 如果已在所有启用平台发布，则归档草稿
+                # 7. 归档草稿处理
                 archived_file_path = None
-                if set(published_platforms) >= set(all_enabled_platforms):
-                    task = progress.add_task("📦 归档草稿...", total=None)
-                    archived_file_path = self._archive_draft(draft_path)
-                    progress.update(task, completed=True)
-                elif not all_success:
-                    self.log("⚠️ 处理未完全成功，跳过归档步骤", level="warning", force=True)
+                published_platforms = self.status_manager.get_published_platforms(draft_path.stem)
+                
+                if all_success:
+                    # 如果本次发布的所有平台都成功，询问是否归档
+                    self.log(f"📋 本次发布成功的平台: {', '.join(successful_platforms)}", level="info", force=True)
+                    
+                    # 检查这是否是首次发布（即之前没有发布过任何平台）
+                    previous_platforms = set(published_platforms) - set(successful_platforms)
+                    is_first_time = len(previous_platforms) == 0
+                    
+                    if is_first_time:
+                        # 首次发布，询问是否归档
+                        archive_choice = input(f"\n✅ 首次发布成功！是否将草稿归档到 archived/ 目录？(Y/n): ").strip().lower()
+                        if archive_choice in ['', 'y', 'yes']:
+                            task = progress.add_task("📦 归档草稿...", total=None)
+                            archived_file_path = self._archive_draft(draft_path)
+                            progress.update(task, completed=True)
+                            self.log("✅ 草稿已归档", level="info", force=True)
+                        else:
+                            self.log("📄 草稿保留在 drafts/ 目录，可继续发布到其他平台", level="info", force=True)
+                    else:
+                        # 非首次发布，检查是否已在所有启用平台发布
+                        all_enabled_platforms = [name for name, config in self.config["platforms"].items() 
+                                               if config.get("enabled", False)]
+                        if set(published_platforms) >= set(all_enabled_platforms):
+                            # 已在所有启用平台发布，自动归档
+                            task = progress.add_task("📦 归档草稿...", total=None)
+                            archived_file_path = self._archive_draft(draft_path)
+                            progress.update(task, completed=True)
+                            self.log("✅ 已在所有启用平台发布，草稿已自动归档", level="info", force=True)
+                        else:
+                            unpublished_platforms = set(all_enabled_platforms) - set(published_platforms)
+                            self.log(f"💾 已发布到: {', '.join(published_platforms)}", level="info", force=True)
+                            self.log(f"📋 未发布平台: {', '.join(unpublished_platforms)} (可稍后发布)", level="info", force=True)
                 else:
-                    # 计算未发布的平台
-                    unpublished_platforms = set(all_enabled_platforms) - set(published_platforms)
-                    self.log(f"💾 已发布到: {', '.join(published_platforms) if published_platforms else '无'}", level="info", force=True)
-                    self.log(f"📋 未发布平台: {', '.join(unpublished_platforms)} (可稍后发布)", level="info", force=True)
+                    self.log("⚠️ 部分发布失败，跳过归档步骤", level="warning", force=True)
                 
             # 内容变现处理
             monetization_result = None
