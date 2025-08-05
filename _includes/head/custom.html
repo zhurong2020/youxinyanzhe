@@ -2,13 +2,105 @@
 
 <!-- insert favicons. use https://realfavicongenerator.net/ -->
 
+<!-- Google Analytics 4 -->
+{% if site.google_analytics_id %}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics_id }}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  
+  gtag('config', '{{ site.google_analytics_id }}', {
+    // 隐私友好设置
+    'anonymize_ip': true,
+    'allow_google_signals': false,
+    'allow_ad_personalization_signals': false
+  });
+  
+  // 自定义会员级别跟踪
+  function trackMemberAccess(memberLevel, accessMethod = 'manual') {
+    gtag('event', 'member_access', {
+      'custom_parameter_1': memberLevel,
+      'custom_parameter_2': accessMethod,
+      'event_category': 'membership',
+      'event_label': memberLevel
+    });
+    
+    // 设置用户属性
+    gtag('config', '{{ site.google_analytics_id }}', {
+      'custom_map': {
+        'custom_parameter_1': 'member_level',
+        'custom_parameter_2': 'access_method'
+      }
+    });
+  }
+  
+  // 音频平台切换跟踪
+  function trackPlatformSwitch(platform, userRegion) {
+    gtag('event', 'platform_switch', {
+      'platform': platform,
+      'user_region': userRegion,
+      'event_category': 'audio_platform',
+      'event_label': platform + '_' + userRegion
+    });
+  }
+  
+  // 内容交互跟踪
+  function trackContentInteraction(action, content_type, content_id = '') {
+    gtag('event', action, {
+      'content_type': content_type,
+      'content_id': content_id,
+      'event_category': 'content_interaction'
+    });
+  }
+  
+  // 暴露到全局，供其他脚本使用
+  window.analytics = {
+    trackMemberAccess: trackMemberAccess,
+    trackPlatformSwitch: trackPlatformSwitch,
+    trackContentInteraction: trackContentInteraction
+  };
+</script>
+{% endif %}
+
 <!-- Load custom CSS -->
 <link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}">
 
 <!-- Custom CSS -->
 <link rel="stylesheet" href="{{ '/assets/css/subscription.css' | relative_url }}">
 
+<!-- Audio Platform Selector CSS -->
+<link rel="stylesheet" href="{{ '/assets/css/audio-platform-selector.css' | relative_url }}">
+
 <!-- Custom JavaScript -->
 <script src="{{ '/assets/js/subscription.js' | relative_url }}" defer></script>
+
+<!-- Audio Platform Selector JavaScript -->
+<script src="{{ '/assets/js/audio-platform-selector.js' | relative_url }}" defer></script>
+
+<!-- Member Analytics Integration -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // 检查用户会员状态并跟踪
+  const memberLevel = localStorage.getItem('memberLevel');
+  const memberAccess = localStorage.getItem('memberAccess');
+  
+  if (memberLevel && memberAccess === 'true' && window.analytics) {
+    // 跟踪会员访问
+    window.analytics.trackMemberAccess(memberLevel, 'localStorage');
+    
+    // 为页面添加会员级别标识（用于分析）
+    document.body.dataset.memberLevel = memberLevel;
+  }
+  
+  // 跟踪内容查看
+  if (window.analytics) {
+    const pageType = document.body.classList.contains('single') ? 'article' : 'page';
+    const contentId = window.location.pathname;
+    
+    window.analytics.trackContentInteraction('page_view', pageType, contentId);
+  }
+});
+</script>
 
 <!-- end custom head snippets --> 

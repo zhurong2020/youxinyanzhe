@@ -227,6 +227,11 @@ function verifyAccess() {
         localStorage.setItem('memberLevel', result.level);
         localStorage.setItem('memberExpiry', result.expiry);
         
+        // Google Analytics跟踪会员访问
+        if (window.analytics && window.analytics.trackMemberAccess) {
+            window.analytics.trackMemberAccess(result.level, 'verification_code');
+        }
+        
         const message = result.isAdmin ? 
             `🔧 管理员访问验证成功！有效期至 ${result.expiry}` :
             `验证成功！${result.levelName}，有效期至 ${result.expiry}`;
@@ -248,8 +253,8 @@ function verifyAccess() {
 
 function validateAccessCode(code) {
     // 支持两种格式：
-    // 1. 普通会员码：LEVEL_EXPIRY_RANDOM (如：VIP1_20250831_A7K9)
-    // 2. 管理员码：ADMIN_EXPIRY_RANDOM (如：ADMIN_20270805_F5LF2U)
+    // 1. 普通会员码：LEVEL_EXPIRY_RANDOM (如：VIP1_YYYYMMDD_XXXX)
+    // 2. 管理员码：ADMIN_EXPIRY_RANDOM (如：ADMIN_YYYYMMDD_XXXXXX)
     const parts = code.split('_');
     
     if (parts.length !== 3) {

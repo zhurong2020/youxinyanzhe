@@ -107,10 +107,13 @@ social:
 
 # Analytics
 analytics:
-  provider               : "google-gtag" # false (default), "google", "google-universal", "google-gtag", "custom"
+  provider               : false # 禁用主题默认Analytics，使用自定义实现
   google:
     tracking_id          : "G-7Z6WD0Y1VP"
     anonymize_ip         : true # true, false (default)
+
+# 自定义Google Analytics配置（支持会员级别跟踪）
+google_analytics_id      : "G-7Z6WD0Y1VP"  # 用于自定义Analytics实现
 
 
 # Site Author

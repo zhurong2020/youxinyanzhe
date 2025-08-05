@@ -1,0 +1,298 @@
+/* 音频平台选择器样式 */
+
+.audio-platform-selector {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5em;
+    margin: 2em 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+}
+
+/* 地区指示器 */
+.platform-indicator {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5em;
+    padding: 0.8em 1em;
+    background: linear-gradient(135deg, #e3f2fd, #f1f8e9);
+    border-left: 4px solid #2196f3;
+    border-radius: 8px;
+    font-size: 0.9em;
+}
+
+.region-indicator {
+    color: #1976d2;
+    font-weight: 600;
+}
+
+.recommended-label {
+    color: #388e3c;
+    font-weight: 600;
+    font-size: 0.85em;
+}
+
+/* 平台标签页 */
+.platform-tabs {
+    display: flex;
+    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 1.5em;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.platform-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.platform-tab {
+    padding: 0.8em 1.5em;
+    border: none;
+    background: transparent;
+    color: #6c757d;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    font-size: 0.9em;
+}
+
+.platform-tab:hover {
+    color: #495057;
+    background: rgba(0,0,0,0.03);
+}
+
+.platform-tab.active {
+    color: #2196f3;
+    border-bottom-color: #2196f3;
+    background: rgba(33, 150, 243, 0.05);
+}
+
+/* 平台内容区域 */
+.platform-content {
+    position: relative;
+    min-height: 300px;
+}
+
+.platform-player {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.platform-player.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 平台不可用状态 */
+.platform-unavailable {
+    text-align: center;
+    padding: 3em 1em;
+    color: #6c757d;
+    font-style: italic;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+}
+
+.platform-error {
+    text-align: center;
+    padding: 2em 1em;
+    color: #dc3545;
+    background: #fff5f5;
+    border: 1px solid #fed7d7;
+    border-radius: 8px;
+}
+
+/* 喜马拉雅播放器样式 */
+.ximalaya-player {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 1em;
+}
+
+.ximalaya-player iframe {
+    width: 100%;
+    height: 200px;
+    border: none;
+}
+
+/* 页脚信息 */
+.platform-footer {
+    margin-top: 1.5em;
+    padding-top: 1em;
+    border-top: 1px solid #dee2e6;
+    text-align: center;
+}
+
+.platform-footer small {
+    color: #6c757d;
+    font-size: 0.8em;
+}
+
+/* 平台链接样式 */
+.platform-player p {
+    margin: 0.8em 0;
+    font-size: 0.9em;
+}
+
+.platform-player a {
+    color: #2196f3;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.platform-player a:hover {
+    text-decoration: underline;
+}
+
+/* 音频播放器优化 */
+.platform-player audio {
+    width: 100%;
+    margin: 1em 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background: #fff;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .audio-platform-selector {
+        padding: 1em;
+        margin: 1em 0;
+    }
+    
+    .platform-indicator {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5em;
+    }
+    
+    .platform-tabs {
+        margin-bottom: 1em;
+    }
+    
+    .platform-tab {
+        padding: 0.6em 1em;
+        font-size: 0.85em;
+    }
+    
+    .platform-content {
+        min-height: 250px;
+    }
+    
+    .ximalaya-player iframe {
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .platform-indicator {
+        font-size: 0.8em;
+    }
+    
+    .region-indicator,
+    .recommended-label {
+        font-size: 0.8em;
+    }
+    
+    .platform-tab {
+        padding: 0.5em 0.8em;
+        font-size: 0.8em;
+    }
+}
+
+/* 加载状态 */
+.platform-loading {
+    text-align: center;
+    padding: 2em;
+    color: #6c757d;
+}
+
+.platform-loading::after {
+    content: "...";
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0%, 33% { content: "."; }
+    34%, 66% { content: ".."; }
+    67%, 100% { content: "..."; }
+}
+
+/* 地区检测失败提示 */
+.region-detection-failed {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 0.8em 1em;
+    border-radius: 6px;
+    margin-bottom: 1em;
+    font-size: 0.9em;
+}
+
+/* 成功检测提示 */
+.region-detection-success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 0.8em 1em;
+    border-radius: 6px;
+    margin-bottom: 1em;
+    font-size: 0.9em;
+}
+
+/* 平台优势标签 */
+.platform-advantage {
+    display: inline-block;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7em;
+    font-weight: bold;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.platform-advantage.recommended {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.platform-advantage.fallback {
+    background: linear-gradient(135deg, #6c757d, #495057);
+}
+
+/* 平台状态指示器 */
+.platform-status {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #28a745;
+}
+
+.platform-status.loading {
+    background: #ffc107;
+    animation: pulse 1s infinite;
+}
+
+.platform-status.error {
+    background: #dc3545;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}

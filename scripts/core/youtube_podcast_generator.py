@@ -2439,14 +2439,22 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
                 print(f"⚠️ YouTube链接已存在于博文中，跳过添加")
                 return True
             
-            # 构造YouTube播客区块
+            # 构造YouTube播客区块（响应式iframe）
             youtube_section = f"""
 ## 🎧 播客收听 (YouTube版)
 
-<iframe width='560' height='315' src='https://www.youtube.com/embed/{upload_result['youtube_video_id']}' frameborder='0' allowfullscreen></iframe>
+<div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000;">
+  <iframe src='https://www.youtube.com/embed/{upload_result['youtube_video_id']}?rel=0&showinfo=0&color=white&iv_load_policy=3' 
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+          frameborder='0' 
+          allowfullscreen>
+  </iframe>
+</div>
 
 **标题**: [{title}]({youtube_url})  
-**平台**: YouTube | **类型**: 音频播客
+**平台**: YouTube | **类型**: 音频播客 | **隐私**: 仅限会员链接访问
+
+> 💡 **提示**: 此视频设为"非公开"状态，只有通过本站链接才能访问，保护会员专享内容。
 """
             
             # 总是追加到文末
@@ -2627,7 +2635,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
                     'defaultAudioLanguage': 'zh-CN'
                 },
                 'status': {
-                    'privacyStatus': 'public',  # 或者使用 'unlisted' 进行测试
+                    'privacyStatus': 'unlisted',  # 设为unlisted保护会员内容，只有知道链接的人才能访问
                     'selfDeclaredMadeForKids': False
                 }
             }
@@ -2778,7 +2786,13 @@ header:
 
 ## 🎧 中文播客导读
 {f'''<!-- YouTube播客优先显示 -->
-{f"<iframe width='560' height='315' src='https://www.youtube.com/embed/{youtube_video_id}' frameborder='0' allowfullscreen></iframe>" if youtube_video_id else ""}
+{f"""<div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000;">
+  <iframe src='https://www.youtube.com/embed/{youtube_video_id}?rel=0&showinfo=0&color=white&iv_load_policy=3' 
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+          frameborder='0' 
+          allowfullscreen>
+  </iframe>
+</div>""" if youtube_video_id else ""}
 
 {f"🎙️ **[在YouTube上收听完整播客](https://www.youtube.com/watch?v={youtube_video_id})**" if youtube_video_id else ""}
 
@@ -2789,7 +2803,13 @@ header:
 </audio>
 
 *建议配合原视频观看，通过中文播客快速理解英文内容精华*''' if audio_relative else f'''
-{f"<iframe width='560' height='315' src='https://www.youtube.com/embed/{youtube_video_id}' frameborder='0' allowfullscreen></iframe>" if youtube_video_id else ""}
+{f"""<div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000;">
+  <iframe src='https://www.youtube.com/embed/{youtube_video_id}?rel=0&showinfo=0&color=white&iv_load_policy=3' 
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+          frameborder='0' 
+          allowfullscreen>
+  </iframe>
+</div>""" if youtube_video_id else ""}
 
 {f"🎙️ **[在YouTube上收听完整播客](https://www.youtube.com/watch?v={youtube_video_id})**" if youtube_video_id else ""}
 
