@@ -26,7 +26,10 @@ def manual_oauth_flow():
         from googleapiclient.discovery import build
         
         # 权限范围
-        SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
+        SCOPES = [
+            'https://www.googleapis.com/auth/youtube.readonly',
+            'https://www.googleapis.com/auth/youtube.upload'
+        ]
         
         credentials_file = project_root / "config" / "youtube_oauth_credentials.json"
         token_file = project_root / "config" / "youtube_oauth_token.json"
@@ -40,16 +43,22 @@ def manual_oauth_flow():
             str(credentials_file), SCOPES
         )
         
+        # 设置redirect_uri（必须匹配Google Cloud Console中的配置）
+        flow.redirect_uri = 'http://localhost:8080/'
+        
         # 生成授权URL
-        auth_url, _ = flow.authorization_url(prompt='consent')
+        auth_url, _ = flow.authorization_url(
+            prompt='consent', 
+            access_type='offline'
+        )
         
         print("\n📋 手动认证步骤:")
         print("1. 复制以下链接到浏览器:")
         print(f"\n{auth_url}\n")
         print("2. 完成Google授权")
-        print("3. 授权后，浏览器会跳转到localhost页面")
+        print("3. 授权后，浏览器会跳转到localhost:8080页面（可能显示无法访问）")
         print("4. 复制地址栏中的完整URL并粘贴到下方")
-        print("5. URL应该类似: http://localhost/?code=4/0Adeu5B...")
+        print("5. URL应该类似: http://localhost:8080/?code=4/0Adeu5B...")
         
         # 获取用户输入的回调URL
         while True:
