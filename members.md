@@ -227,7 +227,10 @@ function verifyAccess() {
         localStorage.setItem('memberLevel', result.level);
         localStorage.setItem('memberExpiry', result.expiry);
         
-        showMessage(`验证成功！${result.level}会员，有效期至 ${result.expiry}`, 'success');
+        const message = result.isAdmin ? 
+            `🔧 管理员访问验证成功！有效期至 ${result.expiry}` :
+            `验证成功！${result.levelName}，有效期至 ${result.expiry}`;
+        showMessage(message, 'success');
         
         // 显示会员内容
         setTimeout(() => {
@@ -244,8 +247,9 @@ function verifyAccess() {
 }
 
 function validateAccessCode(code) {
-    // 访问码格式：LEVEL_EXPIRY_RANDOM
-    // 示例：VIP1_20250831_A7K9
+    // 支持两种格式：
+    // 1. 普通会员码：LEVEL_EXPIRY_RANDOM (如：VIP1_20250831_A7K9)
+    // 2. 管理员码：ADMIN_EXPIRY_RANDOM (如：ADMIN_20270805_F5LF2U)
     const parts = code.split('_');
     
     if (parts.length !== 3) {
@@ -274,12 +278,24 @@ function validateAccessCode(code) {
         return { valid: false };
     }
     
-    // 验证等级代码
+    // 管理员访问码验证
+    if (levelCode === 'ADMIN') {
+        return {
+            valid: true,
+            level: 'admin',
+            levelCode: 'ADMIN',
+            levelName: '管理员',
+            expiry: expiry.toLocaleDateString('zh-CN'),
+            isAdmin: true
+        };
+    }
+    
+    // 普通会员码验证
     const levelMap = {
-        'VIP1': '体验会员',
-        'VIP2': '月度会员', 
-        'VIP3': '季度会员',
-        'VIP4': '年度会员'
+        'VIP1': { name: '体验会员', level: 'experience' },
+        'VIP2': { name: '月度会员', level: 'monthly' },
+        'VIP3': { name: '季度会员', level: 'quarterly' },
+        'VIP4': { name: '年度会员', level: 'yearly' }
     };
     
     if (!levelMap[levelCode]) {
@@ -288,9 +304,11 @@ function validateAccessCode(code) {
     
     return {
         valid: true,
-        level: levelMap[levelCode],
+        level: levelMap[levelCode].level,
+        levelName: levelMap[levelCode].name,
         levelCode: levelCode,
-        expiry: expiry.toLocaleDateString('zh-CN')
+        expiry: expiry.toLocaleDateString('zh-CN'),
+        isAdmin: false
     };
 }
 
