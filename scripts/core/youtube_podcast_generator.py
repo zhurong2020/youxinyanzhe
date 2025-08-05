@@ -240,9 +240,9 @@ class YouTubePodcastGenerator:
         """
         if self.youtube:
             try:
-                # 使用YouTube API获取详细信息
+                # 首先尝试基础权限API调用
                 request = self.youtube.videos().list(
-                    part="snippet,contentDetails,statistics",
+                    part="snippet",
                     id=video_id
                 )
                 response = request.execute()
@@ -252,10 +252,24 @@ class YouTubePodcastGenerator:
                 
                 video = response['items'][0]
                 snippet = video['snippet']
-                content_details = video['contentDetails']
                 
-                # 解析视频时长
-                duration = self.parse_duration(content_details['duration'])
+                # 尝试获取更多详细信息
+                content_details = None
+                duration = "未知时长"
+                try:
+                    # 尝试获取contentDetails（可能需要更高权限）
+                    detailed_request = self.youtube.videos().list(
+                        part="contentDetails,statistics",
+                        id=video_id
+                    )
+                    detailed_response = detailed_request.execute()
+                    if detailed_response['items']:
+                        content_details = detailed_response['items'][0].get('contentDetails')
+                        if content_details:
+                            duration = self.parse_duration(content_details['duration'])
+                except Exception as detail_error:
+                    self._log(f"⚠️ 无法获取详细信息(权限限制): {detail_error}", "warning")
+                    # 继续使用基础信息
                 
                 return {
                     'title': snippet['title'],
@@ -407,6 +421,24 @@ class YouTubePodcastGenerator:
         生成NotebookLM风格的纯对话播客脚本
         """
         self._log("开始生成NotebookLM风格播客脚本")
+        
+        # 检查是否有足够的视频信息生成有意义的播客
+        title = video_info.get('title', '')
+        description = video_info.get('description', '')
+        
+        if (not description or len(description.strip()) < 50) and ('YouTube视频' in title or not title):
+            self._log("⚠️ 视频信息不足，无法生成高质量播客", "warning")
+            self._log("💡 建议：检查YouTube API权限或使用包含详细描述的视频", "warning")
+            
+            # 返回一个通用的错误提示脚本
+            video_id = video_info.get('video_id', 'unknown')
+            return f"""[A]: 抱歉，我们无法获取到这个YouTube视频的详细信息。视频ID是 {video_id}。
+
+[B]: 是的，这可能是因为API权限限制或者视频不可访问。要生成高质量的播客内容，我们需要视频的标题、描述和其他详细信息。
+
+[A]: 建议您检查一下YouTube API的配置，或者尝试使用其他包含完整信息的视频链接。
+
+[B]: 没错，完整的视频信息可以帮助我们生成更准确、更有价值的播客内容。"""
         
         # 解析视频时长，智能调整播客长度
         duration_str = video_info.get('duration', '未知')
@@ -747,8 +779,16 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             
             # 生成每个对话片段的音频
             audio_segments = []
+            total_segments = len(dialogue_segments)
+            self._log(f"🎤 开始生成 {total_segments} 个对话片段...")
+            
             for i, (speaker, segment_text) in enumerate(dialogue_segments):
-                self._log(f"   🎤 生成对话片段 {i+1}/{len(dialogue_segments)}: {segment_text[:30]}...")
+                # 只显示关键进度点，减少日志冗余
+                if i == 0 or i == total_segments - 1 or (i + 1) % 5 == 0:
+                    progress = f"{i+1}/{total_segments}"
+                    self._log(f"   🎤 生成对话片段 {progress}: {segment_text[:30]}...")
+                elif i % 10 == 0:  # 每10个显示一次简化进度
+                    self._log(f"   📊 进度: {i+1}/{total_segments} ({(i+1)*100//total_segments}%)")
                 
                 # 根据说话者选择声音配置
                 voice_settings = self._get_speaker_settings(speaker, voice_config, language)
@@ -1285,12 +1325,13 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
                 'elevenlabs_key': clean_string(self.config.get('ELEVENLABS_API_KEY', ''))[:10] + "..."
             }
             
-            # 检查每个参数是否包含非打印字符
+            # 检查每个参数是否包含真正的控制字符（排除中文字符）
             for param_name, param_value in all_params.items():
-                if param_value and any(ord(c) < 32 or ord(c) > 126 for c in str(param_value) if c not in '一二三四五六七八九十'):
-                    self._log(f"⚠️ 参数{param_name}可能包含问题字符，长度: {len(param_value)}", "warning")
-                    # 显示前50个字符用于调试
-                    self._log(f"   内容预览: {repr(str(param_value)[:50])}", "debug")
+                if param_value:
+                    # 只检查真正的控制字符和特殊字符，排除正常的中文字符
+                    problematic_chars = [c for c in str(param_value) if ord(c) < 32 and c not in '\n\r\t']
+                    if problematic_chars:
+                        self._log(f"⚠️ 参数{param_name}包含控制字符: {[ord(c) for c in problematic_chars[:5]]}", "warning")
             
             # 额外的URL验证
             if '\\n' in repr(clean_url) or '\\r' in repr(clean_url):
