@@ -272,6 +272,7 @@ class YouTubePodcastGenerator:
                     # 继续使用基础信息
                 
                 return {
+                    'video_id': video_id,  # 确保video_id被正确传递
                     'title': snippet['title'],
                     'description': snippet['description'],
                     'channel_title': snippet['channelTitle'],
@@ -298,6 +299,7 @@ class YouTubePodcastGenerator:
             基础视频信息
         """
         return {
+            'video_id': video_id,  # 确保video_id被正确传递
             'title': f"YouTube视频 {video_id}",
             'description': "",
             'channel_title': "Unknown",
@@ -1351,16 +1353,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
                     self._log(f"⚠️ 参数{param_name}包含控制字符: {repr(param_value)}", "warning")
             
             # 修改Podcastfy参数，实现NotebookLM风格的纯对话
-            notebooklm_instructions = f"""
-            生成NotebookLM风格的纯对话播客，要求：
-            1. 绝对禁止开场白、介绍、总结、结束语
-            2. 只能是两个人的自然对话，一问一答
-            3. 像真实朋友聊天，深入讨论视频内容
-            4. 不要任何"欢迎来到播客"等话语
-            5. 直接开始讨论，自然结束
-            6. 保持口语化、真实、有深度的对话风格
-            目标语言：{target_language}
-            """
+            notebooklm_instructions = f"生成NotebookLM风格的纯对话播客，要求：1. 绝对禁止开场白、介绍、总结、结束语；2. 只能是两个人的自然对话，一问一答；3. 像真实朋友聊天，深入讨论视频内容；4. 不要任何欢迎来到播客等话语；5. 直接开始讨论，自然结束；6. 保持口语化、真实、有深度的对话风格；目标语言：{target_language}"
             
             result = self.podcastfy_client.predict(
                 text_input="",
