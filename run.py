@@ -276,6 +276,13 @@ def main():
     else:
         print("⚠️ 处理结果格式异常，请检查日志")
         pipeline.log("处理结果格式异常", level="error", force=True)
+    
+    # 发布完成后，询问是否返回主菜单
+    print("\n" + "="*50)
+    pipeline.log("发布流程结束，等待用户选择", level="info", force=True)
+    input("按Enter键返回主菜单...")
+    main()  # 重新开始主循环
+    return
 
 
 def execute_script_with_logging(pipeline, script_path: Path, args: list, description: str) -> subprocess.CompletedProcess:
