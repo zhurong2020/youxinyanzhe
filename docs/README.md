@@ -1,326 +1,81 @@
-# 有心言者博客内容处理工具
-
-一个用于处理博客内容的自动化工具集,支持图片处理、内容生成和多平台发布。
-
-## 功能特性
-
-- 📝 智能内容处理
-  - 使用 Google Gemini AI 进行内容生成和优化
-  - 自动润色和格式化
-  - 支持多种内容模板和条件显示
-  - 投资理财文章自动添加风险声明
-  - **四大内容分类系统**: 🧠 认知升级、🛠️ 技术赋能、🌍 全球视野、💰 投资理财
-  - **智能文章分类**: 基于关键词和AI分析的自动分类功能
-
-- 🎬 YouTube播客生成器
-  - **英转中播客**: 将英文YouTube视频转换为中文学习播客
-  - **自动生成文章**: 创建包含播客音频的Jekyll学习文章
-  - **多语言支持**: 支持中英日韩多种语言TTS
-  - **灵活配置**: 可选择不同TTS模型和播客对话风格
-  - **学习导读**: 自动生成英语学习指南和内容大纲
-
-- 🚀 多平台发布系统
-  - **GitHub Pages**: 完整的Jekyll网站发布
-  - **WordPress**: 自动发布到WordPress站点
-  - **微信公众号**: 智能内容转换和发布管理
-    - **双模式发布**: 支持API直接发布和手动发布指导
-    - **永久素材管理**: 使用微信公众号永久素材接口
-    - **API限制管理**: 智能跟踪每日API调用量，防止超限
-    - **AI内容优化**: 两阶段处理（内容精简 + 移动端排版）
-    - **图片自动处理**: OneDrive图片自动上传到微信服务器
-    - **发布指导生成**: 自动生成详细的手动发布指南文件
-
-- 📊 发布状态管理
-  - 跟踪文章在各平台的发布状态
-  - 支持已发布文章的重新发布到其他平台
-  - 防止重复发布到同一平台
-  - 微信发布指导文件保存(`.tmp/output/wechat_guides/`)
-
-## 项目结构
-
-详细的项目结构说明请参阅 [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)
-
-```
-youxinyanzhe/
-├── 📁 scripts/             # 核心业务逻辑
-│   ├── core/              # 核心功能模块
-│   │   ├── content_pipeline.py        # 内容处理流水线
-│   │   ├── wechat_publisher.py        # 微信发布器
-│   │   └── youtube_podcast_generator.py # YouTube播客生成器
-│   ├── utils/             # 工具和辅助函数
-│   └── tools/             # 独立工具和调试脚本
-├── 📁 config/              # 配置文件
-│   ├── pipeline_config.yml     # 主配置
-│   ├── gemini_config.yml       # AI模型配置
-│   ├── platforms.yml          # 平台发布配置
-│   └── post_templates.yml     # 文章模板
-├── 📁 docs/                # 项目文档
-│   ├── setup/             # 配置指南
-│   ├── guides/            # 使用指南
-│   └── changelog/         # 变更日志
-├── 📁 tests/               # 测试套件
-├── 📁 assets/              # 静态资源
-│   ├── css/, js/          # 样式和脚本
-│   ├── images/            # 图片资源（按年月组织）
-│   └── audio/             # 音频文件
-├── 📁 _drafts/             # 文章草稿和内容管理
-│   ├── .publishing/       # 发布状态跟踪
-│   ├── archived/          # 已归档文章
-│   └── musk-empire/       # 系列文章规划
-├── 📁 _posts/              # 已发布文章
-├── 📁 _pages/              # 静态页面
-├── 📁 .build/              # 构建和运行时文件（Git忽略）
-├── 📁 .tmp/                # 临时文件和输出（Git忽略）
-│   └── output/
-│       ├── wechat_guides/  # 微信发布指导文件
-│       └── packages/       # 生成的内容包
-└── 📄 核心文件
-    ├── run.py             # 主程序入口
-    ├── CLAUDE.md          # Claude Code协作约定
-    ├── requirements.txt   # Python依赖
-    └── _config.yml        # Jekyll配置
-```
-
-## 配置说明
-
-### 核心配置文件
-- `_config.yml`: Jekyll 站点配置
-- `config/pipeline_config.yml`: 内容处理流程配置
-- `config/gemini_config.yml`: AI 内容生成配置
-- `config/post_templates.yml`: 文章模板配置(支持投资文章风险声明和四大分类系统)
-- `.env`: 环境变量(API密钥等敏感信息)
-
-### 环境变量配置 (.env)
-```bash
-# AI配置
-GEMINI_API_KEY=your_gemini_api_key
-
-# YouTube播客生成器配置（可选）
-YOUTUBE_API_KEY=your_youtube_api_key
-
-# 微信公众号配置
-WECHAT_APPID=your_wechat_appid
-WECHAT_APPSECRET=your_wechat_appsecret
-
-# WordPress配置
-WP_API_URL=your_wordpress_site/wp-json/wp/v2
-WP_USERNAME=your_wp_username
-WP_PASSWORD=your_wp_password
-
-# GitHub配置
-GITHUB_TOKEN=your_github_token
-GITHUB_USERNAME=your_username
-GITHUB_REPO=your_repo_name
-```
-
-### 微信公众号配置要求
-1. **基础配置**:
-   - 在微信公众号后台设置IP白名单
-   - 获取AppID和AppSecret
-   - 确保具有"永久素材管理"接口权限
-
-2. **发布模式选择**:
-   - **API模式**: 直接通过API保存到微信草稿箱（推荐）
-   - **指导模式**: 生成发布指导文件供手动使用
-
-3. **API限制管理**:
-   - 系统自动跟踪每日API调用量
-   - 防止超出微信API日调用限制
-   - 接近限制时自动警告
-
-## 内容处理流程
-
-### 1. 文章创建和处理
-- **新建草稿**: 在`_drafts/`目录创建文章
-- **智能分类**: 基于关键词匹配和AI分析自动分类到四大内容方向
-- **AI 润色**: 使用Gemini AI优化内容质量
-- **内容转换**: 根据目标平台自动调整格式
-- **条件显示**: 投资理财文章自动添加风险声明
-
-### 2. 多平台发布
-- **GitHub Pages**: 完整Jekyll格式，包含所有元数据和页脚
-- **微信公众号**: 
-  - **内容处理**: AI两阶段优化（内容精简 + 移动端排版）
-  - **图片处理**: OneDrive图片自动上传到微信服务器
-  - **链接处理**: 移除所有超链接，添加"阅读原文"引导
-  - **发布方式**: API直接保存草稿或生成手动发布指导
-- **WordPress**: API自动发布
-
-### 3. 发布状态管理
-- **状态跟踪**: `_drafts/.publishing/*.yml`记录各平台发布状态
-- **重新发布**: 支持已发布文章发布到其他平台
-- **防重复**: 自动过滤已发布的平台选项
-- **发布指导**: 微信版本保存到`.tmp/output/wechat_guides/`
-
-
-
-## 推荐图片尺寸
-
-为确保网站各处图片显示效果一致且美观，建议使用以下尺寸规范：
-
-1. 上方频道图片（feature_row）
-   - 尺寸：600px宽 × 400px高
-   - 格式：JPEG或WebP（质量75%）
-   - URL参数：`?format=auto&width=600&quality=75`
-   - 用途：主页上方的三个主要频道展示
-
-2. "最新文章"区块头图
-   - 尺寸：600px宽 × 350px高
-   - 格式：JPEG或WebP（质量75%）
-   - URL参数：`?format=auto&width=600&quality=75`
-   - 用途：主页"最新文章"区块的文章缩略图
-
-3. 文章内容页头图
-   - 尺寸：1200px宽 × 630px高
-   - 格式：JPEG或WebP（质量85%）
-   - URL参数：`?format=auto&width=1200&quality=85`
-   - 用途：文章页面顶部的大图
-
-4. 文章内容中的图片
-   - 尺寸：600px宽，高度自适应
-   - 格式：JPEG或WebP（质量75%）
-   - URL参数：`?format=auto&width=600&quality=75`
-   - 用途：文章正文中插入的图片
-
-> 注：使用OneDrive作为图床时，建议在上传前按照上述尺寸裁剪图片，以确保显示效果一致。
-
-## 环境准备
-
-1. 安装依赖:
-```bash
-pip install -r requirements.txt
-```
-
-2. 配置环境变量:
-```bash
-cp .env.example .env
-# 编辑 .env 文件,填入必要的 API 密钥
-```
-
-## 使用说明
-
-### 基本使用流程
-
-1. **启动内容处理流水线**:
-```bash
-python run.py
-```
-
-2. **选择操作模式**:
-   - `1`: 处理现有草稿 (新文章发布)
-   - `2`: 重新发布已发布文章 (跨平台发布)
-   - `3`: 生成测试文章
-   - `6`: YouTube播客生成器 (英文视频转中文播客)
-
-3. **选择发布平台**:
-   - 系统会自动显示可用的发布平台
-   - 已发布的平台会被自动过滤
-
-### 高级功能
-
-1. **微信公众号发布**:
-```bash
-# 确保配置了微信API和IP白名单
-python run.py
-# 选择选项1 -> 选择文章 -> 选择微信平台
-
-# API模式：直接保存到微信草稿箱
-# 系统会自动处理内容、上传图片并保存为草稿
-
-# 指导模式：生成发布指导文件
-# 查看生成的发布指导文件
-cat .tmp/output/wechat_guides/*_guide.md
-# 按照指导文件在微信后台创建文章
-```
-
-2. **查看发布状态**:
-```bash
-# 查看文章发布状态
-ls _drafts/.publishing/
-
-# 查看微信发布指导文件
-ls .tmp/output/wechat_guides/
-```
-
-3. **运行测试**:
-```bash
-# 完整测试套件
-pytest
-
-# 微信功能测试
-python tests/test_wechat_draft.py
-
-# 使用项目测试运行器
-python tests/run_tests.py
-```
-
-## 开发指南
-
-1. 代码风格
-- 使用 Python 3.8+
-- 遵循 PEP 8 规范
-- 使用类型注解
-
-2. 测试
-- 使用 pytest 进行测试
-- 运行测试前确保配置正确
-- 测试覆盖率要求 > 80%
-
-3. 配置管理
-- 敏感信息存放在 `.env`
-- 配置分模块存放在 `config/`
-- 遵循配置即代码原则
-
-## 贡献指南
-
-1. Fork 本仓库
-2. 创建特性分支
-3. 提交变更
-4. 创建 Pull Request
-
-## 许可证
-
-MIT License
-
-## 作者
-
-Rong Zhu
-
-## 致谢
-
-- [Minimal Mistakes Jekyll Theme](https://mmistakes.github.io/minimal-mistakes/)
-- [Google Gemini](https://deepmind.google/technologies/gemini/)
-
-## 最近更新
-
-### 2025-07-25: 博客分类系统重构 🎯
-- **四大内容分类**: 重构为🧠认知升级、🛠️技术赋能、🌍全球视野、💰投资理财四大核心方向
-- **主页布局优化**: 2x2响应式布局展示四大分类，完美适配宽屏和移动端
-- **分类页面系统**: 创建独立分类页面，包含详细内容方向和系列特色说明
-- **智能文章分类**: 更新自动分类算法，基于新的四分类关键词体系
-- **历史文章迁移**: 完成14篇历史文章的分类标签更新和内容对齐
-- **响应式设计**: 解决布局宽度、间距、404链接等用户体验问题
-
-### 2025-07-16: 微信发布功能重大升级 🚀
-- **双模式发布系统**: 支持API直接发布和手动发布指导两种模式
-- **永久素材管理**: 集成微信公众号永久素材管理接口
-- **智能API限制管理**: 自动跟踪每日API调用量，防止超限
-- **AI两阶段优化**: 内容精简 + 移动端排版的双重AI处理
-- **图片自动上传**: OneDrive图片自动上传到微信服务器
-- **发布状态管理**: 完整的多平台发布状态跟踪系统
-- **发布指导生成**: 自动生成详细的手动发布指南文件
-- **条件内容显示**: 投资理财文章自动添加风险声明
-
-### 历史更新
-- 2025-06-19: 增加了推荐图片尺寸规范，优化了"最新文章"区块的图片显示效果
-- 2025-03-04: 改进了 frontmatter 处理逻辑，使用 OrderedDict 确保字段顺序一致性
-- 2025-03-04: 修复了图片处理和上传流程中的问题
-- 2025-03-04: 优化了内容生成和发布流程
-
-## 路线图 🗺️
-
-- [ ] 支持更多图床服务 (Cloudflare Images, AWS S3)
-- [ ] 添加内容SEO优化建议
-- [ ] 支持批量文章操作
-- [ ] 集成更多社交媒体平台
-- [ ] 添加文章数据分析功能
+# 有心言者项目文档
+
+这是一个基于Jekyll的自动化博客发布系统，专注于多平台内容分发和会员管理。
+
+## 📖 文档导航
+
+### 核心文档
+- **[开发约定](../CLAUDE.md)** - 核心开发规范和当前工作重点
+- **[技术架构](TECHNICAL_ARCHITECTURE.md)** - 详细技术架构和关键决策
+- **[更新历史](CHANGELOG_DETAILED.md)** - 完整的功能实现历史
+
+### 专门指南
+- **[会员系统指南](member-system-guide.md)** - 多级会员验证系统使用说明
+- **[音频平台集成计划](audio-platform-integration-plan.md)** - 喜马拉雅等平台集成规划
+- **[ElevenLabs Pro指南](elevenlabs_pro_guide.md)** - 高级TTS功能使用指南
+
+### 设置指南
+- **[setup/](setup/)** - 各种功能的详细设置指南
+  - YouTube OAuth设置
+  - Gemini API配置
+  - TTS综合设置指南
+- **[guides/](guides/)** - YouTube相关完整指南
+
+### 规划文档
+- **[音频平台集成计划](audio-platform-integration-plan.md)** - 多音频平台集成规划
+- **[喜马拉雅开发要求](ximalaya-developer-requirements.md)** - 平台集成准备
+
+---
+
+## 项目特性概览
+
+### 🎥 YouTube播客生成器
+- 英转中播客: 将英文YouTube视频转换为中文学习播客
+- 多语言支持: 中英日韩四种语言TTS
+- OAuth认证: YouTube API的OAuth和API Key双重认证
+- 配额管理: ElevenLabs API配额实时监控和预警
+
+### 💰 多级会员系统
+- 四级体系: 体验、月度、季度、年度服务
+- 访问码验证: 动态会员级别内容过滤
+- 自动邮件: 会员资料和访问码自动化处理
+- 内容分层: 争议性内容仅向付费用户开放
+
+### 📤 多平台发布
+- Jekyll + GitHub Pages: 全自动化静态站点生成和部署
+- WeChat公众号: 完整的内容处理和发布指导工作流
+- 发布状态管理: YAML文件跟踪多平台发布状态
+
+### 🎧 智能音频平台
+- 地理位置检测: 基于用户位置智能推荐音频平台
+- 响应式设计: 16:9宽高比视频容器，移动端优化
+- 隐私保护: YouTube视频自动unlisted模式，会员专享
+
+### 📈 数据分析
+- Google Analytics 4: 会员级别行为跟踪
+- 平台切换监控和内容交互分析
+- 隐私友好的IP匿名化配置
+
+### 📝 内容管理
+- 四大分类体系: 认知升级、技术赋能、全球视野、投资理财
+- Gemini AI内容优化和自动分类
+- 投资文章自动添加风险声明
+
+---
+
+## 快速开始
+
+1. **环境设置**: 参考 [setup/](setup/) 目录中的相关指南
+2. **开发约定**: 阅读 [../CLAUDE.md](../CLAUDE.md) 了解核心约定
+3. **技术架构**: 查看 [TECHNICAL_ARCHITECTURE.md](TECHNICAL_ARCHITECTURE.md) 理解系统设计
+
+## 获取帮助
+
+- 🐛 **问题反馈**: [GitHub Issues](https://github.com/wuxia/youxinyanzhe/issues)
+- 📚 **功能文档**: 查看对应的专门指南
+- 🔧 **技术问题**: 参考技术架构文档
+
+---
+
+**最后更新**: 2025-08-06  
+**维护者**: 有心言者团队
