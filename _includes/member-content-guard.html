@@ -16,12 +16,28 @@
       {% endcase %}
       及以上权限才能查看。
     </p>
+    
+    <!-- 直接验证码输入区域 -->
+    <div class="inline-member-auth" style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+      <div style="display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap;">
+        <input type="text" id="quickAccessCode" placeholder="输入访问码快速解锁" 
+               maxlength="20" autocomplete="off"
+               style="flex: 1; min-width: 200px; max-width: 300px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;">
+        <button onclick="quickVerifyAccess()" 
+                style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold;">
+          <i class="fas fa-unlock"></i> 解锁内容
+        </button>
+      </div>
+      <div id="quick-auth-message" style="margin-top: 10px; text-align: center; display: none; padding: 8px; border-radius: 4px;"></div>
+    </div>
+    
     {% unless page.layout contains 'members' %}
-    <p>
-      <a href="{{ '/members/' | relative_url }}" class="btn btn--primary">
+    <p style="text-align: center; margin-top: 15px;">
+      或者：
+      <a href="{{ '/members/' | relative_url }}" class="btn btn--primary btn--small">
         <i class="fas fa-key"></i> 前往会员专区
       </a>
-      <a href="{{ '/member-signup/' | relative_url }}" class="btn btn--info">
+      <a href="{{ '/member-signup/' | relative_url }}" class="btn btn--info btn--small">
         <i class="fas fa-user-plus"></i> 加入会员
       </a>
     </p>
@@ -78,6 +94,144 @@
   }
 })();
 
+// 快速验证访问码（在文章页面直接使用）
+function quickVerifyAccess() {
+  const accessCode = document.getElementById('quickAccessCode').value.trim();
+  const messageDiv = document.getElementById('quick-auth-message');
+  
+  if (!accessCode) {
+    showQuickMessage('请输入访问码', 'error');
+    return;
+  }
+  
+  // 验证访问码格式和有效性
+  const result = validateAccessCode(accessCode);
+  
+  if (result.valid) {
+    // 保存会员状态
+    localStorage.setItem('memberAccess', 'true');
+    localStorage.setItem('memberLevel', result.level);
+    localStorage.setItem('memberExpiry', result.expiry);
+    
+    // Google Analytics跟踪会员访问
+    if (window.analytics && window.analytics.trackMemberAccess) {
+      window.analytics.trackMemberAccess(result.level, 'verification_code');
+    }
+    
+    const message = result.isAdmin ? 
+      `🔧 管理员访问验证成功！有效期至 ${result.expiry}` :
+      `✅ 验证成功！${result.levelName}，有效期至 ${result.expiry}`;
+    showQuickMessage(message, 'success');
+    
+    // 隐藏会员限制提示，显示内容
+    setTimeout(() => {
+      const memberGuard = document.querySelector('.member-content-guard');
+      const restrictedContent = document.getElementById('member-restricted-content');
+      
+      if (memberGuard) memberGuard.style.display = 'none';
+      if (restrictedContent) restrictedContent.style.display = 'block';
+      
+      // 如果是管理员，添加管理员标识
+      if (result.isAdmin) {
+        addAdminBadge();
+      }
+      
+      // 页面刷新以确保所有脚本正确执行
+      setTimeout(() => {
+        location.reload();
+      }, 1000);
+      
+    }, 1500);
+    
+  } else {
+    showQuickMessage('❌ 访问码无效或已过期，请检查后重试', 'error');
+  }
+}
+
+// 显示快速验证消息
+function showQuickMessage(message, type) {
+  const messageDiv = document.getElementById('quick-auth-message');
+  if (!messageDiv) return;
+  
+  messageDiv.style.display = 'block';
+  messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+  
+  if (type === 'success') {
+    messageDiv.style.cssText += 'background: #d4edda; color: #155724; border: 1px solid #c3e6cb;';
+  } else {
+    messageDiv.style.cssText += 'background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;';
+  }
+  
+  messageDiv.innerHTML = message;
+}
+
+// 访问码验证函数（复用会员专区的逻辑）
+function validateAccessCode(code) {
+  // 支持两种格式：
+  // 1. 普通会员码：LEVEL_EXPIRY_RANDOM (如：VIP1_YYYYMMDD_XXXX)
+  // 2. 管理员码：ADMIN_EXPIRY_RANDOM (如：ADMIN_YYYYMMDD_XXXXXX)
+  const parts = code.split('_');
+  
+  if (parts.length !== 3) {
+    return { valid: false };
+  }
+  
+  const levelCode = parts[0];
+  const expiryDate = parts[1];
+  const randomPart = parts[2];
+  
+  // 验证日期格式和是否过期
+  if (!/^\d{8}$/.test(expiryDate)) {
+    return { valid: false };
+  }
+  
+  const expiry = new Date(
+    parseInt(expiryDate.substr(0, 4)),
+    parseInt(expiryDate.substr(4, 2)) - 1,
+    parseInt(expiryDate.substr(6, 2))
+  );
+  
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  
+  if (expiry < now) {
+    return { valid: false };
+  }
+  
+  // 管理员访问码验证
+  if (levelCode === 'ADMIN') {
+    return {
+      valid: true,
+      level: 'admin',
+      levelCode: 'ADMIN',
+      levelName: '管理员',
+      expiry: expiry.toLocaleDateString('zh-CN'),
+      isAdmin: true
+    };
+  }
+  
+  // 普通会员码验证
+  const levelMap = {
+    'VIP1': { name: '体验会员', level: 'experience' },
+    'VIP2': { name: '月度会员', level: 'monthly' },
+    'VIP3': { name: '季度会员', level: 'quarterly' },
+    'VIP4': { name: '年度会员', level: 'yearly' }
+  };
+  
+  if (!levelMap[levelCode]) {
+    return { valid: false };
+  }
+  
+  return {
+    valid: true,
+    level: levelMap[levelCode].level,
+    levelName: levelMap[levelCode].name,
+    levelCode: levelCode,
+    expiry: expiry.toLocaleDateString('zh-CN'),
+    isAdmin: false
+  };
+}
+
 // 添加管理员标识
 function addAdminBadge() {
   // 避免重复添加
@@ -101,5 +255,17 @@ function addAdminBadge() {
   `;
   document.body.appendChild(badge);
 }
+
+// 支持回车键快速验证
+document.addEventListener('DOMContentLoaded', function() {
+  const quickAccessInput = document.getElementById('quickAccessCode');
+  if (quickAccessInput) {
+    quickAccessInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        quickVerifyAccess();
+      }
+    });
+  }
+});
 </script>
 {% endif %}

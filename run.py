@@ -348,9 +348,15 @@ def handle_monetization_menu(pipeline):
     print("2. 查看奖励发送状态")
     print("3. 手动发送奖励给用户")
     print("4. 运行奖励系统测试")
+    print("\n📋 会员管理系统：")
+    print("5. 生成测试访问码")
+    print("6. 验证访问码")
+    print("7. 查看会员系统统计")
+    print("8. 处理待处理注册")
+    print("9. 导出会员数据")
     print("0. 返回主菜单")
     
-    sub_choice = input("\n请输入选项 (1-4/0): ").strip()
+    sub_choice = input("\n请输入选项 (1-9/0): ").strip()
     pipeline.log(f"内容变现管理 - 用户选择: {sub_choice}", level="info", force=True)
     
     if sub_choice == "1":
@@ -444,6 +450,29 @@ def handle_monetization_menu(pipeline):
                 print(f"❌ 错误: {result.stderr}")
         except Exception as e:
             print(f"❌ 操作失败: {e}")
+    
+    elif sub_choice == "5":
+        # 生成测试访问码
+        handle_generate_access_code(pipeline)
+    
+    elif sub_choice == "6":
+        # 验证访问码
+        handle_validate_access_code(pipeline)
+    
+    elif sub_choice == "7":
+        # 查看会员系统统计
+        handle_member_stats(pipeline)
+    
+    elif sub_choice == "8":
+        # 处理待处理注册
+        handle_process_registrations(pipeline)
+    
+    elif sub_choice == "9":
+        # 导出会员数据
+        handle_export_member_data(pipeline)
+    
+    elif sub_choice != "0":
+        print("❌ 无效的选择，请重新输入")
     
     input("\n按Enter键返回主菜单...")
 
@@ -2494,6 +2523,304 @@ def handle_youtube_upload_menu(pipeline):
         print("❌ 无效的选择，请重新输入")
     
     input("\n按Enter键继续...")
+
+
+# ========================================
+# 会员管理系统处理函数
+# ========================================
+
+def handle_generate_access_code(pipeline):
+    """生成测试访问码"""
+    print("\n" + "="*40)
+    print("🔑 生成测试访问码")
+    print("="*40)
+    
+    # 导入安全会员管理器
+    try:
+        from scripts.secure_member_manager import SecureMemberManager
+        manager = SecureMemberManager()
+    except ImportError:
+        print("❌ 无法导入安全会员管理器，回退到普通管理器")
+        from scripts.member_management import MemberManager
+        manager = MemberManager()
+    
+    print("请选择会员等级:")
+    print("1. 体验会员 (VIP1) - 7天有效期")
+    print("2. 月度会员 (VIP2) - 30天有效期")
+    print("3. 季度会员 (VIP3) - 90天有效期")
+    print("4. 年度会员 (VIP4) - 365天有效期")
+    print("5. 管理员码 (ADMIN) - 自定义有效期")
+    print("0. 返回")
+    
+    choice = input("\n请输入选项 (1-5/0): ").strip()
+    
+    if choice == "0":
+        return
+    
+    level_map = {
+        '1': 'experience',
+        '2': 'monthly', 
+        '3': 'quarterly',
+        '4': 'yearly'
+    }
+    
+    if choice in level_map:
+        level = level_map[choice]
+        try:
+            if hasattr(manager, 'generate_secure_access_code'):
+                access_code = manager.generate_secure_access_code(level)
+            else:
+                access_code = manager.generate_access_code(level)
+            
+            print(f"\n✅ 生成的访问码: {access_code}")
+            print(f"📋 会员等级: {manager.member_levels[level]['name']}")
+            print(f"⏰ 有效期: {manager.member_levels[level]['days']}天")
+            
+            # 询问是否发送邮件
+            email = input("\n📧 是否发送邮件？请输入邮箱地址（回车跳过）: ").strip()
+            if email:
+                success = manager.send_access_code_email(email, access_code, level)
+                if success:
+                    print("✅ 邮件发送成功")
+                else:
+                    print("❌ 邮件发送失败")
+            
+        except Exception as e:
+            print(f"❌ 生成访问码失败: {e}")
+    
+    elif choice == "5":
+        # 管理员码
+        print("\n🔧 生成管理员访问码")
+        days = input("请输入有效期天数 (默认30): ").strip()
+        try:
+            days = int(days) if days else 30
+            from datetime import datetime, timedelta
+            expiry_date = datetime.now() + timedelta(days=days)
+            expiry_str = expiry_date.strftime('%Y%m%d')
+            
+            import random, string
+            random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+            admin_code = f"ADMIN_{expiry_str}_{random_part}"
+            
+            print(f"\n✅ 生成的管理员访问码: {admin_code}")
+            print(f"⏰ 有效期: {days}天 (至 {expiry_date.strftime('%Y-%m-%d')})")
+            print("🔧 管理员码具有最高权限，请妥善保管")
+            
+        except ValueError:
+            print("❌ 无效的天数")
+    else:
+        print("❌ 无效的选择")
+
+
+def handle_validate_access_code(pipeline):
+    """验证访问码"""
+    print("\n" + "="*40)
+    print("🔍 验证访问码")
+    print("="*40)
+    
+    code = input("请输入要验证的访问码: ").strip()
+    if not code:
+        print("❌ 访问码不能为空")
+        return
+    
+    try:
+        from scripts.secure_member_manager import SecureMemberManager
+        manager = SecureMemberManager()
+        
+        # 使用安全验证
+        if hasattr(manager, 'validate_secure_access_code'):
+            result = manager.validate_secure_access_code(code)
+        else:
+            result = manager.validate_access_code(code)
+        
+        print("\n📋 验证结果:")
+        if result['valid']:
+            print("✅ 访问码有效")
+            print(f"📊 会员等级: {result.get('level_name', result.get('level'))}")
+            if 'expiry_date' in result:
+                if hasattr(result['expiry_date'], 'strftime'):
+                    print(f"⏰ 过期日期: {result['expiry_date'].strftime('%Y-%m-%d')}")
+                else:
+                    print(f"⏰ 过期日期: {result['expiry_date']}")
+            if 'days_remaining' in result:
+                print(f"📅 剩余天数: {result['days_remaining']}天")
+            if result.get('security_check'):
+                print(f"🔒 安全检查: {result['security_check']}")
+        else:
+            print("❌ 访问码无效")
+            print(f"📋 原因: {result.get('reason', '未知原因')}")
+            
+    except ImportError:
+        print("❌ 无法导入安全会员管理器，使用普通验证")
+        try:
+            from scripts.member_management import MemberManager
+            manager = MemberManager()
+            result = manager.validate_access_code(code)
+            
+            if result['valid']:
+                print("✅ 基础格式验证通过")
+                print(f"📊 会员等级: {result.get('level_name')}")
+                print("⚠️  注意: 未进行安全验证，建议升级到安全管理器")
+            else:
+                print("❌ 访问码格式无效")
+        except Exception as e:
+            print(f"❌ 验证失败: {e}")
+    except Exception as e:
+        print(f"❌ 验证过程出错: {e}")
+
+
+def handle_member_stats(pipeline):
+    """查看会员系统统计"""
+    print("\n" + "="*40)
+    print("📊 会员系统统计")
+    print("="*40)
+    
+    try:
+        from scripts.secure_member_manager import SecureMemberManager
+        manager = SecureMemberManager()
+        
+        # 获取基础统计
+        basic_stats = manager.get_stats()
+        print("📋 基础统计:")
+        print(f"   • 总注册数: {basic_stats['total_registrations']}")
+        print(f"   • 待处理注册: {basic_stats['pending_registrations']}")
+        print(f"   • 已处理注册: {basic_stats['processed_registrations']}")
+        print(f"   • 总收入: ¥{basic_stats['total_revenue']}")
+        
+        # 获取白名单统计
+        if hasattr(manager, 'get_whitelist_stats'):
+            whitelist_stats = manager.get_whitelist_stats()
+            print("\n🔒 安全白名单统计:")
+            print(f"   • 总访问码: {whitelist_stats['total_codes']}")
+            print(f"   • 活跃访问码: {whitelist_stats['active_codes']}")
+            print(f"   • 已撤销: {whitelist_stats['revoked_codes']}")
+            print(f"   • 已过期: {whitelist_stats['expired_codes']}")
+            
+            if whitelist_stats['level_distribution']:
+                print("\n📈 等级分布:")
+                for level, count in whitelist_stats['level_distribution'].items():
+                    level_name = manager.member_levels.get(level, {}).get('name', level)
+                    print(f"   • {level_name}: {count}个")
+        
+        # 显示活跃访问码
+        if hasattr(manager, 'list_active_codes'):
+            active_codes = manager.list_active_codes()
+            if active_codes:
+                print(f"\n🔑 活跃访问码 ({len(active_codes)}个):")
+                for code_info in active_codes[:10]:  # 显示前10个
+                    level_name = manager.member_levels.get(code_info['level'], {}).get('name', code_info['level'])
+                    print(f"   • {code_info['code'][:15]}... | {level_name} | 剩余{code_info.get('days_remaining', 0)}天")
+                if len(active_codes) > 10:
+                    print(f"   ... 还有 {len(active_codes) - 10} 个访问码")
+            else:
+                print("\n🔑 当前没有活跃的访问码")
+                
+    except ImportError:
+        print("❌ 无法导入安全会员管理器，使用基础统计")
+        try:
+            from scripts.member_management import MemberManager
+            manager = MemberManager()
+            stats = manager.get_stats()
+            
+            print("📋 基础统计:")
+            print(f"   • 总注册数: {stats['total_registrations']}")
+            print(f"   • 待处理注册: {stats['pending_registrations']}")
+            print(f"   • 已处理注册: {stats['processed_registrations']}")
+            print(f"   • 总收入: ¥{stats['total_revenue']}")
+            
+        except Exception as e:
+            print(f"❌ 获取统计信息失败: {e}")
+    except Exception as e:
+        print(f"❌ 统计过程出错: {e}")
+
+
+def handle_process_registrations(pipeline):
+    """处理待处理注册"""
+    print("\n" + "="*40)
+    print("📝 处理待处理注册")
+    print("="*40)
+    
+    try:
+        from scripts.member_management import MemberManager
+        manager = MemberManager()
+        
+        pending = manager.get_pending_registrations()
+        if not pending:
+            print("📋 当前没有待处理的注册")
+            return
+        
+        print(f"📋 发现 {len(pending)} 个待处理注册:")
+        for i, reg in enumerate(pending[:5], 1):  # 显示前5个
+            print(f"   {i}. {reg['email']} | {reg['memberLevel']} | ¥{reg['paymentAmount']}")
+        
+        if len(pending) > 5:
+            print(f"   ... 还有 {len(pending) - 5} 个注册")
+        
+        print("\n处理选项:")
+        print("1. 批量处理所有注册（生成访问码并发送邮件）")
+        print("2. 批量处理但不发送邮件")
+        print("0. 返回")
+        
+        choice = input("\n请选择 (1-2/0): ").strip()
+        
+        if choice == "1":
+            print("\n🔄 开始批量处理并发送邮件...")
+            manager.batch_process_registrations(send_email=True)
+            print("✅ 批量处理完成")
+        elif choice == "2":
+            print("\n🔄 开始批量处理（不发送邮件）...")
+            manager.batch_process_registrations(send_email=False)
+            print("✅ 批量处理完成")
+            
+    except Exception as e:
+        print(f"❌ 处理注册失败: {e}")
+
+
+def handle_export_member_data(pipeline):
+    """导出会员数据"""
+    print("\n" + "="*40)
+    print("📤 导出会员数据")
+    print("="*40)
+    
+    try:
+        from scripts.member_management import MemberManager
+        manager = MemberManager()
+        
+        print("🔄 正在导出会员数据...")
+        filepath = manager.export_registrations_csv()
+        
+        if filepath:
+            print(f"✅ 数据导出成功: {filepath}")
+            
+            # 显示文件大小
+            from pathlib import Path
+            file_path = Path(filepath)
+            if file_path.exists():
+                file_size = file_path.stat().st_size
+                print(f"📋 文件大小: {file_size:,} 字节")
+                
+                # 询问是否查看文件内容摘要
+                view = input("\n是否查看导出数据摘要？(y/N): ").strip().lower()
+                if view in ['y', 'yes']:
+                    try:
+                        import csv
+                        with open(filepath, 'r', encoding='utf-8') as f:
+                            reader = csv.DictReader(f)
+                            rows = list(reader)
+                            
+                        print(f"\n📊 导出数据摘要:")
+                        print(f"   • 总记录数: {len(rows)}")
+                        if rows:
+                            print("   • 字段:")
+                            for field in rows[0].keys():
+                                print(f"     - {field}")
+                    except Exception as e:
+                        print(f"❌ 读取文件摘要失败: {e}")
+        else:
+            print("❌ 导出失败")
+            
+    except Exception as e:
+        print(f"❌ 导出过程出错: {e}")
 
 
 if __name__ == "__main__":
