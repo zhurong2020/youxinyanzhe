@@ -2573,29 +2573,42 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             return None
             
         # 检查是否使用OAuth认证（只有OAuth可以上传）
-        # 新版本Google API客户端的OAuth检查方式
+        # 优先检查是否使用API Key模式（这种情况下无法上传）
         try:
-            if hasattr(self.youtube, '_http') and hasattr(self.youtube._http, 'credentials'):
-                # 新版本API客户端
-                oauth_configured = True
-                self._log("✅ 检测到OAuth认证（新版API客户端）")
-            elif hasattr(self.youtube, '_http') and hasattr(self.youtube._http, '_credentials'):
-                # 旧版本API客户端
-                oauth_configured = True
-                self._log("✅ 检测到OAuth认证（旧版API客户端）")
-            else:
-                # 检查是否是使用developerKey构建的（API Key模式）
-                if hasattr(self.youtube, '_developerKey'):
-                    oauth_configured = False
-                    self._log("❌ 检测到API Key模式，上传需要OAuth认证")
-                else:
-                    # 无法确定认证类型，假设是OAuth
-                    oauth_configured = True
-                    self._log("⚠️ 无法确定认证类型，尝试继续上传")
-            
-            if not oauth_configured:
+            if hasattr(self.youtube, '_developerKey') and self.youtube._developerKey:
+                # 使用API Key构建的客户端，无法上传
+                oauth_configured = False
+                self._log("❌ 检测到API Key模式，上传需要OAuth认证")
                 self._log("YouTube上传需要OAuth认证，当前仅配置了API Key，无法上传")
-                self._log("请运行: python scripts/tools/youtube_oauth_setup.py 配置OAuth认证")
+                self._log("💡 请运行: python scripts/tools/youtube_oauth_setup.py 配置OAuth认证")
+                return None
+            elif hasattr(self.youtube, '_http') and hasattr(self.youtube._http, 'credentials'):
+                # 新版本OAuth API客户端 - 但需要验证credentials是否有效
+                creds = self.youtube._http.credentials
+                if creds and hasattr(creds, 'valid') and creds.valid:
+                    oauth_configured = True
+                    self._log("✅ 检测到有效的OAuth认证（新版API客户端）")
+                else:
+                    oauth_configured = False
+                    self._log("❌ OAuth认证无效或过期")
+                    self._log("💡 请运行: python scripts/tools/youtube_oauth_setup.py 重新认证")
+                    return None
+            elif hasattr(self.youtube, '_http') and hasattr(self.youtube._http, '_credentials'):
+                # 旧版本OAuth API客户端 - 但需要验证credentials是否有效  
+                creds = self.youtube._http._credentials
+                if creds and hasattr(creds, 'valid') and creds.valid:
+                    oauth_configured = True
+                    self._log("✅ 检测到有效的OAuth认证（旧版API客户端）")
+                else:
+                    oauth_configured = False
+                    self._log("❌ OAuth认证无效或过期")
+                    self._log("💡 请运行: python scripts/tools/youtube_oauth_setup.py 重新认证")
+                    return None
+            else:
+                # 无法确定认证类型
+                oauth_configured = False
+                self._log("❌ 无法检测到有效的OAuth认证")
+                self._log("💡 请运行: python scripts/tools/youtube_oauth_setup.py 配置OAuth认证")
                 return None
         except Exception as auth_check_error:
             self._log(f"OAuth认证检查出错，尝试继续上传: {auth_check_error}")
