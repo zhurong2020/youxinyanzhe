@@ -77,7 +77,7 @@ python run.py
 | | [使用示例文档](docs/audio-platform-usage-example.md) | 功能使用指南和最佳实践 |
 | | [喜马拉雅开发者认证](docs/ximalaya-developer-requirements.md) | 第三方平台集成准备 |
 | **🔒 安全与维护** | [安全配置指南](SECURITY.md) | 项目安全最佳实践 |
-| | [会员系统指南](docs/member-system-guide.md) | 会员管理和配置 |
+| | [会员系统完整指南](docs/member-system-guide.md) | 会员管理、配置和运营指南 |
 | **📋 功能指南** | [YouTube完整指南](docs/guides/YOUTUBE_COMPLETE_GUIDE.md) | YouTube功能使用说明 |
 | | [开发指南](docs/DEVELOPMENT.md) | 开发环境和贡献指南 |
 | | [项目路线图](docs/ROADMAP.md) | 功能规划和发展方向 |
