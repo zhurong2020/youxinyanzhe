@@ -133,6 +133,10 @@ class YouTubePodcastGenerator:
                     token_data = json.load(f)
                     
                 # 检查token是否有效（简单检查）
+                if token_data.get('token') == 'your-oauth-access-token-here':
+                    self._log("⚠️ OAuth token文件包含模板数据，跳过OAuth认证")
+                    raise ValueError("OAuth token is template data")
+                    
                 if 'access_token' in token_data or 'token' in token_data:
                     from google.auth.transport.requests import Request
                     from google.oauth2.credentials import Credentials
@@ -165,13 +169,25 @@ class YouTubePodcastGenerator:
         # 如果OAuth失败，尝试API Key（仅用于读取）
         if not youtube_configured:
             api_key = self.config.get('YOUTUBE_API_KEY') or os.getenv('YOUTUBE_API_KEY')
-            if api_key:
+            self._log(f"🔍 尝试使用YouTube API Key: {'有效' if api_key and api_key.strip() else '无效或为空'}")
+            
+            if api_key and api_key.strip():
                 try:
-                    self.youtube = build('youtube', 'v3', developerKey=api_key)
-                    self._log("✅ YouTube API 配置完成 (仅支持读取)")
+                    # 测试API Key是否有效
+                    test_youtube = build('youtube', 'v3', developerKey=api_key)
+                    # 进行一个简单的测试调用来验证API Key
+                    test_request = test_youtube.videos().list(part="snippet", id="dQw4w9WgXcQ", maxResults=1)
+                    test_response = test_request.execute()
+                    self._log(f"🧪 API Key测试成功，响应项数: {len(test_response.get('items', []))}")
+                    
+                    self.youtube = test_youtube
+                    self._log("✅ YouTube API Key 配置完成 (仅支持读取)")
                     youtube_configured = True
                 except Exception as e:
                     self._log(f"YouTube API Key配置失败: {e}")
+                    self._log("💡 可能的原因: API Key无效、配额不足或网络问题")
+            else:
+                self._log("❌ 未找到有效的 YOUTUBE_API_KEY")
             
         if not youtube_configured:
             self._log("⚠️ 未配置YouTube认证，将使用基础视频信息提取")
