@@ -19,20 +19,31 @@
   
   // 自定义会员级别跟踪
   function trackMemberAccess(memberLevel, accessMethod = 'manual') {
-    gtag('event', 'member_access', {
-      'custom_parameter_1': memberLevel,
-      'custom_parameter_2': accessMethod,
-      'event_category': 'membership',
-      'event_label': memberLevel
-    });
+    console.log('📊 trackMemberAccess被调用');
+    console.log('参数 - 会员级别:', memberLevel);
+    console.log('参数 - 访问方式:', accessMethod);
+    console.log('gtag函数存在:', typeof gtag !== 'undefined');
     
-    // 设置用户属性
-    gtag('config', '{{ site.google_analytics_id }}', {
-      'custom_map': {
-        'custom_parameter_1': 'member_level',
-        'custom_parameter_2': 'access_method'
-      }
-    });
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'member_access', {
+        'custom_parameter_1': memberLevel,
+        'custom_parameter_2': accessMethod,
+        'event_category': 'membership',
+        'event_label': memberLevel
+      });
+      console.log('✅ member_access事件已通过gtag发送');
+      
+      // 设置用户属性
+      gtag('config', '{{ site.google_analytics_id }}', {
+        'custom_map': {
+          'custom_parameter_1': 'member_level',
+          'custom_parameter_2': 'access_method'
+        }
+      });
+      console.log('✅ 用户属性配置已更新');
+    } else {
+      console.error('❌ gtag函数不可用，无法发送Analytics事件');
+    }
   }
   
   // 音频平台切换跟踪
@@ -60,6 +71,11 @@
     trackPlatformSwitch: trackPlatformSwitch,
     trackContentInteraction: trackContentInteraction
   };
+  
+  // 调试信息
+  console.log('🎯 Google Analytics初始化完成');
+  console.log('Analytics ID:', '{{ site.google_analytics_id }}');
+  console.log('Analytics函数已就绪:', !!window.analytics);
 </script>
 {% endif %}
 

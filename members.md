@@ -17,7 +17,7 @@ toc: false
     <h4><i class="fas fa-key"></i> 会员验证</h4>
     <p>请输入您的会员访问码以查看专享内容。如果您还不是会员，请查看下方的会员权益介绍。</p>
     <div class="member-auth-form">
-      <input type="text" id="accessCode" placeholder="请输入访问码" maxlength="20" style="padding: 10px; margin: 10px 0; width: 200px; border: 1px solid #ccc; border-radius: 4px;">
+      <input type="text" id="accessCode" placeholder="请输入访问码" maxlength="30" style="padding: 10px; margin: 10px 0; width: 250px; border: 1px solid #ccc; border-radius: 4px;">
       <button onclick="verifyAccess()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">验证访问</button>
     </div>
     <div id="auth-message" style="margin-top: 10px; padding: 10px; display: none;"></div>
@@ -228,8 +228,17 @@ function verifyAccess() {
         localStorage.setItem('memberExpiry', result.expiry);
         
         // Google Analytics跟踪会员访问
+        console.log('🔍 调试信息：准备跟踪会员访问');
+        console.log('window.analytics存在:', !!window.analytics);
+        console.log('trackMemberAccess函数存在:', !!(window.analytics && window.analytics.trackMemberAccess));
+        console.log('会员级别:', result.level);
+        
         if (window.analytics && window.analytics.trackMemberAccess) {
+            console.log('✅ 开始发送Analytics事件');
             window.analytics.trackMemberAccess(result.level, 'verification_code');
+            console.log('📊 Analytics事件已发送: member_access');
+        } else {
+            console.error('❌ Analytics未就绪，无法跟踪事件');
         }
         
         const message = result.isAdmin ? 
