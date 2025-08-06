@@ -8,12 +8,28 @@
 
 ## ✨ 核心功能
 
-- 📝 **智能内容处理** - AI驱动的内容生成与优化
-- 🚀 **多平台发布** - GitHub Pages、微信公众号、WordPress
-- 🎧 **高质量音频生成** - ElevenLabs双人对话播客，媲美NotebookLM
-- 🎬 **YouTube播客生成器** - 将英文YouTube视频转换为中文学习播客
-- 📊 **发布状态管理** - 跟踪多平台发布状态
-- 💰 **内容变现** - 集成打赏和内容付费系统
+### 🎬 智能音视频系统
+- **YouTube播客生成器** - 英文视频→中文播客→博客文章自动化流程
+- **响应式iframe嵌入** - 移动端友好的视频播放体验
+- **unlisted隐私保护** - 自动设置非公开，保护会员专享内容
+- **多平台音频支持** - 智能地区检测，国内外用户优化体验
+
+### 🚀 多平台发布系统
+- **GitHub Pages** - Jekyll静态博客，完美SEO优化
+- **微信公众号** - 智能内容适配，图片自动处理
+- **WordPress** - API自动发布，扩展兼容性
+- **音频平台准备** - 喜马拉雅等平台集成架构
+
+### 💎 会员服务体系
+- **四级递进权益** - 从入门探索到深度个性化服务
+- **内容分层保护** - 争议话题、深度分析仅向付费用户开放
+- **社区价值导向** - 志同道合用户的终身学习社群
+- **视野拓展内容** - 优质英文资源，增进全球认知
+
+### 📊 数据驱动运营
+- **Google Analytics 4** - 会员级别行为跟踪分析
+- **用户体验监控** - 平台切换、内容互动数据
+- **隐私友好配置** - IP匿名化，符合隐私保护标准
 
 ## 🚀 快速开始
 
@@ -50,20 +66,21 @@ python run.py
 
 | 文档类型 | 文档 | 描述 |
 |---------|------|------|
-| **核心文档** | [详细说明](docs/README.md) | 完整的功能介绍和使用指南 |
+| **🎯 项目总览** | [功能实施总结](docs/project-completion-summary.md) | 最新功能成果和后续规划 |
 | | [项目结构](docs/PROJECT_STRUCTURE.md) | 详细的目录结构说明 |
-| | [开发指南](docs/DEVELOPMENT.md) | 开发环境和贡献指南 |
-| **配置指南** | [Gemini配置](docs/setup/gemini_setup.md) | AI模型配置说明 |
-| | [TTS完整配置](docs/setup/tts_comprehensive_setup.md) | 语音系统完整配置指南 |
+| | [开发约定](CLAUDE.md) | 项目开发规范和约定 |
+| **🔧 配置指南** | [环境配置](.env.example) | 环境变量配置模板 |
 | | [YouTube播客设置](docs/setup/youtube_podcast_setup.md) | YouTube播客完整配置 |
-| | [YouTube OAuth设置](docs/setup/YOUTUBE_OAUTH_SETUP.md) | YouTube上传OAuth2配置 |
-| | [Google OAuth修复](docs/setup/GOOGLE_OAUTH_VERIFICATION_FIX.md) | OAuth验证问题解决方案 |
-| **功能指南** | [YouTube上传完整指南](docs/guides/YOUTUBE_COMPLETE_GUIDE.md) | YouTube上传功能完整指南 |
-| | [YouTube上传解决方案](docs/guides/YOUTUBE_SOLUTIONS.md) | 常见问题和解决方案 |
-| **系统文档** |
-| | [变现系统](docs/REWARD_SYSTEM.md) | 内容变现功能详解 |
+| | [TTS完整配置](docs/setup/tts_comprehensive_setup.md) | 语音系统完整配置指南 |
+| | [Google OAuth设置](docs/setup/YOUTUBE_OAUTH_SETUP.md) | YouTube上传OAuth2配置 |
+| **🎬 音频视频系统** | [音频平台集成规划](docs/audio-platform-integration-plan.md) | 多平台音频系统架构 |
+| | [使用示例文档](docs/audio-platform-usage-example.md) | 功能使用指南和最佳实践 |
+| | [喜马拉雅开发者认证](docs/ximalaya-developer-requirements.md) | 第三方平台集成准备 |
+| **🔒 安全与维护** | [安全配置指南](SECURITY.md) | 项目安全最佳实践 |
+| | [会员系统指南](docs/member-system-guide.md) | 会员管理和配置 |
+| **📋 功能指南** | [YouTube完整指南](docs/guides/YOUTUBE_COMPLETE_GUIDE.md) | YouTube功能使用说明 |
+| | [开发指南](docs/DEVELOPMENT.md) | 开发环境和贡献指南 |
 | | [项目路线图](docs/ROADMAP.md) | 功能规划和发展方向 |
-| | [更新日志](docs/CHANGELOG.md) | 版本更新和变更记录 |
 
 ## 🏗️ 项目结构
 

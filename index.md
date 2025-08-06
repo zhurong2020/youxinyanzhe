@@ -251,24 +251,24 @@ intro:
         <div style="margin-bottom: 1em;">
           <i class="fas fa-crown" style="font-size: 2em; color: #ffc107; margin-bottom: 0.5em;"></i>
           <h3 style="margin: 0 0 0.5em 0; color: white;">付费会员专区</h3>
-          <p style="color: rgba(255,255,255,0.9); font-size: 0.9em; margin-bottom: 1em;">Seeking Alpha精选 + 网格交易软件 + 量化策略</p>
+          <p style="color: rgba(255,255,255,0.9); font-size: 0.9em; margin-bottom: 1em;">深度分析 + 个性化服务 + 终身学习社群</p>
         </div>
         
         <!-- 会员特色亮点 -->
         <div style="background: rgba(255,255,255,0.15); padding: 0.8em; border-radius: 8px; margin-bottom: 1em; text-align: left;">
           <div style="font-size: 0.85em; line-height: 1.4;">
-            ✅ SA专家投资者报告<br>
-            ✅ 网格交易量化软件<br>
-            ✅ Python策略代码库<br>
-            ✅ 1对1投资策略咨询
+            ✅ 专业投资分析报告<br>
+            ✅ 个人投资思路分享<br>
+            ✅ 志同道合社群交流<br>
+            ✅ 争议话题视野拓展
           </div>
         </div>
         
         <!-- 价格信息 -->
         <div style="background: rgba(255,255,255,0.2); padding: 0.8em; border-radius: 8px; margin-bottom: 1em; backdrop-filter: blur(5px);">
-          <div style="font-size: 0.9em; opacity: 0.9;">起步价格</div>
-          <div style="font-size: 1.3em; font-weight: bold; margin: 0.2em 0;">¥108/月</div>
-          <div style="font-size: 0.8em; opacity: 0.8;">年度会员仅¥60/月 (44%折扣)</div>
+          <div style="font-size: 0.9em; opacity: 0.9;">体验价格</div>
+          <div style="font-size: 1.3em; font-weight: bold; margin: 0.2em 0;">¥35起</div>
+          <div style="font-size: 0.8em; opacity: 0.8;">年度会员¥720 (每月仅¥60)</div>
         </div>
         
         <a href="{{ site.baseurl }}/members/" class="btn btn--inverse" style="width: 100%; margin-bottom: 0.5em; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white;">
@@ -284,7 +284,7 @@ intro:
   <!-- 底部说明 -->
   <div style="margin-top: 2em; padding-top: 1.5em; border-top: 1px solid #dee2e6; text-align: center;">
     <p style="color: #6c757d; font-size: 0.9em; margin: 0; max-width: 800px; margin-left: auto; margin-right: auto;">
-      💡 <strong>建议</strong>：先尝试免费订阅了解内容质量，满意后再升级为付费会员获得深度资源
+      💡 <strong>价值理念</strong>：从入门探索到深度个性化服务，为志同道合的终身学习者提供递进式成长体验
     </p>
   </div>
 </div>
