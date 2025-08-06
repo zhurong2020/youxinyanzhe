@@ -190,11 +190,10 @@ def main():
         else:
             print("📋 未选择任何发布平台")
         
-        # 询问是否返回主菜单
+        # 自动返回主菜单
         pipeline.log("未选择发布平台或文章已全部发布，返回主菜单", level="info", force=True)
-        input("\n按Enter键返回主菜单...")
-        main()  # 重新开始主循环
-        return
+        print("\n✅ 自动返回主菜单...")
+        return  # 返回到主循环
     
     # 记录选择的平台
     pipeline.log(f"用户选择发布平台: {', '.join(platforms)}", level="info", force=True)
@@ -277,12 +276,11 @@ def main():
         print("⚠️ 处理结果格式异常，请检查日志")
         pipeline.log("处理结果格式异常", level="error", force=True)
     
-    # 发布完成后，询问是否返回主菜单
+    # 发布完成后，自动返回主菜单（避免交互式输入卡死）
     print("\n" + "="*50)
-    pipeline.log("发布流程结束，等待用户选择", level="info", force=True)
-    input("按Enter键返回主菜单...")
-    main()  # 重新开始主循环
-    return
+    print("✅ 发布流程完成，自动返回主菜单...")
+    pipeline.log("发布流程结束，返回主菜单", level="info", force=True)
+    return  # 返回到主循环，不递归调用main()
 
 
 def execute_script_with_logging(pipeline, script_path: Path, args: list, description: str) -> subprocess.CompletedProcess:

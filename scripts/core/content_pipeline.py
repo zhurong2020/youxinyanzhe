@@ -853,15 +853,12 @@ class ContentPipeline:
                     is_first_time = len(previous_platforms) == 0
                     
                     if is_first_time:
-                        # 首次发布，询问是否归档
-                        archive_choice = input(f"\n✅ 首次发布成功！是否将草稿归档到 archived/ 目录？(Y/n): ").strip().lower()
-                        if archive_choice in ['', 'y', 'yes']:
-                            task = progress.add_task("📦 归档草稿...", total=None)
-                            archived_file_path = self._archive_draft(draft_path)
-                            progress.update(task, completed=True)
-                            self.log("✅ 草稿已归档", level="info", force=True)
-                        else:
-                            self.log("📄 草稿保留在 drafts/ 目录，可继续发布到其他平台", level="info", force=True)
+                        # 首次发布，自动归档（避免交互式输入卡死）
+                        self.log("✅ 首次发布成功！自动归档草稿到 archived/ 目录", level="info", force=True)
+                        task = progress.add_task("📦 归档草稿...", total=None)
+                        archived_file_path = self._archive_draft(draft_path)
+                        progress.update(task, completed=True)
+                        self.log("✅ 草稿已自动归档", level="info", force=True)
                     else:
                         # 非首次发布，检查是否已在所有启用平台发布
                         all_enabled_platforms = [name for name, config in self.config["platforms"].items() 
