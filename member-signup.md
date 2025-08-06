@@ -32,10 +32,10 @@ excerpt: "完成付费后，请填写以下信息以便我们为您发放访问�
       <label for="memberLevel"><i class="fas fa-crown"></i> 选择会员等级 *</label>
       <select id="memberLevel" name="memberLevel" required>
         <option value="">请选择会员等级</option>
-        <option value="experience">体验会员 (￥35/7天) - SA报告体验</option>
-        <option value="monthly">月度会员 (￥108/30天) - SA精选+量化评级</option>
-        <option value="quarterly">季度会员 (￥288/90天) - 专家分析+组合诊断</option>
-        <option value="yearly">年度会员 (￥720/365天) - 网格软件+策略代码</option>
+        <option value="experience">体验会员 (￥35/7天) - 基础学习资源</option>
+        <option value="monthly">月度会员 (￥108/30天) - 专业分析报告</option>
+        <option value="quarterly">季度会员 (￥288/90天) - 个性化服务+社群</option>
+        <option value="yearly">年度会员 (￥720/365天) - 深度服务+咨询</option>
       </select>
     </div>
 
