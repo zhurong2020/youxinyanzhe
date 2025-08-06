@@ -1504,6 +1504,15 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
                             if ord(char) < 32 or ord(char) == 127:
                                 self._log(f"   位置{i}: {repr(char)} (ASCII {ord(char)})", "warning")
             
+            # 添加详细的进度提示
+            self._log("🚀 开始调用Podcastfy API生成播客...")
+            self._log(f"📊 预计生成{word_count}字对话内容")
+            self._log("⏳ 正在处理，可能需要1-3分钟，请耐心等待...")
+            self._log("💭 后台正在：1) 分析视频内容 2) 生成对话脚本 3) 语音合成")
+            
+            import time
+            start_time = time.time()
+            
             result = self.podcastfy_client.predict(
                 text_input="",
                 urls_input=final_params['urls_input'],
@@ -1525,10 +1534,16 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
                 api_name="/process_inputs"
             )
             
+            # 计算处理时间并添加完成提示
+            end_time = time.time()
+            processing_time = end_time - start_time
+            self._log(f"✅ Podcastfy API调用完成！处理耗时: {processing_time:.1f}秒")
+            
             # result应该包含生成的音频文件路径
             if result and len(result) > 0:
                 audio_path = result[0]  # 通常第一个元素是音频文件路径
-                self._log(f"播客生成成功: {audio_path}")
+                self._log(f"🎵 播客音频生成成功: {audio_path}")
+                self._log(f"📁 开始保存音频文件到本地...")
                 return audio_path
             else:
                 raise Exception("播客生成失败，未返回音频文件")
@@ -2686,9 +2701,9 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             if hasattr(self.youtube, '_developerKey') and self.youtube._developerKey:
                 # 使用API Key构建的客户端，无法上传
                 oauth_configured = False
-                self._log("❌ 检测到API Key模式，上传需要OAuth认证")
-                self._log("YouTube上传需要OAuth认证，当前仅配置了API Key，无法上传")
-                self._log("💡 请运行: python scripts/tools/youtube_oauth_setup.py 配置OAuth认证")
+                self._log("💡 当前使用API Key模式（仅支持视频信息获取）")
+                self._log("📝 YouTube视频上传需要OAuth认证，当前配置下跳过上传步骤")
+                self._log("🔗 如需启用上传功能，请运行: python scripts/tools/youtube_oauth_setup.py")
                 return None
             elif hasattr(self.youtube, '_http') and hasattr(self.youtube._http, 'credentials'):
                 # 新版本OAuth API客户端 - 但需要验证credentials是否有效
@@ -3118,7 +3133,9 @@ header:
                 "ja-JP": "日文",
                 "ko-KR": "韩文"
             }.get(target_language, target_language)
-            self._log(f"正在生成{language_name}播客（预计1-3分钟）...")
+            self._log(f"🎙️ 正在生成{language_name}播客（{adaptive_word_count}字，预计1-3分钟）...")
+            self._log("📊 进度跟踪：视频分析完成，即将开始音频生成")
+            self._log("💡 提示：生成过程中可能会有短暂静默，请耐心等待日志更新")
             temp_audio_path = self.generate_podcast(youtube_url, conversation_style, target_language, adaptive_word_count)
             
             # 检查是否使用备用模式
