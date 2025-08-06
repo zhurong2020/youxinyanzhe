@@ -1539,7 +1539,7 @@ class ContentPipeline:
             
             # 在保存前替换音频链接为YouTube嵌入
             try:
-                from scripts.utils.audio_link_replacer import AudioLinkReplacer
+                from ..utils.audio_link_replacer import AudioLinkReplacer
                 replacer = AudioLinkReplacer()
                 content, replaced_count = replacer.replace_audio_links(content, draft_path.stem)
                 if replaced_count > 0:
