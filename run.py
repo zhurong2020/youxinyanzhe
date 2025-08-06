@@ -881,7 +881,8 @@ def handle_youtube_podcast_menu(pipeline):
             import re
             youtube_patterns = [
                 r'(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)',
-                r'youtube\.com\/v\/([^&\n?#]+)'
+                r'youtube\.com\/v\/([^&\n?#]+)',
+                r'youtube\.com\/shorts\/([^&\n?#]+)'  # 支持YouTube Shorts格式
             ]
             
             video_id_found = False
@@ -891,8 +892,13 @@ def handle_youtube_podcast_menu(pipeline):
                     break
             
             if not video_id_found:
+                logger.warning(f"URL格式验证失败: {youtube_url}")
+                logger.warning("URL不匹配任何支持的YouTube格式")
                 print("❌ 无法从URL中提取视频ID，请检查链接格式")
-                print("✅ 正确示例: https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                print("✅ 支持的格式:")
+                print("   • 标准视频: https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                print("   • 短链接: https://youtu.be/dQw4w9WgXcQ")
+                print("   • YouTube Shorts: https://www.youtube.com/shorts/VIDEO_ID")
                 input("按Enter键返回菜单...")
                 return
             
