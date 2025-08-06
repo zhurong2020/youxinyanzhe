@@ -132,10 +132,15 @@ class YouTubePodcastGenerator:
                 with open(oauth_token_path, 'r') as f:
                     token_data = json.load(f)
                     
-                # 检查token是否有效（简单检查）
-                if token_data.get('token') == 'your-oauth-access-token-here':
-                    self._log("⚠️ OAuth token文件包含模板数据，跳过OAuth认证")
-                    raise ValueError("OAuth token is template data")
+                # 检查token是否有效（检查模板数据和占位符数据）
+                template_patterns = [
+                    'your-oauth-access-token-here', 'your_access_token_here'
+                ]
+                
+                if (token_data.get('token', '').startswith('placeholder_token_') or
+                    token_data.get('token') in template_patterns):
+                    self._log("📋 检测到占位符或模板数据，使用API Key模式")
+                    raise ValueError("OAuth token is placeholder or template data")
                     
                 if 'access_token' in token_data or 'token' in token_data:
                     from google.auth.transport.requests import Request
@@ -379,6 +384,102 @@ class YouTubePodcastGenerator:
             parts.append(f"{seconds}秒")
         
         return "".join(parts) if parts else "0秒"
+    
+    def get_duration_seconds(self, duration_str: str) -> int:
+        """
+        解析YouTube API返回的时长格式，返回总秒数
+        
+        Args:
+            duration_str: ISO 8601时长格式 (PT15M33S)
+            
+        Returns:
+            总秒数
+        """
+        import re
+        
+        pattern = r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?'
+        match = re.match(pattern, duration_str)
+        
+        if not match:
+            return 0  # 未知时长默认为0
+        
+        hours, minutes, seconds = match.groups()
+        hours = int(hours) if hours else 0
+        minutes = int(minutes) if minutes else 0
+        seconds = int(seconds) if seconds else 0
+        
+        return hours * 3600 + minutes * 60 + seconds
+    
+    def calculate_adaptive_word_count(self, video_duration_seconds: int) -> int:
+        """
+        根据视频长度自适应计算播客字数
+        
+        Args:
+            video_duration_seconds: 视频总秒数
+            
+        Returns:
+            适合的播客字数
+        """
+        if video_duration_seconds <= 0:
+            return 800  # 默认字数
+        
+        # 自适应规则：
+        # - 1分钟以下: 400-600字（3-5轮对话）
+        # - 1-3分钟: 600-800字（5-7轮对话）  
+        # - 3-5分钟: 800-1000字（7-9轮对话）
+        # - 5-10分钟: 1000-1200字（9-12轮对话）
+        # - 10分钟以上: 1200-1500字（12-15轮对话）
+        
+        if video_duration_seconds <= 60:
+            return 500  # 1分钟以下，短对话
+        elif video_duration_seconds <= 180:  # 3分钟
+            return 700
+        elif video_duration_seconds <= 300:  # 5分钟
+            return 900  
+        elif video_duration_seconds <= 600:  # 10分钟
+            return 1100
+        else:
+            return 1300  # 长视频
+    
+    def get_video_duration_seconds(self, video_info: Dict[str, Any]) -> int:
+        """
+        从视频信息中提取时长秒数
+        
+        Args:
+            video_info: 视频信息字典
+            
+        Returns:
+            视频时长（秒）
+        """
+        duration_str = video_info.get('duration', '')
+        
+        # 如果duration是ISO格式(PT1M30S)，直接解析
+        if duration_str.startswith('PT'):
+            return self.get_duration_seconds(duration_str)
+        
+        # 如果是中文格式(1分30秒)，解析
+        if '分钟' in duration_str or '分' in duration_str or '秒' in duration_str:
+            import re
+            total_seconds = 0
+            
+            # 匹配小时
+            hour_match = re.search(r'(\d+)小时', duration_str)
+            if hour_match:
+                total_seconds += int(hour_match.group(1)) * 3600
+            
+            # 匹配分钟
+            minute_match = re.search(r'(\d+)分钟?', duration_str)
+            if minute_match:
+                total_seconds += int(minute_match.group(1)) * 60
+            
+            # 匹配秒
+            second_match = re.search(r'(\d+)秒', duration_str)
+            if second_match:
+                total_seconds += int(second_match.group(1))
+            
+            return total_seconds
+        
+        return 0  # 无法解析，返回0
     
     def _generate_safe_filename(self, title: str, max_length: int = 50) -> str:
         """
@@ -1301,7 +1402,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             return False
 
     def generate_podcast(self, youtube_url: str, custom_style: str = "casual,informative", 
-                        target_language: str = "zh-CN") -> str:
+                        target_language: str = "zh-CN", word_count: int = 1200) -> str:
         """
         生成播客音频
         
@@ -1309,6 +1410,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             youtube_url: YouTube视频链接
             custom_style: 播客风格
             target_language: 目标语言 ("zh-CN", "en-US", "ja-JP", "ko-KR")
+            word_count: 播客字数，会影响对话长度
             
         Returns:
             生成的音频文件路径
@@ -1410,7 +1512,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
                 gemini_key=final_params['gemini_key'],
                 openai_key="",  # 使用Edge TTS，不需要OpenAI密钥
                 elevenlabs_key=self._clean_string_aggressive(self.config.get('ELEVENLABS_API_KEY', "")),
-                word_count=1200,  # 更精炼的对话长度
+                word_count=word_count,  # 根据视频长度自适应调整
                 conversation_style=final_params['conversation_style'],
                 roles_person1=final_params['roles_person1'],
                 roles_person2=final_params['roles_person2'],
@@ -2911,8 +3013,14 @@ header:
             # 确保只有有效的URL字符：字母数字和 -._/:?&=
             cleaned = re.sub(r'[^\w\-./:?&=]', '', cleaned)
             
-            # 验证URL基本结构
-            if not (('youtube.com/watch?v=' in cleaned) or ('youtu.be/' in cleaned)):
+            # 验证URL基本结构 - 更宽松的检查
+            valid_patterns = [
+                'youtube.com/watch?v=', 'youtu.be/', 'youtube.com/shorts/',
+                'youtube.com/embed/', 'youtube.com/v/'
+            ]
+            is_valid_url = any(pattern in cleaned for pattern in valid_patterns)
+            
+            if not is_valid_url:
                 self._log(f"⚠️ URL清理后格式异常，尝试恢复: {repr(cleaned)}", "warning")
                 # 尝试从原始字符串重新提取
                 import urllib.parse
@@ -2922,6 +3030,9 @@ header:
                         cleaned = urllib.parse.urlunparse(parsed)
                 except Exception:
                     pass
+            else:
+                # URL格式正常，不需要警告
+                self._log(f"✅ URL清理成功: {cleaned[:50]}{'...' if len(cleaned) > 50 else ''}")
         else:
             # 对于其他字符串，移除控制字符但保留中文字符
             import re
@@ -2977,6 +3088,13 @@ header:
             video_info = self.get_video_info(video_id)
             self._log(f"视频标题: {video_info['title']}")
             
+            # 3. 根据视频时长计算自适应字数
+            video_duration_seconds = self.get_video_duration_seconds(video_info)
+            adaptive_word_count = self.calculate_adaptive_word_count(video_duration_seconds)
+            
+            self._log(f"📊 视频时长: {video_info['duration']} ({video_duration_seconds}秒)")
+            self._log(f"📝 自适应字数: {adaptive_word_count}字 (估算{adaptive_word_count//100}轮对话)")
+            
             # 检查视频信息质量，如果API获取失败则提供更多信息
             if video_info['title'] == f"YouTube视频 {video_id}" or not video_info.get('description'):
                 self._log("⚠️ 视频信息不足，无法生成高质量播客", "warning", True)
@@ -3001,7 +3119,7 @@ header:
                 "ko-KR": "韩文"
             }.get(target_language, target_language)
             self._log(f"正在生成{language_name}播客（预计1-3分钟）...")
-            temp_audio_path = self.generate_podcast(youtube_url, conversation_style, target_language)
+            temp_audio_path = self.generate_podcast(youtube_url, conversation_style, target_language, adaptive_word_count)
             
             # 检查是否使用备用模式
             if temp_audio_path == "fallback_mode":
