@@ -24,7 +24,7 @@ toc: false
   </div>
 </div>
 
-<div id="member-content" style="display: none;">
+<div id="member-content" style="display: none;" markdown="1">
 
 ## 🎯 会员专享内容
 
