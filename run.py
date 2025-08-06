@@ -2248,13 +2248,30 @@ def handle_youtube_upload_menu(pipeline):
         credentials_file = Path("config/youtube_oauth_credentials.json")
         token_file = Path("config/youtube_oauth_token.json")
         
-        oauth_status = "✅ 已配置" if (credentials_file.exists() and token_file.exists()) else "❌ 需要配置"
+        # 检查OAuth文件是否存在且不是模板数据
+        oauth_valid = False
+        if credentials_file.exists() and token_file.exists():
+            try:
+                import json
+                with open(token_file, 'r') as f:
+                    token_data = json.load(f)
+                # 检查是否为模板数据
+                if token_data.get('token', '').startswith('your-oauth'):
+                    oauth_status = "⚠️ 包含模板数据，需要重新认证"
+                else:
+                    oauth_status = "✅ 已配置"
+                    oauth_valid = True
+            except Exception:
+                oauth_status = "❌ 文件损坏，需要重新配置"
+        else:
+            oauth_status = "❌ 需要配置"
+            
         print(f"\n🔐 OAuth认证状态: {oauth_status}")
         
-        if not (credentials_file.exists() and token_file.exists()):
+        if not oauth_valid:
             print("💡 请先完成OAuth认证配置:")
             print("   1. 查看文档: YOUTUBE_OAUTH_SETUP.md")
-            print("   2. 或运行: python check_oauth_status.py")
+            print("   2. 或运行: python scripts/tools/youtube_oauth_setup.py")
             input("\n按Enter键返回主菜单...")
             return
             
