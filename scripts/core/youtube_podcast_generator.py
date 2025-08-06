@@ -155,16 +155,27 @@ class YouTubePodcastGenerator:
                     else:
                         self._log("❌ OAuth令牌无效且无法刷新")
         except Exception as e:
-            self._log(f"YouTube OAuth配置失败: {e}")
+            error_msg = str(e)
+            if 'invalid_client' in error_msg:
+                self._log(f"YouTube OAuth配置失败: OAuth客户端配置有误 - {e}")
+                self._log("💡 建议: 请检查 config/youtube_oauth_token.json 或重新设置OAuth认证")
+            else:
+                self._log(f"YouTube OAuth配置失败: {e}")
             
         # 如果OAuth失败，尝试API Key（仅用于读取）
-        if not youtube_configured and 'YOUTUBE_API_KEY' in self.config:
-            self.youtube = build('youtube', 'v3', developerKey=self.config['YOUTUBE_API_KEY'])
-            self._log("✅ YouTube API 配置完成 (仅支持读取)")
-            youtube_configured = True
+        if not youtube_configured:
+            api_key = self.config.get('YOUTUBE_API_KEY') or os.getenv('YOUTUBE_API_KEY')
+            if api_key:
+                try:
+                    self.youtube = build('youtube', 'v3', developerKey=api_key)
+                    self._log("✅ YouTube API 配置完成 (仅支持读取)")
+                    youtube_configured = True
+                except Exception as e:
+                    self._log(f"YouTube API Key配置失败: {e}")
             
         if not youtube_configured:
-            self._log("未配置YouTube认证，将使用基础视频信息提取")
+            self._log("⚠️ 未配置YouTube认证，将使用基础视频信息提取")
+            self._log("💡 提示: 这可能导致视频信息获取不完整，建议配置YouTube API Key")
             self.youtube = None
         
         # 设置ElevenLabs API  
@@ -1293,23 +1304,45 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
                 """彻底清理字符串中的不可打印字符"""
                 if not s:
                     return ""
-                # 转换为字符串并严格清理所有控制字符
+                
+                # 转换为字符串并严格清理
                 s_str = str(s).strip()
-                # 移除所有控制字符包括换行符、制表符等
-                cleaned = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', s_str)
-                # 特殊处理URL - 移除换行但保留基本字符
+                
+                # 特殊处理URL - 更严格地清理
                 if 'youtube.com' in s_str or 'youtu.be' in s_str:
-                    # 对于URL，更严格地清理
-                    cleaned = re.sub(r'[\r\n\t\v\f]', '', cleaned)
-                    # 只保留ASCII字符用于URL
-                    cleaned = re.sub(r'[^\x20-\x7e]', '', cleaned)
+                    # 对于URL，只保留基本ASCII字符和必要的URL符号
+                    # 先移除所有控制字符
+                    cleaned = re.sub(r'[\x00-\x1f\x7f-\xff]', '', s_str)
+                    # 再次清理空白字符
+                    cleaned = re.sub(r'\s+', '', cleaned)  # 移除所有空白字符
+                    # 确保只有有效的URL字符：字母数字和 -._/:?&=
+                    cleaned = re.sub(r'[^\w\-./:?&=]', '', cleaned)
+                    
+                    # 验证URL基本结构
+                    if not (('youtube.com/watch?v=' in cleaned) or ('youtu.be/' in cleaned)):
+                        self._log(f"⚠️ URL清理后格式异常，尝试恢复: {repr(cleaned)}", "warning")
+                        # 尝试从原始字符串重新提取
+                        import urllib.parse
+                        try:
+                            parsed = urllib.parse.urlparse(s_str.replace('\n', '').replace('\r', ''))
+                            if parsed.netloc and parsed.path:
+                                cleaned = urllib.parse.urlunparse(parsed)
+                        except Exception:
+                            pass
                 else:
-                    # 对于其他字符串，保留中文字符
-                    cleaned = re.sub(r'[^\x20-\x7e\u4e00-\u9fff]', '', cleaned)
-                # 规范化空白字符
-                cleaned = re.sub(r'\s+', ' ', cleaned.strip())
+                    # 对于其他字符串，移除控制字符但保留中文字符
+                    cleaned = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', s_str)
+                    # 移除换行符和制表符
+                    cleaned = re.sub(r'[\r\n\t\v\f]', ' ', cleaned)
+                    # 保留中文字符和基本字符
+                    cleaned = re.sub(r'[^\x20-\x7e\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]', '', cleaned)
+                    # 压缩多个空格
+                    cleaned = re.sub(r'\s+', ' ', cleaned)
+                
+                result = cleaned.strip()
+                
                 # 限制长度并确保结果有效
-                return cleaned[:500] if cleaned else ""
+                return result[:500] if result else ""
             
             # 清理所有输入参数
             clean_url = clean_string(youtube_url)
@@ -2899,6 +2932,22 @@ header:
             # 2. 获取视频信息
             video_info = self.get_video_info(video_id)
             self._log(f"视频标题: {video_info['title']}")
+            
+            # 检查视频信息质量，如果API获取失败则提供更多信息
+            if video_info['title'] == f"YouTube视频 {video_id}" or not video_info.get('description'):
+                self._log("⚠️ 视频信息不足，无法生成高质量播客", "warning", True)
+                self._log("💡 建议：检查YouTube API权限或使用包含详细描述的视频", "warning", True)
+                
+                # 尝试获取更多信息用于播客生成
+                try:
+                    # 如果有完整的视频URL，尝试直接使用
+                    if 'youtube.com/watch?v=' in youtube_url or 'youtu.be/' in youtube_url:
+                        # 将原始URL也传递给播客生成，让Podcastfy尝试直接处理
+                        self._log("🔄 将使用原始URL进行播客生成", "info")
+                        # 更新video_info以便后续处理
+                        video_info['original_url'] = youtube_url
+                except Exception as e:
+                    self._log(f"获取额外视频信息失败: {e}", "warning")
             
             # 3. 生成播客
             language_name = {
