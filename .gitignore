@@ -110,3 +110,8 @@ vendor/
 config/elevenlabs_voices.yml
 config/gemini_config.yml
 .claude/
+# 会员系统安全文件
+.tmp/member_data/access_codes_whitelist.json
+
+# 会员系统安全文件
+.tmp/member_data/.security_key
