@@ -241,6 +241,11 @@ class YouTubePodcastGenerator:
     def extract_video_id(self, youtube_url: str) -> str:
         """
         从YouTube URL提取视频ID
+        支持多种YouTube链接格式：
+        - 标准视频: youtube.com/watch?v=VIDEO_ID
+        - 短链接: youtu.be/VIDEO_ID 
+        - 嵌入格式: youtube.com/embed/VIDEO_ID
+        - YouTube Shorts: youtube.com/shorts/VIDEO_ID
         
         Args:
             youtube_url: YouTube视频链接
@@ -250,7 +255,8 @@ class YouTubePodcastGenerator:
         """
         patterns = [
             r'(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)',
-            r'youtube\.com\/v\/([^&\n?#]+)'
+            r'youtube\.com\/v\/([^&\n?#]+)',
+            r'youtube\.com\/shorts\/([^&\n?#]+)'  # 支持YouTube Shorts格式
         ]
         
         for pattern in patterns:
