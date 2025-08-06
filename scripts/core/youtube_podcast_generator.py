@@ -1299,64 +1299,19 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             return "fallback_mode"  # 标识使用备用模式
         
         try:
-            # 强化URL和字符串清理 - 移除所有不可打印字符
-            def clean_string(s: str) -> str:
-                """彻底清理字符串中的不可打印字符"""
-                if not s:
-                    return ""
-                
-                # 转换为字符串并严格清理
-                s_str = str(s).strip()
-                
-                # 特殊处理URL - 更严格地清理
-                if 'youtube.com' in s_str or 'youtu.be' in s_str:
-                    # 对于URL，只保留基本ASCII字符和必要的URL符号
-                    # 先移除所有控制字符
-                    cleaned = re.sub(r'[\x00-\x1f\x7f-\xff]', '', s_str)
-                    # 再次清理空白字符
-                    cleaned = re.sub(r'\s+', '', cleaned)  # 移除所有空白字符
-                    # 确保只有有效的URL字符：字母数字和 -._/:?&=
-                    cleaned = re.sub(r'[^\w\-./:?&=]', '', cleaned)
-                    
-                    # 验证URL基本结构
-                    if not (('youtube.com/watch?v=' in cleaned) or ('youtu.be/' in cleaned)):
-                        self._log(f"⚠️ URL清理后格式异常，尝试恢复: {repr(cleaned)}", "warning")
-                        # 尝试从原始字符串重新提取
-                        import urllib.parse
-                        try:
-                            parsed = urllib.parse.urlparse(s_str.replace('\n', '').replace('\r', ''))
-                            if parsed.netloc and parsed.path:
-                                cleaned = urllib.parse.urlunparse(parsed)
-                        except Exception:
-                            pass
-                else:
-                    # 对于其他字符串，移除控制字符但保留中文字符
-                    cleaned = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', s_str)
-                    # 移除换行符和制表符
-                    cleaned = re.sub(r'[\r\n\t\v\f]', ' ', cleaned)
-                    # 保留中文字符和基本字符
-                    cleaned = re.sub(r'[^\x20-\x7e\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]', '', cleaned)
-                    # 压缩多个空格
-                    cleaned = re.sub(r'\s+', ' ', cleaned)
-                
-                result = cleaned.strip()
-                
-                # 限制长度并确保结果有效
-                return result[:500] if result else ""
-            
-            # 清理所有输入参数
-            clean_url = clean_string(youtube_url)
-            clean_style = clean_string(custom_style)
-            clean_language = clean_string(target_language)
+            # 使用全局清理函数清理所有输入参数
+            clean_url = self._clean_string_aggressive(youtube_url)
+            clean_style = self._clean_string_aggressive(custom_style)
+            clean_language = self._clean_string_aggressive(target_language)
             # 根据目标语言生成不同的指令
             if target_language.startswith("en"):
-                clean_instructions = clean_string(f"Generate an English podcast about this YouTube video for language learners, target language: {clean_language}")
+                clean_instructions = self._clean_string_aggressive(f"Generate an English podcast about this YouTube video for language learners, target language: {clean_language}")
             elif target_language.startswith("ja"):
-                clean_instructions = clean_string(f"日本語でYouTube動画についてのポッドキャストを生成してください、対象言語: {clean_language}")
+                clean_instructions = self._clean_string_aggressive(f"日本語でYouTube動画についてのポッドキャストを生成してください、対象言語: {clean_language}")
             elif target_language.startswith("ko"):
-                clean_instructions = clean_string(f"이 YouTube 동영상에 대한 한국어 팟캐스트를 생성하세요, 대상 언어: {clean_language}")
+                clean_instructions = self._clean_string_aggressive(f"이 YouTube 동영상에 대한 한국어 팟캐스트를 생성하세요, 대상 언어: {clean_language}")
             else:
-                clean_instructions = clean_string(f"请生成一个关于YouTube视频的中文播客，目标语言是{clean_language}，内容要适合英语学习者收听")
+                clean_instructions = self._clean_string_aggressive(f"请生成一个关于YouTube视频的中文播客，目标语言是{clean_language}，内容要适合英语学习者收听")
             
             self._log(f"🔍 清理后的URL: {clean_url}")
             self._log(f"🔍 URL长度: {len(clean_url)}, URL字符检查: {repr(clean_url)}")
@@ -1368,8 +1323,8 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
                 'clean_style': clean_style,
                 'clean_language': clean_language,
                 'clean_instructions': clean_instructions,
-                'gemini_key': clean_string(self.config['GEMINI_API_KEY'])[:10] + "...",
-                'elevenlabs_key': clean_string(self.config.get('ELEVENLABS_API_KEY', ''))[:10] + "..."
+                'gemini_key': self._clean_string_aggressive(self.config['GEMINI_API_KEY'])[:10] + "...",
+                'elevenlabs_key': self._clean_string_aggressive(self.config.get('ELEVENLABS_API_KEY', ''))[:10] + "..."
             }
             
             # 检查每个参数是否包含真正的控制字符（排除中文字符）
@@ -1401,19 +1356,19 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             notebooklm_instructions = f"生成NotebookLM风格的纯对话播客，要求：1. 绝对禁止开场白、介绍、总结、结束语；2. 只能是两个人的自然对话，一问一答；3. 像真实朋友聊天，深入讨论视频内容；4. 不要任何欢迎来到播客等话语；5. 直接开始讨论，自然结束；6. 保持口语化、真实、有深度的对话风格；目标语言：{target_language}"
             
             # 清理notebooklm_instructions并验证所有即将传递的参数
-            clean_instructions = clean_string(notebooklm_instructions)
+            clean_instructions = self._clean_string_aggressive(notebooklm_instructions)
             
             # 完整的参数验证
             final_params = {
                 'urls_input': clean_url,
-                'gemini_key': clean_string(self.config['GEMINI_API_KEY']),
+                'gemini_key': self._clean_string_aggressive(self.config['GEMINI_API_KEY']),
                 'user_instructions': clean_instructions,
-                'conversation_style': clean_string("natural,deep,conversational"),
-                'roles_person1': clean_string("A"),
-                'roles_person2': clean_string("B"),
-                'dialogue_structure': clean_string("对话"),
-                'podcast_name': clean_string(""),
-                'podcast_tagline': clean_string("")
+                'conversation_style': self._clean_string_aggressive("natural,deep,conversational"),
+                'roles_person1': self._clean_string_aggressive("A"),
+                'roles_person2': self._clean_string_aggressive("B"),
+                'dialogue_structure': self._clean_string_aggressive("对话"),
+                'podcast_name': self._clean_string_aggressive(""),
+                'podcast_tagline': self._clean_string_aggressive("")
             }
             
             for param_name, param_value in final_params.items():
@@ -1432,7 +1387,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
                 image_files=[],
                 gemini_key=final_params['gemini_key'],
                 openai_key="",  # 使用Edge TTS，不需要OpenAI密钥
-                elevenlabs_key=clean_string(self.config.get('ELEVENLABS_API_KEY', "")),
+                elevenlabs_key=self._clean_string_aggressive(self.config.get('ELEVENLABS_API_KEY', "")),
                 word_count=1200,  # 更精炼的对话长度
                 conversation_style=final_params['conversation_style'],
                 roles_person1=final_params['roles_person1'],
@@ -2902,6 +2857,52 @@ header:
             self._log(f"文章创建失败: {e}")
             raise
     
+    def _clean_string_aggressive(self, s: str) -> str:
+        """彻底清理字符串中的不可打印字符 - 全局版本"""
+        if not s:
+            return ""
+        
+        # 转换为字符串并严格清理
+        s_str = str(s).strip()
+        
+        # 特殊处理URL - 更严格地清理
+        if 'youtube.com' in s_str or 'youtu.be' in s_str:
+            # 对于URL，只保留基本ASCII字符和必要的URL符号
+            # 先移除所有控制字符和非打印字符
+            import re
+            cleaned = re.sub(r'[\x00-\x1f\x7f-\xff]', '', s_str)
+            # 再次清理空白字符
+            cleaned = re.sub(r'\s+', '', cleaned)  # 移除所有空白字符
+            # 确保只有有效的URL字符：字母数字和 -._/:?&=
+            cleaned = re.sub(r'[^\w\-./:?&=]', '', cleaned)
+            
+            # 验证URL基本结构
+            if not (('youtube.com/watch?v=' in cleaned) or ('youtu.be/' in cleaned)):
+                self._log(f"⚠️ URL清理后格式异常，尝试恢复: {repr(cleaned)}", "warning")
+                # 尝试从原始字符串重新提取
+                import urllib.parse
+                try:
+                    parsed = urllib.parse.urlparse(s_str.replace('\n', '').replace('\r', ''))
+                    if parsed.netloc and parsed.path:
+                        cleaned = urllib.parse.urlunparse(parsed)
+                except Exception:
+                    pass
+        else:
+            # 对于其他字符串，移除控制字符但保留中文字符
+            import re
+            cleaned = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', s_str)
+            # 移除换行符和制表符
+            cleaned = re.sub(r'[\r\n\t\v\f]', ' ', cleaned)
+            # 保留中文字符和基本字符
+            cleaned = re.sub(r'[^\x20-\x7e\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]', '', cleaned)
+            # 压缩多个空格
+            cleaned = re.sub(r'\s+', ' ', cleaned)
+        
+        result = cleaned.strip()
+        
+        # 限制长度并确保结果有效
+        return result[:500] if result else ""
+
     def generate_from_youtube(self, youtube_url: str, custom_title: str = "", 
                             tts_model: str = "elevenlabs", target_language: str = "zh-CN",
                             conversation_style: str = "casual,informative", 
@@ -2921,6 +2922,14 @@ header:
             生成结果字典
         """
         try:
+            # 🚨 在开始时立即清理所有输入参数，防止任何控制字符传播
+            youtube_url = self._clean_string_aggressive(youtube_url)
+            custom_title = self._clean_string_aggressive(custom_title)
+            target_language = self._clean_string_aggressive(target_language)
+            conversation_style = self._clean_string_aggressive(conversation_style)
+            
+            self._log(f"🧹 输入参数清理完成: URL={repr(youtube_url)}, Style={repr(conversation_style)}")
+            
             # 保存当前目标语言供TTS使用
             self.current_target_language = target_language
             self._log(f"开始处理YouTube视频: {youtube_url}")
