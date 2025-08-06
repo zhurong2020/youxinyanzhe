@@ -96,7 +96,8 @@ vendor/
 
 # IDE
 .idea/
-# .vscode/ - keeping for now to help with Python path resolution
+.vscode/
+# Note: If you need VS Code settings for Python path resolution, create a project-specific settings file
 *.sublime-project
 *.sublime-workspace
 .project
