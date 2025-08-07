@@ -67,6 +67,10 @@ class TopicInspirationGenerator:
         self.output_dir = Path(".tmp/output/inspiration_reports")
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
+        # 灵感报告状态跟踪文件
+        self.status_file = Path(".tmp/output/inspiration_status.json")
+        self.status_file.parent.mkdir(parents=True, exist_ok=True)
+        
         # 加载专业领域配置
         self.domains = self._load_domain_config()
         
@@ -1021,11 +1025,14 @@ toc_sticky: true
             if result.url:
                 source_link = f" ([原文链接]({result.url}))"
             
+            # 为中文版本创建简化的描述
+            chinese_summary = f"该研究/报道涉及{topic_name}领域的最新发展"
+            
             content += f"""### {i}. {result.title}
 
 **English Source Reference**: {english_source_desc}, {result.summary}{source_link}
 
-**中文版本**: {chinese_source_desc}，{result.summary}
+**中文版本**: {chinese_source_desc}，{chinese_summary}。
 
 **关键要点**：
 {chr(10).join(f'- {insight}' for insight in result.key_insights[:2] if insight)}
@@ -1052,26 +1059,46 @@ toc_sticky: true
 
 ## 📚 参考资源
 
-### English Sources:
 """
         
-        # 添加英文参考链接
-        for i, result in enumerate(results, 1):
-            if result.url:
-                content += f"{i}. **{result.title}**  \n"
-                content += f"   Source: {result.source}  \n"
-                content += f"   Link: [{result.url}]({result.url})  \n"
-                content += f"   Date: {result.publication_date}\n\n"
-            else:
-                content += f"{i}. **{result.title}**  \n"
-                content += f"   Source: {result.source}  \n"
-                content += f"   Date: {result.publication_date}\n\n"
+        # 检查是否所有来源都是英文权威来源
+        english_sources = {
+            'nature.com', 'sciencemag.org', 'thelancet.com', 'nejm.org', 'arxiv.org', 
+            'statnews.com', 'healthtechmagazine.net', 'mobihealthnews.com',
+            'bloomberg.com', 'reuters.com', 'ft.com', 'wsj.com', 'nytimes.com',
+            'bbc.com', 'guardian.com', 'techcrunch.com', 'wired.com'
+        }
         
-        content += """
-### 中文来源说明：
-"""
-        for i, result in enumerate(results, 1):
-            content += f"{i}. {result.title} - 来源：{result.source}\n"
+        all_english = all(any(eng_source in result.source.lower() for eng_source in english_sources) 
+                         for result in results)
+        
+        if all_english:
+            # 如果全部是英文权威来源，使用简洁格式
+            content += "### Authoritative Sources:\n\n"
+            for i, result in enumerate(results, 1):
+                if result.url:
+                    content += f"{i}. **{result.title}**  \n"
+                    content += f"   *{result.source}* | [{result.publication_date}]({result.url})  \n\n"
+                else:
+                    content += f"{i}. **{result.title}**  \n"
+                    content += f"   *{result.source}* | {result.publication_date}  \n\n"
+        else:
+            # 如果有中文或其他来源，使用完整格式
+            content += "### English Sources:\n\n"
+            for i, result in enumerate(results, 1):
+                if result.url:
+                    content += f"{i}. **{result.title}**  \n"
+                    content += f"   Source: {result.source}  \n"
+                    content += f"   Link: [{result.url}]({result.url})  \n"
+                    content += f"   Date: {result.publication_date}\n\n"
+                else:
+                    content += f"{i}. **{result.title}**  \n"
+                    content += f"   Source: {result.source}  \n"
+                    content += f"   Date: {result.publication_date}\n\n"
+            
+            content += "\n### 中文来源说明：\n\n"
+            for i, result in enumerate(results, 1):
+                content += f"{i}. {result.title} - 来源：{result.source}\n"
         
         content += f"""
 ---
@@ -1080,6 +1107,111 @@ toc_sticky: true
 """
         
         return front_matter + content
+
+    def _load_inspiration_status(self) -> Dict[str, Any]:
+        """加载灵感报告状态"""
+        try:
+            if self.status_file.exists():
+                with open(self.status_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            return {"reports": [], "last_updated": datetime.now().isoformat()}
+        except Exception as e:
+            print(f"⚠️ 加载状态文件失败: {e}")
+            return {"reports": [], "last_updated": datetime.now().isoformat()}
+
+    def _save_inspiration_status(self, status: Dict[str, Any]) -> None:
+        """保存灵感报告状态"""
+        try:
+            status["last_updated"] = datetime.now().isoformat()
+            with open(self.status_file, 'w', encoding='utf-8') as f:
+                json.dump(status, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"⚠️ 保存状态文件失败: {e}")
+
+    def _record_inspiration_report(self, report_file: str, topic: str, domain_name: Optional[str] = None, 
+                                 draft_path: Optional[str] = None) -> None:
+        """记录生成的灵感报告"""
+        status = self._load_inspiration_status()
+        
+        report_record = {
+            "id": datetime.now().strftime('%Y%m%d-%H%M%S'),
+            "report_file": str(report_file),
+            "topic": topic,
+            "domain_name": domain_name,
+            "created_time": datetime.now().isoformat(),
+            "draft_created": draft_path is not None,
+            "draft_path": str(draft_path) if draft_path else None,
+            "draft_exists": Path(draft_path).exists() if draft_path else False,
+            "status": "active"
+        }
+        
+        status["reports"].append(report_record)
+        self._save_inspiration_status(status)
+        
+    def get_inspiration_history(self) -> List[Dict[str, Any]]:
+        """获取灵感报告历史"""
+        status = self._load_inspiration_status()
+        reports = status.get("reports", [])
+        
+        # 更新草稿存在状态
+        for report in reports:
+            if report.get("draft_path"):
+                report["draft_exists"] = Path(report["draft_path"]).exists()
+        
+        # 按时间倒序排列
+        reports.sort(key=lambda x: x.get("created_time", ""), reverse=True)
+        return reports
+        
+    def clean_inspiration_reports(self, keep_days: int = 30) -> Dict[str, int]:
+        """清理旧的灵感报告"""
+        from datetime import timedelta
+        
+        cutoff_date = datetime.now() - timedelta(days=keep_days)
+        status = self._load_inspiration_status()
+        reports = status.get("reports", [])
+        
+        cleaned_count = 0
+        orphan_count = 0
+        kept_reports = []
+        
+        for report in reports:
+            try:
+                report_time = datetime.fromisoformat(report["created_time"])
+                report_file = Path(report["report_file"])
+                
+                # 检查是否超过保留期
+                if report_time < cutoff_date:
+                    # 删除报告文件
+                    if report_file.exists():
+                        report_file.unlink()
+                        cleaned_count += 1
+                    
+                    # 如果有对应的草稿且已被删除，标记为orphan
+                    if report.get("draft_path") and not Path(report["draft_path"]).exists():
+                        report["status"] = "draft_deleted"
+                        orphan_count += 1
+                else:
+                    # 保留的报告，更新草稿状态
+                    if report.get("draft_path"):
+                        report["draft_exists"] = Path(report["draft_path"]).exists()
+                        if not report["draft_exists"] and report["status"] == "active":
+                            report["status"] = "draft_deleted"
+                            orphan_count += 1
+                    kept_reports.append(report)
+                    
+            except Exception as e:
+                print(f"⚠️ 处理报告记录时出错: {e}")
+                kept_reports.append(report)
+        
+        # 更新状态
+        status["reports"] = kept_reports
+        self._save_inspiration_status(status)
+        
+        return {
+            "cleaned": cleaned_count,
+            "orphaned": orphan_count,
+            "remaining": len(kept_reports)
+        }
 
 def main():
     """主函数 - 供独立运行使用"""
@@ -1209,6 +1341,12 @@ def main():
                     print("   • 包含了所有权威来源的关键洞察")
                     print("   • 可以直接编辑完善后发布")
                     print("   • 或使用主程序的'处理现有草稿'功能进行发布")
+                    
+                    # 记录灵感报告和草稿
+                    generator._record_inspiration_report(str(report_file), topic_name, domain_name, draft_path)
+                else:
+                    # 只记录灵感报告
+                    generator._record_inspiration_report(str(report_file), topic_name, domain_name)
         else:
             print("❌ 未找到相关权威资讯，请尝试其他关键词或领域")
             
