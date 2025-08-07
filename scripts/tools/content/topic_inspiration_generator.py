@@ -110,14 +110,26 @@ class TopicInspirationGenerator:
         if not api_key:
             raise ValueError("未找到GEMINI_API_KEY或GOOGLE_API_KEY环境变量，请在.env文件中配置")
         
-        genai.configure(api_key=api_key)  # type: ignore
-        
-        # 使用最新的Gemini 2.5模型
-        model = genai.GenerativeModel(  # type: ignore[attr-defined]
-            model_name='gemini-2.5-pro'
-        )
-        
-        return model
+        try:
+            genai.configure(api_key=api_key)  # type: ignore
+            
+            # 使用最新的Gemini 2.5模型
+            model = genai.GenerativeModel(  # type: ignore[attr-defined]
+                model_name='gemini-2.5-pro'
+            )
+            
+            # 不在初始化时测试连接，避免阻塞程序启动
+            print("✅ Gemini客户端初始化完成")
+            return model
+            
+        except Exception as e:
+            print(f"⚠️ Gemini客户端初始化警告: {e}")
+            print("💡 这不会影响后续搜索功能，如遇到问题请检查API密钥")
+            # 仍然返回model，让具体搜索时处理错误
+            model = genai.GenerativeModel(  # type: ignore[attr-defined]
+                model_name='gemini-2.5-pro'
+            )
+            return model
 
     def _load_domain_config(self) -> Dict[str, Any]:
         """加载专业领域配置文件"""
@@ -281,7 +293,12 @@ class TopicInspirationGenerator:
             prompt = f"""
 {domain_prompt}
 
-**TIME RANGE:** Focus on developments from {date_range} (recent {days} days)
+**CRITICAL TIME REQUIREMENT:** 
+- ONLY search for content from {date_range} 
+- Current date is {datetime.now().strftime('%Y-%m-%d')}
+- Prioritize content from {datetime.now().strftime('%Y')} (this year)
+- Exclude any content from 2024 or earlier years
+- Focus on the most recent {days} days
 
 **OUTPUT FORMAT:**
 For each of exactly 5 results, provide structured information:
@@ -335,7 +352,6 @@ Search for recent, authoritative information about: {keywords_str}
         # 获取领域的核心关键词（使用较少敏感的词汇）
         keywords = domain_config.get('keywords', [])
         sources = domain_config.get('sources', [])
-        display_name = domain_config.get('display_name', '技术创新')
         
         # 简化关键词，避免可能触发过滤的词汇
         safe_keywords = []
@@ -347,7 +363,11 @@ Search for recent, authoritative information about: {keywords_str}
         prompt = f"""
 Find recent news and research developments about: {', '.join(safe_keywords)}
 
-**Time Range**: {date_range} (recent {days} days)
+**CRITICAL TIME REQUIREMENT**:
+- Time Range: {date_range} (most recent {days} days only)
+- Current date: {datetime.now().strftime('%Y-%m-%d')}
+- MUST be from {datetime.now().strftime('%Y')} (this year)
+- NO content from 2024 or earlier years
 **Preferred Sources**: {', '.join(sources[:5])}
 
 Please provide 5 recent articles or research papers with this format:
@@ -458,6 +478,9 @@ Search for recent, authoritative English-language news and insights about: "{top
 
 **SEARCH REQUIREMENTS:**
 - Time Range: {date_range} (focus on the most recent {days} days)
+- Current date: {datetime.now().strftime('%Y-%m-%d')}
+- CRITICAL: ONLY content from {datetime.now().strftime('%Y')} (this year)
+- EXCLUDE any content from 2024 or earlier years
 - Language: English sources ONLY
 - Geographic Focus: International/Global perspective preferred
 - Source Quality: Prioritize authoritative and credible sources
@@ -989,11 +1012,25 @@ toc_sticky: true
         
         # 添加各个结果的内容
         for i, result in enumerate(results, 1):
+            # 构建英文引用和中文翻译
+            english_source_desc = f"According to {result.source}"
+            chinese_source_desc = f"据{result.source}报道"
+            
+            # 如果有URL，添加链接
+            source_link = ""
+            if result.url:
+                source_link = f" ([原文链接]({result.url}))"
+            
             content += f"""### {i}. {result.title}
 
-根据{result.source}的报道，{result.summary}
+**English Source Reference**: {english_source_desc}, {result.summary}{source_link}
+
+**中文版本**: {chinese_source_desc}，{result.summary}
 
 **关键要点**：
+{chr(10).join(f'- {insight}' for insight in result.key_insights[:2] if insight)}
+
+**Key Insights** (English):
 {chr(10).join(f'- {insight}' for insight in result.key_insights[:2] if insight)}
 
 """
@@ -1015,12 +1052,26 @@ toc_sticky: true
 
 ## 📚 参考资源
 
+### English Sources:
 """
         
-        # 添加参考链接
-        for result in results:
+        # 添加英文参考链接
+        for i, result in enumerate(results, 1):
             if result.url:
-                content += f"- [{result.title}]({result.url}) - {result.source}\n"
+                content += f"{i}. **{result.title}**  \n"
+                content += f"   Source: {result.source}  \n"
+                content += f"   Link: [{result.url}]({result.url})  \n"
+                content += f"   Date: {result.publication_date}\n\n"
+            else:
+                content += f"{i}. **{result.title}**  \n"
+                content += f"   Source: {result.source}  \n"
+                content += f"   Date: {result.publication_date}\n\n"
+        
+        content += """
+### 中文来源说明：
+"""
+        for i, result in enumerate(results, 1):
+            content += f"{i}. {result.title} - 来源：{result.source}\n"
         
         content += f"""
 ---
