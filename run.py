@@ -643,8 +643,8 @@ def handle_topic_inspiration_menu(pipeline):
             print("   pip install google-generativeai")
         except ValueError as e:
             print(f"❌ 配置错误: {e}")
-            if "GOOGLE_API_KEY" in str(e):
-                print("💡 请在.env文件中配置GOOGLE_API_KEY")
+            if "GEMINI_API_KEY" in str(e) or "GOOGLE_API_KEY" in str(e):
+                print("💡 请在.env文件中配置GEMINI_API_KEY")
         except Exception as e:
             print(f"❌ 操作失败: {e}")
             pipeline.log(f"主题灵感生成失败: {e}", level="error", force=True)
@@ -689,7 +689,7 @@ def handle_topic_inspiration_menu(pipeline):
         # 配置和测试Gemini连接
         try:
             import os
-            api_key = os.getenv('GOOGLE_API_KEY')
+            api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
             
             print("\n🔧 Gemini配置检查")
             print("="*30)
@@ -712,12 +712,12 @@ def handle_topic_inspiration_menu(pipeline):
                     print("⚠️ 连接正常但搜索无结果，可能是搜索条件限制")
                 
             else:
-                print("❌ 未配置GOOGLE_API_KEY")
+                print("❌ 未配置GEMINI_API_KEY")
                 print("\n💡 配置步骤:")
                 print("1. 访问 https://makersuite.google.com/app/apikey")
                 print("2. 创建或获取API密钥")
                 print("3. 在项目根目录的.env文件中添加:")
-                print("   GOOGLE_API_KEY=your_api_key_here")
+                print("   GEMINI_API_KEY=your_api_key_here")
                 print("4. 重启程序")
                 
         except ImportError:
@@ -740,7 +740,7 @@ def handle_topic_inspiration_menu(pipeline):
 🔧 配置要求
 1. Google API Key (用于Gemini联网搜索)
    - 获取地址: https://makersuite.google.com/app/apikey
-   - 配置方法: 在.env文件中添加 GOOGLE_API_KEY=your_key
+   - 配置方法: 在.env文件中添加 GEMINI_API_KEY=your_key
 
 2. Python依赖库
    - google-generativeai (安装命令: pip install google-generativeai)

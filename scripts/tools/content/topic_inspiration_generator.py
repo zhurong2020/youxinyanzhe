@@ -17,10 +17,22 @@ from dataclasses import dataclass
 project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+# 加载环境变量
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    print("⚠️ 警告：未安装python-dotenv库，请运行: pip install python-dotenv")
+
 try:
     import google.generativeai as genai
+    # 测试主要功能是否可用
+    _ = genai.configure, genai.GenerativeModel
 except ImportError:
     print("⚠️ 警告：未安装google-generativeai库，请运行: pip install google-generativeai")
+    genai = None
+except AttributeError:
+    print("⚠️ 警告：google-generativeai库版本可能不兼容")
     genai = None
 
 @dataclass
@@ -80,9 +92,10 @@ class TopicInspirationGenerator:
         if genai is None:
             raise ValueError("未安装google-generativeai库，请运行: pip install google-generativeai")
             
-        api_key = os.getenv('GOOGLE_API_KEY')
+        # 尝试从两个可能的环境变量名获取API密钥
+        api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
         if not api_key:
-            raise ValueError("未找到GOOGLE_API_KEY环境变量，请在.env文件中配置")
+            raise ValueError("未找到GEMINI_API_KEY或GOOGLE_API_KEY环境变量，请在.env文件中配置")
         
         genai.configure(api_key=api_key)
         
@@ -608,9 +621,10 @@ def main():
     print("="*50)
     
     # 检查环境变量
-    if not os.getenv('GOOGLE_API_KEY'):
-        print("❌ 错误：未找到GOOGLE_API_KEY环境变量")
-        print("请在.env文件中配置您的Google API密钥")
+    api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
+    if not api_key:
+        print("❌ 错误：未找到GEMINI_API_KEY或GOOGLE_API_KEY环境变量")
+        print("请在.env文件中配置您的Gemini API密钥")
         return
     
     # 获取用户输入
