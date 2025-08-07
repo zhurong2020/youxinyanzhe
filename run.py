@@ -557,17 +557,115 @@ def handle_topic_inspiration_menu(pipeline):
     print("   • 需要安装google-generativeai库")
     
     print("\n请选择操作：")
-    print("1. 基于主题生成灵感报告")
-    print("2. 查看最近的灵感报告")
-    print("3. 配置和测试Gemini连接")
-    print("4. 查看使用说明")
+    print("1. 🎯 专业领域搜索 - 基于预设专业领域知识库")
+    print("2. 🔍 自定义主题搜索 - 基于用户输入主题")
+    print("3. 📋 查看最近的灵感报告")
+    print("4. ⚙️  配置和测试Gemini连接")
+    print("5. 📖 查看使用说明")
     print("0. 返回主菜单")
     
-    sub_choice = input("\n请输入选项 (1-4/0): ").strip()
+    sub_choice = input("\n请输入选项 (1-5/0): ").strip()
     pipeline.log(f"主题灵感生成器 - 用户选择: {sub_choice}", level="info", force=True)
     
     if sub_choice == "1":
-        # 生成主题灵感报告
+        # 专业领域搜索
+        try:
+            from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator
+            generator = TopicInspirationGenerator()
+            
+            # 获取可用领域列表
+            domains = generator.list_available_domains()
+            
+            if not domains:
+                print("❌ 未找到专业领域配置文件，请确保config/inspiration_domains.yml存在")
+                return
+                
+            print("\n📋 可用的专业领域：")
+            for i, (domain_id, display_name, description) in enumerate(domains, 1):
+                print(f"{i}. {display_name}")
+                print(f"   {description}")
+                print()
+                
+            domain_choice = input(f"请选择领域 (1-{len(domains)}): ").strip()
+            try:
+                domain_index = int(domain_choice) - 1
+                if 0 <= domain_index < len(domains):
+                    domain_id, display_name, description = domains[domain_index]
+                    
+                    print(f"\n🎯 选择领域: {display_name}")
+                    print(f"📝 描述: {description}")
+                    print(f"🔍 正在搜索{display_name}相关的权威资讯...")
+                    
+                    pipeline.log(f"开始专业领域搜索: {display_name} ({domain_id})", level="info", force=True)
+                    
+                    # 执行专业领域搜索
+                    results = generator.get_domain_inspiration(domain_id)
+                    
+                    if results:
+                        # 获取领域配置
+                        domain_config = generator.domains.get(domain_id, {})
+                        category = domain_config.get('category', 'global-perspective')
+                        topic_name = display_name.replace('🏥 ', '').replace('⚛️ ', '').replace('💳 ', '').replace('🌱 ', '').replace('🧠 ', '').replace('🚀 ', '')
+                        
+                        report = generator.generate_inspiration_report(topic_name, results, category, display_name)
+                        
+                        # 保存报告
+                        import re
+                        from datetime import datetime
+                        timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
+                        safe_topic = re.sub(r'[^\w\s-]', '', topic_name).strip()
+                        safe_topic = re.sub(r'[-\s]+', '-', safe_topic)[:20]
+                        report_file = Path(f".tmp/output/inspiration_reports/{safe_topic}-{timestamp}.md")
+                        report_file.parent.mkdir(parents=True, exist_ok=True)
+                        
+                        with open(report_file, 'w', encoding='utf-8') as f:
+                            f.write(report)
+                        
+                        print(f"\n✅ 灵感报告已生成: {report_file}")
+                        print(f"📊 找到 {len(results)} 条权威资讯")
+                        
+                        pipeline.log(f"专业领域报告生成成功: {report_file}, 结果数: {len(results)}", level="info", force=True)
+                        
+                        # 显示结果概要
+                        for i, result in enumerate(results, 1):
+                            credibility_emoji = "🌟" if result.credibility_score >= 9 else "⭐" if result.credibility_score >= 7 else "📰"
+                            date_display = f" - {result.publication_date}" if result.publication_date else ""
+                            print(f"  {i}. {credibility_emoji} {result.title[:60]}... ({result.source}{date_display})")
+                        
+                        # 询问是否创建草稿
+                        create_draft = input("\n是否基于这些灵感创建文章草稿？(y/N): ").strip().lower()
+                        if create_draft in ['y', 'yes']:
+                            draft_path = generator.create_inspired_draft(topic_name, results, category)
+                            if draft_path:
+                                print(f"📄 草稿已创建: {draft_path}")
+                                print("💡 草稿使用说明:")
+                                print("   • 草稿已自动生成Front Matter和基础结构")
+                                print("   • 包含了所有权威来源的关键洞察")
+                                print("   • 可以直接编辑完善后发布")
+                                print("   • 或选择主菜单 '1. 处理现有草稿' 来正式发布")
+                                pipeline.log(f"基于专业领域创建草稿成功: {draft_path}", level="info", force=True)
+                    else:
+                        print("❌ 未找到相关权威资讯，请检查网络连接或稍后重试")
+                        pipeline.log(f"专业领域搜索无结果: {display_name}", level="warning", force=True)
+                else:
+                    print("❌ 选择无效")
+            except (ValueError, IndexError):
+                print("❌ 输入格式错误")
+                
+        except ImportError as e:
+            print("❌ 功能依赖库未安装")
+            print("💡 请运行以下命令安装依赖:")
+            print("   pip install google-generativeai PyYAML")
+        except ValueError as e:
+            print(f"❌ 配置错误: {e}")
+            if "GEMINI_API_KEY" in str(e) or "GOOGLE_API_KEY" in str(e):
+                print("💡 请在.env文件中配置GEMINI_API_KEY")
+        except Exception as e:
+            print(f"❌ 操作失败: {e}")
+            pipeline.log(f"专业领域搜索失败: {e}", level="error", force=True)
+            
+    elif sub_choice == "2":
+        # 自定义主题搜索
         try:
             topic = input("\n请输入要探索的主题 (英文或中文): ").strip()
             if not topic:
@@ -592,7 +690,7 @@ def handle_topic_inspiration_menu(pipeline):
             category = category_map.get(category_choice)
             
             print(f"\n🔍 正在搜索'{topic}'相关的权威英文资讯...")
-            pipeline.log(f"开始主题灵感搜索: {topic}, 分类: {category or '无限制'}", level="info", force=True)
+            pipeline.log(f"开始自定义主题搜索: {topic}, 分类: {category or '无限制'}", level="info", force=True)
             
             # 导入并使用TopicInspirationGenerator
             from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator
@@ -623,7 +721,6 @@ def handle_topic_inspiration_menu(pipeline):
                 # 显示结果概要
                 for i, result in enumerate(results, 1):
                     credibility_emoji = "🌟" if result.credibility_score >= 9 else "⭐" if result.credibility_score >= 7 else "📰"
-                    # 格式化日期显示
                     date_display = f" - {result.publication_date}" if result.publication_date else ""
                     print(f"  {i}. {credibility_emoji} {result.title[:60]}... ({result.source}{date_display})")
                 
@@ -646,7 +743,7 @@ def handle_topic_inspiration_menu(pipeline):
         except ImportError as e:
             print("❌ 功能依赖库未安装")
             print("💡 请运行以下命令安装依赖:")
-            print("   pip install google-generativeai")
+            print("   pip install google-generativeai PyYAML")
         except ValueError as e:
             print(f"❌ 配置错误: {e}")
             if "GEMINI_API_KEY" in str(e) or "GOOGLE_API_KEY" in str(e):
@@ -655,7 +752,7 @@ def handle_topic_inspiration_menu(pipeline):
             print(f"❌ 操作失败: {e}")
             pipeline.log(f"主题灵感生成失败: {e}", level="error", force=True)
             
-    elif sub_choice == "2":
+    elif sub_choice == "3":
         # 查看最近的灵感报告
         try:
             reports_dir = Path(".tmp/output/inspiration_reports")
@@ -691,7 +788,7 @@ def handle_topic_inspiration_menu(pipeline):
         except Exception as e:
             print(f"❌ 查看报告失败: {e}")
             
-    elif sub_choice == "3":
+    elif sub_choice == "4":
         # 配置和测试Gemini连接
         try:
             import os
@@ -732,7 +829,7 @@ def handle_topic_inspiration_menu(pipeline):
         except Exception as e:
             print(f"❌ 测试连接失败: {e}")
             
-    elif sub_choice == "4":
+    elif sub_choice == "5":
         # 查看使用说明
         print("\n" + "="*50)
         print("📖 主题灵感生成器使用说明")
