@@ -12,7 +12,7 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 # 导入并运行简化版工具
-from scripts.tools.youtube_video_generator import main
+from scripts.tools.youtube.youtube_video_generator import main
 
 if __name__ == "__main__":
     main()
