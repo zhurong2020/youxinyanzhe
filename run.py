@@ -51,25 +51,26 @@ def main():
         print("1. 处理现有草稿")
         print("2. 重新发布已发布文章")
         print("3. 生成测试文章")
+        print("4. 格式化手工草稿")
         print("\n🛠️ 系统工具：")
-        print("4. 内容变现管理")
-        print("5. 系统状态检查")
-        print("6. YouTube播客生成器")
-        print("7. 文章更新工具")
-        print("8. 调试和维护工具")
-        print("9. LLM引擎切换")
-        print("10. ElevenLabs语音测试")
-        print("11. YouTube音频上传")
+        print("5. 内容变现管理")
+        print("6. 系统状态检查")
+        print("7. YouTube播客生成器")
+        print("8. 文章更新工具")
+        print("9. 调试和维护工具")
+        print("10. LLM引擎切换")
+        print("11. ElevenLabs语音测试")
+        print("12. YouTube音频上传")
         print("\n0. 退出")
         
-        choice = input("\n请输入选项 (1-11/0): ").strip()
+        choice = input("\n请输入选项 (1-12/0): ").strip()
         
         # 记录用户选择的操作
         choice_names = {
             '1': '处理现有草稿', '2': '重新发布已发布文章', '3': '生成测试文章',
-            '4': '内容变现管理', '5': '系统状态检查', '6': 'YouTube播客生成器',
-            '7': '文章更新工具', '8': '调试和维护工具', '9': 'LLM引擎切换', 
-            '10': 'ElevenLabs语音测试', '11': 'YouTube音频上传', '0': '退出'
+            '4': '格式化手工草稿', '5': '内容变现管理', '6': '系统状态检查',
+            '7': 'YouTube播客生成器', '8': '文章更新工具', '9': '调试和维护工具',
+            '10': 'LLM引擎切换', '11': 'ElevenLabs语音测试', '12': 'YouTube音频上传', '0': '退出'
         }
         operation_name = choice_names.get(choice, '无效选择')
         pipeline.log(f"用户选择操作: {choice} ({operation_name})", level="info", force=True)
@@ -112,34 +113,38 @@ def main():
                 print("📄 测试文章已保存到草稿目录，您可以稍后选择 '1. 处理现有草稿' 来发布它")
                 continue  # 返回主菜单
         elif choice == "4":
+            # 格式化手工草稿
+            handle_format_draft_menu(pipeline)
+            continue  # 返回主菜单
+        elif choice == "5":
             # 内容变现管理
             handle_monetization_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "5":
+        elif choice == "6":
             # 系统状态检查
             handle_system_check_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "6":
+        elif choice == "7":
             # YouTube播客生成器
             handle_youtube_podcast_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "7":
+        elif choice == "8":
             # 文章更新工具
             handle_post_update_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "8":
+        elif choice == "9":
             # 调试和维护工具
             handle_debug_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "9":
+        elif choice == "10":
             # LLM引擎切换
             handle_llm_engine_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "10":
+        elif choice == "11":
             # ElevenLabs语音测试
             handle_elevenlabs_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "11":
+        elif choice == "12":
             # YouTube音频上传
             handle_youtube_upload_menu(pipeline)
             continue  # 返回主菜单
@@ -323,6 +328,210 @@ def execute_script_with_logging(pipeline, script_path: Path, args: list, descrip
     except Exception as e:
         pipeline.log(f"执行异常: {description} - {str(e)}", level="error", force=True)
         return subprocess.CompletedProcess(cmd, -1, "", str(e))
+
+
+def handle_format_draft_menu(pipeline):
+    """处理格式化手工草稿菜单"""
+    print("\n" + "="*40)
+    print("📝 格式化手工草稿")
+    print("="*40)
+    print("📋 功能说明：")
+    print("   • 智能分析手工编写的草稿内容")
+    print("   • 自动分类到四大内容体系")
+    print("   • 生成完整的Jekyll front matter")
+    print("   • 自动提取标签和生成摘要")
+    print("   • 格式化为发布就绪的草稿文章")
+    
+    print("\n⚠️  使用说明：")
+    print("   • 支持纯文本文件(.txt)和Markdown文件(.md)")
+    print("   • 手工草稿应包含完整的内容正文")
+    print("   • 工具会自动检测并智能分类内容")
+    
+    print("\n请选择操作：")
+    print("1. 格式化单个草稿文件")
+    print("2. 批量格式化多个文件")
+    print("3. 查看使用示例")
+    print("4. 查看分类关键词")
+    print("0. 返回主菜单")
+    
+    sub_choice = input("\n请输入选项 (1-4/0): ").strip()
+    pipeline.log(f"格式化手工草稿 - 用户选择: {sub_choice}", level="info", force=True)
+    
+    if sub_choice == "1":
+        # 格式化单个草稿文件
+        try:
+            # 列出可能的草稿文件
+            import glob
+            potential_files = []
+            for pattern in ["*.txt", "*.md"]:
+                potential_files.extend(glob.glob(pattern))
+                potential_files.extend(glob.glob(f"_drafts/**/{pattern}", recursive=True))
+                potential_files.extend(glob.glob(f"drafts/**/{pattern}", recursive=True))
+            
+            if potential_files:
+                print(f"\n📄 发现 {len(potential_files)} 个可能的草稿文件：")
+                for i, file in enumerate(potential_files[:20], 1):  # 最多显示20个
+                    print(f"  {i}. {file}")
+                if len(potential_files) > 20:
+                    print(f"  ... 和其他 {len(potential_files) - 20} 个文件")
+                print("  0. 手动输入文件路径")
+                
+                file_choice = input(f"\n请选择文件 (1-{min(len(potential_files), 20)}/0): ").strip()
+                
+                if file_choice == "0":
+                    input_file = input("请输入文件路径: ").strip()
+                elif file_choice.isdigit() and 1 <= int(file_choice) <= min(len(potential_files), 20):
+                    input_file = potential_files[int(file_choice) - 1]
+                else:
+                    print("❌ 无效选择")
+                    return
+            else:
+                input_file = input("请输入草稿文件路径: ").strip()
+            
+            if not input_file or not Path(input_file).exists():
+                print("❌ 文件不存在或路径无效")
+                return
+                
+            print(f"\n🔄 正在格式化草稿: {input_file}")
+            
+            # 调用format_draft.py脚本
+            script_path = Path("scripts/tools/format_draft.py")
+            result = execute_script_with_logging(
+                pipeline, script_path, [input_file], 
+                "格式化单个草稿文件"
+            )
+            
+            print(result.stdout)
+            if result.stderr:
+                print(f"❌ 错误: {result.stderr}")
+            elif result.returncode == 0:
+                print("✅ 格式化完成！")
+                print("💡 格式化后的文件已保存到 _drafts/ 目录")
+                print("💡 您可以选择 '1. 处理现有草稿' 来发布格式化后的文章")
+                
+        except Exception as e:
+            print(f"❌ 操作失败: {e}")
+            
+    elif sub_choice == "2":
+        # 批量格式化多个文件
+        batch_dir = input("\n请输入包含草稿文件的目录路径: ").strip()
+        if not batch_dir or not Path(batch_dir).exists():
+            print("❌ 目录不存在")
+            return
+            
+        try:
+            import glob
+            files_to_process = []
+            for pattern in ["*.txt", "*.md"]:
+                files_to_process.extend(glob.glob(f"{batch_dir}/{pattern}"))
+                files_to_process.extend(glob.glob(f"{batch_dir}/**/{pattern}", recursive=True))
+            
+            if not files_to_process:
+                print("❌ 未找到可处理的草稿文件")
+                return
+                
+            print(f"\n📄 找到 {len(files_to_process)} 个文件:")
+            for file in files_to_process:
+                print(f"  • {file}")
+                
+            confirm = input(f"\n确定要批量处理这些文件吗？(y/N): ").strip().lower()
+            if confirm not in ['y', 'yes']:
+                print("❌ 用户取消操作")
+                return
+                
+            print("\n🔄 开始批量格式化...")
+            success_count = 0
+            
+            for file in files_to_process:
+                try:
+                    print(f"\n处理: {file}")
+                    script_path = Path("scripts/tools/format_draft.py")
+                    result = execute_script_with_logging(
+                        pipeline, script_path, [file], 
+                        f"批量格式化-{Path(file).name}"
+                    )
+                    
+                    if result.returncode == 0:
+                        success_count += 1
+                        print(f"✅ 成功: {file}")
+                    else:
+                        print(f"❌ 失败: {file}")
+                        if result.stderr:
+                            print(f"   错误: {result.stderr}")
+                            
+                except Exception as e:
+                    print(f"❌ 处理 {file} 时出错: {e}")
+                    
+            print(f"\n📊 批量处理完成：成功 {success_count}/{len(files_to_process)} 个文件")
+            
+        except Exception as e:
+            print(f"❌ 批量操作失败: {e}")
+            
+    elif sub_choice == "3":
+        # 查看使用示例
+        print("\n" + "="*40)
+        print("📖 格式化草稿使用示例")
+        print("="*40)
+        
+        example_content = '''
+📝 示例输入文件 (example_draft.txt):
+
+深度学习的最新进展与应用前景
+
+人工智能领域在2024年取得了重大突破，特别是在大语言模型和计算机视觉方面。
+本文将探讨这些技术的最新发展和未来应用前景。
+
+## 大语言模型的突破
+GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
+
+## 计算机视觉的进展
+多模态模型如GPT-4V在图像理解方面展现出惊人的能力...
+
+---
+
+🔄 工具会自动生成:
+
+- 智能分类: tech-empowerment (技术赋能)
+- 自动标签: ["人工智能", "深度学习", "机器学习", "技术趋势"]
+- 生成摘要: 探讨2024年人工智能领域的最新突破，重点分析大语言模型和计算机视觉的发展
+- 完整front matter: 包含日期、分类、标签等元数据
+- 格式化内容: 符合Jekyll和项目规范的完整文章
+
+💡 输出文件会保存到 _drafts/ 目录，可直接用于发布流程
+        '''
+        
+        print(example_content)
+        
+    elif sub_choice == "4":
+        # 查看分类关键词
+        print("\n" + "="*40)
+        print("🔍 内容智能分类关键词")
+        print("="*40)
+        
+        categories_info = '''
+🧠 认知升级 (cognitive-upgrade):
+   关键词: 思维、学习、认知、心理学、方法论、习惯、效率、自我提升
+   
+🛠️ 技术赋能 (tech-empowerment):  
+   关键词: 技术、工具、自动化、编程、软件、AI、效率工具、数字化
+   
+🌍 全球视野 (global-perspective):
+   关键词: 国际、全球、文化、跨国、趋势、政策、经济、社会
+   
+💰 投资理财 (investment-finance):
+   关键词: 投资、理财、金融、股票、基金、收益、风险、财务、资产
+
+💡 分类算法会根据内容中这些关键词的出现频率和权重进行智能判断
+💡 如果关键词评分接近，会根据文章长度等因素选择最合适的分类
+        '''
+        
+        print(categories_info)
+        
+    elif sub_choice != "0":
+        print("❌ 无效的选择，请重新输入")
+    
+    if sub_choice != "0":
+        input("\n按Enter键返回主菜单...")
 
 
 def handle_monetization_menu(pipeline):
