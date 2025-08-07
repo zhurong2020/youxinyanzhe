@@ -888,14 +888,14 @@ def handle_youtube_podcast_menu(pipeline):
                     break
             
             if not video_id_found:
-                pipeline.log(f"URL格式验证失败: {youtube_url}", level="warning", force=True)
-                pipeline.log("URL不匹配任何支持的YouTube格式", level="warning", force=True)
-                print("❌ 无法从URL中提取视频ID，请检查链接格式")
-                print("✅ 支持的格式:")
-                print(r"   • 标准视频: https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-                print(r"   • 短链接: https://youtu.be/dQw4w9WgXcQ")
-                print(r"   • YouTube Shorts: https://www.youtube.com/shorts/VIDEO_ID")
-                input("按Enter键返回菜单...")
+                pipeline.log(f"URL format validation failed: {youtube_url}", level="warning", force=True)
+                pipeline.log("URL does not match any supported YouTube format", level="warning", force=True)
+                print("X Unable to extract video ID from URL, please check link format")
+                print("* Supported formats:")
+                print(r"   - Standard video: https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                print(r"   - Short link: https://youtu.be/dQw4w9WgXcQ")
+                print(r"   - YouTube Shorts: https://www.youtube.com/shorts/VIDEO_ID")
+                input("Press Enter to return to menu...")
                 return
             
             custom_title = input("请输入自定义标题 (可选，留空使用自动生成): ").strip()
