@@ -698,7 +698,7 @@ Please ensure all sources are legitimate and authoritative. Avoid opinion blogs,
         # 默认中等分数
         return 6
 
-    def validate_source_reliability(self, source: str, url: str = None) -> Dict[str, Any]:
+    def validate_source_reliability(self, source: str, url: Optional[str] = None) -> Dict[str, Any]:
         """
         校验来源可靠性
         
@@ -928,7 +928,7 @@ Please ensure all sources are legitimate and authoritative. Avoid opinion blogs,
             print(f"      ❌ 相关性计算出错: {e}")
             return 6.0  # 提高默认相关性
 
-    def _generate_finance_chinese_summary(self, english_summary: str, summary_lower: str) -> Optional[str]:
+    def _generate_finance_chinese_summary(self, _: str, summary_lower: str) -> Optional[str]:
         """生成金融科技分类的详细中文摘要"""
         if "regulation" in summary_lower or "regulatory" in summary_lower:
             return "监管机构出台新的政策框架，旨在平衡金融创新与风险控制，为行业发展提供更加明确的合规指导。这一举措将对金融科技企业的业务模式和发展策略产生深远影响，推动行业向更加规范化和可持续的方向发展。"
@@ -940,7 +940,7 @@ Please ensure all sources are legitimate and authoritative. Avoid opinion blogs,
             return "金融科技创新在支付清算和普惠金融领域实现重要突破，新技术的应用显著提升了金融服务的可及性和便利性。这些发展不仅改善了用户体验，还为经济增长和金融包容性提供了强有力的技术支撑。"
         return None
 
-    def _generate_tech_chinese_summary(self, english_summary: str, summary_lower: str) -> Optional[str]:
+    def _generate_tech_chinese_summary(self, _: str, summary_lower: str) -> Optional[str]:
         """生成技术赋能分类的详细中文摘要"""
         if "ai" in summary_lower or "artificial intelligence" in summary_lower:
             return "人工智能技术在垂直领域的突破性应用展现出巨大的变革潜力。从自动化生产到智能决策支持，AI技术正在重新定义工作流程和业务模式，为企业数字化转型和效率提升提供了强有力的技术工具。"
@@ -952,7 +952,7 @@ Please ensure all sources are legitimate and authoritative. Avoid opinion blogs,
             return "自动化和机器人技术在各行业的深入应用正在重塑生产和服务模式。这些技术不仅提高了操作精度和效率，还为人力资源的重新配置和价值创造开辟了新的空间，推动产业结构的优化升级。"
         return None
 
-    def _generate_global_chinese_summary(self, english_summary: str, summary_lower: str) -> Optional[str]:
+    def _generate_global_chinese_summary(self, _: str, summary_lower: str) -> Optional[str]:
         """生成全球视野分类的详细中文摘要"""
         if "policy" in summary_lower or "government" in summary_lower:
             return "全球主要经济体的政策调整和战略布局反映出国际格局的深刻变化。这些政策举措不仅影响着区域经济发展轨迹，还为全球合作与竞争关系的重新平衡提供了重要参考，需要各方以更加开放和包容的态度应对挑战。"
@@ -964,7 +964,7 @@ Please ensure all sources are legitimate and authoritative. Avoid opinion blogs,
             return "跨文化交流和社会发展议题在全球化背景下呈现出新的特点和挑战。不同文明之间的对话与合作，为促进相互理解、消除偏见、构建人类命运共同体提供了重要平台和有益实践。"
         return None
 
-    def _generate_cognitive_chinese_summary(self, english_summary: str, summary_lower: str) -> Optional[str]:
+    def _generate_cognitive_chinese_summary(self, _: str, summary_lower: str) -> Optional[str]:
         """生成认知升级分类的详细中文摘要"""
         if "brain" in summary_lower or "neural" in summary_lower or "neuroscience" in summary_lower:
             return "神经科学和脑科学研究的最新发现为理解人类认知机制提供了重要洞察。这些研究不仅深化了我们对大脑工作原理的认知，还为教育方法优化、认知能力提升和神经系统疾病治疗开辟了新的科学路径。"
@@ -1156,7 +1156,7 @@ toc_sticky: true
                 source_link = f" ([原文链接]({result.url}))"
             
             # 为中文版本创建基于英文摘要和分类的中文描述
-            def translate_to_chinese_summary(english_summary: str, content_category: str = None) -> str:
+            def translate_to_chinese_summary(english_summary: str, content_category: Optional[str] = None) -> str:
                 """基于英文摘要和分类生成有意义的中文总结"""
                 summary_lower = english_summary.lower()
                 
