@@ -623,7 +623,9 @@ def handle_topic_inspiration_menu(pipeline):
                 # 显示结果概要
                 for i, result in enumerate(results, 1):
                     credibility_emoji = "🌟" if result.credibility_score >= 9 else "⭐" if result.credibility_score >= 7 else "📰"
-                    print(f"  {i}. {credibility_emoji} {result.title[:60]}... ({result.source})")
+                    # 格式化日期显示
+                    date_display = f" - {result.publication_date}" if result.publication_date else ""
+                    print(f"  {i}. {credibility_emoji} {result.title[:60]}... ({result.source}{date_display})")
                 
                 # 询问是否创建草稿
                 create_draft = input("\n是否基于这些灵感创建文章草稿？(y/N): ").strip().lower()
@@ -631,7 +633,11 @@ def handle_topic_inspiration_menu(pipeline):
                     draft_path = generator.create_inspired_draft(topic, results, category)
                     if draft_path:
                         print(f"📄 草稿已创建: {draft_path}")
-                        print("💡 您可以选择 '1. 处理现有草稿' 来发布文章")
+                        print("💡 草稿使用说明:")
+                        print("   • 草稿已自动生成Front Matter和基础结构")
+                        print("   • 包含了所有权威来源的关键洞察")
+                        print("   • 可以直接编辑完善后发布")
+                        print("   • 或选择主菜单 '1. 处理现有草稿' 来正式发布")
                         pipeline.log(f"基于灵感创建草稿成功: {draft_path}", level="info", force=True)
             else:
                 print("❌ 未找到相关权威资讯，请尝试其他关键词或检查网络连接")
