@@ -74,7 +74,7 @@ class TopicInspirationGenerator:
         # 加载专业领域配置
         self.domains = self._load_domain_config()
         
-        # 权威来源列表（按可信度排序）
+        # 权威来源列表（按可信度排序，2025年更新）
         self.authoritative_sources = {
             # 顶级权威来源 (9-10分)
             'reuters.com': 10, 'bloomberg.com': 10, 'nature.com': 10,
@@ -93,7 +93,15 @@ class TopicInspirationGenerator:
             
             # 科技专业媒体 (6-7分)
             'arstechnica.com': 7, 'ieee.org': 9, 'acm.org': 9,
-            'venturebeat.com': 6, 'techreview.com': 8
+            'venturebeat.com': 6, 'techreview.com': 8,
+            
+            # 金融科技权威 (7-9分) - 2025年新增
+            'coindesk.com': 8, 'cointelegraph.com': 7, 'pymnts.com': 8,
+            'americanbanker.com': 8, 'finextra.com': 7,
+            
+            # 政策和监管来源 (8-9分)
+            'fed.gov': 9, 'sec.gov': 9, 'treasury.gov': 9,
+            'bis.org': 9, 'imf.org': 9
         }
         
         # 分类相关的搜索增强关键词
@@ -298,11 +306,12 @@ class TopicInspirationGenerator:
             prompt = f"""
 {domain_prompt}
 
-**TIME REQUIREMENTS:** 
-- PRIORITIZE content from 2025 (current year)
-- Include recent 2024 content as secondary priority  
-- Focus on latest developments, news, and research
-- Prefer content from the last 6 months when available
+**CRITICAL TIME REQUIREMENTS:** 
+- MUST prioritize content from 2025 (current year) ONLY
+- REJECT any content older than January 2025
+- Search for "2025" + keywords specifically
+- Focus on content from the last 3 months when available
+- Use date filters: after:2025-01-01
 
 **OUTPUT FORMAT:**
 For each of exactly 5 results, provide structured information:
@@ -475,11 +484,12 @@ Focus on factual reporting, recent developments, and credible sources.
         prompt = f"""
 Search for recent, authoritative English-language news and insights about: "{topic}"
 
-**SEARCH REQUIREMENTS:**
-- Focus on recent {days} days of content
+**CRITICAL SEARCH REQUIREMENTS:**
+- MUST find content from 2025 ONLY (current year)
 - Current date: {datetime.now().strftime('%Y-%m-%d')}
-- CRITICAL: ONLY content from {datetime.now().strftime('%Y')} (this year)
-- EXCLUDE any content from 2024 or earlier years
+- STRICTLY EXCLUDE any content from 2024 or earlier years  
+- Use search operators: "2025" + topic keywords
+- Prioritize content from last {days} days when available
 - Language: English sources ONLY
 - Geographic Focus: International/Global perspective preferred
 - Source Quality: Prioritize authoritative and credible sources
@@ -688,6 +698,74 @@ Please ensure all sources are legitimate and authoritative. Avoid opinion blogs,
         # 默认中等分数
         return 6
 
+    def validate_source_reliability(self, source: str, url: str = None) -> Dict[str, Any]:
+        """
+        校验来源可靠性
+        
+        Returns:
+            Dict包含: is_reliable, credibility_score, validation_details
+        """
+        validation_result = {
+            'is_reliable': False,
+            'credibility_score': 0,
+            'validation_details': []
+        }
+        
+        source_lower = source.lower()
+        
+        # 1. 检查是否在权威来源列表中
+        for domain, score in self.authoritative_sources.items():
+            if domain in source_lower:
+                validation_result['is_reliable'] = True
+                validation_result['credibility_score'] = score
+                validation_result['validation_details'].append(f"✅ 权威来源认证: {domain} (可信度: {score}/10)")
+                break
+        
+        # 2. URL域名验证（如果提供）
+        if url and not validation_result['is_reliable']:
+            import re
+            domain_match = re.search(r'https?://(?:www\.)?([^/]+)', url)
+            if domain_match:
+                url_domain = domain_match.group(1).lower()
+                for auth_domain, score in self.authoritative_sources.items():
+                    if auth_domain in url_domain:
+                        validation_result['is_reliable'] = True
+                        validation_result['credibility_score'] = score
+                        validation_result['validation_details'].append(f"✅ URL域名验证: {url_domain} (可信度: {score}/10)")
+                        break
+        
+        # 3. 内容质量指标检查
+        quality_indicators = {
+            'academic': ['university', 'edu', 'research', 'institute'],
+            'government': ['gov', 'government', 'official'],
+            'major_media': ['times', 'post', 'journal', 'news', 'bbc', 'reuters'],
+            'professional': ['association', 'organization', 'council', 'foundation']
+        }
+        
+        for category, keywords in quality_indicators.items():
+            for keyword in keywords:
+                if keyword in source_lower:
+                    if not validation_result['is_reliable']:
+                        validation_result['credibility_score'] = max(validation_result['credibility_score'], 6)
+                    validation_result['validation_details'].append(f"📊 {category}类别匹配: {keyword}")
+        
+        # 4. 风险指标检查
+        risk_indicators = ['blog', 'personal', 'opinion', 'social', 'forum', 'wiki']
+        risk_count = 0
+        for risk_word in risk_indicators:
+            if risk_word in source_lower:
+                risk_count += 1
+                validation_result['validation_details'].append(f"⚠️ 风险指标: {risk_word}")
+        
+        if risk_count > 0:
+            validation_result['credibility_score'] = max(0, validation_result['credibility_score'] - risk_count * 2)
+            validation_result['validation_details'].append(f"❌ 风险评估: 发现{risk_count}个风险指标，可信度降低")
+        
+        # 5. 最终判断
+        validation_result['is_reliable'] = validation_result['credibility_score'] >= 6
+        
+        return validation_result
+
     def _calculate_relevance_score(self, text: str, topic: str) -> float:
         """计算内容与主题的相关性分数 (0-10)"""
         try:
@@ -849,6 +927,54 @@ Please ensure all sources are legitimate and authoritative. Avoid opinion blogs,
         except Exception as e:
             print(f"      ❌ 相关性计算出错: {e}")
             return 6.0  # 提高默认相关性
+
+    def _generate_finance_chinese_summary(self, english_summary: str, summary_lower: str) -> Optional[str]:
+        """生成金融科技分类的详细中文摘要"""
+        if "regulation" in summary_lower or "regulatory" in summary_lower:
+            return "监管机构出台新的政策框架，旨在平衡金融创新与风险控制，为行业发展提供更加明确的合规指导。这一举措将对金融科技企业的业务模式和发展策略产生深远影响，推动行业向更加规范化和可持续的方向发展。"
+        elif "blockchain" in summary_lower or "cryptocurrency" in summary_lower or "bitcoin" in summary_lower:
+            return "区块链和加密货币技术的最新发展为数字金融生态系统带来重要变革机遇。传统金融机构与新兴科技企业的深度合作，正在重新定义数字资产的价值存储和交换方式，为全球金融基础设施的现代化升级奠定技术基础。"
+        elif "ai" in summary_lower or "artificial intelligence" in summary_lower:
+            return "人工智能技术在金融服务领域的深度应用正在重塑行业竞争格局。从智能风控到个性化投资建议，AI技术不仅提升了服务效率和用户体验，还为金融机构降低运营成本、优化决策流程创造了新的可能性。"
+        elif "payment" in summary_lower or "fintech" in summary_lower:
+            return "金融科技创新在支付清算和普惠金融领域实现重要突破，新技术的应用显著提升了金融服务的可及性和便利性。这些发展不仅改善了用户体验，还为经济增长和金融包容性提供了强有力的技术支撑。"
+        return None
+
+    def _generate_tech_chinese_summary(self, english_summary: str, summary_lower: str) -> Optional[str]:
+        """生成技术赋能分类的详细中文摘要"""
+        if "ai" in summary_lower or "artificial intelligence" in summary_lower:
+            return "人工智能技术在垂直领域的突破性应用展现出巨大的变革潜力。从自动化生产到智能决策支持，AI技术正在重新定义工作流程和业务模式，为企业数字化转型和效率提升提供了强有力的技术工具。"
+        elif "quantum" in summary_lower:
+            return "量子计算技术的最新进展为解决传统计算难题开辟了新的路径。虽然距离大规模商业应用仍有距离，但在密码学、优化问题和科学计算等特定领域已经展现出独特优势，预示着计算技术的重大变革。"
+        elif "cloud" in summary_lower or "infrastructure" in summary_lower:
+            return "云计算和基础设施技术的持续演进为企业数字化转型提供了更加灵活和高效的解决方案。新一代云服务不仅降低了技术门槛，还通过模块化和标准化的服务体系，帮助企业快速响应市场需求和技术变化。"
+        elif "automation" in summary_lower or "robot" in summary_lower:
+            return "自动化和机器人技术在各行业的深入应用正在重塑生产和服务模式。这些技术不仅提高了操作精度和效率，还为人力资源的重新配置和价值创造开辟了新的空间，推动产业结构的优化升级。"
+        return None
+
+    def _generate_global_chinese_summary(self, english_summary: str, summary_lower: str) -> Optional[str]:
+        """生成全球视野分类的详细中文摘要"""
+        if "policy" in summary_lower or "government" in summary_lower:
+            return "全球主要经济体的政策调整和战略布局反映出国际格局的深刻变化。这些政策举措不仅影响着区域经济发展轨迹，还为全球合作与竞争关系的重新平衡提供了重要参考，需要各方以更加开放和包容的态度应对挑战。"
+        elif "trade" in summary_lower or "economic" in summary_lower:
+            return "国际贸易和经济合作模式的演变体现了全球化进程中的新特征和新趋势。在地缘政治风险和技术变革的双重影响下，各国正在重新审视和调整自身在全球价值链中的定位，寻求更加均衡和可持续的发展路径。"
+        elif "climate" in summary_lower or "environment" in summary_lower:
+            return "气候变化和环境保护领域的国际合作取得重要进展，各国在清洁能源转型和碳减排目标方面形成更加广泛的共识。这些努力不仅关乎人类共同的生存环境，还为绿色经济发展和技术创新创造了新的机遇。"
+        elif "culture" in summary_lower or "society" in summary_lower:
+            return "跨文化交流和社会发展议题在全球化背景下呈现出新的特点和挑战。不同文明之间的对话与合作，为促进相互理解、消除偏见、构建人类命运共同体提供了重要平台和有益实践。"
+        return None
+
+    def _generate_cognitive_chinese_summary(self, english_summary: str, summary_lower: str) -> Optional[str]:
+        """生成认知升级分类的详细中文摘要"""
+        if "brain" in summary_lower or "neural" in summary_lower or "neuroscience" in summary_lower:
+            return "神经科学和脑科学研究的最新发现为理解人类认知机制提供了重要洞察。这些研究不仅深化了我们对大脑工作原理的认知，还为教育方法优化、认知能力提升和神经系统疾病治疗开辟了新的科学路径。"
+        elif "learning" in summary_lower or "education" in summary_lower:
+            return "学习科学和教育技术的创新发展为个人成长和能力提升提供了更加科学和有效的方法。通过深入理解学习过程的认知机制，新的教育理念和技术工具正在重塑知识传授和技能培养的传统模式。"
+        elif "psychology" in summary_lower or "behavior" in summary_lower:
+            return "心理学和行为科学的研究成果为理解人类决策和行为模式提供了科学依据。这些发现不仅有助于个人心理健康和行为优化，还为组织管理、市场营销和社会治理提供了重要的理论支撑和实践指导。"
+        elif "productivity" in summary_lower or "performance" in summary_lower:
+            return "效率提升和绩效优化领域的研究为个人和组织发展提供了实用的方法论。通过科学的测量和分析工具，人们能够更好地识别影响效率的关键因素，并制定针对性的改进策略，实现可持续的能力提升。"
+        return None
 
     def generate_inspiration_report(self, topic: str, results: List[NewsResult], category: Optional[str] = None, domain_name: Optional[str] = None) -> str:
         """生成灵感报告"""
@@ -1029,12 +1155,26 @@ toc_sticky: true
             if result.url:
                 source_link = f" ([原文链接]({result.url}))"
             
-            # 为中文版本创建基于英文摘要的中文描述
-            def translate_to_chinese_summary(english_summary: str) -> str:
-                """基于英文摘要生成有意义的中文总结"""
+            # 为中文版本创建基于英文摘要和分类的中文描述
+            def translate_to_chinese_summary(english_summary: str, content_category: str = None) -> str:
+                """基于英文摘要和分类生成有意义的中文总结"""
                 summary_lower = english_summary.lower()
                 
-                # 更精确的关键词识别和中文生成
+                # 分类专用的中文生成策略
+                category_generators = {
+                    'investment-finance': self._generate_finance_chinese_summary,
+                    'tech-empowerment': self._generate_tech_chinese_summary,
+                    'global-perspective': self._generate_global_chinese_summary,
+                    'cognitive-upgrade': self._generate_cognitive_chinese_summary
+                }
+                
+                # 如果有对应分类的专用生成器，使用它
+                if content_category and content_category in category_generators:
+                    detailed_summary = category_generators[content_category](english_summary, summary_lower)
+                    if detailed_summary:
+                        return detailed_summary
+                
+                # 更精确的关键词识别和中文生成（通用逻辑）
                 if "brain" in summary_lower or "neural" in summary_lower or "neuron" in summary_lower:
                     if "bci" in summary_lower or "interface" in summary_lower:
                         return "斯坦福大学研究人员开发的脑机接口技术实现重大突破，为瘫痪患者恢复交流能力带来新希望"
@@ -1071,7 +1211,7 @@ toc_sticky: true
                     else:
                         return f"权威机构发布的{topic}领域分析显示，该领域正在经历重要的发展变化"
             
-            chinese_summary = translate_to_chinese_summary(result.summary)
+            chinese_summary = translate_to_chinese_summary(result.summary, category)
             
             content += f"""### {i}. {result.title}
 
