@@ -52,25 +52,27 @@ def main():
         print("2. 重新发布已发布文章")
         print("3. 生成测试文章")
         print("4. 格式化手工草稿")
+        print("5. 主题灵感生成器")
         print("\n🛠️ 系统工具：")
-        print("5. 内容变现管理")
-        print("6. 系统状态检查")
-        print("7. YouTube播客生成器")
-        print("8. 文章更新工具")
-        print("9. 调试和维护工具")
-        print("10. LLM引擎切换")
-        print("11. ElevenLabs语音测试")
-        print("12. YouTube音频上传")
+        print("6. 内容变现管理")
+        print("7. 系统状态检查")
+        print("8. YouTube播客生成器")
+        print("9. 文章更新工具")
+        print("10. 调试和维护工具")
+        print("11. LLM引擎切换")
+        print("12. ElevenLabs语音测试")
+        print("13. YouTube音频上传")
         print("\n0. 退出")
         
-        choice = input("\n请输入选项 (1-12/0): ").strip()
+        choice = input("\n请输入选项 (1-13/0): ").strip()
         
         # 记录用户选择的操作
         choice_names = {
             '1': '处理现有草稿', '2': '重新发布已发布文章', '3': '生成测试文章',
-            '4': '格式化手工草稿', '5': '内容变现管理', '6': '系统状态检查',
-            '7': 'YouTube播客生成器', '8': '文章更新工具', '9': '调试和维护工具',
-            '10': 'LLM引擎切换', '11': 'ElevenLabs语音测试', '12': 'YouTube音频上传', '0': '退出'
+            '4': '格式化手工草稿', '5': '主题灵感生成器', '6': '内容变现管理', 
+            '7': '系统状态检查', '8': 'YouTube播客生成器', '9': '文章更新工具',
+            '10': '调试和维护工具', '11': 'LLM引擎切换', '12': 'ElevenLabs语音测试', 
+            '13': 'YouTube音频上传', '0': '退出'
         }
         operation_name = choice_names.get(choice, '无效选择')
         pipeline.log(f"用户选择操作: {choice} ({operation_name})", level="info", force=True)
@@ -117,34 +119,38 @@ def main():
             handle_format_draft_menu(pipeline)
             continue  # 返回主菜单
         elif choice == "5":
+            # 主题灵感生成器
+            handle_topic_inspiration_menu(pipeline)
+            continue  # 返回主菜单
+        elif choice == "6":
             # 内容变现管理
             handle_monetization_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "6":
+        elif choice == "7":
             # 系统状态检查
             handle_system_check_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "7":
+        elif choice == "8":
             # YouTube播客生成器
             handle_youtube_podcast_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "8":
+        elif choice == "9":
             # 文章更新工具
             handle_post_update_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "9":
+        elif choice == "10":
             # 调试和维护工具
             handle_debug_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "10":
+        elif choice == "11":
             # LLM引擎切换
             handle_llm_engine_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "11":
+        elif choice == "12":
             # ElevenLabs语音测试
             handle_elevenlabs_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "12":
+        elif choice == "13":
             # YouTube音频上传
             handle_youtube_upload_menu(pipeline)
             continue  # 返回主菜单
@@ -526,6 +532,253 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
         '''
         
         print(categories_info)
+        
+    elif sub_choice != "0":
+        print("❌ 无效的选择，请重新输入")
+    
+    if sub_choice != "0":
+        input("\n按Enter键返回主菜单...")
+
+
+def handle_topic_inspiration_menu(pipeline):
+    """处理主题灵感生成菜单"""
+    print("\n" + "="*40)
+    print("💡 主题灵感生成器")
+    print("="*40)
+    print("📋 功能说明：")
+    print("   • 利用Gemini联网搜索获取最新权威资讯")
+    print("   • 智能筛选英文权威来源（Reuters、Bloomberg、Nature等）")
+    print("   • 生成结构化的创作灵感报告")
+    print("   • 支持四大内容分类的专业化搜索")
+    print("   • 自动创建基于灵感的文章草稿")
+    
+    print("\n⚠️  前提条件：")
+    print("   • 需要配置Google API Key用于Gemini联网搜索")
+    print("   • 需要安装google-generativeai库")
+    
+    print("\n请选择操作：")
+    print("1. 基于主题生成灵感报告")
+    print("2. 查看最近的灵感报告")
+    print("3. 配置和测试Gemini连接")
+    print("4. 查看使用说明")
+    print("0. 返回主菜单")
+    
+    sub_choice = input("\n请输入选项 (1-4/0): ").strip()
+    pipeline.log(f"主题灵感生成器 - 用户选择: {sub_choice}", level="info", force=True)
+    
+    if sub_choice == "1":
+        # 生成主题灵感报告
+        try:
+            topic = input("\n请输入要探索的主题 (英文或中文): ").strip()
+            if not topic:
+                print("❌ 主题不能为空")
+                return
+                
+            print("\n请选择内容分类 (可选):")
+            print("1. 🧠 认知升级")
+            print("2. 🛠️ 技术赋能") 
+            print("3. 🌍 全球视野")
+            print("4. 💰 投资理财")
+            print("5. 不限分类")
+            
+            category_choice = input("请选择 (1-5): ").strip()
+            category_map = {
+                '1': 'cognitive-upgrade',
+                '2': 'tech-empowerment', 
+                '3': 'global-perspective',
+                '4': 'investment-finance'
+            }
+            
+            category = category_map.get(category_choice)
+            
+            print(f"\n🔍 正在搜索'{topic}'相关的权威英文资讯...")
+            pipeline.log(f"开始主题灵感搜索: {topic}, 分类: {category or '无限制'}", level="info", force=True)
+            
+            # 导入并使用TopicInspirationGenerator
+            from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator
+            
+            generator = TopicInspirationGenerator()
+            results = generator.get_topic_inspiration(topic, category)
+            
+            if results:
+                report = generator.generate_inspiration_report(topic, results, category)
+                
+                # 保存报告
+                import re
+                from datetime import datetime
+                timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
+                safe_topic = re.sub(r'[^\w\s-]', '', topic).strip()
+                safe_topic = re.sub(r'[-\s]+', '-', safe_topic)[:20]
+                report_file = Path(f".tmp/output/inspiration_reports/{safe_topic}-{timestamp}.md")
+                report_file.parent.mkdir(parents=True, exist_ok=True)
+                
+                with open(report_file, 'w', encoding='utf-8') as f:
+                    f.write(report)
+                
+                print(f"\n✅ 灵感报告已生成: {report_file}")
+                print(f"📊 找到 {len(results)} 条权威资讯")
+                
+                pipeline.log(f"主题灵感报告生成成功: {report_file}, 结果数: {len(results)}", level="info", force=True)
+                
+                # 显示结果概要
+                for i, result in enumerate(results, 1):
+                    credibility_emoji = "🌟" if result.credibility_score >= 9 else "⭐" if result.credibility_score >= 7 else "📰"
+                    print(f"  {i}. {credibility_emoji} {result.title[:60]}... ({result.source})")
+                
+                # 询问是否创建草稿
+                create_draft = input("\n是否基于这些灵感创建文章草稿？(y/N): ").strip().lower()
+                if create_draft in ['y', 'yes']:
+                    draft_path = generator.create_inspired_draft(topic, results, category)
+                    if draft_path:
+                        print(f"📄 草稿已创建: {draft_path}")
+                        print("💡 您可以选择 '1. 处理现有草稿' 来发布文章")
+                        pipeline.log(f"基于灵感创建草稿成功: {draft_path}", level="info", force=True)
+            else:
+                print("❌ 未找到相关权威资讯，请尝试其他关键词或检查网络连接")
+                pipeline.log(f"主题灵感搜索无结果: {topic}", level="warning", force=True)
+                
+        except ImportError as e:
+            print("❌ 功能依赖库未安装")
+            print("💡 请运行以下命令安装依赖:")
+            print("   pip install google-generativeai")
+        except ValueError as e:
+            print(f"❌ 配置错误: {e}")
+            if "GOOGLE_API_KEY" in str(e):
+                print("💡 请在.env文件中配置GOOGLE_API_KEY")
+        except Exception as e:
+            print(f"❌ 操作失败: {e}")
+            pipeline.log(f"主题灵感生成失败: {e}", level="error", force=True)
+            
+    elif sub_choice == "2":
+        # 查看最近的灵感报告
+        try:
+            reports_dir = Path(".tmp/output/inspiration_reports")
+            if reports_dir.exists():
+                reports = list(reports_dir.glob("*.md"))
+                if reports:
+                    # 按修改时间排序
+                    reports.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+                    print(f"\n📋 最近的 {min(len(reports), 10)} 个灵感报告：")
+                    
+                    for i, report in enumerate(reports[:10], 1):
+                        import datetime
+                        mtime = datetime.datetime.fromtimestamp(report.stat().st_mtime)
+                        print(f"  {i}. {report.stem} ({mtime.strftime('%Y-%m-%d %H:%M')})")
+                    
+                    # 询问是否查看特定报告
+                    view_choice = input(f"\n输入编号查看报告 (1-{min(len(reports), 10)}), 或按Enter返回: ").strip()
+                    if view_choice.isdigit() and 1 <= int(view_choice) <= min(len(reports), 10):
+                        selected_report = reports[int(view_choice) - 1]
+                        print(f"\n📖 查看报告: {selected_report.name}")
+                        print("-" * 60)
+                        with open(selected_report, 'r', encoding='utf-8') as f:
+                            content = f.read()
+                            # 只显示前1000个字符
+                            if len(content) > 1000:
+                                print(content[:1000] + "\n...(内容已截断)")
+                            else:
+                                print(content)
+                else:
+                    print("📋 暂无灵感报告")
+            else:
+                print("📋 暂无灵感报告")
+        except Exception as e:
+            print(f"❌ 查看报告失败: {e}")
+            
+    elif sub_choice == "3":
+        # 配置和测试Gemini连接
+        try:
+            import os
+            api_key = os.getenv('GOOGLE_API_KEY')
+            
+            print("\n🔧 Gemini配置检查")
+            print("="*30)
+            
+            if api_key:
+                masked_key = api_key[:8] + "*" * (len(api_key) - 12) + api_key[-4:] if len(api_key) > 12 else "*" * len(api_key)
+                print(f"✅ API Key已配置: {masked_key}")
+                
+                # 测试连接
+                print("\n🔍 正在测试连接...")
+                from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator
+                
+                generator = TopicInspirationGenerator()
+                
+                # 简单测试搜索
+                test_results = generator.get_topic_inspiration("artificial intelligence", days=1)
+                if test_results:
+                    print(f"✅ 连接测试成功，找到 {len(test_results)} 个测试结果")
+                else:
+                    print("⚠️ 连接正常但搜索无结果，可能是搜索条件限制")
+                
+            else:
+                print("❌ 未配置GOOGLE_API_KEY")
+                print("\n💡 配置步骤:")
+                print("1. 访问 https://makersuite.google.com/app/apikey")
+                print("2. 创建或获取API密钥")
+                print("3. 在项目根目录的.env文件中添加:")
+                print("   GOOGLE_API_KEY=your_api_key_here")
+                print("4. 重启程序")
+                
+        except ImportError:
+            print("❌ 依赖库未安装")
+            print("💡 请运行: pip install google-generativeai")
+        except Exception as e:
+            print(f"❌ 测试连接失败: {e}")
+            
+    elif sub_choice == "4":
+        # 查看使用说明
+        print("\n" + "="*50)
+        print("📖 主题灵感生成器使用说明")
+        print("="*50)
+        
+        usage_guide = """
+🎯 功能概述
+主题灵感生成器通过Gemini的联网搜索能力，为您获取指定主题的最新权威英文资讯，
+并自动生成结构化的创作灵感报告。
+
+🔧 配置要求
+1. Google API Key (用于Gemini联网搜索)
+   - 获取地址: https://makersuite.google.com/app/apikey
+   - 配置方法: 在.env文件中添加 GOOGLE_API_KEY=your_key
+
+2. Python依赖库
+   - google-generativeai (安装命令: pip install google-generativeai)
+
+📊 权威来源筛选
+系统优先筛选以下类型的权威来源:
+• 顶级媒体: Reuters, Bloomberg, Financial Times, Nature, Science
+• 学术机构: Harvard, MIT, Stanford, Oxford, Cambridge  
+• 专业机构: McKinsey, BCG, Harvard Business Review
+• 科技媒体: TechCrunch, Wired, MIT Technology Review
+
+🎨 内容分类增强
+支持四大内容分类的专业化搜索:
+• 🧠 认知升级: 心理学、学习方法、认知科学相关
+• 🛠️ 技术赋能: AI、自动化、数字工具相关
+• 🌍 全球视野: 国际事务、地缘政治、文化趋势
+• 💰 投资理财: 金融市场、投资策略、经济分析
+
+📝 输出格式
+• 权威来源评分 (1-10分可信度)
+• 相关性评分 (与主题的匹配度)
+• 关键洞察提取
+• 中文创作角度建议
+• 自动生成草稿文章
+
+💡 使用技巧
+1. 主题选择: 越具体的主题搜索结果越精准
+2. 英文关键词: 使用英文主题词能获得更好的国际资讯
+3. 时效性: 系统默认搜索最近7天的内容
+4. 组合使用: 可配合"格式化手工草稿"功能完善文章
+
+⚠️ 注意事项  
+• 搜索结果依赖Gemini的联网搜索能力
+• 权威来源筛选基于预设的媒体可信度评分
+• 生成的草稿需要人工润色和事实验证
+        """
+        
+        print(usage_guide)
         
     elif sub_choice != "0":
         print("❌ 无效的选择，请重新输入")
