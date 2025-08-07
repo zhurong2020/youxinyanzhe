@@ -45,9 +45,6 @@
 
 ---
 
-**最后更新**: 2025-08-06  
-**文档版本**: v4.0 (核心约定版)  
-
 **相关文档**:
 - `docs/TECHNICAL_ARCHITECTURE.md` - 详细技术架构说明
 - `docs/CHANGELOG_DETAILED.md` - 完整更新历史
