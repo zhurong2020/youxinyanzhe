@@ -153,134 +153,132 @@ def main():
             continue  # 返回主菜单
             
         # 到这里说明有有效的draft需要处理
-        break
+        # 处理发布流程（在while循环内）
         
-    # 处理发布流程
-    
-    # 选择发布平台
-    pipeline.log(f"开始为文章 '{draft.name}' 选择发布平台", level="info", force=True)
-    platforms = pipeline.select_platforms(draft)
-    if not platforms:
-        # 检查是否是因为已经全部发布
-        article_name = draft.stem
-        published_platforms = pipeline.status_manager.get_published_platforms(article_name)
-        all_enabled_platforms = [name for name, config in pipeline.config["platforms"].items() 
-                               if config.get("enabled", False)]
-        
-        if set(published_platforms) >= set(all_enabled_platforms):
-            print("📋 该文章已在所有启用的平台发布，无需重复发布")
+        # 选择发布平台
+        pipeline.log(f"开始为文章 '{draft.name}' 选择发布平台", level="info", force=True)
+        platforms = pipeline.select_platforms(draft)
+        if not platforms:
+            # 检查是否是因为已经全部发布
+            article_name = draft.stem
+            published_platforms = pipeline.status_manager.get_published_platforms(article_name)
+            all_enabled_platforms = [name for name, config in pipeline.config["platforms"].items() 
+                                   if config.get("enabled", False)]
             
-            # 询问是否仍要进行内容变现处理
-            if pipeline.reward_manager:
-                print("\n💡 提示：您仍可以为此文章创建内容变现包")
-                create_package = input("是否创建内容变现包？(y/N): ").strip().lower()
-                if create_package in ['y', 'yes']:
-                    try:
-                        success, result = pipeline.reward_manager.create_article_package(str(draft), upload_to_github=True)
-                        if success:
-                            print("💰 内容变现包创建成功!")
-                            github_release = result.get('github_release', {})
-                            if github_release.get('success'):
-                                print(f"📦 GitHub Release: {github_release.get('release_url', 'N/A')}")
-                                print(f"⬇️  下载链接: {github_release.get('download_url', 'N/A')}")
-                        else:
-                            print(f"⚠️ 创建失败: {result.get('error', '未知错误')}")
-                    except Exception as e:
-                        print(f"❌ 处理异常: {e}")
-        else:
-            print("📋 未选择任何发布平台")
-        
-        # 自动返回主菜单
-        pipeline.log("未选择发布平台或文章已全部发布，返回主菜单", level="info", force=True)
-        print("\n✅ 自动返回主菜单...")
-        return  # 返回到主循环
-    
-    # 记录选择的平台
-    pipeline.log(f"用户选择发布平台: {', '.join(platforms)}", level="info", force=True)
-    
-    # 询问是否启用内容变现功能
-    enable_monetization = pipeline.ask_monetization_preference()
-    pipeline.log(f"内容变现功能: {'启用' if enable_monetization else '跳过'}", level="info", force=True)
-    
-    # 选择会员分级
-    member_tier = pipeline.select_member_tier()
-    if member_tier:
-        pipeline.log(f"会员分级: {member_tier}", level="info", force=True)
-    else:
-        pipeline.log("跳过会员分级设置", level="info", force=True)
-    
-    # 处理并发布
-    pipeline.log(f"开始发布处理 - 文章: {draft.name}, 平台: {', '.join(platforms)}", level="info", force=True)
-    result = pipeline.process_draft(draft, platforms, enable_monetization=enable_monetization, member_tier=member_tier)
-    
-    # 处理返回结果（兼容旧的布尔值和新的字典格式）
-    if isinstance(result, bool):
-        # 兼容旧格式
-        if result:
-            print("✅ 处理完成!")
-            pipeline.log("发布处理完成", level="info", force=True)
-        else:
-            print("⚠️ 处理未完全成功，请检查日志")
-            pipeline.log("发布处理未完全成功", level="warning", force=True)
-    elif isinstance(result, dict):
-        # 新的详细格式
-        if result['success']:
-            platforms_str = ', '.join(result['successful_platforms']) if result['successful_platforms'] else '无'
-            print(f"✅ 处理完成! 成功发布到: {platforms_str}")
-            pipeline.log(f"发布成功 - 平台: {platforms_str}", level="info", force=True)
-            
-            # 检查是否有微信发布指导文件生成
-            if 'wechat' in result.get('successful_platforms', []):
-                guidance_dir = Path(".tmp/output/wechat_guides")
-                if guidance_dir.exists():
-                    latest_files = sorted(guidance_dir.glob("*_guide.md"), key=lambda p: p.stat().st_mtime, reverse=True)
-                    if latest_files:
-                        print(f"📧 微信发布指导文件: {latest_files[0]}")
-                        print("💡 请按照指导文件完成微信公众号手动发布")
-            
-            # 显示内容变现结果
-            if result.get('monetization'):
-                monetization = result['monetization']
-                if monetization['success']:
-                    print("💰 内容变现包创建成功!")
-                    github_release = monetization.get('github_release', {})
-                    if github_release.get('success'):
-                        print(f"📦 GitHub Release: {github_release.get('release_url', 'N/A')}")
-                        print(f"⬇️  下载链接: {github_release.get('download_url', 'N/A')}")
-                        # Check if guidance file was generated
-                        guidance_dir = Path(".tmp/output/wechat_guides")
-                        if guidance_dir.exists():
-                            latest_files = sorted(guidance_dir.glob("*_guide.md"), key=lambda p: p.stat().st_mtime, reverse=True)
-                            if latest_files:
-                                print(f"📧 微信发布指导文件已生成: {latest_files[0]}")
-                        print("📧 内容变现管理请使用本程序 run.py 选项 6: 内容变现系统")
-                        pipeline.log(f"内容变现包创建成功: {github_release.get('release_url', 'N/A')}", level="info", force=True)
-                else:
-                    print(f"⚠️ 内容变现包创建失败: {monetization.get('error', '未知错误')}")
-                    pipeline.log(f"内容变现包创建失败: {monetization.get('error', '未知错误')}", level="warning", force=True)
-        else:
-            if 'error' in result:
-                print(f"❌ 处理失败: {result['error']}")
-                pipeline.log(f"发布失败: {result['error']}", level="error", force=True)
+            if set(published_platforms) >= set(all_enabled_platforms):
+                print("📋 该文章已在所有启用的平台发布，无需重复发布")
+                
+                # 询问是否仍要进行内容变现处理
+                if pipeline.reward_manager:
+                    print("\n💡 提示：您仍可以为此文章创建内容变现包")
+                    create_package = input("是否创建内容变现包？(y/N): ").strip().lower()
+                    if create_package in ['y', 'yes']:
+                        try:
+                            success, result = pipeline.reward_manager.create_article_package(str(draft), upload_to_github=True)
+                            if success:
+                                print("💰 内容变现包创建成功!")
+                                github_release = result.get('github_release', {})
+                                if github_release.get('success'):
+                                    print(f"📦 GitHub Release: {github_release.get('release_url', 'N/A')}")
+                                    print(f"⬇️  下载链接: {github_release.get('download_url', 'N/A')}")
+                            else:
+                                print(f"⚠️ 创建失败: {result.get('error', '未知错误')}")
+                        except Exception as e:
+                            print(f"❌ 处理异常: {e}")
             else:
-                successful = result.get('successful_platforms', [])
-                total = result.get('total_platforms', 0)
-                if successful:
-                    platforms_str = ', '.join(successful)
-                    print(f"⚠️ 部分成功! 已发布到: {platforms_str} (共{total}个平台)")
-                    pipeline.log(f"部分发布成功: {platforms_str} (共{total}个平台)", level="warning", force=True)
+                print("📋 未选择任何发布平台")
+            
+            # 自动返回主菜单 - 使用continue而不是return
+            pipeline.log("未选择发布平台或文章已全部发布，返回主菜单", level="info", force=True)
+            print("\n✅ 自动返回主菜单...")
+            continue  # 返回到while循环开头
+        
+        # 记录选择的平台
+        pipeline.log(f"用户选择发布平台: {', '.join(platforms)}", level="info", force=True)
+        
+        # 询问是否启用内容变现功能
+        enable_monetization = pipeline.ask_monetization_preference()
+        pipeline.log(f"内容变现功能: {'启用' if enable_monetization else '跳过'}", level="info", force=True)
+        
+        # 选择会员分级
+        member_tier = pipeline.select_member_tier()
+        if member_tier:
+            pipeline.log(f"会员分级: {member_tier}", level="info", force=True)
+        else:
+            pipeline.log("跳过会员分级设置", level="info", force=True)
+        
+        # 处理并发布
+        pipeline.log(f"开始发布处理 - 文章: {draft.name}, 平台: {', '.join(platforms)}", level="info", force=True)
+        result = pipeline.process_draft(draft, platforms, enable_monetization=enable_monetization, member_tier=member_tier)
+        
+        # 处理返回结果（兼容旧的布尔值和新的字典格式）
+        if isinstance(result, bool):
+            # 兼容旧格式
+            if result:
+                print("✅ 处理完成!")
+                pipeline.log("发布处理完成", level="info", force=True)
+            else:
+                print("⚠️ 处理未完全成功，请检查日志")
+                pipeline.log("发布处理未完全成功", level="warning", force=True)
+        elif isinstance(result, dict):
+            # 新的详细格式
+            if result['success']:
+                platforms_str = ', '.join(result['successful_platforms']) if result['successful_platforms'] else '无'
+                print(f"✅ 处理完成! 成功发布到: {platforms_str}")
+                pipeline.log(f"发布成功 - 平台: {platforms_str}", level="info", force=True)
+                
+                # 检查是否有微信发布指导文件生成
+                if 'wechat' in result.get('successful_platforms', []):
+                    guidance_dir = Path(".tmp/output/wechat_guides")
+                    if guidance_dir.exists():
+                        latest_files = sorted(guidance_dir.glob("*_guide.md"), key=lambda p: p.stat().st_mtime, reverse=True)
+                        if latest_files:
+                            print(f"📧 微信发布指导文件: {latest_files[0]}")
+                            print("💡 请按照指导文件完成微信公众号手动发布")
+                
+                # 显示内容变现结果
+                if result.get('monetization'):
+                    monetization = result['monetization']
+                    if monetization['success']:
+                        print("💰 内容变现包创建成功!")
+                        github_release = monetization.get('github_release', {})
+                        if github_release.get('success'):
+                            print(f"📦 GitHub Release: {github_release.get('release_url', 'N/A')}")
+                            print(f"⬇️  下载链接: {github_release.get('download_url', 'N/A')}")
+                            # Check if guidance file was generated
+                            guidance_dir = Path(".tmp/output/wechat_guides")
+                            if guidance_dir.exists():
+                                latest_files = sorted(guidance_dir.glob("*_guide.md"), key=lambda p: p.stat().st_mtime, reverse=True)
+                                if latest_files:
+                                    print(f"📧 微信发布指导文件已生成: {latest_files[0]}")
+                            print("📧 内容变现管理请使用本程序 run.py 选项 6: 内容变现系统")
+                            pipeline.log(f"内容变现包创建成功: {github_release.get('release_url', 'N/A')}", level="info", force=True)
+                    else:
+                        print(f"⚠️ 内容变现包创建失败: {monetization.get('error', '未知错误')}")
+                        pipeline.log(f"内容变现包创建失败: {monetization.get('error', '未知错误')}", level="warning", force=True)
+            else:
+                if 'error' in result:
+                    print(f"❌ 处理失败: {result['error']}")
+                    pipeline.log(f"发布失败: {result['error']}", level="error", force=True)
                 else:
-                    print(f"❌ 发布失败! 所有{total}个平台都未成功")
-                    pipeline.log(f"发布完全失败: 所有{total}个平台都未成功", level="error", force=True)
-    else:
-        print("⚠️ 处理结果格式异常，请检查日志")
-        pipeline.log("处理结果格式异常", level="error", force=True)
-    
-    # 发布完成后，自动返回主菜单（避免交互式输入卡死）
-    print("\n" + "="*50)
-    print("✅ 发布流程完成，自动返回主菜单...")
-    pipeline.log("发布流程结束，返回主菜单", level="info", force=True)
-    return  # 返回到主循环，不递归调用main()
+                    successful = result.get('successful_platforms', [])
+                    total = result.get('total_platforms', 0)
+                    if successful:
+                        platforms_str = ', '.join(successful)
+                        print(f"⚠️ 部分成功! 已发布到: {platforms_str} (共{total}个平台)")
+                        pipeline.log(f"部分发布成功: {platforms_str} (共{total}个平台)", level="warning", force=True)
+                    else:
+                        print(f"❌ 发布失败! 所有{total}个平台都未成功")
+                        pipeline.log(f"发布完全失败: 所有{total}个平台都未成功", level="error", force=True)
+        else:
+            print("⚠️ 处理结果格式异常，请检查日志")
+            pipeline.log("处理结果格式异常", level="error", force=True)
+        
+            # 发布完成后，自动返回主菜单（避免交互式输入卡死）
+            print("\n" + "="*50)
+            print("✅ 发布流程完成，自动返回主菜单...")
+            pipeline.log("发布流程结束，返回主菜单", level="info", force=True)
+            continue  # 返回到while循环开头，显示主菜单
 
 
 def execute_script_with_logging(pipeline, script_path: Path, args: list, description: str) -> subprocess.CompletedProcess:
@@ -890,13 +888,13 @@ def handle_youtube_podcast_menu(pipeline):
                     break
             
             if not video_id_found:
-                logger.warning(f"URL格式验证失败: {youtube_url}")
-                logger.warning("URL不匹配任何支持的YouTube格式")
+                pipeline.log(f"URL格式验证失败: {youtube_url}", level="warning", force=True)
+                pipeline.log("URL不匹配任何支持的YouTube格式", level="warning", force=True)
                 print("❌ 无法从URL中提取视频ID，请检查链接格式")
                 print("✅ 支持的格式:")
-                print("   • 标准视频: https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-                print("   • 短链接: https://youtu.be/dQw4w9WgXcQ")
-                print("   • YouTube Shorts: https://www.youtube.com/shorts/VIDEO_ID")
+                print(r"   • 标准视频: https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+                print(r"   • 短链接: https://youtu.be/dQw4w9WgXcQ")
+                print(r"   • YouTube Shorts: https://www.youtube.com/shorts/VIDEO_ID")
                 input("按Enter键返回菜单...")
                 return
             
