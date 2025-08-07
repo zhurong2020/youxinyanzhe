@@ -1,0 +1,187 @@
+# 专业领域知识库配置文件
+# 定义各专业领域的搜索参数和权威来源
+
+ai_in_medicine:
+  display_name: "🏥 AI医疗"
+  description: "人工智能在医疗健康领域的应用和突破"
+  category: "tech-empowerment"
+  keywords:
+    - "AI in healthcare"
+    - "medical artificial intelligence"
+    - "computational biology"
+    - "diagnostic AI"
+    - "drug discovery AI"
+    - "precision medicine"
+    - "medical imaging AI"
+    - "clinical decision support"
+  sources:
+    - "nature.com"
+    - "sciencemag.org"
+    - "thelancet.com"
+    - "nejm.org"
+    - "arxiv.org"
+    - "statnews.com"
+    - "healthtechmagazine.net"
+    - "mobihealthnews.com"
+  search_prompt_template: |
+    Search for the latest breakthroughs, peer-reviewed research papers, and clinical trials 
+    related to {keywords} from authoritative medical and scientific sources: {sources}. 
+    Focus on recent developments in AI applications for patient care, diagnostic accuracy, 
+    and therapeutic innovations.
+
+quantum_computing:
+  display_name: "⚛️ 量子计算"
+  description: "量子计算技术发展和商业应用"
+  category: "tech-empowerment"
+  keywords:
+    - "quantum computing"
+    - "quantum supremacy"
+    - "quantum advantage"
+    - "qubit stability"
+    - "quantum algorithms"
+    - "quantum error correction"
+    - "quantum cryptography"
+    - "quantum machine learning"
+  sources:
+    - "quantamagazine.org"
+    - "phys.org"
+    - "arxiv.org"
+    - "technologyreview.com"
+    - "nature.com"
+    - "sciencemag.org"
+    - "ieee.org"
+    - "ibm.com/quantum"
+  search_prompt_template: |
+    Find recent developments, expert analysis, and significant research papers about 
+    {keywords} from {sources}. Focus on breakthrough achievements, practical applications, 
+    and industry progress in quantum computing technology.
+
+fintech_innovation:
+  display_name: "💳 金融科技"
+  description: "金融科技创新和数字货币发展"
+  category: "investment-finance"
+  keywords:
+    - "fintech innovation"
+    - "digital banking"
+    - "cryptocurrency"
+    - "blockchain finance"
+    - "payment technology"
+    - "robo-advisors"
+    - "regulatory technology"
+    - "decentralized finance"
+  sources:
+    - "bloomberg.com"
+    - "ft.com"
+    - "wsj.com"
+    - "coindesk.com"
+    - "techcrunch.com"
+    - "pymnts.com"
+    - "americanbanker.com"
+    - "finextra.com"
+  search_prompt_template: |
+    Search for cutting-edge developments in {keywords} from leading financial and 
+    technology publications: {sources}. Focus on regulatory changes, market trends, 
+    and technological innovations transforming the financial services industry.
+
+climate_tech:
+  display_name: "🌱 气候科技"
+  description: "气候变化应对和清洁能源技术"
+  category: "global-perspective"
+  keywords:
+    - "climate technology"
+    - "clean energy"
+    - "carbon capture"
+    - "renewable energy"
+    - "sustainable technology"
+    - "green hydrogen"
+    - "energy storage"
+    - "climate adaptation"
+  sources:
+    - "nature.com"
+    - "technologyreview.com"
+    - "greentechmedia.com"
+    - "cleantechnica.com"
+    - "reuters.com"
+    - "bloomberg.com"
+    - "scientificamerican.com"
+    - "energycentral.com"
+  search_prompt_template: |
+    Discover the latest innovations and research in {keywords} from authoritative 
+    environmental and technology sources: {sources}. Focus on breakthrough solutions, 
+    policy developments, and market adoption of climate technologies.
+
+cognitive_science:
+  display_name: "🧠 认知科学"
+  description: "认知心理学和神经科学研究进展"
+  category: "cognitive-upgrade"
+  keywords:
+    - "cognitive science"
+    - "neuroscience research"
+    - "brain-computer interface"
+    - "memory enhancement"
+    - "learning psychology"
+    - "decision making"
+    - "consciousness studies"
+    - "neuroplasticity"
+  sources:
+    - "nature.com"
+    - "sciencemag.org"
+    - "psychologytoday.com"
+    - "scientificamerican.com"
+    - "harvard.edu"
+    - "mit.edu"
+    - "stanford.edu"
+    - "frontiersin.org"
+  search_prompt_template: |
+    Search for groundbreaking research and insights about {keywords} from leading 
+    academic and scientific institutions: {sources}. Focus on new discoveries about 
+    human cognition, brain function, and practical applications for learning and performance.
+
+space_technology:
+  display_name: "🚀 航天科技"
+  description: "太空探索和航天技术发展"
+  category: "global-perspective"
+  keywords:
+    - "space technology"
+    - "satellite innovation"
+    - "Mars exploration"
+    - "space commercialization"
+    - "launch systems"
+    - "space manufacturing"
+    - "asteroid mining"
+    - "space tourism"
+  sources:
+    - "spacenews.com"
+    - "spaceflightnow.com"
+    - "nasa.gov"
+    - "spacex.com"
+    - "technologyreview.com"
+    - "arstechnica.com"
+    - "ieee.org"
+    - "nature.com"
+  search_prompt_template: |
+    Find the latest developments and missions in {keywords} from authoritative space 
+    and technology sources: {sources}. Focus on technological breakthroughs, commercial 
+    opportunities, and scientific discoveries in space exploration.
+
+# 默认通用搜索配置
+general_search:
+  display_name: "🔍 通用搜索"
+  description: "基于用户输入主题的通用权威搜索"
+  category: "global-perspective"
+  keywords: []  # 将使用用户输入的主题
+  sources:
+    - "reuters.com"
+    - "bloomberg.com"
+    - "nature.com"
+    - "sciencemag.org"
+    - "economist.com"
+    - "ft.com"
+    - "nytimes.com"
+    - "wsj.com"
+    - "bbc.com"
+    - "techcrunch.com"
+  search_prompt_template: |
+    Search for recent, authoritative information about {keywords} from credible 
+    international sources: {sources}. Focus on factual reporting, expert analysis, 
+    and significant developments with global relevance.

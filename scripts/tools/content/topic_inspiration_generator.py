@@ -10,8 +10,14 @@ import json
 import re
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from dataclasses import dataclass
+
+try:
+    import yaml
+except ImportError:
+    print("⚠️ 警告：未安装PyYAML库，请运行: pip install PyYAML")
+    yaml = None
 
 # 添加项目根目录到 Python 路径
 project_root = Path(__file__).parent.parent.parent.parent
@@ -61,6 +67,9 @@ class TopicInspirationGenerator:
         self.output_dir = Path(".tmp/output/inspiration_reports")
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
+        # 加载专业领域配置
+        self.domains = self._load_domain_config()
+        
         # 权威来源列表（按可信度排序）
         self.authoritative_sources = {
             # 顶级权威来源 (9-10分)
@@ -109,6 +118,160 @@ class TopicInspirationGenerator:
         )
         
         return model
+
+    def _load_domain_config(self) -> Dict[str, Any]:
+        """加载专业领域配置文件"""
+        try:
+            if yaml is None:
+                print("⚠️ PyYAML未安装，使用默认配置")
+                return {}
+                
+            config_path = Path("config/inspiration_domains.yml")
+            if not config_path.exists():
+                print("⚠️ 专业领域配置文件不存在，使用默认配置")
+                return {}
+                
+            with open(config_path, 'r', encoding='utf-8') as f:
+                domains = yaml.safe_load(f)
+                
+            print(f"✅ 成功加载 {len(domains)} 个专业领域配置")
+            return domains
+            
+        except Exception as e:
+            print(f"⚠️ 加载专业领域配置失败: {e}")
+            return {}
+
+    def list_available_domains(self) -> List[tuple]:
+        """获取可用的专业领域列表"""
+        domain_list = []
+        for domain_id, config in self.domains.items():
+            display_name = config.get('display_name', domain_id)
+            description = config.get('description', '')
+            domain_list.append((domain_id, display_name, description))
+        return domain_list
+
+    def get_domain_inspiration(self, domain_id: str, days: int = 7) -> List[NewsResult]:
+        """
+        基于专业领域配置获取灵感
+        
+        Args:
+            domain_id: 领域ID
+            days: 搜索天数范围
+        
+        Returns:
+            权威新闻结果列表
+        """
+        if domain_id not in self.domains:
+            print(f"❌ 未找到领域配置: {domain_id}")
+            return []
+            
+        domain_config = self.domains[domain_id]
+        print(f"🔍 正在搜索领域: {domain_config.get('display_name', domain_id)}")
+        
+        try:
+            # 构建专业领域搜索提示词
+            search_prompt = self._build_domain_search_prompt(domain_config, days)
+            
+            # 执行Gemini联网搜索
+            print("🌐 正在调用Gemini联网搜索...")
+            response = self.gemini_client.generate_content(search_prompt)
+            
+            if not response or not response.text:
+                print("❌ Gemini搜索未返回结果")
+                return []
+            
+            print("📊 正在解析搜索结果...")
+            # 解析搜索结果
+            topic_name = domain_config.get('display_name', domain_id)
+            results = self._parse_search_results(response.text, topic_name)
+            
+            # 使用领域专用的权威来源进行筛选和评分
+            filtered_results = self._filter_and_score_domain_results(results, domain_config)
+            
+            # 按相关性和可信度排序
+            sorted_results = sorted(
+                filtered_results, 
+                key=lambda x: (x.credibility_score * 0.6 + x.relevance_score * 0.4), 
+                reverse=True
+            )
+            
+            # 返回前5个结果
+            return sorted_results[:5]
+            
+        except Exception as e:
+            print(f"❌ 搜索过程出错: {e}")
+            return []
+
+    def _build_domain_search_prompt(self, domain_config: Dict[str, Any], days: int = 7) -> str:
+        """构建专业领域搜索提示词"""
+        
+        # 计算日期范围
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+        date_range = f"{start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
+        
+        # 获取领域配置
+        keywords = domain_config.get('keywords', [])
+        sources = domain_config.get('sources', [])
+        template = domain_config.get('search_prompt_template', '')
+        
+        # 使用领域专用的搜索模板
+        if template and keywords and sources:
+            keywords_str = ', '.join(keywords)
+            sources_str = ', '.join(sources)
+            
+            # 替换模板中的占位符
+            domain_prompt = template.format(
+                keywords=keywords_str,
+                sources=sources_str
+            )
+            
+            # 添加时间范围和输出格式要求
+            prompt = f"""
+{domain_prompt}
+
+**TIME RANGE:** Focus on developments from {date_range} (recent {days} days)
+
+**OUTPUT FORMAT:**
+For each of exactly 5 results, provide structured information:
+
+## Result [Number]
+**Title:** [Clear, descriptive headline]
+**Source:** [Publication name]
+**Date:** [YYYY-MM-DD format]
+**URL:** [If available]
+**Summary:** [2-3 sentences describing the main content]
+**Key Insights:** 
+- [Insight 1]
+- [Insight 2] 
+- [Insight 3]
+**Blog Post Angles:**
+- [Potential Chinese blog angle 1]
+- [Potential Chinese blog angle 2]
+- [Potential Chinese blog angle 3]
+
+---
+
+**QUALITY CRITERIA:**
+- Credible, fact-based reporting from the specified authoritative sources
+- Recent developments (prioritize newer content)
+- Significant impact or breakthrough potential
+- Unique insights or analysis
+- Potential for inspiring thoughtful Chinese content
+"""
+        else:
+            # 回退到通用搜索格式
+            keywords_str = ', '.join(keywords) if keywords else "general topics"
+            prompt = f"""
+Search for recent, authoritative information about: {keywords_str}
+
+**TIME RANGE:** {date_range} (focus on the most recent {days} days)
+**PREFERRED SOURCES:** {', '.join(sources) if sources else 'Major international news and academic sources'}
+
+[继续使用标准输出格式...]
+"""
+        
+        return prompt
 
     def get_topic_inspiration(self, topic: str, category: Optional[str] = None, days: int = 7) -> List[NewsResult]:
         """
@@ -421,7 +584,87 @@ Please ensure all sources are legitimate and authoritative. Avoid opinion blogs,
         
         return filtered_results
 
-    def generate_inspiration_report(self, topic: str, results: List[NewsResult], category: Optional[str] = None) -> str:
+    def _filter_and_score_domain_results(self, results: List[NewsResult], domain_config: Dict[str, Any]) -> List[NewsResult]:
+        """筛选和评分领域专用结果"""
+        filtered_results = []
+        domain_sources = domain_config.get('sources', [])
+        domain_keywords = domain_config.get('keywords', [])
+        
+        for result in results:
+            # 基本质量过滤
+            if (len(result.title) < 10 or len(result.summary) < 50):
+                continue
+            
+            # 使用领域专用来源计算可信度
+            domain_credibility = self._calculate_domain_source_credibility(result.source, domain_sources)
+            result.credibility_score = max(result.credibility_score, domain_credibility)
+            
+            # 使用领域关键词计算相关性
+            domain_relevance = self._calculate_domain_relevance_score(
+                result.title + " " + result.summary, 
+                domain_keywords
+            )
+            result.relevance_score = max(result.relevance_score, domain_relevance)
+            
+            # 设置更高的质量标准
+            if result.credibility_score >= 6 and result.relevance_score >= 6:
+                filtered_results.append(result)
+        
+        return filtered_results
+
+    def _calculate_domain_source_credibility(self, source: str, domain_sources: List[str]) -> int:
+        """计算领域专用来源可信度分数"""
+        source_lower = source.lower()
+        
+        # 优先匹配领域专用来源
+        for domain_source in domain_sources:
+            if domain_source.lower() in source_lower:
+                # 领域专用来源给予更高分数
+                if domain_source in ['nature.com', 'sciencemag.org', 'nejm.org', 'arxiv.org']:
+                    return 10
+                elif domain_source in ['bloomberg.com', 'reuters.com', 'ft.com']:
+                    return 9
+                else:
+                    return 8
+        
+        # 回退到通用权威来源评分
+        return self._calculate_source_credibility(source)
+
+    def _calculate_domain_relevance_score(self, text: str, domain_keywords: List[str]) -> float:
+        """计算与领域关键词的相关性分数"""
+        try:
+            text_lower = text.lower()
+            relevance_score = 0.0
+            
+            # 计算领域关键词匹配度
+            for keyword in domain_keywords:
+                keyword_lower = keyword.lower()
+                if keyword_lower in text_lower:
+                    # 完整短语匹配给予更高分数
+                    if ' ' in keyword:
+                        relevance_score += 3
+                    else:
+                        relevance_score += 2
+                
+                # 部分词匹配
+                keyword_words = keyword_lower.split()
+                for word in keyword_words:
+                    if len(word) > 3 and word in text_lower:
+                        relevance_score += 1
+            
+            # 归一化到10分制
+            max_possible = len(domain_keywords) * 3
+            if max_possible > 0:
+                relevance_score = min((relevance_score / max_possible) * 10, 10)
+            else:
+                relevance_score = 7.0  # 默认相关性
+            
+            return max(relevance_score, 5.0)  # 最低5分
+            
+        except Exception:
+            return 7.0  # 默认相关性
+
+    def generate_inspiration_report(self, topic: str, results: List[NewsResult], category: Optional[str] = None, domain_name: Optional[str] = None) -> str:
         """生成灵感报告"""
         
         if not results:
@@ -438,7 +681,12 @@ Please ensure all sources are legitimate and authoritative. Avoid opinion blogs,
             'global-perspective': '🌍 全球视野',
             'cognitive-upgrade': '🧠 认知升级'
         }
-        category_display = category_names.get(category, '🔍 综合搜索') if category else '🔍 综合搜索'
+        
+        # 优先显示专业领域名称
+        if domain_name:
+            category_display = domain_name
+        else:
+            category_display = category_names.get(category, '🔍 综合搜索') if category else '🔍 综合搜索'
         
         report = f"""# 📰 主题灵感报告：{topic}
 
@@ -621,8 +869,8 @@ toc_sticky: true
 
 def main():
     """主函数 - 供独立运行使用"""
-    print("💡 主题灵感生成器")
-    print("="*50)
+    print("💡 主题灵感生成器 - 专业化版本")
+    print("="*60)
     
     # 检查环境变量
     api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
@@ -631,43 +879,97 @@ def main():
         print("请在.env文件中配置您的Gemini API密钥")
         return
     
-    # 获取用户输入
-    topic = input("请输入要探索的主题: ").strip()
-    if not topic:
-        print("❌ 主题不能为空")
-        return
-    
-    print("\n选择内容分类 (可选):")
-    print("1. 🧠 认知升级")
-    print("2. 🛠️ 技术赋能") 
-    print("3. 🌍 全球视野")
-    print("4. 💰 投资理财")
-    print("5. 不限分类")
-    
-    category_choice = input("请选择 (1-5): ").strip()
-    category_map = {
-        '1': 'cognitive-upgrade',
-        '2': 'tech-empowerment', 
-        '3': 'global-perspective',
-        '4': 'investment-finance'
-    }
-    
-    category = category_map.get(category_choice)
-    
     try:
         # 创建生成器实例
         generator = TopicInspirationGenerator()
         
-        # 获取灵感
-        results = generator.get_topic_inspiration(topic, category)
+        # 显示搜索模式选择
+        print("\n🔍 请选择搜索模式：")
+        print("1. 📚 专业领域搜索 - 基于预设的专业领域知识库")
+        print("2. 🔍 自定义主题搜索 - 基于用户输入的主题")
         
+        mode_choice = input("请选择模式 (1-2): ").strip()
+        
+        results = []
+        topic_name = ""
+        domain_name = None
+        category = None
+        
+        if mode_choice == "1":
+            # 专业领域搜索模式
+            domains = generator.list_available_domains()
+            
+            if not domains:
+                print("❌ 未找到专业领域配置，回退到自定义搜索模式")
+                mode_choice = "2"
+            else:
+                print("\n📋 可用的专业领域：")
+                for i, (domain_id, display_name, description) in enumerate(domains, 1):
+                    print(f"{i}. {display_name}")
+                    print(f"   {description}")
+                    print()
+                
+                domain_choice = input(f"请选择领域 (1-{len(domains)}): ").strip()
+                try:
+                    domain_index = int(domain_choice) - 1
+                    if 0 <= domain_index < len(domains):
+                        domain_id, display_name, description = domains[domain_index]
+                        domain_name = display_name
+                        topic_name = display_name.replace('🏥 ', '').replace('⚛️ ', '').replace('💳 ', '').replace('🌱 ', '').replace('🧠 ', '').replace('🚀 ', '')
+                        
+                        print(f"\n🎯 选择领域: {display_name}")
+                        print(f"📝 描述: {description}")
+                        
+                        # 获取领域配置中的category
+                        domain_config = generator.domains.get(domain_id, {})
+                        category = domain_config.get('category', 'global-perspective')
+                        
+                        # 执行专业领域搜索
+                        results = generator.get_domain_inspiration(domain_id)
+                    else:
+                        print("❌ 选择无效，回退到自定义搜索")
+                        mode_choice = "2"
+                except (ValueError, IndexError):
+                    print("❌ 输入格式错误，回退到自定义搜索")
+                    mode_choice = "2"
+        
+        if mode_choice == "2":
+            # 自定义主题搜索模式
+            topic = input("\n请输入要探索的主题: ").strip()
+            if not topic:
+                print("❌ 主题不能为空")
+                return
+            
+            topic_name = topic
+            
+            print("\n选择内容分类 (可选):")
+            print("1. 🧠 认知升级")
+            print("2. 🛠️ 技术赋能") 
+            print("3. 🌍 全球视野")
+            print("4. 💰 投资理财")
+            print("5. 不限分类")
+            
+            category_choice = input("请选择 (1-5): ").strip()
+            category_map = {
+                '1': 'cognitive-upgrade',
+                '2': 'tech-empowerment', 
+                '3': 'global-perspective',
+                '4': 'investment-finance'
+            }
+            
+            category = category_map.get(category_choice)
+            
+            # 执行传统主题搜索
+            results = generator.get_topic_inspiration(topic, category)
+        
+        # 处理搜索结果
         if results:
             # 生成报告
-            report = generator.generate_inspiration_report(topic, results, category)
+            report = generator.generate_inspiration_report(topic_name, results, category, domain_name)
             
             # 保存报告
             timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
-            safe_topic = re.sub(r'[^\w\s-]', '', topic)[:20]
+            safe_topic = re.sub(r'[^\w\s-]', '', topic_name)[:20]
             report_file = generator.output_dir / f"{safe_topic}-{timestamp}.md"
             
             with open(report_file, 'w', encoding='utf-8') as f:
@@ -678,14 +980,14 @@ def main():
             
             # 显示结果概要
             for i, result in enumerate(results, 1):
-                # 格式化日期显示
+                credibility_emoji = "🌟" if result.credibility_score >= 9 else "⭐" if result.credibility_score >= 7 else "📰"
                 date_display = f" - {result.publication_date}" if result.publication_date else ""
-                print(f"  {i}. ⭐ {result.title} ({result.source}{date_display})")
+                print(f"  {i}. {credibility_emoji} {result.title} ({result.source}{date_display})")
             
             # 询问是否创建草稿
             create_draft = input("\n是否基于这些灵感创建文章草稿？(y/N): ").strip().lower()
             if create_draft in ['y', 'yes']:
-                draft_path = generator.create_inspired_draft(topic, results, category)
+                draft_path = generator.create_inspired_draft(topic_name, results, category)
                 if draft_path:
                     print(f"📄 草稿已创建: {draft_path}")
                     print("💡 草稿使用说明:")
@@ -694,7 +996,7 @@ def main():
                     print("   • 可以直接编辑完善后发布")
                     print("   • 或使用主程序的'处理现有草稿'功能进行发布")
         else:
-            print("❌ 未找到相关权威资讯，请尝试其他关键词")
+            print("❌ 未找到相关权威资讯，请尝试其他关键词或领域")
             
     except Exception as e:
         print(f"❌ 操作失败: {e}")
