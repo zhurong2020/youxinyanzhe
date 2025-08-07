@@ -202,7 +202,18 @@ class TopicInspirationGenerator:
             
             # 执行Gemini联网搜索
             print("🌐 正在调用Gemini联网搜索...")
-            response = self.gemini_client.generate_content(search_prompt)
+            try:
+                response = self.gemini_client.generate_content(search_prompt)
+            except Exception as e:
+                print(f"❌ Gemini API调用失败: {e}")
+                print("🔄 尝试使用备用搜索策略...")
+                fallback_prompt = self._build_fallback_search_prompt(domain_config, days)
+                try:
+                    response = self.gemini_client.generate_content(fallback_prompt)
+                    print("✅ 备用搜索策略成功")
+                except Exception as e2:
+                    print(f"❌ 备用搜索也失败: {e2}")
+                    return []
             
             if not response:
                 print("❌ Gemini搜索未返回响应")
@@ -231,33 +242,57 @@ class TopicInspirationGenerator:
                         print("❌ 内容因引用问题被过滤，请尝试其他搜索词")
                         return []
             
-            # 尝试获取响应文本
+            # 尝试获取响应文本 - 改进的提取逻辑
+            response_text = None
+            
             try:
-                response_text = response.text
-                if not response_text:
-                    print("❌ Gemini搜索返回空内容")
-                    return []
+                # 首先尝试直接获取文本
+                if hasattr(response, 'text') and response.text:
+                    response_text = response.text
+                    print("✅ 直接获取响应文本成功")
             except Exception as e:
                 print(f"⚠️ 无法直接获取响应文本: {e}")
-                # 尝试从候选答案中获取内容
-                if hasattr(response, 'candidates') and response.candidates:
-                    for candidate in response.candidates:
-                        if hasattr(candidate, 'content') and candidate.content:
-                            if hasattr(candidate.content, 'parts') and candidate.content.parts:
-                                for part in candidate.content.parts:
-                                    if hasattr(part, 'text') and part.text:
-                                        response_text = part.text
-                                        print("✅ 从候选内容中提取到文本")
-                                        break
-                                if response_text:
-                                    break
+            
+            # 如果直接获取失败，尝试从candidates中提取
+            if not response_text and hasattr(response, 'candidates') and response.candidates:
+                print("🔍 尝试从candidates中提取内容...")
+                for i, candidate in enumerate(response.candidates):
+                    print(f"  检查候选答案 {i+1}")
                     
-                    if not response_text:
-                        print("❌ 无法从任何候选答案中提取内容")
-                        return []
+                    if hasattr(candidate, 'content') and candidate.content:
+                        print(f"    候选答案{i+1}有content")
+                        if hasattr(candidate.content, 'parts') and candidate.content.parts:
+                            print(f"    候选答案{i+1}有{len(candidate.content.parts)}个parts")
+                            for j, part in enumerate(candidate.content.parts):
+                                print(f"      检查part {j+1}")
+                                if hasattr(part, 'text'):
+                                    part_text = getattr(part, 'text', None)
+                                    if part_text and part_text.strip():
+                                        response_text = part_text
+                                        print(f"✅ 从候选答案{i+1}的part{j+1}中提取到文本 ({len(response_text)}字符)")
+                                        break
+                                else:
+                                    print(f"      part {j+1}没有text属性")
+                            if response_text:
+                                break
+                        else:
+                            print(f"    候选答案{i+1}没有parts")
+                    else:
+                        print(f"    候选答案{i+1}没有content")
+            
+            if not response_text:
+                print("❌ 无法从响应中提取任何文本内容")
+                print("🔍 响应结构调试信息:")
+                if hasattr(response, 'candidates'):
+                    print(f"  candidates数量: {len(response.candidates) if response.candidates else 0}")
+                    if response.candidates:
+                        for i, candidate in enumerate(response.candidates):
+                            print(f"  候选答案{i+1}属性: {dir(candidate)}")
+                            if hasattr(candidate, 'finish_reason'):
+                                print(f"  候选答案{i+1}完成原因: {candidate.finish_reason}")
                 else:
-                    print("❌ 响应中没有候选答案")
-                    return []
+                    print("  没有candidates属性")
+                return []
             
             print("📊 正在解析搜索结果...")
             # 解析搜索结果
@@ -373,29 +408,26 @@ Search for recent, authoritative information about: {keywords_str}
             safe_keywords.append(safe_keyword)
         
         prompt = f"""
-Find recent news and research developments about: {', '.join(safe_keywords)}
+Please search for recent factual information and news updates related to: {', '.join(safe_keywords)}
 
-**TIME REQUIREMENTS**:
-- PRIORITIZE content from 2025 (current year)
-- Include recent 2024 content as secondary priority
-- Focus on latest developments and trending topics
-**Preferred Sources**: {', '.join(sources[:5])}
+**Requirements**:
+- Focus on 2025 content (current year)
+- Factual news reporting and research updates
+- Recent industry developments and market trends
+- Information from established news organizations
 
-Please provide 5 recent articles or research papers with this format:
+**Format requested**:
+Please provide 3-5 recent items with basic details:
 
-## Result 1
-**Title:** [Article title]
-**Source:** [Publication name] 
-**Date:** [YYYY-MM-DD]
-**Summary:** [Brief description]
-**Key Points:**
-- [Point 1]
-- [Point 2]
+Item 1:
+Title: [News headline]
+Source: [Media organization] 
+Summary: [Brief factual description]
 
-## Result 2
-[Same format...]
+Item 2:
+[Same format]
 
-Focus on factual reporting, recent developments, and credible sources.
+Looking for recent factual reporting and industry updates from established sources.
 """
         
         return prompt
