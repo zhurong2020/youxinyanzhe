@@ -10,7 +10,7 @@ import json
 import re
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List, Dict, Optional, Any
+from typing import List, Optional
 from dataclasses import dataclass
 
 # 添加项目根目录到 Python 路径
@@ -25,9 +25,13 @@ except ImportError:
     print("⚠️ 警告：未安装python-dotenv库，请运行: pip install python-dotenv")
 
 try:
-    import google.generativeai as genai
-    # 测试主要功能是否可用
-    _ = genai.configure, genai.GenerativeModel
+    import google.generativeai as genai  # type: ignore
+    # 验证库是否正确安装并可用
+    if hasattr(genai, 'configure') and hasattr(genai, 'GenerativeModel'):
+        # 主要功能可用
+        pass
+    else:
+        raise AttributeError("google.generativeai库功能不完整")
 except ImportError:
     print("⚠️ 警告：未安装google-generativeai库，请运行: pip install google-generativeai")
     genai = None
@@ -97,11 +101,11 @@ class TopicInspirationGenerator:
         if not api_key:
             raise ValueError("未找到GEMINI_API_KEY或GOOGLE_API_KEY环境变量，请在.env文件中配置")
         
-        genai.configure(api_key=api_key)
+        genai.configure(api_key=api_key)  # type: ignore
         
-        # 使用支持搜索的Gemini模型
-        model = genai.GenerativeModel(
-            model_name='gemini-1.5-pro'
+        # 使用最新的Gemini 2.5模型
+        model = genai.GenerativeModel(  # type: ignore[attr-defined]
+            model_name='gemini-2.5-pro'
         )
         
         return model
@@ -674,7 +678,9 @@ def main():
             
             # 显示结果概要
             for i, result in enumerate(results, 1):
-                print(f"  {i}. {result.title} ({result.source})")
+                # 格式化日期显示
+                date_display = f" - {result.publication_date}" if result.publication_date else ""
+                print(f"  {i}. ⭐ {result.title} ({result.source}{date_display})")
             
             # 询问是否创建草稿
             create_draft = input("\n是否基于这些灵感创建文章草稿？(y/N): ").strip().lower()
@@ -682,7 +688,11 @@ def main():
                 draft_path = generator.create_inspired_draft(topic, results, category)
                 if draft_path:
                     print(f"📄 草稿已创建: {draft_path}")
-                    print("💡 您可以使用主程序的'处理现有草稿'功能来发布文章")
+                    print("💡 草稿使用说明:")
+                    print("   • 草稿已自动生成Front Matter和基础结构")
+                    print("   • 包含了所有权威来源的关键洞察")
+                    print("   • 可以直接编辑完善后发布")
+                    print("   • 或使用主程序的'处理现有草稿'功能进行发布")
         else:
             print("❌ 未找到相关权威资讯，请尝试其他关键词")
             
