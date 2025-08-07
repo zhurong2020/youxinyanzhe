@@ -105,7 +105,7 @@ class DraftFormatter:
             category_scores['investment-finance'] += text.count(keyword) * 2
         
         # 返回得分最高的分类
-        best_category = max(category_scores, key=category_scores.get)
+        best_category = max(category_scores.items(), key=lambda x: x[1])[0]
         
         # 如果所有分类得分都很低，根据长度返回默认分类
         if category_scores[best_category] < 3:
