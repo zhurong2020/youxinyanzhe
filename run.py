@@ -395,7 +395,7 @@ def handle_format_draft_menu(pipeline):
             print(f"\n🔄 正在格式化草稿: {input_file}")
             
             # 调用format_draft.py脚本
-            script_path = Path("scripts/tools/format_draft.py")
+            script_path = Path("scripts/tools/content/format_draft.py")
             result = execute_script_with_logging(
                 pipeline, script_path, [input_file], 
                 "格式化单个草稿文件"
@@ -445,7 +445,7 @@ def handle_format_draft_menu(pipeline):
             for file in files_to_process:
                 try:
                     print(f"\n处理: {file}")
-                    script_path = Path("scripts/tools/format_draft.py")
+                    script_path = Path("scripts/tools/content/format_draft.py")
                     result = execute_script_with_logging(
                         pipeline, script_path, [file], 
                         f"批量格式化-{Path(file).name}"
@@ -644,7 +644,7 @@ def handle_monetization_menu(pipeline):
     elif sub_choice == "4":
         # 运行奖励系统测试
         try:
-            script_path = Path("scripts/tools/test_reward_system.py")
+            script_path = Path("scripts/tools/testing/test_reward_system.py")
             print("\n🧪 运行奖励系统测试...")
             result = execute_script_with_logging(
                 pipeline, script_path, [], 
@@ -721,7 +721,7 @@ def handle_system_check_menu(pipeline):
     elif sub_choice == "2":
         # GitHub Token状态检查
         try:
-            script_path = Path("scripts/tools/check_github_token.py")
+            script_path = Path("scripts/tools/checks/check_github_token.py")
             print("\n🔍 检查GitHub Token状态...")
             result = execute_script_with_logging(
                 pipeline, script_path, [], 
@@ -847,7 +847,7 @@ def handle_system_check_menu(pipeline):
         
         # 检查GitHub Token
         try:
-            script_path = Path("scripts/tools/check_github_token.py")
+            script_path = Path("scripts/tools/checks/check_github_token.py")
             result = execute_script_with_logging(
                 pipeline, script_path, [], 
                 "综合检查-GitHub Token"
