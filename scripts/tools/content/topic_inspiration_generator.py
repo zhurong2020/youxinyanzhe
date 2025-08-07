@@ -108,6 +108,10 @@ class TopicInspirationGenerator:
         """初始化Gemini客户端"""
         if genai is None:
             raise ValueError("未安装google-generativeai库，请运行: pip install google-generativeai")
+        
+        # 确保加载环境变量
+        from dotenv import load_dotenv
+        load_dotenv()
             
         # 尝试从两个可能的环境变量名获取API密钥
         api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
@@ -297,12 +301,10 @@ class TopicInspirationGenerator:
             prompt = f"""
 {domain_prompt}
 
-**CRITICAL TIME REQUIREMENT:** 
-- ONLY search for content from {date_range} 
-- Current date is {datetime.now().strftime('%Y-%m-%d')}
-- Prioritize content from {datetime.now().strftime('%Y')} (this year)
-- Exclude any content from 2024 or earlier years
-- Focus on the most recent {days} days
+**TIME PREFERENCE:** 
+- Prioritize recent content from 2024-2025
+- Focus on current developments and trends
+- Include both breaking news and recent research
 
 **OUTPUT FORMAT:**
 For each of exactly 5 results, provide structured information:
@@ -367,11 +369,9 @@ Search for recent, authoritative information about: {keywords_str}
         prompt = f"""
 Find recent news and research developments about: {', '.join(safe_keywords)}
 
-**CRITICAL TIME REQUIREMENT**:
-- Time Range: {date_range} (most recent {days} days only)
-- Current date: {datetime.now().strftime('%Y-%m-%d')}
-- MUST be from {datetime.now().strftime('%Y')} (this year)
-- NO content from 2024 or earlier years
+**TIME PREFERENCE**:
+- Focus on recent developments from 2024-2025
+- Prioritize current and trending topics
 **Preferred Sources**: {', '.join(sources[:5])}
 
 Please provide 5 recent articles or research papers with this format:
@@ -1026,7 +1026,7 @@ toc_sticky: true
                 source_link = f" ([原文链接]({result.url}))"
             
             # 为中文版本创建简化的描述
-            chinese_summary = f"该研究/报道涉及{topic_name}领域的最新发展"
+            chinese_summary = f"该研究/报道涉及{topic}领域的最新发展"
             
             content += f"""### {i}. {result.title}
 
