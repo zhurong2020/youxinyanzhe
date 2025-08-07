@@ -339,7 +339,7 @@ For each of exactly 5 results, provide structured information:
             prompt = f"""
 Search for recent, authoritative information about: {keywords_str}
 
-**TIME RANGE:** {date_range} (focus on the most recent {days} days)
+**TIME FOCUS:** Recent {days} days (prioritizing latest developments)
 **PREFERRED SOURCES:** {', '.join(sources) if sources else 'Major international news and academic sources'}
 
 [继续使用标准输出格式...]
@@ -476,7 +476,7 @@ Focus on factual reporting, recent developments, and credible sources.
 Search for recent, authoritative English-language news and insights about: "{topic}"
 
 **SEARCH REQUIREMENTS:**
-- Time Range: {date_range} (focus on the most recent {days} days)
+- Focus on recent {days} days of content
 - Current date: {datetime.now().strftime('%Y-%m-%d')}
 - CRITICAL: ONLY content from {datetime.now().strftime('%Y')} (this year)
 - EXCLUDE any content from 2024 or earlier years
