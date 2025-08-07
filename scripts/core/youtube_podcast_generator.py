@@ -481,6 +481,51 @@ class YouTubePodcastGenerator:
         
         return 0  # 无法解析，返回0
     
+    def _format_podcast_script(self, script_content: str) -> str:
+        """
+        格式化播客脚本用于在文章中显示
+        
+        Args:
+            script_content: 原始脚本内容
+            
+        Returns:
+            格式化后的脚本内容
+        """
+        try:
+            lines = script_content.split('\n')
+            formatted_lines = []
+            
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    formatted_lines.append('')
+                    continue
+                
+                # 检测对话格式并美化
+                if line.startswith('Person A:') or line.startswith('A:'):
+                    # Person A 用蓝色
+                    formatted_lines.append(f"**🟦 主持人A**: {line.split(':', 1)[1].strip()}")
+                elif line.startswith('Person B:') or line.startswith('B:'):
+                    # Person B 用绿色  
+                    formatted_lines.append(f"**🟩 主持人B**: {line.split(':', 1)[1].strip()}")
+                elif line.startswith('Narrator:') or line.startswith('旁白:'):
+                    # 旁白用灰色
+                    formatted_lines.append(f"*📢 {line.split(':', 1)[1].strip()}*")
+                elif ':' in line and len(line.split(':', 1)[0]) < 20:
+                    # 其他对话格式
+                    speaker, content = line.split(':', 1)
+                    formatted_lines.append(f"**🎙️ {speaker.strip()}**: {content.strip()}")
+                else:
+                    # 普通文本
+                    formatted_lines.append(line)
+            
+            return '\n'.join(formatted_lines)
+            
+        except Exception as e:
+            self._log(f"播客脚本格式化失败: {e}", "warning")
+            # 如果格式化失败，返回原始内容但加上代码块格式
+            return f"```\n{script_content}\n```"
+    
     def _generate_safe_filename(self, title: str, max_length: int = 50) -> str:
         """
         从标题生成安全的文件名
@@ -2881,7 +2926,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
     
     def create_jekyll_article(self, video_info: Dict[str, Any], content_guide: Dict[str, Any], 
                             youtube_url: str, audio_path: Optional[str] = None, thumbnail_path: str = "",
-                            youtube_video_id: Optional[str] = None) -> str:
+                            youtube_video_id: Optional[str] = None, script_path: Optional[str] = None) -> str:
         """
         创建Jekyll格式的文章
         
@@ -2892,6 +2937,7 @@ YouTube 동영상 "{video_info['title']}"에 대한 {podcast_minutes}분간의 �
             audio_path: 音频文件路径
             thumbnail_path: 缩略图路径
             youtube_video_id: YouTube播客视频ID（可选）
+            script_path: 播客脚本文件路径（可选）
             
         Returns:
             文章文件路径
@@ -2967,6 +3013,43 @@ header:
         # 添加大纲内容
         for point in content_guide['outline']:
             article_content += f"- {point}\n"
+        
+        # 添加播客文稿展示部分
+        if script_path and os.path.exists(script_path):
+            try:
+                with open(script_path, 'r', encoding='utf-8') as f:
+                    script_content = f.read()
+                
+                # 清理和格式化脚本内容
+                formatted_script = self._format_podcast_script(script_content)
+                
+                article_content += f"""
+
+## 📝 播客文稿
+
+<details>
+<summary>点击展开查看完整播客文稿</summary>
+
+{formatted_script}
+
+</details>
+
+---
+
+"""
+            except Exception as e:
+                self._log(f"⚠️ 无法读取播客脚本文件: {e}", "warning")
+                article_content += f"""
+
+## 📝 播客文稿
+
+> ⚠️ 播客脚本文件读取失败，但播客音频正常生成。
+> 
+> 脚本文件位置: `{script_path}`
+
+---
+
+"""
         
         article_content += f"""
 ## 🌍 英语学习指南
@@ -3243,9 +3326,21 @@ header:
                 else:
                     self._log("⚠️ 音频视频生成失败，跳过YouTube上传")
             
-            # 7. 创建Jekyll文章（更新以包含YouTube链接）
+            # 7. 创建Jekyll文章（更新以包含YouTube链接和播客脚本）
+            # 获取script_path（如果存在）
+            script_path_for_article = None
+            if 'script_path' in locals():
+                script_path_for_article = script_path
+            else:
+                # 尝试构建脚本文件路径（针对非备用模式）
+                today = datetime.now()
+                safe_title = self._generate_safe_filename(video_info['title'])
+                potential_script_path = os.path.join(self.audio_dir, f"youtube-{today.strftime('%Y%m%d')}-{safe_title}-script.txt")
+                if os.path.exists(potential_script_path):
+                    script_path_for_article = potential_script_path
+            
             article_path = self.create_jekyll_article(
-                video_info, content_guide, youtube_url, audio_path, thumbnail_path, youtube_video_id
+                video_info, content_guide, youtube_url, audio_path, thumbnail_path, youtube_video_id, script_path_for_article
             )
             
             result = {
