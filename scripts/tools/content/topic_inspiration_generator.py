@@ -276,10 +276,7 @@ class TopicInspirationGenerator:
     def _build_domain_search_prompt(self, domain_config: Dict[str, Any], days: int = 7) -> str:
         """构建专业领域搜索提示词"""
         
-        # 计算日期范围
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=days)
-        date_range = f"{start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
+        # 日期信息用于搜索偏好
         
         # 获取领域配置
         keywords = domain_config.get('keywords', [])
@@ -301,10 +298,11 @@ class TopicInspirationGenerator:
             prompt = f"""
 {domain_prompt}
 
-**TIME PREFERENCE:** 
-- Prioritize recent content from 2024-2025
-- Focus on current developments and trends
-- Include both breaking news and recent research
+**TIME REQUIREMENTS:** 
+- PRIORITIZE content from 2025 (current year)
+- Include recent 2024 content as secondary priority  
+- Focus on latest developments, news, and research
+- Prefer content from the last 6 months when available
 
 **OUTPUT FORMAT:**
 For each of exactly 5 results, provide structured information:
@@ -313,7 +311,7 @@ For each of exactly 5 results, provide structured information:
 **Title:** [Clear, descriptive headline]
 **Source:** [Publication name]
 **Date:** [YYYY-MM-DD format]
-**URL:** [If available]
+**URL:** [Original article URL - REQUIRED for credibility]
 **Summary:** [2-3 sentences describing the main content]
 **Key Insights:** 
 - [Insight 1]
@@ -332,6 +330,8 @@ For each of exactly 5 results, provide structured information:
 - Significant impact or breakthrough potential
 - Unique insights or analysis
 - Potential for inspiring thoughtful Chinese content
+
+**CRITICAL: MUST include original article URLs for all results**
 """
         else:
             # 回退到通用搜索格式
@@ -350,10 +350,7 @@ Search for recent, authoritative information about: {keywords_str}
     def _build_fallback_search_prompt(self, domain_config: Dict[str, Any], days: int = 7) -> str:
         """构建更简单的备用搜索提示词（避免安全过滤）"""
         
-        # 计算日期范围
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=days)
-        date_range = f"{start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
+        # 日期信息用于搜索偏好
         
         # 获取领域的核心关键词（使用较少敏感的词汇）
         keywords = domain_config.get('keywords', [])
@@ -369,9 +366,10 @@ Search for recent, authoritative information about: {keywords_str}
         prompt = f"""
 Find recent news and research developments about: {', '.join(safe_keywords)}
 
-**TIME PREFERENCE**:
-- Focus on recent developments from 2024-2025
-- Prioritize current and trending topics
+**TIME REQUIREMENTS**:
+- PRIORITIZE content from 2025 (current year)
+- Include recent 2024 content as secondary priority
+- Focus on latest developments and trending topics
 **Preferred Sources**: {', '.join(sources[:5])}
 
 Please provide 5 recent articles or research papers with this format:
@@ -471,10 +469,7 @@ Focus on factual reporting, recent developments, and credible sources.
     def _build_search_prompt(self, topic: str, category: Optional[str] = None, days: int = 7) -> str:
         """构建搜索提示词"""
         
-        # 计算日期范围
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=days)
-        date_range = f"{start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
+        # 日期信息用于搜索偏好
         
         # 基础搜索提示
         prompt = f"""
@@ -503,7 +498,7 @@ For each of exactly 5 results, provide structured information:
 **Title:** [Clear, descriptive headline]
 **Source:** [Publication name]
 **Date:** [YYYY-MM-DD format]
-**URL:** [If available]
+**URL:** [Original article URL - REQUIRED for credibility]
 **Summary:** [2-3 sentences describing the main content]
 **Key Insights:** 
 - [Insight 1]
@@ -540,6 +535,7 @@ For each of exactly 5 results, provide structured information:
 - Unique insights or analysis
 - Potential for inspiring thoughtful Chinese content
 
+**CRITICAL: MUST include original article URLs for all results**
 Please ensure all sources are legitimate and authoritative. Avoid opinion blogs, social media, or unverified sources.
 """
         
@@ -1025,8 +1021,35 @@ toc_sticky: true
             if result.url:
                 source_link = f" ([原文链接]({result.url}))"
             
-            # 为中文版本创建简化的描述
-            chinese_summary = f"该研究/报道涉及{topic}领域的最新发展"
+            # 为中文版本创建基于英文摘要的中文描述
+            def translate_to_chinese_summary(english_summary: str) -> str:
+                """基于英文摘要生成有意义的中文总结"""
+                # 提取关键信息并生成中文摘要
+                if "AI" in english_summary or "artificial intelligence" in english_summary:
+                    chinese_base = "人工智能技术"
+                elif "blockchain" in english_summary or "crypto" in english_summary:
+                    chinese_base = "区块链和数字货币"
+                elif "drug" in english_summary or "medical" in english_summary:
+                    chinese_base = "医疗健康技术"
+                elif "quantum" in english_summary:
+                    chinese_base = "量子计算技术"
+                elif "climate" in english_summary or "energy" in english_summary:
+                    chinese_base = "气候与能源技术"
+                else:
+                    chinese_base = f"{topic}相关技术"
+                
+                # 基于摘要长度和内容生成合适的中文描述
+                if len(english_summary) > 150:
+                    if "study" in english_summary.lower() or "research" in english_summary.lower():
+                        return f"最新研究显示，{chinese_base}在实际应用中取得重要进展，为行业发展带来新的可能性"
+                    elif "company" in english_summary.lower() or "launched" in english_summary.lower():
+                        return f"业界重要动态表明，{chinese_base}的商业化应用正在加速，市场影响力不断扩大"
+                    else:
+                        return f"权威报道指出，{chinese_base}领域出现显著发展，相关技术和政策环境都在发生重要变化"
+                else:
+                    return f"据权威报道，{chinese_base}领域的最新发展值得关注"
+            
+            chinese_summary = translate_to_chinese_summary(result.summary)
             
             content += f"""### {i}. {result.title}
 

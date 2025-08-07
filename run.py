@@ -626,6 +626,9 @@ def handle_topic_inspiration_menu(pipeline):
                         
                         pipeline.log(f"专业领域报告生成成功: {report_file}, 结果数: {len(results)}", level="info", force=True)
                         
+                        # 记录灵感报告到状态系统
+                        generator._record_inspiration_report(str(report_file), topic_name, display_name)
+                        
                         # 显示结果概要
                         for i, result in enumerate(results, 1):
                             credibility_emoji = "🌟" if result.credibility_score >= 9 else "⭐" if result.credibility_score >= 7 else "📰"
@@ -644,6 +647,9 @@ def handle_topic_inspiration_menu(pipeline):
                                 print("   • 可以直接编辑完善后发布")
                                 print("   • 或选择主菜单 '1. 处理现有草稿' 来正式发布")
                                 pipeline.log(f"基于专业领域创建草稿成功: {draft_path}", level="info", force=True)
+                                
+                                # 更新状态记录，添加草稿信息
+                                generator._record_inspiration_report(str(report_file), topic_name, display_name, draft_path)
                     else:
                         print("❌ 未找到相关权威资讯，请检查网络连接或稍后重试")
                         pipeline.log(f"专业领域搜索无结果: {display_name}", level="warning", force=True)
@@ -718,6 +724,9 @@ def handle_topic_inspiration_menu(pipeline):
                 
                 pipeline.log(f"主题灵感报告生成成功: {report_file}, 结果数: {len(results)}", level="info", force=True)
                 
+                # 记录灵感报告到状态系统
+                generator._record_inspiration_report(str(report_file), topic, None)
+                
                 # 显示结果概要
                 for i, result in enumerate(results, 1):
                     credibility_emoji = "🌟" if result.credibility_score >= 9 else "⭐" if result.credibility_score >= 7 else "📰"
@@ -736,6 +745,9 @@ def handle_topic_inspiration_menu(pipeline):
                         print("   • 可以直接编辑完善后发布")
                         print("   • 或选择主菜单 '1. 处理现有草稿' 来正式发布")
                         pipeline.log(f"基于灵感创建草稿成功: {draft_path}", level="info", force=True)
+                        
+                        # 更新状态记录，添加草稿信息
+                        generator._record_inspiration_report(str(report_file), topic, None, draft_path)
             else:
                 print("❌ 未找到相关权威资讯，请尝试其他关键词或检查网络连接")
                 pipeline.log(f"主题灵感搜索无结果: {topic}", level="warning", force=True)
