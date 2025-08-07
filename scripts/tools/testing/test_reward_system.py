@@ -82,7 +82,7 @@ def test_smtp_connection():
     print("\n🔍 测试邮件SMTP连接...")
     
     try:
-        from ..utils.email_sender import create_email_sender
+        from ...utils.email_sender import create_email_sender
         sender = create_email_sender()
         success, message = sender.test_connection()
         
@@ -102,7 +102,7 @@ def test_github_access():
     print("\n🔍 测试GitHub API访问...")
     
     try:
-        from ..utils.github_release_manager import create_github_manager
+        from ...utils.github_release_manager import create_github_manager
         manager = create_github_manager()
         
         # 测试获取统计信息
@@ -134,7 +134,7 @@ def test_package_creator():
     print("\n🔍 测试内容包创建器...")
     
     try:
-        from ..utils.package_creator import create_package_creator
+        from ...utils.package_creator import create_package_creator
         creator = create_package_creator()
         
         # 检查输出目录是否可创建

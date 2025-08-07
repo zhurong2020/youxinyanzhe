@@ -99,19 +99,19 @@ class TestElevenLabsTools:
     def test_voice_tester_imports(self):
         """测试声音测试器导入"""
         # 测试主要的导入不会失败
-        import scripts.tools.elevenlabs_voice_tester as voice_tester
+        import scripts.tools.elevenlabs.elevenlabs_voice_tester as voice_tester
         assert hasattr(voice_tester, 'ElevenLabsVoiceTester')
         assert hasattr(voice_tester, 'main')
     
     def test_permission_check_imports(self):
         """测试权限检查工具导入"""
-        import scripts.tools.elevenlabs_permission_check as permission_check
+        import scripts.tools.elevenlabs.elevenlabs_permission_check as permission_check
         assert hasattr(permission_check, 'check_api_permissions')
         assert hasattr(permission_check, 'main')
     
     def test_dual_voice_test_imports(self):
         """测试双人对话测试导入"""
-        import scripts.tools.test_dual_voice_podcast as dual_voice_test
+        import scripts.tools.elevenlabs.test_dual_voice_podcast as dual_voice_test
         assert hasattr(dual_voice_test, 'test_dual_voice_dialogue')
         assert hasattr(dual_voice_test, 'main')
 

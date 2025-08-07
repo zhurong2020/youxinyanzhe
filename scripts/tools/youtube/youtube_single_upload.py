@@ -14,7 +14,7 @@ sys.path.insert(0, str(project_root))
 def main():
     """主函数"""
     try:
-        from scripts.tools.youtube_upload_tester import YouTubeUploadTester
+        from scripts.tools.youtube.youtube_upload_tester import YouTubeUploadTester
         
         print("🎬 YouTube单个文件上传工具")
         print("=" * 50)
