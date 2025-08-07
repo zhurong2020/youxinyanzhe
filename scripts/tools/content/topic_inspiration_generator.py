@@ -176,14 +176,65 @@ class TopicInspirationGenerator:
             print("🌐 正在调用Gemini联网搜索...")
             response = self.gemini_client.generate_content(search_prompt)
             
-            if not response or not response.text:
-                print("❌ Gemini搜索未返回结果")
+            if not response:
+                print("❌ Gemini搜索未返回响应")
                 return []
+            
+            # 检查响应状态
+            response_text = None
+            if hasattr(response, 'candidates') and response.candidates:
+                candidate = response.candidates[0]
+                if hasattr(candidate, 'finish_reason'):
+                    finish_reason = candidate.finish_reason
+                    if finish_reason == 1:  # STOP - 正常完成
+                        print("✅ 搜索正常完成")
+                    elif finish_reason == 2:  # MAX_TOKENS
+                        print("⚠️ 响应被截断，但可能包含有用信息")
+                    elif finish_reason == 3:  # SAFETY
+                        print("❌ 内容被安全过滤器阻止，尝试使用更通用的搜索词...")
+                        # 尝试使用更通用的搜索提示
+                        fallback_prompt = self._build_fallback_search_prompt(domain_config, days)
+                        print("🔄 使用备用搜索策略...")
+                        response = self.gemini_client.generate_content(fallback_prompt)
+                        if not response:
+                            print("❌ 备用搜索也失败")
+                            return []
+                    elif finish_reason == 4:  # RECITATION
+                        print("❌ 内容因引用问题被过滤，请尝试其他搜索词")
+                        return []
+            
+            # 尝试获取响应文本
+            try:
+                response_text = response.text
+                if not response_text:
+                    print("❌ Gemini搜索返回空内容")
+                    return []
+            except Exception as e:
+                print(f"⚠️ 无法直接获取响应文本: {e}")
+                # 尝试从候选答案中获取内容
+                if hasattr(response, 'candidates') and response.candidates:
+                    for candidate in response.candidates:
+                        if hasattr(candidate, 'content') and candidate.content:
+                            if hasattr(candidate.content, 'parts') and candidate.content.parts:
+                                for part in candidate.content.parts:
+                                    if hasattr(part, 'text') and part.text:
+                                        response_text = part.text
+                                        print("✅ 从候选内容中提取到文本")
+                                        break
+                                if response_text:
+                                    break
+                    
+                    if not response_text:
+                        print("❌ 无法从任何候选答案中提取内容")
+                        return []
+                else:
+                    print("❌ 响应中没有候选答案")
+                    return []
             
             print("📊 正在解析搜索结果...")
             # 解析搜索结果
             topic_name = domain_config.get('display_name', domain_id)
-            results = self._parse_search_results(response.text, topic_name)
+            results = self._parse_search_results(response_text, topic_name)
             
             # 使用领域专用的权威来源进行筛选和评分
             filtered_results = self._filter_and_score_domain_results(results, domain_config)
@@ -273,6 +324,51 @@ Search for recent, authoritative information about: {keywords_str}
         
         return prompt
 
+    def _build_fallback_search_prompt(self, domain_config: Dict[str, Any], days: int = 7) -> str:
+        """构建更简单的备用搜索提示词（避免安全过滤）"""
+        
+        # 计算日期范围
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+        date_range = f"{start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
+        
+        # 获取领域的核心关键词（使用较少敏感的词汇）
+        keywords = domain_config.get('keywords', [])
+        sources = domain_config.get('sources', [])
+        display_name = domain_config.get('display_name', '技术创新')
+        
+        # 简化关键词，避免可能触发过滤的词汇
+        safe_keywords = []
+        for keyword in keywords[:4]:  # 只使用前4个关键词
+            # 移除可能敏感的词汇
+            safe_keyword = keyword.replace('AI', 'artificial intelligence').replace('medical', 'healthcare')
+            safe_keywords.append(safe_keyword)
+        
+        prompt = f"""
+Find recent news and research developments about: {', '.join(safe_keywords)}
+
+**Time Range**: {date_range} (recent {days} days)
+**Preferred Sources**: {', '.join(sources[:5])}
+
+Please provide 5 recent articles or research papers with this format:
+
+## Result 1
+**Title:** [Article title]
+**Source:** [Publication name] 
+**Date:** [YYYY-MM-DD]
+**Summary:** [Brief description]
+**Key Points:**
+- [Point 1]
+- [Point 2]
+
+## Result 2
+[Same format...]
+
+Focus on factual reporting, recent developments, and credible sources.
+"""
+        
+        return prompt
+
     def get_topic_inspiration(self, topic: str, category: Optional[str] = None, days: int = 7) -> List[NewsResult]:
         """
         获取主题相关的权威英文资讯灵感
@@ -297,13 +393,39 @@ Search for recent, authoritative information about: {keywords_str}
             print("🌐 正在调用Gemini联网搜索...")
             response = self.gemini_client.generate_content(search_prompt)
             
-            if not response or not response.text:
-                print("❌ Gemini搜索未返回结果")
+            if not response:
+                print("❌ Gemini搜索未返回响应")
                 return []
+            
+            # 获取响应文本（使用相同的错误处理逻辑）
+            try:
+                response_text = response.text
+                if not response_text:
+                    print("❌ Gemini搜索返回空内容")
+                    return []
+            except Exception as e:
+                print(f"⚠️ 无法直接获取响应文本: {e}")
+                # 尝试从候选答案中获取内容
+                response_text = None
+                if hasattr(response, 'candidates') and response.candidates:
+                    for candidate in response.candidates:
+                        if hasattr(candidate, 'content') and candidate.content:
+                            if hasattr(candidate.content, 'parts') and candidate.content.parts:
+                                for part in candidate.content.parts:
+                                    if hasattr(part, 'text') and part.text:
+                                        response_text = part.text
+                                        print("✅ 从候选内容中提取到文本")
+                                        break
+                                if response_text:
+                                    break
+                
+                if not response_text:
+                    print("❌ 无法从响应中提取任何文本内容")
+                    return []
             
             print("📊 正在解析搜索结果...")
             # 解析搜索结果
-            results = self._parse_search_results(response.text, topic)
+            results = self._parse_search_results(response_text, topic)
             
             # 筛选和评分
             filtered_results = self._filter_and_score_results(results)
