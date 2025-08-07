@@ -753,40 +753,129 @@ def handle_topic_inspiration_menu(pipeline):
             pipeline.log(f"主题灵感生成失败: {e}", level="error", force=True)
             
     elif sub_choice == "3":
-        # 查看最近的灵感报告
+        # 查看最近的灵感报告 - 使用新的报告管理系统
         try:
-            reports_dir = Path(".tmp/output/inspiration_reports")
-            if reports_dir.exists():
-                reports = list(reports_dir.glob("*.md"))
+            from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator
+            generator = TopicInspirationGenerator()
+            
+            print("\n📋 灵感报告管理")
+            print("="*40)
+            print("请选择操作：")
+            print("1. 📊 查看报告历史和统计")
+            print("2. 🔍 浏览具体报告内容")
+            print("3. 🧹 清理过期报告")
+            print("0. 返回上级菜单")
+            
+            manage_choice = input("\n请输入选项 (1-3/0): ").strip()
+            
+            if manage_choice == "1":
+                # 查看报告历史和统计
+                reports = generator.get_inspiration_history()
+                
+                # 计算统计信息
+                total_reports = len(reports)
+                domain_reports = sum(1 for r in reports if r.get('domain_name'))
+                custom_reports = total_reports - domain_reports
+                draft_count = sum(1 for r in reports if r.get('draft_path'))
+                
+                print(f"\n📊 报告统计信息")
+                print("-" * 30)
+                print(f"总报告数量: {total_reports}")
+                print(f"专业领域报告: {domain_reports}")
+                print(f"自定义主题报告: {custom_reports}")
+                print(f"生成草稿数量: {draft_count}")
+                
                 if reports:
-                    # 按修改时间排序
-                    reports.sort(key=lambda p: p.stat().st_mtime, reverse=True)
-                    print(f"\n📋 最近的 {min(len(reports), 10)} 个灵感报告：")
-                    
+                    print(f"\n📋 最近 {min(len(reports), 10)} 个报告:")
                     for i, report in enumerate(reports[:10], 1):
-                        import datetime
-                        mtime = datetime.datetime.fromtimestamp(report.stat().st_mtime)
-                        print(f"  {i}. {report.stem} ({mtime.strftime('%Y-%m-%d %H:%M')})")
-                    
-                    # 询问是否查看特定报告
-                    view_choice = input(f"\n输入编号查看报告 (1-{min(len(reports), 10)}), 或按Enter返回: ").strip()
-                    if view_choice.isdigit() and 1 <= int(view_choice) <= min(len(reports), 10):
-                        selected_report = reports[int(view_choice) - 1]
-                        print(f"\n📖 查看报告: {selected_report.name}")
-                        print("-" * 60)
-                        with open(selected_report, 'r', encoding='utf-8') as f:
-                            content = f.read()
-                            # 只显示前1000个字符
-                            if len(content) > 1000:
-                                print(content[:1000] + "\n...(内容已截断)")
-                            else:
-                                print(content)
+                        status_emoji = "✅" if report['status'] == 'completed' else "⏳" if report['status'] == 'draft_created' else "📄"
+                        domain_info = f" [{report['domain_name']}]" if report.get('domain_name') else ""
+                        print(f"  {i}. {status_emoji} {report['topic']}{domain_info}")
+                        print(f"      {report['created_time']} - {Path(report['report_file']).name}")
+                        if report.get('draft_path'):
+                            draft_status = "存在" if report.get('draft_exists', False) else "已删除"
+                            print(f"      📝 草稿: {Path(report['draft_path']).name} ({draft_status})")
+                        print()
                 else:
-                    print("📋 暂无灵感报告")
-            else:
-                print("📋 暂无灵感报告")
+                    print("\n📋 暂无历史报告")
+                    
+            elif manage_choice == "2":
+                # 浏览具体报告内容
+                reports_dir = Path(".tmp/output/inspiration_reports")
+                if reports_dir.exists():
+                    reports = list(reports_dir.glob("*.md"))
+                    if reports:
+                        # 按修改时间排序
+                        reports.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+                        print(f"\n📋 可用报告 ({len(reports)} 个):")
+                        
+                        for i, report in enumerate(reports[:15], 1):
+                            import datetime
+                            mtime = datetime.datetime.fromtimestamp(report.stat().st_mtime)
+                            print(f"  {i}. {report.stem} ({mtime.strftime('%Y-%m-%d %H:%M')})")
+                        
+                        # 询问是否查看特定报告
+                        view_choice = input(f"\n输入编号查看报告 (1-{min(len(reports), 15)}), 或按Enter返回: ").strip()
+                        if view_choice.isdigit() and 1 <= int(view_choice) <= min(len(reports), 15):
+                            selected_report = reports[int(view_choice) - 1]
+                            print(f"\n📖 查看报告: {selected_report.name}")
+                            print("-" * 60)
+                            with open(selected_report, 'r', encoding='utf-8') as f:
+                                content = f.read()
+                                # 智能显示：优先显示摘要部分
+                                if "## 📊 搜索结果统计" in content:
+                                    # 显示统计和前几条结果
+                                    parts = content.split("## 📊 搜索结果统计")
+                                    if len(parts) > 1:
+                                        header = parts[0]
+                                        stats_and_results = "## 📊 搜索结果统计" + parts[1]
+                                        if len(stats_and_results) > 1500:
+                                            stats_and_results = stats_and_results[:1500] + "\n\n...(内容已截断，完整内容请查看文件)"
+                                        print(header)
+                                        print(stats_and_results)
+                                    else:
+                                        # 回退到简单截断
+                                        if len(content) > 1000:
+                                            print(content[:1000] + "\n\n...(内容已截断)")
+                                        else:
+                                            print(content)
+                                else:
+                                    # 简单截断
+                                    if len(content) > 1000:
+                                        print(content[:1000] + "\n\n...(内容已截断)")
+                                    else:
+                                        print(content)
+                    else:
+                        print("📋 暂无可用报告")
+                else:
+                    print("📋 报告目录不存在")
+                    
+            elif manage_choice == "3":
+                # 清理过期报告
+                print("\n🧹 清理过期报告")
+                days = input("请输入保留天数 (默认30天): ").strip()
+                if not days.isdigit():
+                    days = 30
+                else:
+                    days = int(days)
+                    
+                confirm = input(f"\n确定要清理 {days} 天前的报告吗？(y/N): ").strip().lower()
+                if confirm in ['y', 'yes']:
+                    result = generator.clean_inspiration_reports(keep_days=days)
+                    print(f"\n✅ 清理完成:")
+                    print(f"   删除报告: {result['reports_deleted']} 个")
+                    print(f"   删除状态记录: {result['status_records_deleted']} 个")
+                    if result['reports_deleted'] > 0 or result['status_records_deleted'] > 0:
+                        print(f"   释放存储空间")
+                else:
+                    print("❌ 用户取消清理操作")
+                    
+            elif manage_choice != "0":
+                print("❌ 无效的选择")
+                
         except Exception as e:
-            print(f"❌ 查看报告失败: {e}")
+            print(f"❌ 报告管理失败: {e}")
+            pipeline.log(f"灵感报告管理失败: {e}", level="error", force=True)
             
     elif sub_choice == "4":
         # 配置和测试Gemini连接
