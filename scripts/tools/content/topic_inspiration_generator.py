@@ -590,9 +590,17 @@ Please ensure all sources are legitimate and authoritative. Avoid opinion blogs,
         domain_sources = domain_config.get('sources', [])
         domain_keywords = domain_config.get('keywords', [])
         
-        for result in results:
+        print(f"🔍 开始筛选 {len(results)} 个搜索结果...")
+        
+        for i, result in enumerate(results):
+            print(f"  结果 {i+1}: {result.title[:50]}...")
+            print(f"    来源: {result.source}")
+            print(f"    原始可信度: {result.credibility_score}")
+            print(f"    原始相关性: {result.relevance_score:.1f}")
+            
             # 基本质量过滤
             if (len(result.title) < 10 or len(result.summary) < 50):
+                print(f"    ❌ 被过滤：标题或摘要太短 (标题:{len(result.title)}, 摘要:{len(result.summary)})")
                 continue
             
             # 使用领域专用来源计算可信度
@@ -606,10 +614,19 @@ Please ensure all sources are legitimate and authoritative. Avoid opinion blogs,
             )
             result.relevance_score = max(result.relevance_score, domain_relevance)
             
-            # 设置更高的质量标准
-            if result.credibility_score >= 6 and result.relevance_score >= 6:
+            print(f"    领域可信度: {domain_credibility}")
+            print(f"    领域相关性: {domain_relevance:.1f}")
+            print(f"    最终可信度: {result.credibility_score}")
+            print(f"    最终相关性: {result.relevance_score:.1f}")
+            
+            # 放宽质量标准 - 从6分降到5分
+            if result.credibility_score >= 5 and result.relevance_score >= 5:
+                print(f"    ✅ 通过筛选")
                 filtered_results.append(result)
+            else:
+                print(f"    ❌ 被过滤：质量不达标 (可信度:{result.credibility_score}, 相关性:{result.relevance_score:.1f})")
         
+        print(f"📊 筛选结果：{len(filtered_results)}/{len(results)} 个结果通过")
         return filtered_results
 
     def _calculate_domain_source_credibility(self, source: str, domain_sources: List[str]) -> int:
@@ -635,34 +652,58 @@ Please ensure all sources are legitimate and authoritative. Avoid opinion blogs,
         try:
             text_lower = text.lower()
             relevance_score = 0.0
+            matched_keywords = 0
+            
+            print(f"      分析文本: {text_lower[:100]}...")
+            print(f"      领域关键词: {domain_keywords}")
             
             # 计算领域关键词匹配度
             for keyword in domain_keywords:
                 keyword_lower = keyword.lower()
+                keyword_matched = False
+                
                 if keyword_lower in text_lower:
                     # 完整短语匹配给予更高分数
                     if ' ' in keyword:
-                        relevance_score += 3
+                        relevance_score += 4  # 提高完整短语分数
+                        print(f"      ✅ 完整短语匹配: '{keyword}' (+4分)")
                     else:
-                        relevance_score += 2
+                        relevance_score += 3  # 提高单词分数
+                        print(f"      ✅ 单词匹配: '{keyword}' (+3分)")
+                    keyword_matched = True
+                else:
+                    # 部分词匹配
+                    keyword_words = keyword_lower.split()
+                    partial_matches = 0
+                    for word in keyword_words:
+                        if len(word) > 2 and word in text_lower:  # 降低词长度要求
+                            partial_matches += 1
+                            relevance_score += 1
+                            print(f"      ⚡ 部分匹配: '{word}' (+1分)")
+                    
+                    if partial_matches > 0:
+                        keyword_matched = True
                 
-                # 部分词匹配
-                keyword_words = keyword_lower.split()
-                for word in keyword_words:
-                    if len(word) > 3 and word in text_lower:
-                        relevance_score += 1
+                if keyword_matched:
+                    matched_keywords += 1
             
-            # 归一化到10分制
-            max_possible = len(domain_keywords) * 3
-            if max_possible > 0:
-                relevance_score = min((relevance_score / max_possible) * 10, 10)
+            # 更宽松的归一化 - 基于匹配的关键词数量而非最大可能分数
+            if matched_keywords > 0:
+                # 基础分数 + 匹配奖励
+                base_score = 6.0  # 提高基础分数
+                match_bonus = min(relevance_score * 0.5, 4.0)  # 匹配奖励
+                relevance_score = base_score + match_bonus
             else:
-                relevance_score = 7.0  # 默认相关性
+                relevance_score = 5.0  # 没有匹配时的基础分数
             
-            return max(relevance_score, 5.0)  # 最低5分
+            print(f"      匹配关键词数: {matched_keywords}/{len(domain_keywords)}")
+            print(f"      计算相关性: {relevance_score:.1f}")
             
-        except Exception:
-            return 7.0  # 默认相关性
+            return min(relevance_score, 10.0)  # 最高10分
+            
+        except Exception as e:
+            print(f"      ❌ 相关性计算出错: {e}")
+            return 6.0  # 提高默认相关性
 
     def generate_inspiration_report(self, topic: str, results: List[NewsResult], category: Optional[str] = None, domain_name: Optional[str] = None) -> str:
         """生成灵感报告"""
