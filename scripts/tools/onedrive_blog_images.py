@@ -10,6 +10,8 @@ import time
 import logging
 import argparse
 import webbrowser
+import subprocess
+import platform
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -24,6 +26,42 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+
+def smart_open_browser(url: str) -> bool:
+    """智能打开浏览器，适配不同环境"""
+    try:
+        # 检查是否在WSL环境中
+        if platform.system() == "Linux":
+            # 尝试检测WSL环境
+            try:
+                with open('/proc/version', 'r') as f:
+                    proc_version = f.read()
+                if 'microsoft' in proc_version.lower() or 'wsl' in proc_version.lower():
+                    # WSL环境，使用cmd.exe打开浏览器
+                    subprocess.run(['cmd.exe', '/c', 'start', url], check=True, 
+                                 capture_output=True, text=True)
+                    return True
+            except (FileNotFoundError, subprocess.CalledProcessError):
+                pass
+            
+            # 非WSL Linux环境，尝试常见的浏览器命令
+            browsers = ['xdg-open', 'google-chrome', 'firefox', 'chromium-browser']
+            for browser in browsers:
+                try:
+                    subprocess.run([browser, url], check=True, 
+                                 capture_output=True, text=True)
+                    return True
+                except (FileNotFoundError, subprocess.CalledProcessError):
+                    continue
+        
+        # 回退到默认webbrowser模块
+        webbrowser.open(url)
+        return True
+        
+    except Exception as e:
+        logger.warning(f"Failed to open browser automatically: {e}")
+        return False
 
 
 class AuthCallbackHandler(BaseHTTPRequestHandler):
@@ -193,7 +231,10 @@ class OneDriveAuthManager:
         auth_url = self.get_authorization_url()
         print(f"🌐 Opening browser for authentication...")
         print(f"If browser doesn't open automatically, visit: {auth_url}")
-        webbrowser.open(auth_url)
+        
+        # 使用智能浏览器打开函数
+        if not smart_open_browser(auth_url):
+            print("⚠️  Could not open browser automatically. Please manually copy and paste the URL above.")
         
         # 等待认证回调
         print("⏳ Waiting for authentication callback...")
