@@ -9,7 +9,7 @@ from pathlib import Path
 from PIL import Image
 import requests
 import json
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 import argparse
 
 class ImageManager:
@@ -160,8 +160,9 @@ class ImageManager:
     def _upload_to_cloudinary(self, image_path: str) -> Optional[str]:
         """上传到Cloudinary（需要安装cloudinary库）"""
         try:
-            import cloudinary
-            import cloudinary.uploader
+            # 可选导入 - 仅在使用Cloudinary时需要
+            import cloudinary  # type: ignore
+            import cloudinary.uploader  # type: ignore
             
             # 这里需要配置Cloudinary凭据
             result = cloudinary.uploader.upload(image_path)
@@ -220,7 +221,7 @@ class ImageManager:
         
         return result
     
-    def batch_process(self, image_dir: str, article_date: str) -> Dict:
+    def batch_process(self, image_dir: Union[str, Path], article_date: str) -> Dict:
         """批量处理图片"""
         results = {}
         image_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
@@ -229,9 +230,7 @@ class ImageManager:
         if not image_dir_path.exists():
             return {'error': f'目录不存在: {image_dir}'}
         
-        image_dir = image_dir_path
-        
-        image_files = [f for f in image_dir.glob('*') 
+        image_files = [f for f in image_dir_path.glob('*') 
                       if f.suffix.lower() in image_extensions]
         
         if not image_files:

@@ -3696,11 +3696,18 @@ def handle_onedrive_images_menu(pipeline):
             
             try:
                 # 尝试导入并测试连接
-                import sys
-                sys.path.insert(0, "scripts/tools")
-                try:
-                    from onedrive_blog_images import BlogImageManager
-                except ImportError:
+                import importlib.util
+                
+                # 动态导入OneDrive模块
+                spec = importlib.util.spec_from_file_location(
+                    "onedrive_blog_images",  # type: ignore 
+                    "scripts/tools/onedrive_blog_images.py"
+                )
+                if spec and spec.loader:
+                    onedrive_module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(onedrive_module)
+                    BlogImageManager = onedrive_module.BlogImageManager
+                else:
                     print("❌ OneDrive模块导入失败")
                     continue
                 
