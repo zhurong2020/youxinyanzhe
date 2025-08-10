@@ -38,8 +38,8 @@ def smart_open_browser(url: str) -> bool:
                 with open('/proc/version', 'r') as f:
                     proc_version = f.read()
                 if 'microsoft' in proc_version.lower() or 'wsl' in proc_version.lower():
-                    # WSL环境，使用cmd.exe打开浏览器
-                    subprocess.run(['cmd.exe', '/c', 'start', url], check=True, 
+                    # WSL环境，使用cmd.exe打开浏览器，用引号包围URL避免参数截断
+                    subprocess.run(['cmd.exe', '/c', 'start', '', url], check=True, 
                                  capture_output=True, text=True)
                     return True
             except (FileNotFoundError, subprocess.CalledProcessError):
