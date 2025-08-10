@@ -62,9 +62,10 @@ def main():
         print("11. LLM引擎切换")
         print("12. ElevenLabs语音测试")
         print("13. YouTube音频上传")
+        print("14. OneDrive图床管理")
         print("\n0. 退出")
         
-        choice = input("\n请输入选项 (1-13/0): ").strip()
+        choice = input("\n请输入选项 (1-14/0): ").strip()
         
         # 记录用户选择的操作
         choice_names = {
@@ -72,7 +73,7 @@ def main():
             '4': '格式化手工草稿', '5': '主题灵感生成器', '6': '内容变现管理', 
             '7': '系统状态检查', '8': 'YouTube播客生成器', '9': '文章更新工具',
             '10': '调试和维护工具', '11': 'LLM引擎切换', '12': 'ElevenLabs语音测试', 
-            '13': 'YouTube音频上传', '0': '退出'
+            '13': 'YouTube音频上传', '14': 'OneDrive图床管理', '0': '退出'
         }
         operation_name = choice_names.get(choice, '无效选择')
         pipeline.log(f"用户选择操作: {choice} ({operation_name})", level="info", force=True)
@@ -153,6 +154,10 @@ def main():
         elif choice == "13":
             # YouTube音频上传
             handle_youtube_upload_menu(pipeline)
+            continue  # 返回主菜单
+        elif choice == "14":
+            # OneDrive图床管理
+            handle_onedrive_images_menu(pipeline)
             continue  # 返回主菜单
         elif choice == "0":
             print("👋 再见！")
@@ -3589,6 +3594,173 @@ def handle_export_member_data(pipeline):
             
     except Exception as e:
         print(f"❌ 导出过程出错: {e}")
+
+
+def handle_onedrive_images_menu(pipeline):
+    """OneDrive图床管理菜单"""
+    while True:
+        print("\n" + "="*50)
+        print("📁 OneDrive图床管理")
+        print("="*50)
+        print("1. 初始化OneDrive认证")
+        print("2. 处理单个草稿的图片")
+        print("3. 批量处理所有草稿图片")
+        print("4. 检查OneDrive连接状态")
+        print("5. 查看图片处理统计")
+        print("\n0. 返回主菜单")
+        
+        choice = input("\n请选择操作 (1-5/0): ").strip()
+        
+        if choice == "1":
+            # 初始化认证
+            print("🔐 启动OneDrive认证...")
+            try:
+                result = subprocess.run([
+                    "python3", "scripts/tools/onedrive_blog_images.py", 
+                    "--setup"
+                ], check=False, capture_output=False)
+                
+                if result.returncode == 0:
+                    print("✅ 认证设置完成")
+                else:
+                    print("❌ 认证设置失败")
+                    
+            except Exception as e:
+                print(f"❌ 认证过程出错: {e}")
+                
+        elif choice == "2":
+            # 处理单个草稿
+            print("📝 选择要处理的草稿文件...")
+            
+            # 显示草稿列表
+            drafts_dir = Path("_drafts")
+            if not drafts_dir.exists():
+                print("❌ 草稿目录不存在")
+                continue
+                
+            draft_files = list(drafts_dir.glob("*.md"))
+            if not draft_files:
+                print("❌ 没有找到草稿文件")
+                continue
+                
+            print("\n可用的草稿文件:")
+            for i, draft in enumerate(draft_files, 1):
+                print(f"{i}. {draft.name}")
+                
+            try:
+                file_choice = input(f"\n请选择文件 (1-{len(draft_files)}/0取消): ").strip()
+                if file_choice == "0":
+                    continue
+                    
+                file_index = int(file_choice) - 1
+                if 0 <= file_index < len(draft_files):
+                    selected_draft = draft_files[file_index]
+                    print(f"📝 处理草稿: {selected_draft.name}")
+                    
+                    result = subprocess.run([
+                        "python3", "scripts/tools/onedrive_blog_images.py",
+                        "--draft", str(selected_draft)
+                    ], check=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ 草稿图片处理完成")
+                    else:
+                        print("❌ 草稿图片处理失败")
+                else:
+                    print("❌ 无效的文件选择")
+                    
+            except (ValueError, IndexError):
+                print("❌ 无效的输入")
+                
+        elif choice == "3":
+            # 批量处理
+            print("📁 批量处理所有草稿图片...")
+            
+            try:
+                result = subprocess.run([
+                    "python3", "scripts/tools/onedrive_blog_images.py",
+                    "--batch", "_drafts"
+                ], check=False)
+                
+                if result.returncode == 0:
+                    print("✅ 批量处理完成")
+                else:
+                    print("❌ 批量处理失败")
+                    
+            except Exception as e:
+                print(f"❌ 批量处理出错: {e}")
+                
+        elif choice == "4":
+            # 检查连接状态
+            print("🔍 检查OneDrive连接状态...")
+            
+            try:
+                # 尝试导入并测试连接
+                import sys
+                sys.path.insert(0, "scripts/tools")
+                try:
+                    from onedrive_blog_images import BlogImageManager
+                except ImportError:
+                    print("❌ OneDrive模块导入失败")
+                    continue
+                
+                manager = BlogImageManager()
+                
+                # 测试API连接
+                response = manager.uploader._make_request('GET', '/me/drive')
+                if response.status_code == 200:
+                    drive_info = response.json()
+                    total_gb = drive_info['quota']['total'] / (1024**3)
+                    used_gb = drive_info['quota']['used'] / (1024**3)
+                    free_gb = total_gb - used_gb
+                    
+                    print("✅ OneDrive连接正常")
+                    print(f"📊 存储使用情况:")
+                    print(f"   总容量: {total_gb:.1f}GB")
+                    print(f"   已使用: {used_gb:.1f}GB")
+                    print(f"   可用空间: {free_gb:.1f}GB")
+                    print(f"   使用率: {(used_gb/total_gb)*100:.1f}%")
+                else:
+                    print(f"❌ OneDrive连接失败: {response.status_code}")
+                    
+            except Exception as e:
+                print(f"❌ 连接测试失败: {e}")
+                print("💡 提示: 请先运行初始化认证")
+                
+        elif choice == "5":
+            # 查看处理统计
+            print("📊 图片处理统计...")
+            
+            # 检查日志文件
+            log_file = Path("logs/onedrive_blog_images.log")
+            if log_file.exists():
+                try:
+                    with open(log_file, 'r', encoding='utf-8') as f:
+                        lines = f.readlines()
+                        
+                    # 简单统计
+                    upload_success = len([l for l in lines if 'Successfully uploaded' in l])
+                    upload_fail = len([l for l in lines if 'Failed to process image' in l])
+                    
+                    print(f"📈 处理统计:")
+                    print(f"   成功上传: {upload_success} 张图片")
+                    print(f"   失败处理: {upload_fail} 张图片")
+                    
+                    # 显示最近几条日志
+                    print(f"\n📋 最近日志 (最后10条):")
+                    for line in lines[-10:]:
+                        if any(keyword in line for keyword in ['Successfully uploaded', 'Failed to process', 'ERROR']):
+                            print(f"   {line.strip()}")
+                            
+                except Exception as e:
+                    print(f"❌ 读取日志失败: {e}")
+            else:
+                print("📝 暂无处理日志")
+                
+        elif choice == "0":
+            break
+        else:
+            print("❌ 无效选择，请重新输入")
 
 
 if __name__ == "__main__":

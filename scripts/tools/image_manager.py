@@ -4,14 +4,12 @@
 根据文件大小和用途自动选择存储策略
 """
 
-import os
-import sys
 import shutil
 from pathlib import Path
 from PIL import Image
 import requests
 import json
-from typing import Tuple, Dict, Optional
+from typing import Dict, Optional
 import argparse
 
 class ImageManager:
@@ -227,9 +225,11 @@ class ImageManager:
         results = {}
         image_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
         
-        image_dir = Path(image_dir)
-        if not image_dir.exists():
+        image_dir_path = Path(image_dir)
+        if not image_dir_path.exists():
             return {'error': f'目录不存在: {image_dir}'}
+        
+        image_dir = image_dir_path
         
         image_files = [f for f in image_dir.glob('*') 
                       if f.suffix.lower() in image_extensions]
