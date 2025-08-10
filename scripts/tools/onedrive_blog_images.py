@@ -6,6 +6,7 @@ OneDrive博客图床自动化系统
 
 import re
 import json
+import os
 import time
 import logging
 import argparse
@@ -19,6 +20,7 @@ from urllib.parse import urlparse, parse_qs, urlencode
 import requests
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import threading
+from dotenv import load_dotenv
 
 # 配置日志
 logging.basicConfig(
@@ -604,10 +606,26 @@ class BlogImageManager:
         self._setup_logging()
     
     def _load_config(self) -> Dict:
-        """加载配置文件"""
+        """加载配置文件并合并.env环境变量"""
         try:
+            # 加载.env文件
+            load_dotenv()
+            
+            # 加载JSON配置文件
             with open(self.config_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                config = json.load(f)
+            
+            # 从环境变量覆盖敏感配置
+            if 'ONEDRIVE_TENANT_ID' in os.environ:
+                config['auth']['tenant_id'] = os.environ['ONEDRIVE_TENANT_ID']
+            if 'ONEDRIVE_CLIENT_ID' in os.environ:
+                config['auth']['client_id'] = os.environ['ONEDRIVE_CLIENT_ID']
+            if 'ONEDRIVE_CLIENT_SECRET' in os.environ:
+                config['auth']['client_secret'] = os.environ['ONEDRIVE_CLIENT_SECRET']
+            if 'ONEDRIVE_REDIRECT_URI' in os.environ:
+                config['auth']['redirect_uri'] = os.environ['ONEDRIVE_REDIRECT_URI']
+                
+            return config
         except Exception as e:
             raise Exception(f"Failed to load config from {self.config_path}: {e}")
     
