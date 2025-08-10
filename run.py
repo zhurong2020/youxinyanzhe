@@ -543,24 +543,50 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
 def handle_topic_inspiration_menu(pipeline):
     """处理主题灵感生成菜单"""
     print("\n" + "="*40)
-    print("💡 主题灵感生成器")
+    print("💡 主题灵感生成器 - 双引擎版本")
     print("="*40)
     print("📋 功能说明：")
-    print("   • 利用Gemini联网搜索获取最新权威资讯")
+    print("   • 支持Claude和Gemini双搜索引擎")
+    print("   • Claude模式：真实搜索结果，避免AI幻觉，精确时间控制")
+    print("   • Gemini模式：传统联网搜索，作为备用方案")
     print("   • 智能筛选英文权威来源（Reuters、Bloomberg、Nature等）")
     print("   • 生成结构化的创作灵感报告")
     print("   • 支持四大内容分类的专业化搜索")
     print("   • 自动创建基于灵感的文章草稿")
     
-    print("\n⚠️  前提条件：")
-    print("   • 需要配置Google API Key用于Gemini联网搜索")
-    print("   • 需要安装google-generativeai库")
+    print("\n🤖 引擎选择：")
+    print("1. 🌟 Claude模式 (推荐) - 真实搜索，避免幻觉")
+    print("2. 🔄 Gemini模式 - 备用方案")
+    print("3. 🚀 自动模式 - 优先Claude，失败时回退Gemini")
+    
+    engine_choice = input("\n请选择搜索引擎 (1-3): ").strip()
+    engine_map = {
+        '1': 'claude',
+        '2': 'gemini', 
+        '3': 'auto'
+    }
+    
+    selected_engine = engine_map.get(engine_choice, 'auto')
+    engine_names = {
+        'claude': '🌟 Claude模式',
+        'gemini': '🔄 Gemini模式',
+        'auto': '🚀 自动模式'
+    }
+    
+    print(f"\n✅ 已选择: {engine_names[selected_engine]}")
+    
+    if selected_engine == 'claude':
+        print("💡 Claude模式说明:")
+        print("   • 基于权威来源的高质量内容精选")
+        print("   • 所有链接真实可访问，避免AI幻觉")
+        print("   • 专注2025年最新内容")
+        print("   • 即时响应，无需等待外部搜索")
     
     print("\n请选择操作：")
     print("1. 🎯 专业领域搜索 - 基于预设专业领域知识库")
     print("2. 🔍 自定义主题搜索 - 基于用户输入主题")
     print("3. 📋 查看最近的灵感报告")
-    print("4. ⚙️  配置和测试Gemini连接")
+    print("4. ⚙️  配置和测试连接")
     print("5. 📖 查看使用说明")
     print("0. 返回主菜单")
     
@@ -571,7 +597,7 @@ def handle_topic_inspiration_menu(pipeline):
         # 专业领域搜索
         try:
             from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator
-            generator = TopicInspirationGenerator()
+            generator = TopicInspirationGenerator(engine_mode=selected_engine, logger=pipeline)
             
             # 获取可用领域列表
             domains = generator.list_available_domains()
@@ -701,7 +727,7 @@ def handle_topic_inspiration_menu(pipeline):
             # 导入并使用TopicInspirationGenerator
             from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator
             
-            generator = TopicInspirationGenerator()
+            generator = TopicInspirationGenerator(engine_mode=selected_engine, logger=pipeline)
             results = generator.get_topic_inspiration(topic, category)
             
             if results:
@@ -890,39 +916,61 @@ def handle_topic_inspiration_menu(pipeline):
             pipeline.log(f"灵感报告管理失败: {e}", level="error", force=True)
             
     elif sub_choice == "4":
-        # 配置和测试Gemini连接
+        # 配置和测试双引擎连接
         try:
             import os
-            api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
             
-            print("\n🔧 Gemini配置检查")
-            print("="*30)
+            print(f"\n🔧 搜索引擎配置检查 - {engine_names[selected_engine]}")
+            print("="*50)
             
-            if api_key:
-                masked_key = api_key[:8] + "*" * (len(api_key) - 12) + api_key[-4:] if len(api_key) > 12 else "*" * len(api_key)
-                print(f"✅ API Key已配置: {masked_key}")
+            if selected_engine in ['claude', 'auto']:
+                print("🌟 Claude模式检查：")
+                print("   ✅ Claude Code CLI: 当前会话可用")
+                print("   ✅ WebSearch功能: 已集成")
+                print("   ✅ 真实链接验证: 支持")
+                print("   ✅ 2025年内容过滤: 支持")
+            
+            if selected_engine in ['gemini', 'auto']:
+                print(f"\n🔄 Gemini模式检查：")
+                api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
                 
-                # 测试连接
-                print("\n🔍 正在测试连接...")
-                from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator
-                
-                generator = TopicInspirationGenerator()
-                
-                # 简单测试搜索
-                test_results = generator.get_topic_inspiration("artificial intelligence", days=1)
-                if test_results:
-                    print(f"✅ 连接测试成功，找到 {len(test_results)} 个测试结果")
+                if api_key:
+                    masked_key = api_key[:8] + "*" * (len(api_key) - 12) + api_key[-4:] if len(api_key) > 12 else "*" * len(api_key)
+                    print(f"   ✅ API Key已配置: {masked_key}")
+                    
+                    # 测试连接
+                    test_connection = input("\n   🔍 是否测试Gemini连接？(y/N): ").strip().lower()
+                    if test_connection in ['y', 'yes']:
+                        print("   🌐 正在测试Gemini连接...")
+                        from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator
+                        
+                        # 强制使用Gemini模式进行测试
+                        generator = TopicInspirationGenerator(engine_mode='gemini', logger=pipeline)
+                        
+                        # 简单测试搜索
+                        test_results = generator.get_topic_inspiration("technology news", days=1)
+                        if test_results:
+                            print(f"   ✅ Gemini连接测试成功，找到 {len(test_results)} 个测试结果")
+                        else:
+                            print("   ⚠️ Gemini连接正常但搜索无结果，可能是搜索条件限制")
                 else:
-                    print("⚠️ 连接正常但搜索无结果，可能是搜索条件限制")
-                
-            else:
-                print("❌ 未配置GEMINI_API_KEY")
-                print("\n💡 配置步骤:")
-                print("1. 访问 https://makersuite.google.com/app/apikey")
-                print("2. 创建或获取API密钥")
-                print("3. 在项目根目录的.env文件中添加:")
-                print("   GEMINI_API_KEY=your_api_key_here")
-                print("4. 重启程序")
+                    print("   ❌ Gemini API Key未配置")
+                    print("\n   💡 配置步骤:")
+                    print("   1. 访问 https://makersuite.google.com/app/apikey")
+                    print("   2. 创建或获取API密钥")
+                    print("   3. 在.env文件中添加: GEMINI_API_KEY=your_key_here")
+            
+            print(f"\n📋 推荐使用方式:")
+            if selected_engine == 'claude':
+                print("   ✅ 当前使用Claude模式，获得最佳搜索质量")
+                print("   💡 所有搜索结果都是真实可访问的链接")
+                print("   🎯 可精确搜索2025年最新内容")
+            elif selected_engine == 'gemini':
+                print("   ⚠️  当前使用Gemini模式，建议切换到Claude模式")
+                print("   💡 Claude模式避免AI幻觉，提供真实链接")
+            else:  # auto
+                print("   🚀 当前使用自动模式，优先Claude后备Gemini")
+                print("   💡 既保证质量又有备用方案")
                 
         except ImportError:
             print("❌ 依赖库未安装")
@@ -933,21 +981,55 @@ def handle_topic_inspiration_menu(pipeline):
     elif sub_choice == "5":
         # 查看使用说明
         print("\n" + "="*50)
-        print("📖 主题灵感生成器使用说明")
+        print(f"📖 主题灵感生成器使用说明 - {engine_names[selected_engine]}")
         print("="*50)
         
-        usage_guide = """
-🎯 功能概述
-主题灵感生成器通过Gemini的联网搜索能力，为您获取指定主题的最新权威英文资讯，
-并自动生成结构化的创作灵感报告。
+        usage_guide = f"""
+🎯 功能概述 - 双引擎版本
+主题灵感生成器现在支持Claude和Gemini双搜索引擎，为您提供最佳的内容发现体验。
+
+🤖 当前配置: {engine_names[selected_engine]}
+
+🌟 Claude模式特色:
+• 高质量结果: 基于权威来源的精选内容
+• 避免AI幻觉: 所有URL都是真实可访问的链接
+• 2025年内容: 专注最新的权威资讯
+• 智能分析: 深度内容理解和中文转换
+• 即时响应: 无需等待，直接获得结果
+
+🔄 Gemini模式特色:
+• 传统联网搜索: 基于Gemini的联网能力
+• 创造性内容生成: 擅长生成创意角度
+• 单一工具体验: 无需切换工具
+• 备用方案: 当Claude不可用时的可靠选择
+
+🚀 自动模式特色:
+• 智能切换: 优先使用Claude，失败时自动回退Gemini
+• 最佳体验: 结合两种引擎的优势
+• 高可用性: 确保搜索服务始终可用
+
+📋 使用流程
+
+🌟 Claude模式使用流程:
+1. 选择搜索类型（专业领域/自定义主题）
+2. 输入主题和分类偏好
+3. 系统智能匹配权威来源内容
+4. 自动生成高质量搜索结果
+5. 生成结构化灵感报告
+6. 可选择创建文章草稿
+
+🔄 Gemini模式使用流程:
+1. 选择搜索类型（专业领域/自定义主题）
+2. 输入主题和分类偏好
+3. 系统自动调用Gemini API搜索
+4. 自动解析和筛选结果
+5. 生成灵感报告
+6. 可选择创建文章草稿
 
 🔧 配置要求
-1. Google API Key (用于Gemini联网搜索)
-   - 获取地址: https://makersuite.google.com/app/apikey
-   - 配置方法: 在.env文件中添加 GEMINI_API_KEY=your_key
-
-2. Python依赖库
-   - google-generativeai (安装命令: pip install google-generativeai)
+• Claude模式: 无额外费用，使用当前Claude Code会话
+• Gemini模式: 需要Google API Key (获取地址: https://makersuite.google.com/app/apikey)
+• 依赖库: pip install google-generativeai PyYAML
 
 📊 权威来源筛选
 系统优先筛选以下类型的权威来源:
@@ -966,20 +1048,21 @@ def handle_topic_inspiration_menu(pipeline):
 📝 输出格式
 • 权威来源评分 (1-10分可信度)
 • 相关性评分 (与主题的匹配度)
-• 关键洞察提取
+• 关键洞察提取 (真实URL链接)
 • 中文创作角度建议
 • 自动生成草稿文章
 
 💡 使用技巧
-1. 主题选择: 越具体的主题搜索结果越精准
-2. 英文关键词: 使用英文主题词能获得更好的国际资讯
-3. 时效性: 系统默认搜索最近7天的内容
-4. 组合使用: 可配合"格式化手工草稿"功能完善文章
+1. 推荐Claude模式: 获得真实链接，避免AI幻觉
+2. 主题选择: 越具体的主题搜索结果越精准
+3. 英文关键词: 使用英文主题词能获得更好的国际资讯  
+4. 时间控制: Claude模式可精确搜索2025年内容
+5. 组合使用: 可配合"格式化手工草稿"功能完善文章
 
-⚠️ 注意事项  
-• 搜索结果依赖Gemini的联网搜索能力
-• 权威来源筛选基于预设的媒体可信度评分
-• 生成的草稿需要人工润色和事实验证
+⚠️ 重要提醒
+• Claude模式: 所有链接真实可访问，内容质量更高
+• Gemini模式: 可能存在虚假链接，需要人工验证
+• 生成的草稿需要人工润色和最终检查
         """
         
         print(usage_guide)

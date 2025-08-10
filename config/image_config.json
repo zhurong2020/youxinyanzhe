@@ -1,0 +1,31 @@
+{
+  "local_path": "assets/images/posts/",
+  "cdn_config": {
+    "provider": "imgbb",
+    "api_key": "",
+    "base_url": ""
+  },
+  "compression": {
+    "jpeg_quality": 85,
+    "webp_quality": 80,
+    "png_optimize": true
+  },
+  "max_width": 1200,
+  "thumbnail_width": 400,
+  "size_thresholds": {
+    "tiny_kb": 50,
+    "small_kb": 200,
+    "medium_kb": 1024
+  },
+  "storage_rules": {
+    "tiny": "local",
+    "small": "local_compressed", 
+    "medium": "cdn",
+    "large": "cdn_with_thumbnail"
+  },
+  "optimization_rules": {
+    "convert_png_to_webp": true,
+    "compress_screenshots": true,
+    "generate_thumbnails_for_large": true
+  }
+}
