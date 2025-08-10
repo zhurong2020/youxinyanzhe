@@ -113,5 +113,9 @@ config/gemini_config.yml
 # 会员系统安全文件
 .tmp/member_data/access_codes_whitelist.json
 
+# OneDrive OAuth凭据（敏感信息）
+config/onedrive_tokens.json
+config/onedrive_config.json
+
 # 会员系统安全文件
 .tmp/member_data/.security_key
