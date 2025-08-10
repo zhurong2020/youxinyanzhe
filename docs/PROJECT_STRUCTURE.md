@@ -58,10 +58,12 @@ scripts/
     │   └── elevenlabs_pro_setup.py     # Pro功能设置
     ├── checks/                # 系统检查工具
     │   └── check_github_token.py  # GitHub Token检查
-    └── testing/               # 测试工具
-        ├── test_reward_system.py   # 奖励系统测试
-        ├── test_content_generation.py  # 内容生成测试
-        └── test_podcastfy_api.py    # API测试
+    ├── testing/               # 测试工具
+    │   ├── test_reward_system.py   # 奖励系统测试
+    │   ├── test_content_generation.py  # 内容生成测试
+    │   └── test_podcastfy_api.py    # API测试
+    ├── image_manager.py           # 智能图片管理系统
+    └── onedrive_blog_images.py    # OneDrive图床自动化系统
 ```
 
 ### 配置管理 (`config/`)
@@ -72,7 +74,11 @@ config/
 ├── elevenlabs_voices.yml   # ElevenLabs语音配置
 ├── elevenlabs_voices_pro.yml  # Pro版语音配置
 ├── youtube_categories.yml  # YouTube分类映射
-└── member_tiers.yml        # 会员等级配置
+├── member_tiers.yml        # 会员等级配置
+├── onedrive_config.json    # OneDrive图床配置
+├── onedrive_tokens.json    # OneDrive访问令牌 (运行时生成)
+├── image_config.json       # 图片处理配置
+└── azure_app_info.md       # Azure应用注册信息
 ```
 
 ### 文档系统 (`docs/`)
@@ -88,8 +94,10 @@ docs/
 │   └── member-system-guide.md
 ├── TECHNICAL_ARCHITECTURE.md  # 技术架构
 ├── CHANGELOG_DETAILED.md      # 详细更新历史
-├── DEVELOPMENT.md             # 开发指南
-└── ROADMAP.md                 # 路线图
+├── ONEDRIVE_BLOG_IMAGE_SYSTEM.md  # OneDrive图床系统文档
+├── IMAGE_MANAGEMENT_WORKFLOW.md   # 图片管理工作流程
+├── ONEDRIVE_SETUP_GUIDE.md        # OneDrive设置指南
+└── PROJECT_STRUCTURE.md       # 项目结构文档
 ```
 
 ### 内容和资源
