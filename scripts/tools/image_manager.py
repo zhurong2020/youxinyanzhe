@@ -4,6 +4,7 @@
 根据文件大小和用途自动选择存储策略
 """
 
+import os
 import shutil
 from pathlib import Path
 from PIL import Image
