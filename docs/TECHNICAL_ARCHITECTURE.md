@@ -27,9 +27,10 @@
 - **优势**: 保持技术处理自动化，提供清晰的手动发布步骤
 
 ### 2. 图片托管方案
-**决策**: 使用OneDrive作为图片托管服务
-- **原因**: 简单、可靠、低成本，适合低流量场景
-- **WeChat集成**: OneDrive图片自动下载并重新上传到WeChat服务器
+**决策**: 智能图片管理系统 + OneDrive图床自动化
+- **智能策略**: 根据文件大小和用途自动选择存储方案(本地/OneDrive/第三方)
+- **OneDrive集成**: OAuth认证自动化，支持图片批量上传和管理
+- **WeChat兼容**: OneDrive图片自动下载并重新上传到WeChat服务器
 - **路径处理**: 所有图片使用`{{ site.baseurl }}`变量确保GitHub Pages兼容
 
 ### 3. 发布状态管理
@@ -55,6 +56,8 @@
 │   │   └── youtube_podcast_generator.py
 │   ├── utils/             # 可重用工具
 │   └── tools/             # 独立调试工具
+│       ├── image_manager.py      # 智能图片管理系统
+│       └── onedrive_blog_images.py  # OneDrive图床自动化
 ├── tests/                 # 所有测试文件
 ├── config/                # 配置文件
 │   ├── platforms.yml
@@ -74,6 +77,8 @@
 - **youtube_podcast_generator.py**: YouTube视频转播客系统
 - **wechat_publisher.py**: WeChat发布指导生成器
 - **member_management.py**: 会员系统管理工具
+- **image_manager.py**: 根据文件大小自动选择存储策略的智能图片管理
+- **onedrive_blog_images.py**: OneDrive OAuth认证和图床自动化系统
 
 ## 安全与部署
 
@@ -113,6 +118,6 @@
 
 ---
 
-**文档版本**: v1.0  
-**最后更新**: 2025-08-06  
+**文档版本**: v1.1  
+**最后更新**: 2025-08-10  
 **维护**: 技术架构变更时同步更新
