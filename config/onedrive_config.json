@@ -5,8 +5,8 @@
     "client_secret": "YOUR_CLIENT_SECRET",
     "redirect_uri": "http://localhost:8080/callback",
     "scopes": [
-      "https://graph.microsoft.com/Files.ReadWrite",
-      "https://graph.microsoft.com/Sites.ReadWrite.All"
+      "https://graph.microsoft.com/Files.ReadWrite.All",
+      "offline_access"
     ]
   },
   "onedrive": {
