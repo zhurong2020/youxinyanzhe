@@ -6,10 +6,9 @@ OneDrive博客图片索引管理系统
 
 import json
 import hashlib
-import os
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from dataclasses import dataclass, asdict
 from dotenv import load_dotenv
 

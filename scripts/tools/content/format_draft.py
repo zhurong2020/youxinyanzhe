@@ -4,7 +4,6 @@
 用于将手工编写的草稿内容快速格式化为符合项目规范的Jekyll文章
 """
 
-import os
 import sys
 import json
 import argparse
