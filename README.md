@@ -16,11 +16,14 @@
 
 ### 🚀 多平台发布系统
 - **GitHub Pages** - Jekyll静态博客，完美SEO优化
+- **OneDrive图床自动化** - 完整的图片托管工作流，从本地创作到云端发布
 - **微信公众号** - 智能内容适配，图片自动处理
 - **WordPress** - API自动发布，扩展兼容性
 - **音频平台准备** - 喜马拉雅等平台集成架构
 
 ### ✏️ 智能内容处理
+- **OneDrive图片管理** - 自动上传、链接替换、本地清理的完整图片工作流
+- **图片索引系统** - 智能去重、多维查询、完整元数据追踪
 - **手工草稿格式化** - 智能分析手工内容，自动分类到四大体系
 - **Jekyll规范化** - 自动生成front matter、标签、摘要
 - **批量处理能力** - 支持单个文件和目录批量格式化
@@ -79,9 +82,11 @@ python run.py
 | 文档类型 | 文档 | 描述 |
 |---------|------|------|
 | **🎯 项目总览** | [功能实施总结](docs/project-completion-summary.md) | 最新功能成果和后续规划 |
+| | [技术架构文档](docs/TECHNICAL_ARCHITECTURE.md) | 详细的技术架构和设计决策 |
 | | [项目结构](docs/PROJECT_STRUCTURE.md) | 详细的目录结构说明 |
 | | [开发约定](CLAUDE.md) | 项目开发规范和约定 |
-| **🔧 配置指南** | [环境配置](.env.example) | 环境变量配置模板 |
+| **🔧 配置指南** | [OneDrive图片工作流程](docs/IMAGE_MANAGEMENT_WORKFLOW.md) | 完整的图片管理自动化流程 |
+| | [环境配置](.env.example) | 环境变量配置模板 |
 | | [YouTube播客设置](docs/setup/youtube_podcast_setup.md) | YouTube播客完整配置 |
 | | [TTS完整配置](docs/setup/tts_comprehensive_setup.md) | 语音系统完整配置指南 |
 | | [Google OAuth设置](docs/setup/YOUTUBE_OAUTH_SETUP.md) | YouTube上传OAuth2配置 |
@@ -98,13 +103,18 @@ python run.py
 
 ```
 youxinyanzhe/
-├── 📁 _posts/          # Jekyll文章
+├── 📁 _posts/          # Jekyll发布文章
+├── 📁 _drafts/         # 草稿文件
+├── 📁 _data/           # Jekyll数据文件(图片索引等)
 ├── 📁 assets/          # 静态资源(图片、音频、CSS)
 ├── 📁 scripts/         # 核心业务脚本
 │   ├── 📁 core/        # 核心业务逻辑
 │   ├── 📁 utils/       # 工具和辅助函数
 │   └── 📁 tools/       # 独立工具和测试脚本
+│       ├── onedrive_blog_images.py    # OneDrive图床自动化
+│       └── onedrive_image_index.py    # 图片索引管理
 ├── 📁 config/          # 配置文件
+│   └── onedrive_config.json           # OneDrive图床配置
 ├── 📁 docs/            # 项目文档
 │   ├── 📁 setup/       # 安装配置指南
 │   └── 📁 guides/      # 功能使用指南

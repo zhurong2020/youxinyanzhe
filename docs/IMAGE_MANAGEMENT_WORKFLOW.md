@@ -1,258 +1,282 @@
-# 智能图片管理工作流
+# OneDrive图片管理工作流程
 
-## 概述
+本文档详细说明博客图片从创作到发布的完整自动化工作流程。
 
-基于文件大小和用途的智能图片管理系统，自动选择最优存储策略，平衡GitHub空间使用和访问体验。
+## 工作流程概览
 
-## 存储策略
-
-### 分类规则
-
-| 大小范围 | 存储位置 | 处理方式 | 适用场景 |
-|---------|---------|----------|----------|
-| < 50KB | 本地assets | 直接存储 | 图标、小截图 |
-| 50KB-200KB | 本地assets | 压缩优化 | 普通截图 |
-| 200KB-1MB | 外部CDN | 原图上传 | 高质量图片 |
-| > 1MB | 外部CDN | 原图+缩略图 | 大图、动图 |
-
-### 存储路径规范
-
+### 完整流程图
 ```
-本地存储：
-assets/images/posts/YYYY/MM/filename.ext
-
-CDN存储：
-https://cdn-provider.com/xxxxx
-
-配置文件：
-config/image_config.json
+内容创作 → 图片准备 → 本地引用 → OneDrive处理 → 文章发布
+    ↓         ↓         ↓          ↓          ↓
+ 草稿文件   assets图片   MD引用    云端托管    _posts发布
 ```
 
-## 使用方法
+## 详细工作流程
 
-### 1. 环境准备
+### 1. 内容创作阶段
+**目标**: 创建带有本地图片引用的草稿文章
 
+**操作步骤**:
 ```bash
-# 安装依赖
-pip install Pillow requests
-
-# 可选：Cloudinary支持
-pip install cloudinary
-
-# 配置CDN API密钥（以ImgBB为例）
-# 编辑 config/image_config.json，填入api_key
+# 创建草稿文件
+_drafts/YYYY-MM-DD-文章标题.md
 ```
 
-### 2. 基本使用
-
-```bash
-# 分析图片（不处理）
-python scripts/tools/image_manager.py --analyze-only --image-dir /path/to/images --article-date 2025/08
-
-# 处理图片
-python scripts/tools/image_manager.py --image-dir /path/to/images --article-date 2025/08
-```
-
-### 3. 写作工作流集成
-
-#### 步骤1: 准备图片
-```bash
-# 创建文章图片目录
-mkdir temp_images_20250808
-
-# 将截图/素材放入目录
-# 支持: .png, .jpg, .jpeg, .gif, .webp
-```
-
-#### 步骤2: 分析与处理
-```bash
-# 先分析，了解处理策略
-python scripts/tools/image_manager.py --analyze-only --image-dir temp_images_20250808 --article-date 2025/08
-
-# 确认无误后处理
-python scripts/tools/image_manager.py --image-dir temp_images_20250808 --article-date 2025/08
-```
-
-#### 步骤3: 获取Markdown链接
-处理完成后，工具会输出可直接使用的Markdown链接：
-
+**文件结构示例**:
 ```markdown
-![图片描述]({{ site.baseurl }}/assets/images/posts/2025/08/small_image.webp)
-![大图片](https://i.ibb.co/xxxxx/large_image.png)
+---
+title: "文章标题"
+date: "YYYY-MM-DD"
+categories: ["cognitive-upgrade"]
+---
+
+文章内容...
+
+![图片描述](assets/images/posts/2025/08/screenshot.png)
 ```
 
-## 配置选项
+### 2. 图片准备阶段
+**目标**: 收集和整理文章相关图片
 
-### image_config.json详解
+**目录结构**:
+```
+assets/images/posts/
+└── YYYY/
+    └── MM/
+        ├── image1.png
+        ├── image2.jpg
+        └── screenshot.png
+```
 
+**支持格式**: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.svg`
+
+### 3. 本地引用阶段
+**目标**: 在草稿中正确引用本地图片
+
+**引用格式支持**:
+- `assets/images/posts/2025/08/image.png` (相对于项目根目录)
+- `./images/screenshot.png` (相对于文章目录)
+- `{{ site.baseurl }}/assets/images/posts/2025/08/image.png` (Jekyll变量)
+
+### 4. OneDrive处理阶段 ⭐
+**目标**: 自动化图片上传、链接替换、本地清理
+
+#### 4.1 启动处理
+```bash
+# 方式1: 通过run.py菜单
+python run.py
+# 选择: 14. OneDrive图床管理 → 1. 处理单个草稿文件
+
+# 方式2: 直接命令行
+python scripts/tools/onedrive_blog_images.py --draft _drafts/文章名.md
+```
+
+#### 4.2 自动化处理流程
+1. **OAuth认证验证**
+   - 检查OneDrive访问令牌有效性
+   - 如需要，自动刷新令牌
+   - WSL环境优化: 使用PowerShell启动浏览器
+
+2. **图片扫描和解析**
+   - 扫描草稿文件中的图片引用
+   - 解析各种格式的本地路径
+   - 验证图片文件实际存在
+
+3. **文件哈希计算**
+   - 计算每个图片的MD5哈希值
+   - 检查重复文件，避免重复上传
+   - 如发现重复，直接返回已存在的OneDrive链接
+
+4. **OneDrive上传**
+   - 创建目标文件夹: `/BlogImages/{year}/{month}/`
+   - 上传文件，命名格式: `{date}_{article_title}_{index:02d}.{ext}`
+   - 获取OneDrive分享链接和嵌入链接
+
+5. **索引记录更新**
+   - 保存图片记录到`_data/onedrive_image_index.json`
+   - 记录完整元数据: 路径、链接、文件信息、文章关联等
+
+6. **文章链接替换**
+   - 将本地图片路径替换为OneDrive嵌入链接
+   - 更新草稿文件内容
+
+7. **本地文件清理** (可配置)
+   - 删除assets目录中已成功上传的图片文件
+   - 自动清理空目录
+
+#### 4.3 处理示例
+**处理前**:
+```markdown
+![截图](assets/images/posts/2025/08/screenshot.png)
+```
+
+**处理后**:
+```markdown
+![截图](https://7fp1fj-my.sharepoint.com/:i:/g/personal/zhurong_7fp1fj_onmicrosoft_com/EQbmqgcFdMxOjQeFxdHciEMB...)
+```
+
+**OneDrive结构**:
+```
+/BlogImages/
+└── 2025/
+    └── 08/
+        └── 20250811_文章标题_01.png
+```
+
+**索引记录**:
 ```json
 {
-  "local_path": "assets/images/posts/",       // 本地存储基础路径
-  "cdn_config": {
-    "provider": "imgbb",                      // CDN提供商: imgbb/cloudinary
-    "api_key": "your_api_key_here",          // API密钥
-    "base_url": ""                           // 自定义CDN域名
-  },
-  "compression": {
-    "jpeg_quality": 85,                      // JPEG压缩质量 (1-100)
-    "webp_quality": 80,                      // WebP压缩质量 (1-100) 
-    "png_optimize": true                     // PNG优化开关
-  },
-  "max_width": 1200,                         // 最大宽度限制
-  "thumbnail_width": 400                     // 缩略图宽度
+  "文章名_01_abc12345": {
+    "local_path": "assets/images/posts/2025/08/screenshot.png",
+    "onedrive_path": "/BlogImages/2025/08/20250811_文章标题_01.png",
+    "onedrive_url": "https://...",
+    "embed_url": "https://...",
+    "article_file": "_drafts/2025-08-11-文章标题.md",
+    "article_title": "文章标题",
+    "file_hash": "abc123...",
+    "upload_date": "2025-08-11T10:30:00"
+  }
 }
 ```
 
-## 高级功能
+### 5. 文章发布阶段
+**目标**: 将处理完成的文章移动到发布目录
 
-### 1. 批量迁移现有图片
-
+**操作**:
 ```bash
-# 分析现有assets目录
-find assets/images -name "*.png" -o -name "*.jpg" | while read file; do
-  size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file")
-  if [ $size -gt 204800 ]; then  # >200KB
-    echo "Large file: $file ($((size/1024))KB) - 建议迁移到CDN"
-  fi
-done
+# 手动移动文件
+mv _drafts/YYYY-MM-DD-标题.md _posts/
+
+# Jekyll自动构建发布
+# 所有OneDrive链接在生产环境正常显示
 ```
 
-### 2. 自动化集成到run.py
+## 图片索引管理系统
 
-在`run.py`中添加图片处理步骤：
-
-```python
-def process_article_images(article_path: str):
-    """处理文章图片"""
-    import subprocess
-    
-    # 检查是否有待处理图片目录
-    temp_dir = f"temp_images_{datetime.now().strftime('%Y%m%d')}"
-    if os.path.exists(temp_dir):
-        article_date = datetime.now().strftime('%Y/%m')
-        
-        # 调用图片管理工具
-        result = subprocess.run([
-            'python', 'scripts/tools/image_manager.py',
-            '--image-dir', temp_dir,
-            '--article-date', article_date
-        ], capture_output=True, text=True)
-        
-        if result.returncode == 0:
-            print("✅ 图片处理完成")
-            print(result.stdout)
-        else:
-            print("❌ 图片处理失败")
-            print(result.stderr)
-```
-
-### 3. Jekyll插件集成
-
-创建Jekyll插件自动优化图片：
-
-```ruby
-# _plugins/image_optimizer.rb
-Jekyll::Hooks.register :posts, :pre_render do |post|
-  # 检查图片链接，必要时提示优化
-  content = post.content
-  large_images = content.scan(/!\[.*?\]\((.*?)\)/).flatten
-  
-  large_images.each do |img_url|
-    if img_url.include?('assets/images') && !img_url.include?('compressed')
-      # 检查文件大小，给出建议
-    end
-  end
-end
-```
-
-## 最佳实践
-
-### 1. 文章写作时
-
-1. **截图阶段**：直接保存为PNG，不要手动压缩
-2. **收集阶段**：将所有图片放入临时目录
-3. **处理阶段**：运行图片管理工具一次性处理
-4. **写作阶段**：复制粘贴生成的Markdown链接
-
-### 2. 存储策略选择
-
-- **图表/流程图**：通常<100KB，适合本地存储
-- **截图**：100KB-500KB，压缩后本地存储
-- **摄影作品**：>500KB，CDN存储
-- **GIF动图**：通常>1MB，必须CDN存储
-
-### 3. 性能考虑
-
-- **本地图片**：首次访问慢，但CDN加速后很快
-- **CDN图片**：全球访问快，但依赖第三方服务
-- **混合策略**：核心内容本地，辅助内容CDN
-
-## 监控与维护
-
-### 1. 空间使用监控
-
+### 索引查询功能
 ```bash
-# 检查assets目录大小
-du -sh assets/images/
+# 查看统计信息
+python scripts/tools/onedrive_image_index.py --stats
 
-# 统计各类型文件数量
-find assets/images -name "*.webp" | wc -l
-find assets/images -name "*.png" | wc -l
+# 生成详细报告
+python scripts/tools/onedrive_image_index.py --report
+
+# 查看文章相关图片
+python scripts/tools/onedrive_image_index.py --article _drafts/文章名.md
+
+# 查看日期范围内图片
+python scripts/tools/onedrive_image_index.py --date-range 2025-08-01 2025-08-31
+
+# 清理无效记录
+python scripts/tools/onedrive_image_index.py --cleanup
 ```
 
-### 2. CDN使用情况
+### run.py集成菜单
+```
+14. OneDrive图床管理
+    1. 处理单个草稿文件
+    2. 批量处理草稿目录  
+    3. 设置OneDrive认证
+    4. 测试OneDrive连接
+    5. 查看配置信息
+    6. 图片索引管理 ← 新增功能
+        1. 查看图片统计
+        2. 生成详细报告
+        3. 按文章查询图片
+        4. 清理无效记录
+        5. 显示帮助信息
+```
 
-- ImgBB：访问dashboard查看使用量
-- Cloudinary：查看monthly usage报告
-- 建议设置用量告警
+## 配置管理
 
-### 3. 定期清理
+### 核心配置文件: `config/onedrive_config.json`
+```json
+{
+  "auth": {
+    "tenant_id": "YOUR_TENANT_ID",
+    "client_id": "YOUR_CLIENT_ID", 
+    "client_secret": "YOUR_CLIENT_SECRET",
+    "redirect_uri": "http://localhost:8080/callback",
+    "scopes": ["Files.ReadWrite", "offline_access"]
+  },
+  "onedrive": {
+    "base_folder": "/BlogImages",
+    "folder_structure": "{year}/{month:02d}",
+    "filename_format": "{date}_{article_title}_{index:02d}.{ext}"
+  },
+  "processing": {
+    "max_file_size_mb": 32,
+    "delete_local_after_upload": true,
+    "backup_before_delete": false
+  },
+  "links": {
+    "width": 800
+  }
+}
+```
 
+### 环境变量配置: `.env`
 ```bash
-# 查找可能的冗余文件
-find assets/images -name "*_compressed*" -size +200k
-
-# 查找超大本地图片（可能需要迁移）
-find assets/images -size +500k -type f
+# OneDrive认证信息 (敏感数据)
+ONEDRIVE_TENANT_ID=actual_tenant_id
+ONEDRIVE_CLIENT_ID=actual_client_id
+ONEDRIVE_CLIENT_SECRET=actual_client_secret
+ONEDRIVE_REDIRECT_URI=http://localhost:8080/callback
 ```
 
 ## 故障排除
 
-### 常见问题
+### 常见问题和解决方案
 
-1. **上传CDN失败**
-   - 检查API密钥配置
-   - 确认网络连接
-   - 查看CDN服务状态
+#### 1. OAuth认证失败
+**症状**: 浏览器显示"missing scope parameter"
+**解决**: 
+- 检查Azure应用权限配置
+- 确认环境变量正确设置
+- WSL环境使用PowerShell启动浏览器
 
-2. **图片压缩失败**
-   - 检查PIL库安装
-   - 确认图片格式支持
-   - 查看磁盘空间
+#### 2. 路径解析失败
+**症状**: 日志显示"Could not resolve local path"
+**解决**:
+- 检查图片文件是否实际存在
+- 确认路径格式正确
+- 支持的格式: 相对路径、Jekyll变量、绝对路径
 
-3. **Jekyll构建失败**
-   - 检查图片路径格式
-   - 确认baseurl配置
-   - 验证Markdown语法
+#### 3. 上传失败
+**症状**: 上传过程中报错
+**解决**:
+- 检查文件大小限制 (默认32MB)
+- 验证OneDrive存储空间
+- 确认网络连接稳定
 
-### 日志记录
+#### 4. 索引记录不一致
+**症状**: 索引显示的图片与实际不符
+**解决**:
+```bash
+# 清理无效记录
+python scripts/tools/onedrive_image_index.py --cleanup
+```
 
-工具会自动记录处理日志，位于：
-- `logs/image_processing.log`
-- 包含处理时间、文件大小、存储策略等信息
+## 最佳实践
 
-## 扩展功能
+### 1. 文件命名规范
+- 图片文件使用英文名称，避免特殊字符
+- 采用描述性命名: `wechat-interface.png`, `data-analysis-chart.jpg`
 
-### 计划中的功能
-- [ ] 自动图片格式转换（PNG→WebP）
-- [ ] 图片水印添加
-- [ ] 智能裁剪和缩放
-- [ ] 图片内容识别（OCR）
-- [ ] 多CDN负载均衡
-- [ ] 图片访问统计分析
+### 2. 文件大小控制
+- 单个图片文件不超过32MB
+- 建议压缩大图片以提高上传速度
 
-这套工作流能帮你实现：
-- ✅ 自动选择最优存储策略
-- ✅ 减少GitHub仓库空间占用
-- ✅ 保持图片访问速度
-- ✅ 简化日常写作流程
+### 3. 批量处理建议
+- 对于多篇文章，可以使用批量处理功能
+- 建议在网络稳定时进行批量操作
+
+### 4. 备份策略
+- 重要图片建议保留本地备份
+- 可配置`backup_before_delete: true`保留原文件
+
+---
+
+**文档版本**: v1.0  
+**创建日期**: 2025-08-11  
+**维护**: 与OneDrive系统功能变更同步更新
