@@ -76,8 +76,20 @@ Thumbs.db
 .*.swp
 *~
 
-# 临时和优化文件
-assets/images/*/temp/
+# 图片处理临时目录 (包含用户数据，不应提交)
+assets/images/processing/
+assets/images/temp/
+
+# 但保留目录结构说明文件
+!assets/images/processing/.gitkeep
+!assets/images/processing/README.md
+!assets/images/temp/.gitkeep
+
+# 传统posts目录也排除 (已迁移到云端)
+assets/images/posts/
+!assets/images/posts/.gitkeep
+
+# 其他临时和优化文件  
 assets/images/*/optimized/
 assets/images/*/wechat_optimized/
 assets/audio/temp/
