@@ -7,7 +7,6 @@ import sys
 import argparse
 import logging
 import subprocess
-import yaml
 from pathlib import Path
 from dotenv import load_dotenv
 from scripts.core.content_pipeline import ContentPipeline
