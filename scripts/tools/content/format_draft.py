@@ -278,15 +278,225 @@ class DraftFormatter:
         
         return content_with_more
 
-    def add_more_tag(self, content: str) -> str:
+    def create_content_structure(self, content: str, title: str) -> str:
         """
-        在适当位置添加<!-- more -->标签
+        创建标准内容结构：摘要 + <!-- more --> + 背景介绍(可选) + 主体内容
+        
+        Args:
+            content: 原始内容
+            title: 文章标题
+            
+        Returns:
+            结构化的内容
+        """
+        lines = content.split('\n')
+        clean_lines = [line.strip() for line in lines if line.strip()]
+        
+        if not clean_lines:
+            return content
+        
+        # 生成开头摘要 (50-60字符)
+        summary = self.generate_opening_summary(content, title)
+        
+        # 判断是否需要背景介绍
+        needs_background = self.needs_background_introduction(content, title)
+        
+        # 构建结构化内容
+        structured_content = [summary, '', '<!-- more -->', '']
+        
+        # 如果需要背景介绍，添加背景介绍部分
+        if needs_background:
+            background = self.generate_background_introduction(content, title)
+            structured_content.extend(['## 背景介绍', '', background, ''])
+        
+        # 添加主体内容
+        structured_content.extend(['## 主要内容', ''] + clean_lines)
+        
+        return '\n'.join(structured_content)
+
+    def format_basic_structure(self, content: str) -> str:
+        """
+        对结构化内容进行基础格式化
+        
+        Args:
+            content: 结构化内容
+            
+        Returns:
+            格式化后的内容
+        """
+        lines = content.split('\n')
+        formatted_lines = []
+        
+        for line in lines:
+            # 保留空行和特殊标记
+            if not line.strip() or line.strip() == '<!-- more -->':
+                formatted_lines.append(line)
+                continue
+            
+            # 处理标题（确保标题格式正确）
+            if line.startswith('#'):
+                if not line[1:].startswith(' '):
+                    line = line[0] + ' ' + line[1:]
+                formatted_lines.append(line)
+            
+            # 处理列表项
+            elif line.startswith('-') or line.startswith('*'):
+                if not line[1:].startswith(' '):
+                    line = line[0] + ' ' + line[1:]
+                formatted_lines.append(line)
+            
+            # 处理编号列表
+            elif re.match(r'^\d+\.', line):
+                formatted_lines.append(line)
+            
+            # 普通段落
+            else:
+                formatted_lines.append(line)
+        
+        return '\n'.join(formatted_lines)
+
+    def generate_opening_summary(self, content: str, title: str) -> str:
+        """
+        生成开头摘要段落 (50-60字符)
         
         Args:
             content: 文章内容
+            title: 文章标题
             
         Returns:
-            添加more标签的内容
+            摘要段落
+        """
+        # 移除markdown格式
+        clean_content = re.sub(r'[#*`\[\](){}]', '', content)
+        clean_content = re.sub(r'\s+', ' ', clean_content).strip()
+        
+        # 提取关键句子
+        sentences = re.split(r'[。！？.!?]', clean_content)
+        key_sentences = [s.strip() for s in sentences[:3] if len(s.strip()) > 10]
+        
+        if key_sentences:
+            # 从第一句开始构建摘要
+            summary = key_sentences[0]
+            
+            # 确保长度在50-60字符
+            if len(summary) > 60:
+                summary = summary[:57] + "..."
+            elif len(summary) < 50 and len(key_sentences) > 1:
+                # 尝试添加第二句的部分内容
+                remaining = 57 - len(summary) - 1  # 预留省略号空间
+                if remaining > 10:
+                    addition = key_sentences[1][:remaining]
+                    summary = summary + "，" + addition + "..."
+        else:
+            # 回退方案：基于标题生成摘要
+            summary = f"本文探讨{title}相关的核心观点和实用方法，为读者提供有价值的思考和参考。"
+        
+        return summary
+
+    def needs_background_introduction(self, content: str, title: str) -> bool:
+        """
+        判断是否需要背景介绍段落
+        
+        Args:
+            content: 文章内容
+            title: 文章标题
+            
+        Returns:
+            是否需要背景介绍
+        """
+        # 检查内容复杂性指标
+        complexity_indicators = 0
+        
+        # 1. 内容长度 (超过1500字符认为复杂)
+        if len(content) > 1500:
+            complexity_indicators += 1
+        
+        # 2. 专业术语密度
+        technical_terms = ['api', 'ai', '算法', '模型', '架构', '系统', '平台', '框架', '技术', '方案', '策略', '机制']
+        text_lower = content.lower()
+        term_count = sum(1 for term in technical_terms if term in text_lower)
+        if term_count >= 3:
+            complexity_indicators += 1
+        
+        # 3. 数据和数字密度
+        numbers = re.findall(r'\d+%|\d+\.\d+%|\d+万|\d+亿|\$\d+', content)
+        if len(numbers) >= 3:
+            complexity_indicators += 1
+        
+        # 4. 外部引用 (URL、引用等)
+        references = re.findall(r'http[s]?://|据.*报道|研究显示|调查表明', content)
+        if len(references) >= 2:
+            complexity_indicators += 1
+        
+        # 5. 多级标题结构
+        headers = re.findall(r'^#{2,4}\s', content, re.MULTILINE)
+        if len(headers) >= 3:
+            complexity_indicators += 1
+        
+        # 如果复杂性指标达到2个或以上，需要背景介绍
+        return complexity_indicators >= 2
+
+    def generate_background_introduction(self, content: str, title: str) -> str:
+        """
+        生成背景介绍段落
+        
+        Args:
+            content: 文章内容
+            title: 文章标题
+            
+        Returns:
+            背景介绍内容
+        """
+        # 提取可能的背景信息
+        background_elements = []
+        
+        # 1. 时间背景
+        time_patterns = [
+            r'(\d{4}年\d{1,2}月)', r'(近期|最近|今年)', r'(去年|上个月)',
+            r'(\d{1,2}月\d{1,2}日)', r'(本周|上周)'
+        ]
+        for pattern in time_patterns:
+            matches = re.findall(pattern, content)
+            if matches:
+                background_elements.append(f"时间背景：{matches[0]}")
+                break
+        
+        # 2. 事件背景
+        event_keywords = ['发布', '宣布', '推出', '更新', '升级', '变化', '调整']
+        for keyword in event_keywords:
+            if keyword in content:
+                # 找到包含关键词的句子
+                sentences = re.split(r'[。！？.!?]', content)
+                for sentence in sentences:
+                    if keyword in sentence and len(sentence.strip()) > 20:
+                        background_elements.append(f"事件背景：{sentence.strip()}")
+                        break
+                break
+        
+        # 3. 概念解释 (如果标题包含专业术语)
+        technical_terms = {
+            'AI': '人工智能技术',
+            'API': '应用程序编程接口',
+            'TTS': '文本转语音技术',
+            'OAuth': '开放授权协议',
+            'CDN': '内容分发网络'
+        }
+        for term, explanation in technical_terms.items():
+            if term.lower() in title.lower():
+                background_elements.append(f"概念说明：{term}是指{explanation}")
+                break
+        
+        # 构建背景介绍
+        if background_elements:
+            intro = "为了更好地理解本文内容，这里先提供一些背景信息：\n\n"
+            intro += "\n".join(f"- {element}" for element in background_elements)
+            return intro
+        else:
+            return f"本文将详细分析{title}的相关内容，帮助读者深入理解相关概念和应用场景。"
+
+    def add_more_tag(self, content: str) -> str:
+        """
+        保持原有的more标签添加逻辑（作为备选方案）
         """
         lines = content.split('\n')
         
@@ -422,8 +632,11 @@ class DraftFormatter:
         # 创建front matter
         front_matter = self.create_front_matter(title, raw_content, category, tags)
         
+        # 创建结构化内容（摘要 + <!-- more --> + 背景介绍 + 主体内容）
+        structured_content = self.create_content_structure(raw_content, title)
+        
         # 格式化内容
-        formatted_content = self.format_content(raw_content)
+        formatted_content = self.format_basic_structure(structured_content)
         
         # 添加页脚
         final_content = self.add_footer(formatted_content, front_matter['categories'][0])
