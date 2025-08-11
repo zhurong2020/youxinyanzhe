@@ -22,6 +22,12 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import threading
 from dotenv import load_dotenv
 
+# 导入索引管理器
+try:
+    from onedrive_image_index import OneDriveImageIndex
+except ImportError:
+    OneDriveImageIndex = None
+
 # 配置日志
 logging.basicConfig(
     level=logging.INFO,
@@ -425,6 +431,8 @@ class MarkdownImageProcessor:
         self.config = config
         # 匹配Markdown图片链接的正则表达式
         self.image_pattern = re.compile(r'!\[(.*?)\]\((.*?)\)')
+        # 初始化索引管理器
+        self.index = OneDriveImageIndex() if OneDriveImageIndex else None
         
     def find_local_images(self, content: str) -> List[Tuple[str, str, str]]:
         """查找Markdown中的本地图片链接"""
@@ -474,8 +482,11 @@ class MarkdownImageProcessor:
                 # 绝对路径
                 full_path = Path(img_path[1:])  # 去掉开头的斜杠
             else:
-                # 相对路径
-                full_path = article_dir / img_path
+                # 相对路径 - 先尝试相对于项目根目录
+                full_path = Path(img_path)
+                if not full_path.exists():
+                    # 如果不存在，再尝试相对于文章目录
+                    full_path = article_dir / img_path
             
             return str(full_path) if full_path.exists() else None
             
@@ -558,10 +569,44 @@ class MarkdownImageProcessor:
                         self.config['links']['width']
                     )
                     
+                    # 添加到索引记录
+                    if self.index:
+                        try:
+                            self.index.add_record(
+                                local_path=local_path,
+                                onedrive_path=remote_path,
+                                onedrive_url=share_link,
+                                embed_url=embed_link,
+                                article_file=article_path,
+                                article_title=article_title,
+                                onedrive_file_id=upload_result['id'],
+                                image_index=i,
+                                processing_notes=f"Uploaded from {img_path}"
+                            )
+                        except Exception as e:
+                            logger.warning(f"Failed to add image to index: {e}")
+                    
                     # 记录替换
                     new_link = f"![{alt_text}]({embed_link})"
                     replacements[full_match] = new_link
                     processed_count += 1
+                    
+                    # 删除本地文件（如果配置允许）
+                    if self.config['processing'].get('delete_local_after_upload', False):
+                        try:
+                            local_file = Path(local_path)
+                            if local_file.exists():
+                                local_file.unlink()
+                                logger.info(f"🗑️ Deleted local file: {local_path}")
+                                
+                                # 检查是否需要删除空目录
+                                parent_dir = local_file.parent
+                                if parent_dir.exists() and not any(parent_dir.iterdir()):
+                                    parent_dir.rmdir()
+                                    logger.info(f"🗂️ Removed empty directory: {parent_dir}")
+                                    
+                        except Exception as e:
+                            logger.warning(f"Failed to delete local file {local_path}: {e}")
                     
                     logger.info(f"✅ Processed image {i}/{len(local_images)}: {Path(local_path).name}")
                     
