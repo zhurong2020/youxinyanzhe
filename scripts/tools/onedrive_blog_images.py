@@ -390,6 +390,40 @@ class OneDriveUploadManager:
         else:
             raise Exception(f"Failed to create sharing link: {response.text}")
     
+    def get_direct_image_url(self, item_id: str) -> str:
+        """获取可直接嵌入Jekyll的图片链接"""
+        try:
+            # 方法1: 尝试获取直接下载链接
+            response = self._make_request('GET', f"/me/drive/items/{item_id}")
+            if response.status_code == 200:
+                item_data = response.json()
+                
+                # 检查是否有直接下载链接
+                download_url = item_data.get('@microsoft.graph.downloadUrl')
+                if download_url:
+                    logger.info("Using @microsoft.graph.downloadUrl")
+                    return download_url
+                
+                # 方法2: 构建直接访问链接
+                web_url = item_data.get('webUrl', '')
+                if web_url:
+                    # 将OneDrive web链接转换为直接下载链接
+                    # 格式: https://domain.sharepoint.com/personal/user/_layouts/15/download.aspx?UniqueId=xxx
+                    if 'sharepoint.com' in web_url:
+                        unique_id = item_data.get('id', '')
+                        base_url = web_url.split('/personal/')[0] + '/personal/' + web_url.split('/personal/')[1].split('/')[0]
+                        direct_url = f"{base_url}/_layouts/15/download.aspx?UniqueId={unique_id}"
+                        logger.info("Using SharePoint direct download URL")
+                        return direct_url
+            
+            # 方法3: 回退到分享链接
+            logger.warning("Falling back to sharing link")
+            return self.get_sharing_link(item_id, 'view')
+            
+        except Exception as e:
+            logger.error(f"Failed to get direct image URL: {e}")
+            return self.get_sharing_link(item_id, 'view')
+    
     def convert_to_embed_link(self, share_url: str, width: int = 800) -> str:
         """将OneDrive分享链接转换为嵌入链接"""
         try:
@@ -403,6 +437,7 @@ class OneDriveUploadManager:
             parsed = urlparse(share_url)
             params = parse_qs(parsed.query)
             
+            # 处理标准OneDrive链接格式 (onedrive.live.com)
             if 'resid' in params and 'authkey' in params:
                 resid = params['resid'][0]
                 authkey = params['authkey'][0]
@@ -414,6 +449,14 @@ class OneDriveUploadManager:
                 }
                 
                 return f"https://onedrive.live.com/embed?{urlencode(embed_params)}"
+            
+            # 处理SharePoint链接格式 (xxx.sharepoint.com)
+            if 'sharepoint.com' in share_url and ':i:' in share_url:
+                # SharePoint图片链接格式转换为嵌入链接
+                # 原始链接格式: https://domain.sharepoint.com/:i:/g/personal/user/ID?e=hash
+                # 嵌入链接格式: https://domain.sharepoint.com/:i:/g/personal/user/ID (移除查询参数)
+                base_url = share_url.split('?')[0]  # 移除查询参数
+                return base_url
             
             # 如果无法转换，返回原链接
             return share_url
@@ -560,14 +603,18 @@ class MarkdownImageProcessor:
                     logger.info(f"Uploading {local_path} to OneDrive...")
                     upload_result = self.uploader.upload_file(local_path, remote_path)
                     
-                    # 获取分享链接
-                    share_link = self.uploader.get_sharing_link(upload_result['id'])
-                    
-                    # 转换为嵌入链接
-                    embed_link = self.uploader.convert_to_embed_link(
-                        share_link, 
-                        self.config['links']['width']
-                    )
+                    # 获取直接图片链接(优先)或分享链接(备用)
+                    try:
+                        direct_link = self.uploader.get_direct_image_url(upload_result['id'])
+                        embed_link = direct_link
+                        logger.info(f"Using direct image URL: {direct_link[:100]}...")
+                    except Exception as e:
+                        logger.warning(f"Direct link failed, using share link: {e}")
+                        share_link = self.uploader.get_sharing_link(upload_result['id'])
+                        embed_link = self.uploader.convert_to_embed_link(
+                            share_link, 
+                            self.config['links']['width']
+                        )
                     
                     # 添加到索引记录
                     if self.index:
