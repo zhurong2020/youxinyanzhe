@@ -2,6 +2,33 @@
 
 本文档记录项目的详细更新历史，包括已完成的功能实现和重要技术决策。
 
+## 2025-08-11: OneDrive图床系统与图片索引管理完成 ✅
+- **完整OneDrive图床自动化系统**:
+  - 实现Microsoft Graph API OAuth2认证，支持WSL环境优化
+  - 完成图片上传、链接替换、本地文件删除的完整工作流
+  - 自动创建OneDrive文件夹结构: `/BlogImages/{year}/{month}/`
+  - 智能文件命名: `{date}_{article_title}_{index:02d}.{ext}`
+- **图片索引管理系统**:
+  - 创建`_data/onedrive_image_index.json`完整索引记录
+  - 实现文件哈希去重，避免重复上传浪费空间
+  - 支持多维度查询：按文章、按日期、按统计信息
+  - 提供索引清理和数据维护功能
+- **技术架构优化**:
+  - 修复WSL环境OAuth浏览器启动问题（cmd.exe→powershell.exe）
+  - 完善路径解析逻辑，支持Jekyll baseurl变量和多种引用格式
+  - 集成环境变量安全配置管理，敏感数据与代码分离
+- **用户界面完善**:
+  - 在run.py中新增"图片索引管理"菜单（选项6）
+  - 提供5个子功能：统计、报告、查询、清理、帮助
+  - 支持命令行直接调用和交互式菜单两种使用方式
+- **配置文件完善**:
+  - 新增`delete_local_after_upload`配置控制本地文件清理
+  - 完善OneDrive配置项，支持文件大小限制、压缩质量等
+- **文档体系完善**:
+  - 创建`docs/IMAGE_MANAGEMENT_WORKFLOW.md`详细工作流程文档
+  - 更新`docs/TECHNICAL_ARCHITECTURE.md`同步最新架构变化
+  - 在`CLAUDE.md`中添加完整创作流程说明
+
 ## 2025-08-07: 代码质量优化与类型注解修复 ✅
 - **类型注解修复**: 修复format_draft.py中的类型兼容性问题
 - **技术细节**:

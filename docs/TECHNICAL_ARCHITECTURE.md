@@ -14,7 +14,7 @@
 ### 关键集成
 - **WeChat API**: 公众号内容发布指导
 - **Google Analytics 4**: 深度用户行为分析
-- **OneDrive**: 图片托管和缓存
+- **Microsoft Graph API**: OneDrive图床自动化和图片索引管理
 - **SMTP**: 自动化邮件发送
 
 ## 核心架构决策
@@ -26,12 +26,13 @@
 - **文件位置**: `.tmp/output/wechat_guides/`
 - **优势**: 保持技术处理自动化，提供清晰的手动发布步骤
 
-### 2. 图片托管方案
-**决策**: 智能图片管理系统 + OneDrive图床自动化
-- **智能策略**: 根据文件大小和用途自动选择存储方案(本地/OneDrive/第三方)
-- **OneDrive集成**: OAuth认证自动化，支持图片批量上传和管理
-- **WeChat兼容**: OneDrive图片自动下载并重新上传到WeChat服务器
-- **路径处理**: 所有图片使用`{{ site.baseurl }}`变量确保GitHub Pages兼容
+### 2. 图片托管方案 (已完成)
+**决策**: OneDrive图床自动化系统，完整的创作到发布工作流
+- **完整工作流**: 本地创作 → OneDrive上传 → 链接替换 → 本地清理 → 索引记录
+- **Microsoft Graph集成**: OAuth2认证，WSL环境优化，支持文件批量管理
+- **智能索引系统**: 文件哈希去重，完整元数据记录，多维度查询支持
+- **自动化处理**: 上传成功后自动删除本地assets文件，保持仓库精简
+- **路径兼容**: 支持Jekyll baseurl变量，确保GitHub Pages完全兼容
 
 ### 3. 发布状态管理
 **决策**: 使用YAML文件跟踪发布状态
@@ -56,14 +57,18 @@
 │   │   └── youtube_podcast_generator.py
 │   ├── utils/             # 可重用工具
 │   └── tools/             # 独立调试工具
-│       ├── image_manager.py      # 智能图片管理系统
-│       └── onedrive_blog_images.py  # OneDrive图床自动化
+│       ├── image_manager.py           # 智能图片管理系统
+│       ├── onedrive_blog_images.py    # OneDrive图床自动化
+│       └── onedrive_image_index.py    # OneDrive图片索引管理
 ├── tests/                 # 所有测试文件
 ├── config/                # 配置文件
 │   ├── platforms.yml
 │   ├── gemini_config.yml
+│   ├── onedrive_config.json        # OneDrive图床配置
 │   └── templates/
 ├── docs/                  # 项目文档
+├── _data/                 # Jekyll数据文件
+│   └── onedrive_image_index.json   # OneDrive图片索引记录
 ├── _drafts/
 │   ├── .publishing/       # 发布状态跟踪
 │   └── archived/          # 已完成文章归档
@@ -72,13 +77,14 @@
 ```
 
 ### 关键文件说明
-- **run.py**: 主入口脚本，统一的操作界面
+- **run.py**: 主入口脚本，统一的操作界面，含OneDrive图片索引管理菜单
 - **content_pipeline.py**: 内容处理管道，支持多平台适配
 - **youtube_podcast_generator.py**: YouTube视频转播客系统
 - **wechat_publisher.py**: WeChat发布指导生成器
 - **member_management.py**: 会员系统管理工具
 - **image_manager.py**: 根据文件大小自动选择存储策略的智能图片管理
-- **onedrive_blog_images.py**: OneDrive OAuth认证和图床自动化系统
+- **onedrive_blog_images.py**: OneDrive OAuth认证和图床自动化系统，支持批量处理
+- **onedrive_image_index.py**: OneDrive图片索引管理，支持查询统计和数据维护
 
 ## 安全与部署
 
@@ -118,6 +124,12 @@
 
 ---
 
-**文档版本**: v1.1  
-**最后更新**: 2025-08-10  
+**文档版本**: v1.2  
+**最后更新**: 2025-08-11  
 **维护**: 技术架构变更时同步更新
+
+## 最近更新 (v1.2)
+- 完成OneDrive图床自动化系统集成
+- 新增图片索引管理系统和完整工作流程
+- 优化WSL环境下的OAuth认证流程
+- 实现本地文件自动清理和去重功能
