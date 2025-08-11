@@ -2,6 +2,19 @@
 
 本文档详细说明博客图片从创作到发布的完整自动化工作流程。
 
+## ⚠️ 重要更新 (2025-08-11)
+
+### 新增功能
+- ✅ **修复图片渲染问题** - OneDrive链接现在生成可直接嵌入Jekyll的图片URL
+- ✅ **增加回退机制** - 处理失败时自动恢复到原始状态  
+- ✅ **集成GitHub备份** - 完整的文章和图片资源备份到GitHub Release
+- ✅ **链接验证功能** - 自动测试图片链接可访问性
+
+### 新增工具
+- `enhanced_onedrive_processor.py` - 增强处理器(包含回退+备份)
+- `restore_local_image_links.py` - OneDrive链接恢复为本地链接
+- `cleanup_onedrive_images.py` - 安全清理OneDrive文件和记录
+
 ## 工作流程概览
 
 ### 完整流程图
@@ -149,6 +162,42 @@ mv _drafts/YYYY-MM-DD-标题.md _posts/
 
 # Jekyll自动构建发布
 # 所有OneDrive链接在生产环境正常显示
+```
+
+## 增强工具使用指南
+
+### 1. 增强处理器 (推荐)
+```bash
+# 带回退和GitHub备份的完整处理
+python3 scripts/tools/enhanced_onedrive_processor.py "_drafts/文章.md" --with-github-backup
+
+# 从快照回退
+python3 scripts/tools/enhanced_onedrive_processor.py --rollback "snapshot_id"
+```
+
+**特性**:
+- ✅ 自动创建处理前快照
+- ✅ 失败时自动回退
+- ✅ 图片链接验证
+- ✅ GitHub Release备份
+- ✅ 自动生成恢复脚本
+
+### 2. 链接恢复工具
+```bash
+# 将OneDrive链接恢复为本地Jekyll链接
+python3 scripts/tools/restore_local_image_links.py "_drafts/文章.md"
+
+# 演练模式
+python3 scripts/tools/restore_local_image_links.py "_drafts/文章.md" --dry-run
+```
+
+### 3. 安全清理工具
+```bash
+# 交互式清理OneDrive文件和记录
+python3 scripts/tools/cleanup_onedrive_images.py --article "_drafts/文章.md"
+
+# 清理所有记录
+python3 scripts/tools/cleanup_onedrive_images.py
 ```
 
 ## 图片索引管理系统
