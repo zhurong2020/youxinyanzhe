@@ -425,28 +425,203 @@ class ContentPipeline:
         
         return valid_drafts
     
+    def analyze_draft_status(self, draft_path: Path) -> str:
+        """
+        分析草稿状态，检查是否有需要预处理的问题
+        
+        Args:
+            draft_path: 草稿文件路径
+            
+        Returns:
+            状态信息字符串
+        """
+        issues = []
+        
+        try:
+            # 读取草稿内容
+            with open(draft_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # 检查图片路径问题
+            image_issues = self.check_image_paths(content)
+            if image_issues:
+                issues.append("🖼️ 图片")
+            
+            # 检查Front Matter
+            if not content.strip().startswith('---'):
+                issues.append("📋 格式")
+            
+            # 检查<!-- more -->标签
+            if '<!-- more -->' not in content:
+                issues.append("✂️ 分页")
+            
+            # 检查内容长度
+            clean_content = content.replace('---', '').replace('<!-- more -->', '')
+            if len(clean_content.strip()) < 500:
+                issues.append("📏 长度")
+                
+        except Exception as e:
+            issues.append("❌ 读取")
+        
+        if issues:
+            return f" ⚠️ [{', '.join(issues)}]"
+        else:
+            return " ✅"
+    
+    def check_image_paths(self, content: str) -> List[str]:
+        """
+        检查内容中的图片路径问题
+        
+        Args:
+            content: 文章内容
+            
+        Returns:
+            问题图片路径列表
+        """
+        import re
+        
+        # 查找所有图片引用
+        image_patterns = [
+            r'!\[.*?\]\((.*?)\)',  # Markdown 图片
+            r'<img[^>]+src=["\']([^"\']+)["\']',  # HTML img 标签
+        ]
+        
+        problematic_images = []
+        
+        for pattern in image_patterns:
+            matches = re.findall(pattern, content)
+            for match in matches:
+                image_path = match.strip()
+                
+                # 检查是否是本地assets路径（需要OneDrive处理）
+                if ('assets/images/' in image_path and 
+                    not image_path.startswith('http') and 
+                    not '{{ site.baseurl }}' in image_path):
+                    problematic_images.append(image_path)
+                
+                # 检查是否是绝对路径（Jekyll不兼容）
+                elif image_path.startswith('/assets/'):
+                    problematic_images.append(image_path)
+        
+        return problematic_images
+    
+    def check_draft_issues(self, draft_path: Path) -> List[str]:
+        """
+        检查草稿的具体问题
+        
+        Args:
+            draft_path: 草稿文件路径
+            
+        Returns:
+            问题描述列表
+        """
+        issues = []
+        
+        try:
+            with open(draft_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # 检查图片路径问题
+            image_issues = self.check_image_paths(content)
+            if image_issues:
+                issues.append(f"图片路径不规范 ({len(image_issues)}个图片需要OneDrive处理)")
+                for img in image_issues[:3]:  # 最多显示3个示例
+                    issues.append(f"  例如: {img}")
+                if len(image_issues) > 3:
+                    issues.append(f"  ... 还有{len(image_issues)-3}个图片")
+            
+            # 检查Front Matter
+            if not content.strip().startswith('---'):
+                issues.append("缺少Jekyll Front Matter (需要标题、分类、标签等)")
+            
+            # 检查<!-- more -->标签
+            if '<!-- more -->' not in content:
+                issues.append("缺少首页分页标记 <!-- more -->")
+            
+            # 检查内容结构
+            if 'excerpt:' not in content and content.strip().startswith('---'):
+                issues.append("缺少摘要字段 (excerpt) 影响SEO")
+            
+            # 检查内容长度
+            clean_content = content.replace('---', '').replace('<!-- more -->', '')
+            if len(clean_content.strip()) < 500:
+                issues.append("内容过短，可能影响SEO效果")
+                
+        except Exception as e:
+            issues.append(f"文件读取错误: {str(e)}")
+        
+        return issues
+    
+    def get_preprocessing_suggestions(self, issues: List[str]) -> List[str]:
+        """
+        根据问题提供预处理建议
+        
+        Args:
+            issues: 问题列表
+            
+        Returns:
+            建议列表
+        """
+        suggestions = []
+        
+        # 分析问题类型并给出相应建议
+        has_image_issues = any('图片' in issue for issue in issues)
+        has_format_issues = any(any(keyword in issue for keyword in ['Front Matter', '分页', '摘要', '内容过短']) for issue in issues)
+        
+        if has_image_issues:
+            suggestions.append("🖼️  14. OneDrive图床管理 - 处理图片上传和路径规范化")
+        
+        if has_format_issues:
+            suggestions.append("📝 4. 内容规范化处理 - 完善Front Matter和内容结构")
+        
+        if not suggestions:
+            suggestions.append("📋 建议先检查文件内容和格式是否符合Jekyll规范")
+        
+        suggestions.append("💡 或者继续发布，系统会尝试自动处理部分问题")
+        
+        return suggestions
+    
     def select_draft(self) -> Optional[Path]:
         """让用户选择要处理的草稿"""
         drafts = self.list_drafts()
         if not drafts:
-            print("📝 没有找到草稿文件")
-            print("\n💡 提示：")
-            print("   1. 您可以在 _drafts/ 目录创建新的 .md 文件")
-            print("   2. 或者选择主菜单的 '3. 生成测试文章' 选项")
-            print("   3. 或者使用 '2. 重新发布已发布文章' 将已发布文章转为草稿")
+            print("📝 没有找到规范化草稿文件")
+            print("\n🔍 快速创作建议：")
+            print("   🎯 5. 主题灵感生成器 - AI生成文章主题和大纲")
+            print("   🎬 8. YouTube播客生成器 - 将YouTube视频转换为文章")
+            print("   📝 4. 内容规范化处理 - 处理手工草稿或其他内容")
+            print("   📄 3. 生成测试文章 - 快速生成示例内容")
+            
+            print("\n🛠️ 其他选项：")
+            print("   📁 手工创建：在 _drafts/ 目录创建 .md 文件")
+            print("   📰 2. 重新发布已发布文章 - 将已发布文章转为草稿")
+            
+            print("\n💡 推荐工作流程：")
+            print("   创作内容 → 4.内容规范化处理 → 1.发布规范化草稿")
             
             while True:
-                choice = input("\n是否现在生成测试文章？(y/N): ").strip().lower()
-                if choice in ['y', 'yes']:
+                choice = input("\n选择快速操作 (5=灵感生成/8=YouTube/4=规范化/3=测试/N=返回): ").strip().lower()
+                if choice == '5':
+                    print("🎯 正在跳转到主题灵感生成器...")
+                    return 'redirect_to_inspiration'  # 特殊返回值
+                elif choice == '8':
+                    print("🎬 正在跳转到YouTube播客生成器...")
+                    return 'redirect_to_youtube'  # 特殊返回值
+                elif choice == '4':
+                    print("📝 正在跳转到内容规范化处理...")
+                    return 'redirect_to_normalization'  # 特殊返回值
+                elif choice == '3':
                     return self.generate_test_content()
                 elif choice in ['n', 'no', '']:
                     return None
                 else:
-                    print("请输入 y 或 N")
+                    print("请输入 5、8、4、3 或 N")
             
         print("\n可用的草稿文件：")
         for i, draft in enumerate(drafts, 1):
-            print(f"{i}. {draft.name}")
+            # 检查草稿状态和问题
+            status_info = self.analyze_draft_status(draft)
+            print(f"{i}. {draft.name}{status_info}")
         print("0. 退出")
             
         while True:
@@ -455,7 +630,26 @@ class ContentPipeline:
                 if choice == 0:
                     return None
                 if 1 <= choice <= len(drafts):
-                    return drafts[choice-1]
+                    selected_draft = drafts[choice-1]
+                    
+                    # 检查选择的草稿是否有问题，给出预处理建议
+                    issues = self.check_draft_issues(selected_draft)
+                    if issues:
+                        print(f"\n⚠️  草稿 '{selected_draft.name}' 检测到以下问题：")
+                        for issue in issues:
+                            print(f"   • {issue}")
+                        
+                        print("\n🔧 建议的预处理步骤：")
+                        suggestions = self.get_preprocessing_suggestions(issues)
+                        for suggestion in suggestions:
+                            print(f"   {suggestion}")
+                        
+                        proceed = input("\n是否继续发布此草稿？(y/N): ").strip().lower()
+                        if proceed not in ['y', 'yes']:
+                            print("💡 您可以先处理这些问题，然后再回来发布")
+                            continue
+                    
+                    return selected_draft
                 print("无效的选择")
             except ValueError:
                 print("请输入有效的数字")
