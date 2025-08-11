@@ -3607,9 +3607,10 @@ def handle_onedrive_images_menu(pipeline):
         print("3. 批量处理所有草稿图片")
         print("4. 检查OneDrive连接状态")
         print("5. 查看图片处理统计")
+        print("6. 图片索引管理")
         print("\n0. 返回主菜单")
         
-        choice = input("\n请选择操作 (1-5/0): ").strip()
+        choice = input("\n请选择操作 (1-6/0): ").strip()
         
         if choice == "1":
             # 初始化认证
@@ -3763,6 +3764,124 @@ def handle_onedrive_images_menu(pipeline):
                     print(f"❌ 读取日志失败: {e}")
             else:
                 print("📝 暂无处理日志")
+                
+        elif choice == "6":
+            # 图片索引管理
+            handle_image_index_menu()
+            
+        elif choice == "0":
+            break
+        else:
+            print("❌ 无效选择，请重新输入")
+
+
+def handle_image_index_menu():
+    """图片索引管理菜单"""
+    while True:
+        print("\n" + "="*50)
+        print("🗂️ 图片索引管理")
+        print("="*50)
+        print("1. 查看图片统计")
+        print("2. 生成详细报告")
+        print("3. 按文章查看图片")
+        print("4. 按日期查看图片")
+        print("5. 清理无效记录")
+        print("\n0. 返回上级菜单")
+        
+        choice = input("\n请选择操作 (1-5/0): ").strip()
+        
+        if choice == "1":
+            # 查看统计
+            print("📊 正在获取图片统计...")
+            try:
+                result = subprocess.run([
+                    "python3", "scripts/tools/onedrive_image_index.py", 
+                    "--stats"
+                ], check=False, capture_output=False)
+                
+                if result.returncode != 0:
+                    print("⚠️ 获取统计信息时出现问题")
+                    
+            except Exception as e:
+                print(f"❌ 统计获取失败: {e}")
+                
+        elif choice == "2":
+            # 生成报告
+            print("📄 正在生成详细报告...")
+            try:
+                result = subprocess.run([
+                    "python3", "scripts/tools/onedrive_image_index.py", 
+                    "--report"
+                ], check=False, capture_output=False)
+                
+                if result.returncode != 0:
+                    print("⚠️ 生成报告时出现问题")
+                    
+            except Exception as e:
+                print(f"❌ 报告生成失败: {e}")
+                
+        elif choice == "3":
+            # 按文章查看
+            article = input("请输入文章文件名（不含扩展名）: ").strip()
+            if article:
+                print(f"🔍 查找文章 {article} 的图片...")
+                try:
+                    result = subprocess.run([
+                        "python3", "scripts/tools/onedrive_image_index.py", 
+                        "--article", article
+                    ], check=False, capture_output=False)
+                    
+                    if result.returncode != 0:
+                        print("⚠️ 查询过程中出现问题")
+                        
+                except Exception as e:
+                    print(f"❌ 查询失败: {e}")
+            else:
+                print("❌ 请输入有效的文章名")
+                
+        elif choice == "4":
+            # 按日期查看
+            print("请输入日期范围 (格式: YYYY-MM-DD)")
+            start_date = input("开始日期: ").strip()
+            end_date = input("结束日期: ").strip()
+            
+            if start_date and end_date:
+                print(f"🗓️ 查找 {start_date} 至 {end_date} 的图片...")
+                try:
+                    result = subprocess.run([
+                        "python3", "scripts/tools/onedrive_image_index.py", 
+                        "--date-range", start_date, end_date
+                    ], check=False, capture_output=False)
+                    
+                    if result.returncode != 0:
+                        print("⚠️ 查询过程中出现问题")
+                        
+                except Exception as e:
+                    print(f"❌ 查询失败: {e}")
+            else:
+                print("❌ 请输入有效的日期范围")
+                
+        elif choice == "5":
+            # 清理无效记录
+            print("🧹 正在清理无效记录...")
+            confirm = input("确认清理无效记录？(y/N): ").strip().lower()
+            
+            if confirm == 'y':
+                try:
+                    result = subprocess.run([
+                        "python3", "scripts/tools/onedrive_image_index.py", 
+                        "--cleanup"
+                    ], check=False, capture_output=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ 清理完成")
+                    else:
+                        print("⚠️ 清理过程中出现问题")
+                        
+                except Exception as e:
+                    print(f"❌ 清理失败: {e}")
+            else:
+                print("❌ 已取消清理操作")
                 
         elif choice == "0":
             break

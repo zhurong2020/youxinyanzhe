@@ -21,7 +21,9 @@
     "compression_quality": 85,
     "create_thumbnails": false,
     "backup_originals": false,
-    "convert_to_webp": false
+    "convert_to_webp": false,
+    "delete_local_after_upload": true,
+    "backup_before_delete": false
   },
   "links": {
     "type": "embed",
