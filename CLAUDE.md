@@ -6,10 +6,12 @@
 - **主要功能**: Jekyll博客系统、YouTube播客生成器、会员管理系统、OneDrive图床自动化、多平台发布
 - **技术架构**: 详见 `docs/TECHNICAL_ARCHITECTURE.md`
 - **图片管理**: 详见 `docs/IMAGE_MANAGEMENT_WORKFLOW.md`
+- **Azure集成规划**: 详见 `docs/AZURE_INTEGRATION_ROADMAP.md`
 - **更新历史**: 详见 `docs/CHANGELOG_DETAILED.md`
 
 ## 当前工作重点
 - **Phase 1 (当前)**: 内容创作与数据观察 - 保持每周1-2篇高质量内容，完善会员服务，OneDrive图床自动化已完成
+- **Phase 1.5 (即将开始)**: Azure AI服务集成 - Azure OpenAI Service和Azure AI Speech替换现有服务，优化成本和质量
 - **Phase 2 (2-3月后)**: 喜马拉雅平台集成 - OAuth认证、音频上传、智能平台选择
 - **Phase 3 (3-6月后)**: 社区功能与高级服务 - Discord社区、深度投资服务
 

@@ -15,6 +15,7 @@
 - **WeChat API**: 公众号内容发布指导
 - **Google Analytics 4**: 深度用户行为分析
 - **Microsoft Graph API**: OneDrive图床自动化和图片索引管理
+- **Azure AI服务 (规划中)**: Azure OpenAI Service + Azure AI Speech
 - **SMTP**: 自动化邮件发送
 
 ## 核心架构决策
@@ -122,14 +123,31 @@
 - **钩子系统**: 关键流程节点支持自定义处理
 - **API接口**: 为外部工具提供标准化API
 
+## 技术路线图
+
+### Azure生态系统集成 (Phase 1.5)
+**目标**: 优化成本结构，提升服务质量和技术栈一致性
+
+**优先级1 - AI服务替换**:
+- **Azure OpenAI Service**: 替换Google Gemini，提升中文内容生成质量
+- **Azure AI Speech**: 替换ElevenLabs，节省月度订阅成本($11/月)
+
+**优先级2 - 基础设施增强**:
+- **Azure Key Vault**: 统一密钥管理，提升安全性
+- **Azure CDN**: OneDrive图片全球加速
+
+**详细规划**: 参见 `docs/AZURE_INTEGRATION_ROADMAP.md`
+
 ---
 
-**文档版本**: v1.2  
+**文档版本**: v1.3  
 **最后更新**: 2025-08-11  
 **维护**: 技术架构变更时同步更新
 
-## 最近更新 (v1.2)
+## 最近更新 (v1.3)
 - 完成OneDrive图床自动化系统集成
 - 新增图片索引管理系统和完整工作流程
 - 优化WSL环境下的OAuth认证流程
 - 实现本地文件自动清理和去重功能
+- 新增Azure生态系统集成技术路线图
+- 规划AI服务替换策略，优化成本结构

@@ -83,6 +83,7 @@ python run.py
 |---------|------|------|
 | **🎯 项目总览** | [功能实施总结](docs/project-completion-summary.md) | 最新功能成果和后续规划 |
 | | [技术架构文档](docs/TECHNICAL_ARCHITECTURE.md) | 详细的技术架构和设计决策 |
+| | [Azure集成路线图](docs/AZURE_INTEGRATION_ROADMAP.md) | Azure生态系统集成规划和成本分析 |
 | | [项目结构](docs/PROJECT_STRUCTURE.md) | 详细的目录结构说明 |
 | | [开发约定](CLAUDE.md) | 项目开发规范和约定 |
 | **🔧 配置指南** | [OneDrive图片工作流程](docs/IMAGE_MANAGEMENT_WORKFLOW.md) | 完整的图片管理自动化流程 |
