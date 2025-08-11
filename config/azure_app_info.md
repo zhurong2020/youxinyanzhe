@@ -9,8 +9,9 @@
 
 ## 配置信息
 - **重定向 URI**: http://localhost:8080/callback (Web)
-- **客户端密码描述**: BlogImageManager-Secret-2025
-- **密码到期时间**: 24个月后
+- **客户端密码描述**: BlogImageManager-Secret-2025-New
+- **机密ID**: be312d41-b537-4a82-a51f-08aacd551cfc
+- **密码到期时间**: 24个月后 (2027年8月)
 
 ## API权限
 - **Files.ReadWrite** (已委托) - 完全访问用户文件
