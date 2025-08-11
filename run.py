@@ -87,6 +87,19 @@ def main():
             if not draft:
                 pipeline.log("用户取消或无草稿可处理", level="info", force=True)
                 continue  # 返回主菜单
+            elif isinstance(draft, str) and draft.startswith('redirect_to_'):
+                # 处理重定向
+                if draft == 'redirect_to_inspiration':
+                    handle_topic_inspiration_menu(pipeline)
+                    continue
+                elif draft == 'redirect_to_youtube':
+                    handle_youtube_podcast_menu(pipeline)
+                    continue  
+                elif draft == 'redirect_to_normalization':
+                    handle_content_normalization_menu(pipeline)
+                    continue
+                else:
+                    continue
         elif choice == "2":
             # 重新发布已发布文章
             pipeline.log("开始重新发布已发布文章", level="info", force=True)
