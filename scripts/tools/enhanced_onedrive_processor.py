@@ -19,18 +19,8 @@ except ImportError as e:
     print(f"⚠️  BlogImageManager import failed: {e}")
     BlogImageManager = None
 
-# 尝试导入RewardManager
-try:
-    import sys
-    sys.path.append(str(Path(__file__).parent.parent))
-    from core.content_rewards import RewardManager
-except ImportError:
-    try:
-        # 备用导入路径
-        from scripts.core.content_rewards import RewardManager
-    except ImportError as e:
-        print(f"⚠️  RewardManager import failed: {e}")
-        RewardManager = None
+# RewardManager 模块不存在，直接设为None
+RewardManager = None
 
 
 class EnhancedOneDriveProcessor:
