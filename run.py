@@ -47,33 +47,26 @@ def main():
         print("\n" + "="*50)
         print("📝 有心言者 - 内容发布系统")
         print("="*50)
-        print("📝 内容处理：")
-        print("1. 发布规范化草稿")
-        print("2. 重新发布已发布文章")
-        print("3. 生成测试文章")
-        print("4. 内容规范化处理")
-        print("5. 主题灵感生成器")
-        print("\n🛠️ 系统工具：")
-        print("6. 内容变现管理")
-        print("7. 系统状态检查")
-        print("8. YouTube播客生成器")
-        print("9. 文章更新工具")
-        print("10. 调试和维护工具")
-        print("11. LLM引擎切换")
-        print("12. ElevenLabs语音测试")
-        print("13. YouTube音频上传")
-        print("14. OneDrive图床管理")
+        print("📝 内容工作流程：")
+        print("1. 智能内容发布")      # 合并1+2
+        print("2. 内容规范化处理")    # 保持原4
+        print("3. 智能内容创作")      # 合并5+3，提升位置
+        print("4. YouTube内容处理")   # 合并8+13
+        print("\n🛠️ 系统管理：")
+        print("5. OneDrive图床管理")  # 保持原14
+        print("6. 内容变现管理")      # 保持原6
+        print("7. 语音和音频工具")    # 合并12+相关
+        print("8. 文章更新工具")      # 保持原9
+        print("9. 系统工具集合")      # 合并7+10+11
         print("\n0. 退出")
         
-        choice = input("\n请输入选项 (1-14/0): ").strip()
+        choice = input("\n请输入选项 (1-9/0): ").strip()
         
         # 记录用户选择的操作
         choice_names = {
-            '1': '发布规范化草稿', '2': '重新发布已发布文章', '3': '生成测试文章',
-            '4': '内容规范化处理', '5': '主题灵感生成器', '6': '内容变现管理', 
-            '7': '系统状态检查', '8': 'YouTube播客生成器', '9': '文章更新工具',
-            '10': '调试和维护工具', '11': 'LLM引擎切换', '12': 'ElevenLabs语音测试', 
-            '13': 'YouTube音频上传', '14': 'OneDrive图床管理', '0': '退出'
+            '1': '智能内容发布', '2': '内容规范化处理', '3': '智能内容创作',
+            '4': 'YouTube内容处理', '5': 'OneDrive图床管理', '6': '内容变现管理',
+            '7': '语音和音频工具', '8': '文章更新工具', '9': '系统工具集合', '0': '退出'
         }
         operation_name = choice_names.get(choice, '无效选择')
         pipeline.log(f"用户选择操作: {choice} ({operation_name})", level="info", force=True)
@@ -81,103 +74,49 @@ def main():
         draft = None
         
         if choice == "1":
-            # 发布规范化草稿
-            pipeline.log("开始发布规范化草稿", level="info", force=True)
-            draft = pipeline.select_draft()
+            # 智能内容发布 (合并1+2)
+            draft = handle_smart_publishing_menu(pipeline)
             if not draft:
-                pipeline.log("用户取消或无草稿可处理", level="info", force=True)
                 continue  # 返回主菜单
-            elif isinstance(draft, str) and draft.startswith('redirect_to_'):
-                # 处理重定向
-                if draft == 'redirect_to_inspiration':
-                    handle_topic_inspiration_menu(pipeline)
-                    continue
-                elif draft == 'redirect_to_youtube':
-                    handle_youtube_podcast_menu(pipeline)
-                    continue  
-                elif draft == 'redirect_to_normalization':
-                    handle_content_normalization_menu(pipeline)
-                    continue
-                else:
-                    continue
         elif choice == "2":
-            # 重新发布已发布文章
-            pipeline.log("开始重新发布已发布文章", level="info", force=True)
-            post = pipeline.select_published_post()
-            if not post:
-                pipeline.log("用户取消或无文章可重新发布", level="info", force=True)
-                continue  # 返回主菜单
-            draft = pipeline.copy_post_to_draft(post)
-            if not draft:
-                print("复制文章到草稿失败")
-                pipeline.log("复制文章到草稿失败", level="error", force=True)
-                continue  # 返回主菜单
-        elif choice == "3":
-            # 生成测试文章
-            pipeline.log("开始生成测试文章", level="info", force=True)
-            draft = pipeline.generate_test_content()
-            if not draft:
-                print("生成测试文章失败")
-                pipeline.log("生成测试文章失败", level="error", force=True)
-                continue  # 返回主菜单
-            
-            # 测试文章生成成功后，询问是否要发布
-            print(f"\n✅ 测试文章已生成: {draft}")
-            publish_choice = input("\n是否要发布此测试文章？(y/N): ").strip().lower()
-            pipeline.log(f"测试文章生成成功: {draft}, 用户选择{'发布' if publish_choice in ['y', 'yes'] else '不发布'}", level="info", force=True)
-            if publish_choice not in ['y', 'yes']:
-                print("📄 测试文章已保存到草稿目录，您可以稍后选择 '1. 处理现有草稿' 来发布它")
-                continue  # 返回主菜单
-        elif choice == "4":
-            # 内容规范化处理
+            # 内容规范化处理 (保持原4)
             handle_content_normalization_menu(pipeline)
             continue  # 返回主菜单
+        elif choice == "3":
+            # 智能内容创作 (合并5+3)
+            draft = handle_smart_creation_menu(pipeline)
+            if not draft:
+                continue  # 返回主菜单
+        elif choice == "4":
+            # YouTube内容处理 (合并8+13)
+            handle_youtube_processing_menu(pipeline)
+            continue  # 返回主菜单
         elif choice == "5":
-            # 主题灵感生成器
-            handle_topic_inspiration_menu(pipeline)
+            # OneDrive图床管理 (保持原14)
+            handle_onedrive_images_menu(pipeline)
             continue  # 返回主菜单
         elif choice == "6":
-            # 内容变现管理
+            # 内容变现管理 (保持原6)
             handle_monetization_menu(pipeline)
             continue  # 返回主菜单
         elif choice == "7":
-            # 系统状态检查
-            handle_system_check_menu(pipeline)
+            # 语音和音频工具 (合并12+相关)
+            handle_audio_tools_menu(pipeline)
             continue  # 返回主菜单
         elif choice == "8":
-            # YouTube播客生成器
-            handle_youtube_podcast_menu(pipeline)
-            continue  # 返回主菜单
-        elif choice == "9":
-            # 文章更新工具
+            # 文章更新工具 (保持原9)
             handle_post_update_menu(pipeline)
             continue  # 返回主菜单
-        elif choice == "10":
-            # 调试和维护工具
-            handle_debug_menu(pipeline)
-            continue  # 返回主菜单
-        elif choice == "11":
-            # LLM引擎切换
-            handle_llm_engine_menu(pipeline)
-            continue  # 返回主菜单
-        elif choice == "12":
-            # ElevenLabs语音测试
-            handle_elevenlabs_menu(pipeline)
-            continue  # 返回主菜单
-        elif choice == "13":
-            # YouTube音频上传
-            handle_youtube_upload_menu(pipeline)
-            continue  # 返回主菜单
-        elif choice == "14":
-            # OneDrive图床管理
-            handle_onedrive_images_menu(pipeline)
+        elif choice == "9":
+            # 系统工具集合 (合并7+10+11)
+            handle_system_tools_menu(pipeline)
             continue  # 返回主菜单
         elif choice == "0":
             print("👋 再见！")
             pipeline.log("用户退出系统", level="info", force=True)
             return
         else:
-            print("❌ 无效的选择，请重新输入")
+            print("❌ 无效的选择，请输入 1-9 或 0")
             pipeline.log(f"用户输入无效选择: {choice}", level="warning", force=True)
             continue  # 返回主菜单
             
@@ -3905,6 +3844,260 @@ def handle_image_index_menu():
             break
         else:
             print("❌ 无效选择，请重新输入")
+
+
+# ========== 新增整合菜单处理函数 ==========
+
+def handle_smart_publishing_menu(pipeline):
+    """智能内容发布菜单 (合并原功能1+2)"""
+    print("\n" + "="*50)
+    print("📤 智能内容发布")
+    print("="*50)
+    print("🎯 统一发布入口，支持新草稿和重新发布")
+    
+    print("\n请选择发布类型：")
+    print("1. 发布新草稿")
+    print("2. 重新发布已发布文章") 
+    print("3. 查看发布历史")
+    print("0. 返回主菜单")
+    
+    choice = input("\n请选择 (1-3/0): ").strip()
+    
+    if choice == "1":
+        # 发布新草稿 (原功能1)
+        pipeline.log("智能发布：开始发布新草稿", level="info", force=True)
+        draft = pipeline.select_draft()
+        if not draft:
+            pipeline.log("用户取消或无草稿可处理", level="info", force=True)
+            return None
+        elif isinstance(draft, str) and draft.startswith('redirect_to_'):
+            # 处理重定向
+            if draft == 'redirect_to_inspiration':
+                handle_topic_inspiration_menu(pipeline)
+                return None
+            elif draft == 'redirect_to_youtube':
+                handle_youtube_podcast_menu(pipeline)
+                return None  
+            elif draft == 'redirect_to_normalization':
+                handle_content_normalization_menu(pipeline)
+                return None
+            else:
+                return None
+        return draft
+        
+    elif choice == "2":
+        # 重新发布已发布文章 (原功能2)
+        pipeline.log("智能发布：开始重新发布已发布文章", level="info", force=True)
+        post = pipeline.select_published_post()
+        if not post:
+            pipeline.log("用户取消或无文章可重新发布", level="info", force=True)
+            return None
+        draft = pipeline.copy_post_to_draft(post)
+        if not draft:
+            print("复制文章到草稿失败")
+            pipeline.log("复制文章到草稿失败", level="error", force=True)
+            return None
+        return draft
+        
+    elif choice == "3":
+        # 查看发布历史
+        print("\n📋 发布历史功能开发中...")
+        # TODO: 实现发布历史查看功能
+        return None
+        
+    elif choice == "0":
+        return None
+    else:
+        print("❌ 无效选择，请重新输入")
+        return handle_smart_publishing_menu(pipeline)
+
+
+def handle_smart_creation_menu(pipeline):
+    """智能内容创作菜单 (合并原功能5+3)"""
+    print("\n" + "="*50)
+    print("🎯 智能内容创作")
+    print("="*50)
+    print("🤖 AI驱动的内容创作和灵感生成")
+    
+    print("\n请选择创作类型：")
+    print("1. AI主题生成")
+    print("2. 快速测试文章") 
+    print("3. 内容大纲创建")
+    print("4. 创作辅助工具")
+    print("0. 返回主菜单")
+    
+    choice = input("\n请选择 (1-4/0): ").strip()
+    
+    if choice == "1":
+        # AI主题生成 (原主题灵感生成器)
+        handle_topic_inspiration_menu(pipeline)
+        return None
+        
+    elif choice == "2":
+        # 快速测试文章 (原生成测试文章)
+        pipeline.log("智能创作：开始生成测试文章", level="info", force=True)
+        draft = pipeline.generate_test_content()
+        if not draft:
+            print("生成测试文章失败")
+            pipeline.log("生成测试文章失败", level="error", force=True)
+            return None
+        
+        # 测试文章生成成功后，询问是否要发布
+        print(f"\n✅ 测试文章已生成: {draft}")
+        publish_choice = input("\n是否要发布此测试文章？(y/N): ").strip().lower()
+        pipeline.log(f"测试文章生成成功: {draft}, 用户选择{'发布' if publish_choice in ['y', 'yes'] else '不发布'}", level="info", force=True)
+        if publish_choice not in ['y', 'yes']:
+            print("📄 测试文章已保存到草稿目录，您可以稍后通过'智能内容发布'来发布它")
+            return None
+        return draft
+        
+    elif choice == "3":
+        # 内容大纲创建
+        print("\n📝 内容大纲创建功能开发中...")
+        # TODO: 实现内容大纲创建功能
+        return None
+        
+    elif choice == "4":
+        # 创作辅助工具
+        print("\n🛠️ 创作辅助工具功能开发中...")
+        # TODO: 实现创作辅助工具
+        return None
+        
+    elif choice == "0":
+        return None
+    else:
+        print("❌ 无效选择，请重新输入")
+        return handle_smart_creation_menu(pipeline)
+
+
+def handle_youtube_processing_menu(pipeline):
+    """YouTube内容处理菜单 (合并原功能8+13)"""
+    print("\n" + "="*50)
+    print("🎬 YouTube内容处理")
+    print("="*50)
+    print("📺 视频→文章→音频→上传的完整工作流程")
+    
+    print("\n请选择处理类型：")
+    print("1. 视频转文章")
+    print("2. 音频生成和处理") 
+    print("3. YouTube平台上传")
+    print("4. 完整视频处理流程")
+    print("0. 返回主菜单")
+    
+    choice = input("\n请选择 (1-4/0): ").strip()
+    
+    if choice == "1":
+        # 视频转文章 (原YouTube播客生成器)
+        handle_youtube_podcast_menu(pipeline)
+        
+    elif choice == "2":
+        # 音频生成和处理
+        print("\n🎙️ 音频生成和处理功能开发中...")
+        # TODO: 实现音频处理功能
+        
+    elif choice == "3":
+        # YouTube平台上传 (原YouTube音频上传)
+        handle_youtube_upload_menu(pipeline)
+        
+    elif choice == "4":
+        # 完整视频处理流程
+        print("\n🔄 完整视频处理流程功能开发中...")
+        # TODO: 实现完整流程
+        
+    elif choice == "0":
+        return
+    else:
+        print("❌ 无效选择，请重新输入")
+        handle_youtube_processing_menu(pipeline)
+
+
+def handle_audio_tools_menu(pipeline):
+    """语音和音频工具菜单 (合并原功能12+相关)"""
+    print("\n" + "="*50)
+    print("🔊 语音和音频工具")
+    print("="*50)
+    print("🎙️ TTS服务管理和音频处理工具")
+    
+    print("\n请选择工具：")
+    print("1. TTS语音测试")
+    print("2. 音频质量评估") 
+    print("3. 语音服务切换")
+    print("4. 音频格式转换")
+    print("0. 返回主菜单")
+    
+    choice = input("\n请选择 (1-4/0): ").strip()
+    
+    if choice == "1":
+        # TTS语音测试 (原ElevenLabs测试)
+        handle_elevenlabs_menu(pipeline)
+        
+    elif choice == "2":
+        # 音频质量评估
+        print("\n📊 音频质量评估功能开发中...")
+        # TODO: 实现音频质量评估
+        
+    elif choice == "3":
+        # 语音服务切换 (支持豆包、Edge TTS等)
+        print("\n🔄 语音服务切换功能开发中...")
+        print("💡 规划支持：豆包(中文) + Edge TTS(英文) + ElevenLabs(备选)")
+        # TODO: 实现混合TTS架构
+        
+    elif choice == "4":
+        # 音频格式转换
+        print("\n🎵 音频格式转换功能开发中...")
+        # TODO: 实现音频格式转换
+        
+    elif choice == "0":
+        return
+    else:
+        print("❌ 无效选择，请重新输入")
+        handle_audio_tools_menu(pipeline)
+
+
+def handle_system_tools_menu(pipeline):
+    """系统工具集合菜单 (合并原功能7+10+11)"""
+    print("\n" + "="*50)
+    print("⚙️ 系统工具集合")
+    print("="*50)
+    print("🛠️ 系统维护和配置管理")
+    
+    print("\n请选择工具：")
+    print("1. 系统状态检查")
+    print("2. LLM引擎切换")
+    print("3. 调试和维护")
+    print("4. 配置管理")
+    print("5. 日志查看")
+    print("0. 返回主菜单")
+    
+    choice = input("\n请选择 (1-5/0): ").strip()
+    
+    if choice == "1":
+        # 系统状态检查 (原功能7)
+        handle_system_check_menu(pipeline)
+        
+    elif choice == "2":
+        # LLM引擎切换 (原功能11)
+        handle_llm_engine_menu(pipeline)
+        
+    elif choice == "3":
+        # 调试和维护 (原功能10)
+        handle_debug_menu(pipeline)
+        
+    elif choice == "4":
+        # 配置管理
+        print("\n⚙️ 配置管理功能开发中...")
+        # TODO: 实现配置管理功能
+        
+    elif choice == "5":
+        # 日志查看
+        print("\n📋 日志查看功能开发中...")
+        # TODO: 实现日志查看功能
+        
+    elif choice == "0":
+        return
+    else:
+        print("❌ 无效选择，请重新输入")
+        handle_system_tools_menu(pipeline)
 
 
 if __name__ == "__main__":
