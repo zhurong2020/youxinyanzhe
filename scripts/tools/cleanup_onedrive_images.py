@@ -34,7 +34,7 @@ class OneDriveCleanupManager:
         self.index_data = self._load_index()
         
         # 初始化OneDrive组件
-        if OneDriveAuthManager and self.config:
+        if OneDriveAuthManager is not None and OneDriveUploadManager is not None and self.config:
             try:
                 self.auth = OneDriveAuthManager(self.config)
                 self.uploader = OneDriveUploadManager(self.auth, self.config)
