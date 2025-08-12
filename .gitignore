@@ -135,7 +135,7 @@ config/gemini_config.yml
 
 # OneDrive OAuth凭据（敏感信息）
 config/onedrive_tokens.json
-config/onedrive_config.json
+config/azure_app_info.md
 
 # 会员系统安全文件
 .tmp/member_data/.security_key

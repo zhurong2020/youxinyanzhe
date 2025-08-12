@@ -1,0 +1,52 @@
+{
+  "auth": {
+    "tenant_id": "YOUR_TENANT_ID",
+    "client_id": "YOUR_CLIENT_ID", 
+    "client_secret": "YOUR_CLIENT_SECRET",
+    "redirect_uri": "http://localhost:8080/callback",
+    "scopes": [
+      "Files.ReadWrite",
+      "offline_access"
+    ]
+  },
+  "onedrive": {
+    "base_folder": "/BlogImages",
+    "folder_structure": "{year}/{month:02d}",
+    "filename_format": "{date}_{article_title}_{index:02d}.{ext}",
+    "supported_formats": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"]
+  },
+  "processing": {
+    "max_file_size_mb": 32,
+    "compress_large_images": true,
+    "compression_quality": 85,
+    "create_thumbnails": false,
+    "backup_originals": true,
+    "convert_to_webp": false,
+    "delete_local_after_upload": false,
+    "backup_before_delete": true,
+    "manual_delete_confirmation": true,
+    "temp_storage_dir": "temp/image_processing"
+  },
+  "image_processing": {
+    "temp_retention_days": 7,
+    "auto_cleanup_after_publish": false,
+    "backup_original_files": true,
+    "processing_directory": "assets/images/processing",
+    "max_file_size_mb": 10,
+    "enable_mixed_workflow": true,
+    "search_common_temp_dirs": true,
+    "max_search_depth": 3
+  },
+  "links": {
+    "type": "embed",
+    "width": 800,
+    "height": null,
+    "quality": "auto"
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "logs/onedrive_blog_images.log",
+    "max_size_mb": 10,
+    "backup_count": 5
+  }
+}
