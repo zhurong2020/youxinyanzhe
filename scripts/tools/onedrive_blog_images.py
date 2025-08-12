@@ -393,36 +393,43 @@ class OneDriveUploadManager:
     def get_direct_image_url(self, item_id: str) -> str:
         """获取可直接嵌入Jekyll的图片链接"""
         try:
-            # 方法1: 尝试获取直接下载链接
-            response = self._make_request('GET', f"/me/drive/items/{item_id}")
-            if response.status_code == 200:
-                item_data = response.json()
-                
-                # 检查是否有直接下载链接
-                download_url = item_data.get('@microsoft.graph.downloadUrl')
-                if download_url:
-                    logger.info("Using @microsoft.graph.downloadUrl")
-                    return download_url
-                
-                # 方法2: 构建直接访问链接
-                web_url = item_data.get('webUrl', '')
-                if web_url:
-                    # 将OneDrive web链接转换为直接下载链接
-                    # 格式: https://domain.sharepoint.com/personal/user/_layouts/15/download.aspx?UniqueId=xxx
-                    if 'sharepoint.com' in web_url:
+            # 方法1: 优先使用永久分享链接转换为embed格式 (无临时令牌，更持久)
+            sharing_link = self.get_sharing_link(item_id, 'view')
+            embed_link = self.convert_to_embed_link(sharing_link)
+            if embed_link and embed_link != sharing_link:
+                logger.info("Using permanent embed link (no temp tokens)")
+                return embed_link
+            else:
+                logger.info("Using permanent sharing link (no temp tokens)")
+                return sharing_link
+            
+        except Exception as e:
+            logger.warning(f"Failed to get sharing link, trying direct download: {e}")
+            
+            try:
+                # 方法2: 回退到直接下载链接 (包含临时令牌，会过期)
+                response = self._make_request('GET', f"/me/drive/items/{item_id}")
+                if response.status_code == 200:
+                    item_data = response.json()
+                    
+                    # 检查是否有直接下载链接
+                    download_url = item_data.get('@microsoft.graph.downloadUrl')
+                    if download_url:
+                        logger.warning("Using @microsoft.graph.downloadUrl (contains temp tokens, may expire)")
+                        return download_url
+                    
+                    # 方法3: 构建直接访问链接
+                    web_url = item_data.get('webUrl', '')
+                    if web_url and 'sharepoint.com' in web_url:
                         unique_id = item_data.get('id', '')
                         base_url = web_url.split('/personal/')[0] + '/personal/' + web_url.split('/personal/')[1].split('/')[0]
                         direct_url = f"{base_url}/_layouts/15/download.aspx?UniqueId={unique_id}"
                         logger.info("Using SharePoint direct download URL")
                         return direct_url
-            
-            # 方法3: 回退到分享链接
-            logger.warning("Falling back to sharing link")
-            return self.get_sharing_link(item_id, 'view')
-            
-        except Exception as e:
-            logger.error(f"Failed to get direct image URL: {e}")
-            return self.get_sharing_link(item_id, 'view')
+                        
+            except Exception as e2:
+                logger.error(f"All methods failed: {e2}")
+                raise Exception(f"Could not generate any valid image URL: {e}, {e2}")
     
     def convert_to_embed_link(self, share_url: str, width: int = 800) -> str:
         """将OneDrive分享链接转换为嵌入链接"""
@@ -481,6 +488,7 @@ class MarkdownImageProcessor:
         """查找Markdown中的本地图片链接"""
         local_images = []
         
+        # 处理Markdown内容中的图片
         for match in self.image_pattern.finditer(content):
             alt_text = match.group(1)
             img_path = match.group(2)
@@ -489,6 +497,24 @@ class MarkdownImageProcessor:
             # 检查是否是本地路径
             if self._is_local_path(img_path):
                 local_images.append((full_match, alt_text, img_path))
+        
+        # 处理Front Matter中的图片路径
+        import re
+        front_matter_pattern = re.compile(r'^---\s*\n(.*?)\n---', re.DOTALL | re.MULTILINE)
+        fm_match = front_matter_pattern.search(content)
+        
+        if fm_match:
+            front_matter_content = fm_match.group(1)
+            # 查找header.teaser等图片字段
+            teaser_pattern = re.compile(r'^\s*teaser:\s*(.+)$', re.MULTILINE)
+            teaser_match = teaser_pattern.search(front_matter_content)
+            
+            if teaser_match:
+                img_path = teaser_match.group(1).strip()
+                if self._is_local_path(img_path):
+                    # 为front matter创建特殊的匹配格式
+                    full_match = f"teaser: {img_path}"
+                    local_images.append((full_match, "header_teaser", img_path))
         
         return local_images
     
@@ -511,7 +537,16 @@ class MarkdownImageProcessor:
         try:
             article_dir = Path(article_path).parent
             
-            if '{{ site.baseurl }}' in img_path:
+            # 处理Windows绝对路径 (如 c:\Users\... 或 C:\Users\...)
+            if len(img_path) >= 3 and img_path[1:3] == ':\\':
+                # Windows绝对路径格式，转换为WSL路径
+                drive_letter = img_path[0].lower()
+                windows_path = img_path[3:].replace('\\', '/')
+                # 转换为WSL格式: /mnt/c/Users/...
+                wsl_path = f"/mnt/{drive_letter}/{windows_path}"
+                full_path = Path(wsl_path)
+                logger.info(f"Converted Windows path {img_path} to WSL path {wsl_path}")
+            elif '{{ site.baseurl }}' in img_path:
                 # Jekyll baseurl路径
                 relative_path = img_path.replace('{{ site.baseurl }}/', '')
                 full_path = Path(relative_path)
