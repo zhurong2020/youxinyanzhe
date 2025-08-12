@@ -1,9 +1,11 @@
-# Claude Code 开发约定
+# 有心工坊 开发约定
 
-这是一个基于Jekyll的自动化博客发布系统，重点关注多平台内容分发和会员管理。
+这是有心工坊 (YouXin Workshop) - 为有心人打造的数字创作平台，基于Jekyll的自动化博客发布系统，重点关注多平台内容分发、图片管理和会员服务。
 
 ## 项目概述
-- **主要功能**: Jekyll博客系统、YouTube播客生成器、会员管理系统、OneDrive图床自动化、多平台发布
+- **平台定位**: 有心工坊 - 为终身学习者和内容创作者提供的一站式数字创作平台
+- **主要功能**: Jekyll博客系统、YouTube播客生成器、会员管理系统、混合图片管理、多平台发布
+- **核心理念**: 学习 · 分享 · 进步
 - **技术架构**: 详见 `docs/TECHNICAL_ARCHITECTURE.md`
 - **图片管理**: 详见 `docs/IMAGE_MANAGEMENT_WORKFLOW.md`
 - **Azure集成规划**: 详见 `docs/AZURE_INTEGRATION_ROADMAP.md`

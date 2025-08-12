@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-混合图片管理系统 - Phase 0.5 实现
+有心工坊 - 混合图片管理系统 Phase 0.5
+YouXin Workshop - Mixed Image Management System
+
 支持任意位置图片发现和四阶段处理流程: 临时创作 → 项目缓存 → 云端归档 → 安全清理
 
 核心特性:
@@ -681,7 +683,7 @@ class MixedImageManager:
 
 def main():
     """命令行接口"""
-    parser = argparse.ArgumentParser(description="混合图片管理系统")
+    parser = argparse.ArgumentParser(description="有心工坊 - 混合图片管理系统")
     parser.add_argument("article_path", nargs='?', help="文章文件路径")
     parser.add_argument("--dry-run", action="store_true", help="试运行模式（不实际修改文件）")
     parser.add_argument("--list-sessions", action="store_true", help="列出等待清理的会话")
