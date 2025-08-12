@@ -13,6 +13,10 @@ from typing import Dict, List, Optional, Tuple
 import argparse
 import re
 from urllib.parse import urlparse
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 # 添加项目根目录到Python路径
 sys.path.insert(0, str(Path(__file__).parent))
@@ -42,10 +46,35 @@ class OneDriveCloudCleaner:
             print("请确保配置文件正确且已完成OAuth认证")
     
     def load_config(self) -> Dict:
-        """加载OneDrive配置"""
+        """加载OneDrive配置，优先使用环境变量"""
         try:
+            # 首先加载基础配置文件
             with open(self.config_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                config = json.load(f)
+            
+            # 使用环境变量覆盖认证配置
+            if 'ONEDRIVE_TENANT_ID' in os.environ:
+                if 'auth' not in config:
+                    config['auth'] = {}
+                config['auth']['tenant_id'] = os.environ['ONEDRIVE_TENANT_ID']
+            
+            if 'ONEDRIVE_CLIENT_ID' in os.environ:
+                if 'auth' not in config:
+                    config['auth'] = {}
+                config['auth']['client_id'] = os.environ['ONEDRIVE_CLIENT_ID']
+            
+            if 'ONEDRIVE_CLIENT_SECRET' in os.environ:
+                if 'auth' not in config:
+                    config['auth'] = {}
+                config['auth']['client_secret'] = os.environ['ONEDRIVE_CLIENT_SECRET']
+            
+            if 'ONEDRIVE_REDIRECT_URI' in os.environ:
+                if 'auth' not in config:
+                    config['auth'] = {}
+                config['auth']['redirect_uri'] = os.environ['ONEDRIVE_REDIRECT_URI']
+            
+            return config
+            
         except FileNotFoundError:
             print(f"❌ 配置文件未找到: {self.config_file}")
             return {}
