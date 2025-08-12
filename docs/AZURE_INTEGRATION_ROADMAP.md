@@ -1,6 +1,6 @@
 # Azure服务集成路线图
 
-基于已有的OneDrive图床系统成功实践，本文档规划了进一步利用Microsoft Azure生态系统增强博客项目的技术路线图。
+基于有心工坊 (YouXin Workshop) 已有的OneDrive图床系统成功实践，本文档规划了进一步利用Microsoft Azure生态系统增强数字创作平台的技术路线图。
 
 ## 🎯 **总体策略**
 

@@ -1,6 +1,7 @@
-# 有心言者博客发布系统
+# 有心工坊 (YouXin Workshop)
 
-> 🚀 自动化多平台内容发布与管理系统
+> 🛠️ 为有心人打造的数字创作平台
+> 💡 学习 · 分享 · 进步
 
 [![Jekyll](https://img.shields.io/badge/Jekyll-CC0000?style=flat&logo=Jekyll&logoColor=white)](https://jekyllrb.com/)
 [![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)](https://python.org/)

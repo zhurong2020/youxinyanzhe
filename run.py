@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """
-内容处理流水线启动脚本
+有心工坊 - 为有心人打造的数字创作平台
+YouXin Workshop - Digital Content Creation Platform for Caring Minds
 """
 import os
 import sys
@@ -25,7 +26,7 @@ project_root = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, project_root)
 
 def main():
-    parser = argparse.ArgumentParser(description="内容处理流水线")
+    parser = argparse.ArgumentParser(description="有心工坊 - 数字创作平台")
     parser.add_argument("-v", "--verbose", 
                        action="store_true",
                        help="显示详细日志")
@@ -43,9 +44,13 @@ def main():
     
     while True:  # 主循环，支持返回主菜单
         # 选择操作
-        print("\n" + "="*50)
-        print("📝 有心言者 - 内容发布系统")
-        print("="*50)
+        print("\n" + "="*60)
+        print("🛠️ 有心工坊 v2.0")
+        print("   YouXin Workshop")
+        print()
+        print("💡 为有心人打造的数字创作平台")
+        print("📝 学习 · 分享 · 进步")
+        print("="*60)
         print("📝 内容工作流程：")
         print("1. 智能内容发布")      # 合并1+2
         print("2. 内容规范化处理")    # 保持原4
