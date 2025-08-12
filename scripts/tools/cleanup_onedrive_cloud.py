@@ -11,8 +11,6 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 import argparse
-import re
-from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 # 加载环境变量
@@ -82,7 +80,7 @@ class OneDriveCloudCleaner:
             print(f"❌ 配置文件格式错误: {e}")
             return {}
     
-    def list_cloud_files(self, folder_path: str = None) -> List[Dict]:
+    def list_cloud_files(self, folder_path: Optional[str] = None) -> List[Dict]:
         """列出OneDrive中的文件"""
         if not self.upload_manager:
             return []
@@ -125,11 +123,11 @@ class OneDriveCloudCleaner:
             print(f"❌ 列出文件时出错: {e}")
             return []
     
-    def list_all_files_recursive(self, base_path: str = None) -> List[Dict]:
+    def list_all_files_recursive(self, base_path: Optional[str] = None) -> List[Dict]:
         """递归列出所有文件（包括子文件夹）"""
         all_files = []
         
-        def _list_folder(folder_path: str = None):
+        def _list_folder(folder_path: Optional[str] = None):
             try:
                 if folder_path:
                     query_path = f"/me/drive/root:/{folder_path}:/children"
@@ -360,7 +358,7 @@ class OneDriveCloudCleaner:
             
             print(f"🗑️ [{i}/{len(filtered_files)}] 删除: {filename}")
             
-            if self.delete_cloud_file(file_id):
+            if file_id and self.delete_cloud_file(file_id):
                 deleted_files.append(file_info)
                 print(f"✅ 删除成功: {filename}")
             else:

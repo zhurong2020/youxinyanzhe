@@ -426,6 +426,12 @@ class OneDriveUploadManager:
                         direct_url = f"{base_url}/_layouts/15/download.aspx?UniqueId={unique_id}"
                         logger.info("Using SharePoint direct download URL")
                         return direct_url
+                    else:
+                        logger.error("No valid download URL found in item data")
+                        raise Exception("No valid download URL found in item data")
+                else:
+                    logger.error(f"Failed to get item data: {response.status_code} - {response.text}")
+                    raise Exception(f"Failed to get item data: {response.status_code}")
                         
             except Exception as e2:
                 logger.error(f"All methods failed: {e2}")
@@ -722,9 +728,11 @@ class MarkdownImageProcessor:
                     upload_result = self.uploader.upload_file(local_path, remote_path)
                     
                     # 获取直接图片链接(优先)或分享链接(备用)
+                    share_link = None
                     try:
                         direct_link = self.uploader.get_direct_image_url(upload_result['id'])
                         embed_link = direct_link
+                        share_link = direct_link  # 记录实际使用的链接
                         logger.info(f"Using direct image URL: {direct_link[:100]}...")
                     except Exception as e:
                         logger.warning(f"Direct link failed, using share link: {e}")
