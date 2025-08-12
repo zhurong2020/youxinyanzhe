@@ -80,10 +80,18 @@ Thumbs.db
 assets/images/processing/
 assets/images/temp/
 
+# OneDrive图床相关临时目录
+temp/image_processing/
+temp/recovered_images/
+temp/onedrive_snapshots/
+
 # 但保留目录结构说明文件
 !assets/images/processing/.gitkeep
 !assets/images/processing/README.md
 !assets/images/temp/.gitkeep
+!temp/image_processing/.gitkeep
+!temp/recovered_images/.gitkeep
+!temp/onedrive_snapshots/.gitkeep
 
 # 传统posts目录也排除 (已迁移到云端)
 assets/images/posts/
