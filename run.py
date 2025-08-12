@@ -3564,9 +3564,11 @@ def handle_onedrive_images_menu(pipeline):
         print("4. 检查OneDrive连接状态")
         print("5. 查看图片处理统计")
         print("6. 图片索引管理")
+        print("7. 🆕 混合图片管理（支持任意位置）")
+        print("8. 🧹 管理处理会话")
         print("\n0. 返回主菜单")
         
-        choice = input("\n请选择操作 (1-6/0): ").strip()
+        choice = input("\n请选择操作 (1-8/0): ").strip()
         
         if choice == "1":
             # 初始化认证
@@ -3725,6 +3727,16 @@ def handle_onedrive_images_menu(pipeline):
             # 图片索引管理
             handle_image_index_menu()
             
+        elif choice == "7":
+            # 混合图片管理（支持任意位置）
+            print("🚀 启动混合图片管理系统...")
+            handle_mixed_image_management_menu()
+            
+        elif choice == "8":
+            # 管理处理会话
+            print("🧹 管理图片处理会话...")
+            handle_processing_sessions_menu()
+            
         elif choice == "0":
             break
         else:
@@ -3839,6 +3851,267 @@ def handle_image_index_menu():
             else:
                 print("❌ 已取消清理操作")
                 
+        elif choice == "0":
+            break
+        else:
+            print("❌ 无效选择，请重新输入")
+
+
+def handle_mixed_image_management_menu():
+    """混合图片管理菜单"""
+    while True:
+        print("\n" + "="*50)
+        print("🚀 混合图片管理系统")
+        print("="*50)
+        print("✨ 支持任意位置图片发现和四阶段处理流程")
+        print()
+        print("1. 处理单个文章图片")
+        print("2. 试运行模式（预览不修改）")
+        print("3. 查看处理历史")
+        print("4. 帮助和说明")
+        print("\n0. 返回上级菜单")
+        
+        choice = input("\n请选择操作 (1-4/0): ").strip()
+        
+        if choice == "1":
+            # 处理单个文章图片
+            print("📝 选择要处理的文章...")
+            
+            # 显示草稿和文章列表
+            draft_files = []
+            post_files = []
+            
+            drafts_dir = Path("_drafts")
+            if drafts_dir.exists():
+                draft_files = list(drafts_dir.glob("*.md"))
+            
+            posts_dir = Path("_posts")
+            if posts_dir.exists():
+                post_files = list(posts_dir.glob("*.md"))
+            
+            all_files = draft_files + post_files
+            if not all_files:
+                print("❌ 没有找到文章文件")
+                continue
+            
+            print("\n可用的文章文件:")
+            for i, file_path in enumerate(all_files, 1):
+                file_type = "草稿" if file_path.parent.name == "_drafts" else "文章"
+                print(f"{i}. [{file_type}] {file_path.name}")
+            
+            try:
+                file_choice = input(f"\n请选择文件 (1-{len(all_files)}/0取消): ").strip()
+                if file_choice == "0":
+                    continue
+                
+                file_index = int(file_choice) - 1
+                if 0 <= file_index < len(all_files):
+                    selected_file = all_files[file_index]
+                    print(f"🔄 处理文章: {selected_file.name}")
+                    
+                    try:
+                        result = subprocess.run([
+                            "python3", "scripts/tools/mixed_image_manager.py",
+                            str(selected_file)
+                        ], check=False)
+                        
+                        if result.returncode == 0:
+                            print("✅ 混合图片处理完成")
+                        else:
+                            print("❌ 处理过程中出现问题")
+                    except Exception as e:
+                        print(f"❌ 处理出错: {e}")
+                else:
+                    print("❌ 无效的文件选择")
+            except (ValueError, IndexError):
+                print("❌ 无效的输入")
+        
+        elif choice == "2":
+            # 试运行模式
+            print("🔍 试运行模式 - 预览处理过程但不修改文件")
+            
+            # 文件选择逻辑与选项1相同，但加上--dry-run参数
+            draft_files = []
+            post_files = []
+            
+            drafts_dir = Path("_drafts")
+            if drafts_dir.exists():
+                draft_files = list(drafts_dir.glob("*.md"))
+            
+            posts_dir = Path("_posts")
+            if posts_dir.exists():
+                post_files = list(posts_dir.glob("*.md"))
+            
+            all_files = draft_files + post_files
+            if not all_files:
+                print("❌ 没有找到文章文件")
+                continue
+            
+            print("\n可用的文章文件:")
+            for i, file_path in enumerate(all_files, 1):
+                file_type = "草稿" if file_path.parent.name == "_drafts" else "文章"
+                print(f"{i}. [{file_type}] {file_path.name}")
+            
+            try:
+                file_choice = input(f"\n请选择文件 (1-{len(all_files)}/0取消): ").strip()
+                if file_choice == "0":
+                    continue
+                
+                file_index = int(file_choice) - 1
+                if 0 <= file_index < len(all_files):
+                    selected_file = all_files[file_index]
+                    print(f"🔍 试运行处理: {selected_file.name}")
+                    
+                    try:
+                        result = subprocess.run([
+                            "python3", "scripts/tools/mixed_image_manager.py",
+                            str(selected_file), "--dry-run"
+                        ], check=False)
+                        
+                        if result.returncode == 0:
+                            print("✅ 试运行完成")
+                        else:
+                            print("❌ 试运行过程中出现问题")
+                    except Exception as e:
+                        print(f"❌ 试运行出错: {e}")
+                else:
+                    print("❌ 无效的文件选择")
+            except (ValueError, IndexError):
+                print("❌ 无效的输入")
+        
+        elif choice == "3":
+            # 查看处理历史
+            print("📋 查看混合图片处理历史...")
+            
+            try:
+                result = subprocess.run([
+                    "python3", "scripts/tools/mixed_image_manager.py",
+                    "--list-sessions"
+                ], check=False)
+            except Exception as e:
+                print(f"❌ 查看历史出错: {e}")
+        
+        elif choice == "4":
+            # 帮助和说明
+            print("\n" + "="*60)
+            print("📖 混合图片管理系统说明")
+            print("="*60)
+            print()
+            print("🎯 核心特性:")
+            print("  • 智能路径解析: 支持绝对路径、相对路径、任意临时目录")
+            print("  • 四阶段管理: 临时创作 → 项目缓存 → 云端归档 → 安全清理")
+            print("  • 完整备份机制: 处理前自动备份，支持失败回滚")
+            print("  • 安全清理策略: 用户确认后才删除本地备份")
+            print()
+            print("🔄 处理流程:")
+            print("  1. 发现图片: 在文章中找到本地图片引用")
+            print("  2. 智能解析: 解析各种路径格式，包括临时目录中的图片")
+            print("  3. 项目缓存: 将图片复制到 assets/images/processing/pending/")
+            print("  4. 云端上传: 上传到OneDrive并获取直接链接")
+            print("  5. 更新链接: 替换文章中的图片链接")
+            print("  6. 等待确认: 移动到 uploaded/ 目录等待用户确认清理")
+            print()
+            print("⚠️  注意事项:")
+            print("  • 首次使用需要先完成OneDrive认证")
+            print("  • 建议先使用试运行模式预览处理结果")
+            print("  • 处理完成后建议及时确认清理以释放存储空间")
+            print("  • 支持从 Desktop、Downloads 等常见临时目录自动发现图片")
+            print()
+            input("按回车键返回...")
+        
+        elif choice == "0":
+            break
+        else:
+            print("❌ 无效选择，请重新输入")
+
+
+def handle_processing_sessions_menu():
+    """处理会话管理菜单"""
+    while True:
+        print("\n" + "="*50)
+        print("🧹 图片处理会话管理")
+        print("="*50)
+        print("📦 管理混合图片处理的中间状态和备份")
+        print()
+        print("1. 查看等待清理的会话")
+        print("2. 确认清理指定会话")
+        print("3. 查看失败的处理会话")
+        print("4. 清理所有过期会话")
+        print("\n0. 返回上级菜单")
+        
+        choice = input("\n请选择操作 (1-4/0): ").strip()
+        
+        if choice == "1":
+            # 查看等待清理的会话
+            print("📋 查看等待清理的会话...")
+            
+            try:
+                result = subprocess.run([
+                    "python3", "scripts/tools/mixed_image_manager.py",
+                    "--list-sessions"
+                ], check=False)
+            except Exception as e:
+                print(f"❌ 查看会话出错: {e}")
+        
+        elif choice == "2":
+            # 确认清理指定会话
+            print("🗑️ 确认清理指定会话...")
+            
+            session_id = input("请输入会话ID (或按回车取消): ").strip()
+            if not session_id:
+                continue
+            
+            try:
+                result = subprocess.run([
+                    "python3", "scripts/tools/mixed_image_manager.py",
+                    "--confirm-cleanup", session_id
+                ], check=False)
+            except Exception as e:
+                print(f"❌ 清理会话出错: {e}")
+        
+        elif choice == "3":
+            # 查看失败的处理会话
+            print("❌ 查看失败的处理会话...")
+            
+            failed_dir = Path("assets/images/processing/failed")
+            if not failed_dir.exists():
+                print("📭 没有失败的处理会话")
+                continue
+            
+            failed_sessions = list(failed_dir.iterdir())
+            if not failed_sessions:
+                print("📭 没有失败的处理会话")
+                continue
+            
+            print(f"\n发现 {len(failed_sessions)} 个失败的会话:")
+            for session_dir in failed_sessions:
+                if session_dir.is_dir():
+                    print(f"  📁 {session_dir.name}")
+                    error_file = session_dir / "error.txt"
+                    if error_file.exists():
+                        try:
+                            error_content = error_file.read_text(encoding='utf-8')
+                            print(f"     错误: {error_content.split('Error: ')[1].split('\\n')[0] if 'Error: ' in error_content else '未知错误'}")
+                        except:
+                            print("     错误: 读取错误信息失败")
+                    print()
+        
+        elif choice == "4":
+            # 清理所有过期会话
+            print("🧹 清理所有过期会话...")
+            print("⚠️  这将删除超过配置时间的所有处理会话！")
+            
+            confirm = input("请输入 'YES' 确认清理过期会话: ").strip()
+            if confirm == "YES":
+                try:
+                    # 这里需要实现过期会话清理逻辑
+                    print("🔄 清理过期会话功能开发中...")
+                    print("💡 提示: 当前可手动删除 assets/images/processing/ 下的过期目录")
+                except Exception as e:
+                    print(f"❌ 清理过期会话出错: {e}")
+            else:
+                print("❌ 清理已取消")
+        
         elif choice == "0":
             break
         else:
