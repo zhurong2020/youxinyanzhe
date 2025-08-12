@@ -518,6 +518,89 @@ class MarkdownImageProcessor:
         
         return local_images
     
+    def _handle_local_file_after_upload(self, local_path: str, remote_path: str) -> None:
+        """处理上传后的本地文件：备份到项目临时目录，可选删除"""
+        try:
+            local_file = Path(local_path)
+            if not local_file.exists():
+                return
+            
+            # 检查文件是否在项目外部
+            project_root = Path().resolve()
+            try:
+                local_file.resolve().relative_to(project_root)
+                is_external = False
+            except ValueError:
+                # 文件在项目外部
+                is_external = True
+            
+            # 如果是外部文件，备份到项目临时目录
+            if is_external:
+                temp_dir = Path(self.config['processing'].get('temp_storage_dir', 'temp/image_processing'))
+                temp_dir.mkdir(parents=True, exist_ok=True)
+                
+                # 生成唯一的备份文件名
+                backup_name = f"{local_file.stem}_{hash(local_path) % 10000}{local_file.suffix}"
+                backup_path = temp_dir / backup_name
+                
+                # 复制文件到临时目录
+                import shutil
+                shutil.copy2(local_file, backup_path)
+                logger.info(f"📁 外部文件已备份到项目: {backup_path}")
+                
+                # 记录备份映射
+                backup_record = {
+                    'original_path': str(local_file),
+                    'backup_path': str(backup_path),
+                    'remote_path': remote_path,
+                    'backup_time': datetime.now().isoformat()
+                }
+                
+                backup_index_file = temp_dir / "backup_index.json"
+                if backup_index_file.exists():
+                    with open(backup_index_file, 'r', encoding='utf-8') as f:
+                        backup_index = json.load(f)
+                else:
+                    backup_index = {}
+                
+                backup_index[backup_name] = backup_record
+                
+                with open(backup_index_file, 'w', encoding='utf-8') as f:
+                    json.dump(backup_index, f, indent=2, ensure_ascii=False)
+            
+            # 检查是否需要删除原文件
+            if self.config['processing'].get('delete_local_after_upload', False):
+                if self.config['processing'].get('manual_delete_confirmation', False):
+                    # 手动确认删除
+                    response = input(f"\n🗑️ 是否删除已上传的本地文件？\n路径: {local_file}\n(y/N): ").strip().lower()
+                    if response == 'y':
+                        self._delete_local_file(local_file)
+                    else:
+                        logger.info(f"⏭️ 保留本地文件: {local_file}")
+                else:
+                    # 自动删除
+                    self._delete_local_file(local_file)
+            else:
+                logger.info(f"📁 保留本地文件: {local_file}")
+                
+        except Exception as e:
+            logger.warning(f"Failed to handle local file {local_path}: {e}")
+    
+    def _delete_local_file(self, local_file: Path) -> None:
+        """删除本地文件和空目录"""
+        try:
+            if local_file.exists():
+                local_file.unlink()
+                logger.info(f"🗑️ Deleted local file: {local_file}")
+                
+                # 检查是否需要删除空目录
+                parent_dir = local_file.parent
+                if parent_dir.exists() and not any(parent_dir.iterdir()):
+                    parent_dir.rmdir()
+                    logger.info(f"🗂️ Removed empty directory: {parent_dir}")
+        except Exception as e:
+            logger.warning(f"Failed to delete local file {local_file}: {e}")
+    
     def _is_local_path(self, path: str) -> bool:
         """判断是否是本地路径"""
         # Jekyll baseurl路径
@@ -673,22 +756,8 @@ class MarkdownImageProcessor:
                     replacements[full_match] = new_link
                     processed_count += 1
                     
-                    # 删除本地文件（如果配置允许）
-                    if self.config['processing'].get('delete_local_after_upload', False):
-                        try:
-                            local_file = Path(local_path)
-                            if local_file.exists():
-                                local_file.unlink()
-                                logger.info(f"🗑️ Deleted local file: {local_path}")
-                                
-                                # 检查是否需要删除空目录
-                                parent_dir = local_file.parent
-                                if parent_dir.exists() and not any(parent_dir.iterdir()):
-                                    parent_dir.rmdir()
-                                    logger.info(f"🗂️ Removed empty directory: {parent_dir}")
-                                    
-                        except Exception as e:
-                            logger.warning(f"Failed to delete local file {local_path}: {e}")
+                    # 处理本地文件（备份到项目临时目录，可选删除）
+                    self._handle_local_file_after_upload(local_path, upload_result['remote_path'])
                     
                     logger.info(f"✅ Processed image {i}/{len(local_images)}: {Path(local_path).name}")
                     
