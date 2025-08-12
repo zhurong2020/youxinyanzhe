@@ -75,7 +75,42 @@ python scripts/tools/manage_uploaded_images.py --info
 python scripts/tools/manage_uploaded_images.py --clean --yes
 ```
 
-### 3. onedrive_blog_images.py - 核心处理器
+### 3. cleanup_onedrive_cloud.py - 云端清理工具
+
+#### 功能
+- 按日期范围删除OneDrive中的图片文件
+- 支持预览和安全删除机制
+- 自动更新本地索引记录
+
+#### 使用方法
+```bash
+# 列出所有云端文件
+python scripts/tools/cleanup_onedrive_cloud.py --list
+
+# 预览指定日期范围的文件
+python scripts/tools/cleanup_onedrive_cloud.py --preview 7d
+python scripts/tools/cleanup_onedrive_cloud.py --preview 2025-08-12
+
+# 删除指定日期范围的文件
+python scripts/tools/cleanup_onedrive_cloud.py --delete 24h
+python scripts/tools/cleanup_onedrive_cloud.py --delete 2025-08-12:2025-08-15
+
+# 跳过删除确认（危险操作）
+python scripts/tools/cleanup_onedrive_cloud.py --delete 1d --yes
+```
+
+#### 支持的日期格式
+- **相对时间**: `7d` (7天), `24h` (24小时), `30d` (30天)
+- **绝对日期**: `2025-08-12` (指定日期当天)
+- **日期范围**: `2025-08-12:2025-08-15` (日期范围)
+
+#### 安全特性
+- 删除前显示详细文件列表预览
+- 二次确认机制防止误删
+- 自动更新本地索引保持一致性
+- 支持仅预览模式查看待删除文件
+
+### 4. onedrive_blog_images.py - 核心处理器
 
 #### 新增功能
 - `_handle_local_file_after_upload()`: 智能处理上传后的本地文件
@@ -161,6 +196,12 @@ temp/
 - 查看详细错误信息和处理过程
 
 ## 版本历史
+
+### v2.2.0 (2025-08-12)
+- ✅ 新增OneDrive云端清理工具
+- ✅ 支持按日期范围删除云端文件
+- ✅ 集成到主菜单系统
+- ✅ 完善安全删除机制
 
 ### v2.1.0 (2025-08-12)
 - ✅ 新增Windows路径支持

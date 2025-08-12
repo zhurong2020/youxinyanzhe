@@ -3601,9 +3601,10 @@ def handle_onedrive_images_menu(pipeline):
         print("6. 图片索引管理")
         print("7. 🆕 混合图片管理（支持任意位置）")
         print("8. 🧹 管理处理会话")
+        print("9. 🗑️ OneDrive云端清理工具")
         print("\n0. 返回主菜单")
         
-        choice = input("\n请选择操作 (1-8/0): ").strip()
+        choice = input("\n请选择操作 (1-9/0): ").strip()
         
         if choice == "1":
             # 初始化认证
@@ -3771,6 +3772,11 @@ def handle_onedrive_images_menu(pipeline):
             # 管理处理会话
             print("🧹 管理图片处理会话...")
             handle_processing_sessions_menu()
+            
+        elif choice == "9":
+            # OneDrive云端清理工具
+            print("🗑️ 启动OneDrive云端清理工具...")
+            handle_onedrive_cleanup_menu()
             
         elif choice == "0":
             break
@@ -4406,6 +4412,130 @@ def handle_system_tools_menu(pipeline):
         print("❌ 无效选择，请重新输入")
         handle_system_tools_menu(pipeline)
 
+
+def handle_onedrive_cleanup_menu():
+    """OneDrive云端清理工具菜单"""
+    while True:
+        print("\n" + "="*50)
+        print("🗑️ OneDrive云端清理工具")
+        print("="*50)
+        print("📋 功能说明：")
+        print("   • 按日期范围删除OneDrive中的图片文件")
+        print("   • 支持预览和安全删除机制")
+        print("   • 自动更新本地索引记录")
+        print()
+        print("🕒 支持的日期格式：")
+        print("   • 相对时间: 7d (7天), 24h (24小时)")
+        print("   • 绝对日期: 2025-08-12")
+        print("   • 日期范围: 2025-08-12:2025-08-15")
+        print()
+        print("请选择操作：")
+        print("1. 列出所有云端文件")
+        print("2. 预览指定日期范围的文件")
+        print("3. 删除指定日期范围的文件")
+        print("4. 查看工具使用指南")
+        print("\n0. 返回上级菜单")
+        
+        choice = input("\n请选择操作 (1-4/0): ").strip()
+        
+        if choice == "1":
+            # 列出所有文件
+            print("📡 正在获取OneDrive文件列表...")
+            try:
+                import subprocess
+                result = subprocess.run([
+                    "python", "scripts/tools/cleanup_onedrive_cloud.py", "--list"
+                ], capture_output=True, text=True)
+                
+                if result.returncode == 0:
+                    print(result.stdout)
+                else:
+                    print(f"❌ 获取文件列表失败：\n{result.stderr}")
+            except Exception as e:
+                print(f"❌ 执行命令失败：{e}")
+                
+        elif choice == "2":
+            # 预览文件
+            date_range = input("请输入日期范围 (例如：7d, 24h, 2025-08-12): ").strip()
+            if date_range:
+                print(f"🔍 预览日期范围: {date_range}")
+                try:
+                    import subprocess
+                    result = subprocess.run([
+                        "python", "scripts/tools/cleanup_onedrive_cloud.py", 
+                        "--preview", date_range
+                    ], capture_output=True, text=True)
+                    
+                    if result.returncode == 0:
+                        print(result.stdout)
+                    else:
+                        print(f"❌ 预览失败：\n{result.stderr}")
+                except Exception as e:
+                    print(f"❌ 执行命令失败：{e}")
+            else:
+                print("❌ 日期范围不能为空")
+                
+        elif choice == "3":
+            # 删除文件
+            date_range = input("请输入要删除的日期范围 (例如：7d, 24h, 2025-08-12): ").strip()
+            if date_range:
+                print("⚠️ 警告：此操作将永久删除OneDrive中的文件！")
+                confirm = input("确认要继续吗？输入 'yes' 确认: ").strip().lower()
+                
+                if confirm == 'yes':
+                    print(f"🗑️ 删除日期范围: {date_range}")
+                    try:
+                        import subprocess
+                        result = subprocess.run([
+                            "python", "scripts/tools/cleanup_onedrive_cloud.py", 
+                            "--delete", date_range
+                        ], capture_output=True, text=True)
+                        
+                        if result.returncode == 0:
+                            print(result.stdout)
+                        else:
+                            print(f"❌ 删除失败：\n{result.stderr}")
+                    except Exception as e:
+                        print(f"❌ 执行命令失败：{e}")
+                else:
+                    print("❌ 操作已取消")
+            else:
+                print("❌ 日期范围不能为空")
+                
+        elif choice == "4":
+            # 使用指南
+            print("\n" + "="*50)
+            print("📖 OneDrive云端清理工具使用指南")
+            print("="*50)
+            print("🕒 日期格式说明：")
+            print("   • 相对时间：")
+            print("     - 7d：最近7天")
+            print("     - 24h：最近24小时")
+            print("     - 30d：最近30天")
+            print()
+            print("   • 绝对日期：")
+            print("     - 2025-08-12：指定日期当天")
+            print("     - 2025-08-12:2025-08-15：日期范围")
+            print()
+            print("🛡️ 安全机制：")
+            print("   • 删除前会显示详细的文件列表预览")
+            print("   • 需要二次确认才能执行删除操作")
+            print("   • 自动更新本地索引，保持数据一致性")
+            print("   • 支持单独预览模式，安全查看待删除文件")
+            print()
+            print("⚠️ 注意事项：")
+            print("   • 删除操作不可逆，请谨慎使用")
+            print("   • 建议先使用预览功能确认文件列表")
+            print("   • 仅删除图片文件，不会影响文件夹结构")
+            print("   • 需要有效的OneDrive认证才能使用")
+            
+        elif choice == "0":
+            break
+        else:
+            print("❌ 无效选择，请重新输入")
+        
+        if choice in ["1", "2", "3"]:
+            input("\n按Enter键继续...")
 
 if __name__ == "__main__":
     main() 
