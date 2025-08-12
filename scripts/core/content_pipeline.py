@@ -627,7 +627,7 @@ class ContentPipeline:
         
         return suggestions
     
-    def select_draft(self) -> Optional[Path]:
+    def select_draft(self) -> Optional[Path] | str:
         """让用户选择要处理的草稿"""
         drafts = self.list_drafts()
         if not drafts:
@@ -2814,6 +2814,10 @@ def main():
         draft = pipeline.select_draft()
         if not draft:
             return
+        elif isinstance(draft, str) and draft.startswith('redirect_to_'):
+            # 处理重定向 - 在直接调用时不支持重定向，跳过
+            print("此模式下不支持重定向，请直接选择草稿文件")
+            return
     elif choice == "2":
         # 重新发布已发布文章
         post = pipeline.select_published_post()
@@ -2830,6 +2834,11 @@ def main():
             return
     else:
         print("无效的选择")
+        return
+        
+    # 确保draft是Path类型
+    if not isinstance(draft, Path):
+        print("错误：无效的草稿类型")
         return
         
     # 选择发布平台

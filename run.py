@@ -157,6 +157,11 @@ def main():
         
         # 处理发布流程（在while循环内）
         
+        # 确保draft是Path类型
+        if not isinstance(draft, Path):
+            pipeline.log(f"错误：无效的草稿类型 {type(draft)}", level="error", force=True)
+            continue
+        
         # 选择发布平台
         pipeline.log(f"开始为文章 '{draft.name}' 选择发布平台", level="info", force=True)
         platforms = pipeline.select_platforms(draft)
@@ -3602,9 +3607,10 @@ def handle_onedrive_images_menu(pipeline):
         print("7. 🆕 混合图片管理（支持任意位置）")
         print("8. 🧹 管理处理会话")
         print("9. 🗑️ OneDrive云端清理工具")
+        print("10. 📅 按日期下载图片备份")
         print("\n0. 返回主菜单")
         
-        choice = input("\n请选择操作 (1-9/0): ").strip()
+        choice = input("\n请选择操作 (1-10/0): ").strip()
         
         if choice == "1":
             # 初始化认证
@@ -3777,6 +3783,11 @@ def handle_onedrive_images_menu(pipeline):
             # OneDrive云端清理工具
             print("🗑️ 启动OneDrive云端清理工具...")
             handle_onedrive_cleanup_menu()
+            
+        elif choice == "10":
+            # 按日期下载图片备份
+            print("📅 启动按日期下载图片备份工具...")
+            handle_onedrive_date_download_menu(pipeline)
             
         elif choice == "0":
             break
@@ -4536,6 +4547,190 @@ def handle_onedrive_cleanup_menu():
         
         if choice in ["1", "2", "3"]:
             input("\n按Enter键继续...")
+
+
+def handle_onedrive_date_download_menu(pipeline):
+    """OneDrive按日期下载图片备份菜单"""
+    while True:
+        print("\n" + "="*50)
+        print("📅 OneDrive按日期下载图片备份")
+        print("="*50)
+        print("1. 查看可用的上传日期")
+        print("2. 按日期范围下载图片（预览模式）")
+        print("3. 按日期范围下载图片（实际下载）")
+        print("4. 下载最近几天的图片")
+        print("5. 使用指南")
+        print("\n0. 返回OneDrive图床管理菜单")
+        
+        choice = input("\n请选择操作 (1-5/0): ").strip()
+        
+        if choice == "1":
+            # 查看可用日期
+            print("📅 查看可用的上传日期...")
+            try:
+                result = subprocess.run([
+                    "python3", "scripts/tools/onedrive_date_downloader.py", 
+                    "--list-dates"
+                ], check=False, capture_output=False)
+                
+                if result.returncode != 0:
+                    print("❌ 获取日期列表失败")
+                    
+            except Exception as e:
+                print(f"❌ 执行失败: {e}")
+                
+        elif choice == "2":
+            # 预览模式下载
+            print("🔍 按日期范围下载图片（预览模式）")
+            print("支持的日期格式：")
+            print("  • 相对时间: 7d (7天前), 24h (24小时前)")
+            print("  • 绝对日期: 2025-08-12")
+            print("  • 留空表示不限制")
+            
+            start_date = input("\n开始日期 (留空表示最早): ").strip()
+            end_date = input("结束日期 (留空表示最新): ").strip()
+            limit = input("限制数量 (留空表示全部): ").strip()
+            
+            cmd = ["python3", "scripts/tools/onedrive_date_downloader.py", "--dry-run"]
+            if start_date:
+                cmd.extend(["--start-date", start_date])
+            if end_date:
+                cmd.extend(["--end-date", end_date])
+            if limit and limit.isdigit():
+                cmd.extend(["--limit", limit])
+            
+            try:
+                print("\n🔍 执行预览...")
+                result = subprocess.run(cmd, check=False, capture_output=False)
+                
+                if result.returncode != 0:
+                    print("❌ 预览执行失败")
+                    
+            except Exception as e:
+                print(f"❌ 执行失败: {e}")
+                
+        elif choice == "3":
+            # 实际下载
+            print("📥 按日期范围下载图片（实际下载）")
+            print("⚠️ 这将实际下载文件到本地")
+            print("支持的日期格式：")
+            print("  • 相对时间: 7d (7天前), 24h (24小时前)")
+            print("  • 绝对日期: 2025-08-12")
+            print("  • 留空表示不限制")
+            
+            start_date = input("\n开始日期 (留空表示最早): ").strip()
+            end_date = input("结束日期 (留空表示最新): ").strip()
+            limit = input("限制数量 (留空表示全部): ").strip()
+            download_dir = input("下载目录 (默认: temp/date_downloads): ").strip()
+            
+            if not download_dir:
+                download_dir = "temp/date_downloads"
+            
+            # 确认操作
+            confirm = input(f"\n确认下载到目录 '{download_dir}'？(y/N): ").strip().lower()
+            if confirm != 'y':
+                print("❌ 操作取消")
+                continue
+            
+            cmd = ["python3", "scripts/tools/onedrive_date_downloader.py", "--download-dir", download_dir]
+            if start_date:
+                cmd.extend(["--start-date", start_date])
+            if end_date:
+                cmd.extend(["--end-date", end_date])
+            if limit and limit.isdigit():
+                cmd.extend(["--limit", limit])
+            
+            try:
+                print("\n📥 开始下载...")
+                result = subprocess.run(cmd, check=False, capture_output=False)
+                
+                if result.returncode == 0:
+                    print("✅ 下载完成")
+                    pipeline.log(f"OneDrive图片按日期下载完成，目录：{download_dir}", level="info")
+                else:
+                    print("❌ 下载执行失败")
+                    
+            except Exception as e:
+                print(f"❌ 执行失败: {e}")
+                
+        elif choice == "4":
+            # 下载最近几天的图片
+            print("📥 下载最近几天的图片")
+            days = input("输入天数 (默认: 7): ").strip()
+            if not days or not days.isdigit():
+                days = "7"
+            
+            limit = input("限制数量 (留空表示全部): ").strip()
+            download_dir = input("下载目录 (默认: temp/recent_downloads): ").strip()
+            
+            if not download_dir:
+                download_dir = "temp/recent_downloads"
+            
+            # 确认操作
+            confirm = input(f"\n确认下载最近{days}天的图片到 '{download_dir}'？(y/N): ").strip().lower()
+            if confirm != 'y':
+                print("❌ 操作取消")
+                continue
+            
+            cmd = ["python3", "scripts/tools/onedrive_date_downloader.py", 
+                   "--start-date", f"{days}d", "--download-dir", download_dir]
+            if limit and limit.isdigit():
+                cmd.extend(["--limit", limit])
+            
+            try:
+                print(f"\n📥 开始下载最近{days}天的图片...")
+                result = subprocess.run(cmd, check=False, capture_output=False)
+                
+                if result.returncode == 0:
+                    print("✅ 下载完成")
+                    pipeline.log(f"OneDrive最近{days}天图片下载完成，目录：{download_dir}", level="info")
+                else:
+                    print("❌ 下载执行失败")
+                    
+            except Exception as e:
+                print(f"❌ 执行失败: {e}")
+                
+        elif choice == "5":
+            # 使用指南
+            print("\n" + "="*50)
+            print("📖 OneDrive按日期下载图片使用指南")
+            print("="*50)
+            print()
+            print("🎯 功能说明：")
+            print("   本工具可以按日期范围从OneDrive云端下载已上传的图片备份")
+            print("   特别适用于错误处理后的图片恢复场景")
+            print()
+            print("📅 支持的日期格式：")
+            print("   • 相对时间: 7d (7天前), 24h (24小时前), 1h (1小时前)")
+            print("   • 绝对日期: 2025-08-12, 2025-08-12T10:30:00")
+            print("   • 日期范围: 通过开始日期和结束日期组合使用")
+            print()
+            print("💡 使用建议：")
+            print("   1. 先使用'查看可用日期'了解可下载的时间范围")
+            print("   2. 使用'预览模式'确认要下载的文件列表")
+            print("   3. 确认无误后再执行'实际下载'")
+            print("   4. 可以使用'限制数量'参数控制下载文件数")
+            print()
+            print("🛡️ 安全特性：")
+            print("   • 使用OneDrive API安全下载，不会误删云端文件")
+            print("   • 下载前有确认步骤，防止误操作")
+            print("   • 自动创建下载目录，不会覆盖现有文件")
+            print("   • 跳过已存在的文件，支持断点续传")
+            print()
+            print("🔧 适用场景：")
+            print("   • 文章处理出错后恢复图片")
+            print("   • 定期备份重要图片到本地")
+            print("   • 迁移或同步图片资源")
+            print("   • 清理前的图片备份")
+            
+        elif choice == "0":
+            break
+        else:
+            print("❌ 无效选择，请重新输入")
+        
+        if choice in ["1", "2", "3", "4"]:
+            input("\n按Enter键继续...")
+
 
 if __name__ == "__main__":
     main() 
