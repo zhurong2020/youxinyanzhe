@@ -200,7 +200,15 @@ class EnhancedOneDriveProcessor:
     def resolve_local_path(self, img_path: str, article_path: str) -> Optional[str]:
         """解析本地图片的实际路径"""
         try:
-            if '{{ site.baseurl }}' in img_path:
+            # 处理Windows绝对路径 (如 c:\Users\... 或 C:\Users\...)
+            if len(img_path) >= 3 and img_path[1:3] == ':\\':
+                # Windows绝对路径格式，转换为WSL路径
+                drive_letter = img_path[0].lower()
+                windows_path = img_path[3:].replace('\\', '/')
+                # 转换为WSL格式: /mnt/c/Users/...
+                wsl_path = f"/mnt/{drive_letter}/{windows_path}"
+                return wsl_path
+            elif '{{ site.baseurl }}' in img_path:
                 relative_path = img_path.replace('{{ site.baseurl }}/', '')
                 return str(Path(relative_path))
             elif img_path.startswith('../'):
