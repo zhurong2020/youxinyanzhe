@@ -125,6 +125,36 @@ def main():
             continue  # 返回主菜单
             
         # 到这里说明有有效的draft需要处理
+        # 草稿预检机制 - 检查是否有需要预处理的问题
+        pipeline.log("正在进行草稿质量预检...", level="info", force=True)
+        draft_issues = pipeline.check_draft_issues(draft)
+        if draft_issues:
+            print(f"\n⚠️ 发现草稿质量问题：")
+            for issue in draft_issues:
+                print(f"   • {issue}")
+            
+            print(f"\n🔧 建议的处理方案：")
+            if any("图片" in issue for issue in draft_issues):
+                print(f"   1. 使用 '5. OneDrive图床管理' → '处理单个草稿' 来处理图片")
+                print(f"   2. 或使用 '2. 内容规范化处理' 来完善内容格式")
+            
+            if any("格式" in issue or "分页" in issue or "长度" in issue for issue in draft_issues):
+                print(f"   3. 使用 '2. 内容规范化处理' 来修复格式问题")
+                
+            print(f"\n💡 推荐工作流程：")
+            print(f"   草稿预处理 → 2.内容规范化处理 → 1.智能内容发布")
+            
+            continue_choice = input(f"\n是否仍要继续发布？(y/N): ").strip().lower()
+            if continue_choice not in ['y', 'yes']:
+                print("📝 已取消发布，请先处理草稿问题")
+                pipeline.log("用户选择取消发布，需先处理草稿质量问题", level="info", force=True)
+                continue  # 返回主菜单
+            else:
+                print("⚠️ 继续发布可能导致内容不完整，建议发布后及时修复")
+                pipeline.log("用户选择继续发布存在问题的草稿", level="warning", force=True)
+        else:
+            pipeline.log("✅ 草稿质量检查通过", level="info", force=True)
+        
         # 处理发布流程（在while循环内）
         
         # 选择发布平台

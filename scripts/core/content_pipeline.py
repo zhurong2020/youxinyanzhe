@@ -521,34 +521,80 @@ class ContentPipeline:
             with open(draft_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            # 检查图片路径问题
+            # 1. 检查图片路径问题
             image_issues = self.check_image_paths(content)
             if image_issues:
-                issues.append(f"图片路径不规范 ({len(image_issues)}个图片需要OneDrive处理)")
-                for img in image_issues[:3]:  # 最多显示3个示例
-                    issues.append(f"  例如: {img}")
-                if len(image_issues) > 3:
-                    issues.append(f"  ... 还有{len(image_issues)-3}个图片")
+                issues.append(f"🖼️ 图片路径不规范 ({len(image_issues)}个图片需要OneDrive处理)")
+                for img in image_issues[:2]:  # 最多显示2个示例
+                    issues.append(f"      例如: {img}")
+                if len(image_issues) > 2:
+                    issues.append(f"      ... 还有{len(image_issues)-2}个图片")
             
-            # 检查Front Matter
+            # 2. 检查Front Matter
             if not content.strip().startswith('---'):
-                issues.append("缺少Jekyll Front Matter (需要标题、分类、标签等)")
+                issues.append("📋 缺少Jekyll Front Matter (需要标题、分类、标签等)")
+            else:
+                # 解析Front Matter检查必需字段
+                try:
+                    import frontmatter
+                    post = frontmatter.loads(content)
+                    required_fields = ['title', 'date', 'header']
+                    missing_fields = [field for field in required_fields if field not in post.metadata]
+                    if missing_fields:
+                        issues.append(f"📋 Front Matter缺少必需字段: {', '.join(missing_fields)}")
+                    
+                    # 检查特定字段格式
+                    if 'title' in post.metadata:
+                        title_len = len(str(post.metadata['title']))
+                        if title_len < 10:
+                            issues.append("📝 标题过短，建议25-35字符")
+                        elif title_len > 60:
+                            issues.append("📝 标题过长，建议25-35字符")
+                    
+                    if 'header' in post.metadata and isinstance(post.metadata['header'], dict):
+                        if 'teaser' in post.metadata['header']:
+                            teaser_path = str(post.metadata['header']['teaser'])
+                            if teaser_path.startswith('c:') or teaser_path.startswith('C:'):
+                                issues.append("🖼️ 头图使用了本地路径，需要OneDrive处理")
+                    
+                except Exception as e:
+                    issues.append(f"📋 Front Matter格式错误: {str(e)}")
             
-            # 检查<!-- more -->标签
+            # 3. 检查内容结构
             if '<!-- more -->' not in content:
-                issues.append("缺少首页分页标记 <!-- more -->")
+                issues.append("✂️ 缺少首页分页标记 <!-- more -->")
             
-            # 检查内容结构
             if 'excerpt:' not in content and content.strip().startswith('---'):
-                issues.append("缺少摘要字段 (excerpt) 影响SEO")
+                issues.append("📄 缺少摘要字段 (excerpt) 影响SEO")
             
-            # 检查内容长度
+            # 4. 检查内容质量
             clean_content = content.replace('---', '').replace('<!-- more -->', '')
+            content_lines = [line.strip() for line in clean_content.split('\n') if line.strip()]
+            
             if len(clean_content.strip()) < 500:
-                issues.append("内容过短，可能影响SEO效果")
-                
+                issues.append("📏 内容过短 (建议至少500字符)")
+            
+            # 检查是否有明显的结尾
+            if len(content_lines) > 0:
+                last_line = content_lines[-1]
+                if len(last_line) < 20 or not any(punct in last_line for punct in ['。', '？', '！', '.', '?', '!']):
+                    issues.append("📝 文章可能没有合适的结尾段落")
+            
+            # 5. 检查分类标签
+            if content.strip().startswith('---'):
+                try:
+                    import frontmatter
+                    post = frontmatter.loads(content)
+                    if 'categories' not in post.metadata and 'category' not in post.metadata:
+                        issues.append("🏷️ 缺少分类信息，建议使用四大分类之一")
+                    
+                    if 'tags' not in post.metadata or not post.metadata.get('tags'):
+                        issues.append("🏷️ 缺少标签信息，有助于内容发现")
+                except:
+                    pass  # Front Matter已检查过
+                    
         except Exception as e:
-            issues.append(f"文件读取错误: {str(e)}")
+            issues.append(f"❌ 文件读取错误: {str(e)}")
         
         return issues
     
@@ -1457,10 +1503,20 @@ class ContentPipeline:
                     content_text = polished_content
             
             # 添加页脚（如果需要）
-            if platform_config.get('append_footer', False):
-                # 获取页脚模板
-                footer_template = self.templates.get('footer', {}).get(platform, '')
-                self.log(f"页脚模板: {footer_template[:50]}...", level="info")
+            append_footer = platform_config.get('append_footer', False)
+            self.log(f"平台 {platform} append_footer 配置: {append_footer}", level="info", force=True)
+            
+            if append_footer:
+                # 获取页脚模板 - 兼容不同的配置结构
+                footer_templates = self.templates.get('footer', {})
+                if not footer_templates and 'footer' in self.config:
+                    # 直接从config中获取footer配置
+                    footer_templates = self.config.get('footer', {})
+                
+                self.log(f"可用的页脚模板: {list(footer_templates.keys())}", level="info", force=True)
+                
+                footer_template = footer_templates.get(platform, '')
+                self.log(f"获取到的页脚模板长度: {len(footer_template) if footer_template else 0}", level="info", force=True)
                 
                 if footer_template:
                     # 确保页脚前有足够的空行
@@ -1468,9 +1524,11 @@ class ContentPipeline:
                         content_text = content_text.rstrip() + '\n\n'
                     
                     content_text = f"{content_text}{footer_template}"
-                    self.log(f"添加页脚成功", level="info", force=True)
+                    self.log(f"✅ 添加页脚成功，页脚长度: {len(footer_template)} 字符", level="info", force=True)
                 else:
-                    self.log(f"未找到平台 {platform} 的页脚模板", level="warning", force=True)
+                    self.log(f"❌ 未找到平台 {platform} 的页脚模板", level="warning", force=True)
+            else:
+                self.log(f"平台 {platform} 未启用页脚添加", level="info")
             
             # 更新内容
             post.content = content_text
@@ -1643,19 +1701,8 @@ class ContentPipeline:
             post.content = self._convert_links_to_new_window(post.content)
             self.log("✅ 已将链接设置为在新窗口打开", level="info")
             
-            # 添加页脚
-            platform_config = self.platforms_config.get('github_pages', {})
-            if platform_config.get('append_footer', False):
-                footer_template = self.templates.get('footer', {}).get('github_pages', '')
-                if footer_template:
-                    # 确保页脚前有足够的空行
-                    if not post.content.endswith('\n\n'):
-                        post.content = post.content.rstrip() + '\n\n'
-                    
-                    post.content = f"{post.content}{footer_template}"
-                    self.log(f"添加页脚成功", level="info")
-                else:
-                    self.log(f"未找到 github_pages 的页脚模板", level="warning")
+            # 页脚已在 _generate_platform_content 中处理，此处不重复添加
+            self.log("页脚处理已在内容生成阶段完成", level="info")
             
             # 添加调试日志
             self.log(f"处理后的内容长度: {len(post.content)}", level="debug")
