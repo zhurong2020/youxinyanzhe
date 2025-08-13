@@ -2295,17 +2295,8 @@ class ContentPipeline:
             return categories, []
     
     def _replace_images(self, content: str, images: Dict[str, str], temp_dir_path: Path) -> str:
-        """替换文章中的图片链接为Cloudflare链接"""
+        """替换文章中的图片链接"""
         return self.image_processor.replace_images_in_content(content, images, temp_dir_path)
-        
-        # 记录已处理的OneDrive URL，避免重复处理
-        processed_urls = {}
-        total_replacements = 0
-        
-        # 处理OneDrive链接
-        for pattern in onedrive_patterns:
-            matches = re.finditer(pattern, content)
-            match_count = 0
             
             for match in matches:
                 match_count += 1

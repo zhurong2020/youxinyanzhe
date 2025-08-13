@@ -366,7 +366,7 @@ class ImageProcessor:
             except Exception as e:
                 self.log(f"清理临时目录失败: {str(e)}", level="warning")
     
-    def replace_images_in_content(self, content: str, images: Dict[str, str], temp_dir_path: Optional[Path] = None) -> str:
+    def replace_images_in_content(self, content: str, images: Dict[str, str], _temp_dir_path: Optional[Path] = None) -> str:
         """
         替换内容中的图片路径
         
