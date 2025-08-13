@@ -25,7 +25,7 @@ class PlatformAdapter(ABC):
         pass
     
     @abstractmethod
-    def generate_content(self, content: str, metadata: Dict[str, Any]) -> str:
+    def generate_content(self, content: str, _: Dict[str, Any]) -> str:
         """为特定平台生成适配内容"""
         pass
     
@@ -49,7 +49,10 @@ class WeChatAdapter(PlatformAdapter):
     def _initialize_publisher(self):
         """初始化微信发布器"""
         try:
-            self.wechat_publisher = WechatPublisher(self.project_root, self.logger)
+            # WechatPublisher需要gemini_model参数，暂时传None
+            # 在实际使用时会通过config传入正确的gemini_model
+            gemini_model = self.config.get("gemini_model", None)
+            self.wechat_publisher = WechatPublisher(gemini_model)
             self.log("微信发布器初始化成功", level="info")
         except Exception as e:
             self.log(f"微信发布器初始化失败: {str(e)}", level="error")
@@ -96,7 +99,7 @@ class WeChatAdapter(PlatformAdapter):
             self.log(f"微信发布失败: {str(e)}", level="error", force=True)
             return False
     
-    def generate_content(self, content: str, metadata: Dict[str, Any]) -> str:
+    def generate_content(self, content: str, _: Dict[str, Any]) -> str:
         """为微信平台生成适配内容"""
         # 微信平台的内容格式化
         # 可以添加微信特有的格式优化
@@ -113,10 +116,9 @@ class GitHubPagesAdapter(PlatformAdapter):
         _ = content, metadata  # 避免未使用参数警告
         return True
     
-    def generate_content(self, content: str, metadata: Dict[str, Any]) -> str:
+    def generate_content(self, content: str, _: Dict[str, Any]) -> str:
         """为GitHub Pages生成适配内容"""
         # Jekyll格式的内容处理
-        _ = metadata  # 避免未使用参数警告
         return content
 
 
@@ -130,10 +132,9 @@ class WordPressAdapter(PlatformAdapter):
         self.log("WordPress发布功能待实现", level="warning")
         return False
     
-    def generate_content(self, content: str, metadata: Dict[str, Any]) -> str:
+    def generate_content(self, content: str, _: Dict[str, Any]) -> str:
         """为WordPress生成适配内容"""
         # WordPress特有的格式处理
-        _ = metadata  # 避免未使用参数警告
         return content
 
 

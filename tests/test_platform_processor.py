@@ -157,7 +157,7 @@ class TestWeChatAdapter(unittest.TestCase):
         adapter = WeChatAdapter(self.config, self.project_root, self.mock_logger)
         
         self.assertIsNotNone(adapter.wechat_publisher)
-        mock_publisher_class.assert_called_once_with(self.project_root, self.mock_logger)
+        mock_publisher_class.assert_called_once_with(None)  # gemini_model from config
     
     @patch('scripts.core.processors.platform_processor.WechatPublisher')
     def test_initialization_failure(self, mock_publisher_class):
