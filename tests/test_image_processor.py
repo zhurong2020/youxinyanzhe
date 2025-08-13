@@ -169,8 +169,9 @@ class TestImageProcessor(unittest.TestCase):
         self.assertTrue(filename.endswith('.jpg'))
         
         # 验证文件确实被创建
-        file_path = self.temp_dir / filename
-        self.assertTrue(file_path.exists())
+        if filename:
+            file_path = self.temp_dir / filename
+            self.assertTrue(file_path.exists())
     
     @patch('requests.get')
     def test_download_onedrive_image_failure(self, mock_get):
@@ -192,7 +193,7 @@ header:
 ![Content Image](https://onedrive.live.com/embed?resid=123)
 """)
     @patch('frontmatter.loads')
-    def test_process_post_images(self, mock_frontmatter, mock_file):
+    def test_process_post_images(self, mock_frontmatter, _mock_file):
         """测试处理文章图片"""
         # Mock frontmatter解析结果
         mock_post = MagicMock()
