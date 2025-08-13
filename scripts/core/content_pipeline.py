@@ -22,97 +22,9 @@ from dotenv import load_dotenv
 
 # 导入本地模块
 from .wechat_publisher import WechatPublisher
+from .managers.publish_manager import PublishingStatusManager
 from ..utils.reward_system_manager import RewardSystemManager
 
-class PublishingStatusManager:
-    """发布状态管理器"""
-    
-    def __init__(self, drafts_dir: Path):
-        self.drafts_dir = Path(drafts_dir)
-        self.status_dir = self.drafts_dir / ".publishing"
-        self.status_dir.mkdir(exist_ok=True)
-        
-    def get_status_file_path(self, article_name: str) -> Path:
-        """获取文章状态文件路径"""
-        # 移除文件扩展名
-        article_name = article_name.replace('.md', '')
-        return self.status_dir / f"{article_name}.yml"
-    
-    def get_published_platforms(self, article_name: str) -> List[str]:
-        """获取文章已发布的平台列表"""
-        status_file = self.get_status_file_path(article_name)
-        
-        if not status_file.exists():
-            return []
-            
-        try:
-            with open(status_file, 'r', encoding='utf-8') as f:
-                status_data = yaml.safe_load(f) or {}
-            return status_data.get('published_platforms', [])
-        except Exception:
-            return []
-    
-    def update_published_platforms(self, article_name: str, platforms: List[str]):
-        """更新文章的发布平台列表"""
-        status_file = self.get_status_file_path(article_name)
-        
-        # 读取现有状态
-        status_data = {}
-        if status_file.exists():
-            try:
-                with open(status_file, 'r', encoding='utf-8') as f:
-                    status_data = yaml.safe_load(f) or {}
-            except Exception:
-                status_data = {}
-        
-        # 更新发布平台列表（合并，避免重复）
-        existing_platforms = set(status_data.get('published_platforms', []))
-        new_platforms = set(platforms)
-        all_platforms = list(existing_platforms.union(new_platforms))
-        
-        # 更新状态数据
-        status_data.update({
-            'article_name': article_name,
-            'published_platforms': all_platforms,
-            'last_updated': datetime.now().isoformat(),
-            'total_publications': len(all_platforms)
-        })
-        
-        # 保存状态文件
-        try:
-            with open(status_file, 'w', encoding='utf-8') as f:
-                yaml.safe_dump(status_data, f, default_flow_style=False, 
-                             allow_unicode=True, sort_keys=False)
-        except Exception as e:
-            logging.error(f"保存发布状态失败: {e}")
-    
-    def get_available_platforms(self, article_name: str, all_platforms: List[str]) -> List[str]:
-        """获取文章可发布的平台列表（排除已发布的）"""
-        published_platforms = set(self.get_published_platforms(article_name))
-        available_platforms = [p for p in all_platforms if p not in published_platforms]
-        return available_platforms
-    
-    def initialize_legacy_post_status(self, posts_dir: Path):
-        """初始化存量已发布文档的状态"""
-        if not posts_dir.exists():
-            return
-            
-        legacy_count = 0
-        for post_file in posts_dir.glob("*.md"):
-            article_name = post_file.stem
-            
-            # 检查是否已有状态文件
-            if self.get_status_file_path(article_name).exists():
-                continue
-                
-            # 为存量文档创建状态记录（默认已在github_pages发布）
-            self.update_published_platforms(article_name, ['github_pages'])
-            legacy_count += 1
-            
-        if legacy_count > 0:
-            logging.info(f"已为 {legacy_count} 个存量文档初始化发布状态")
-        
-        return legacy_count
 
 class ContentPipeline:
     _instance = None  # 类属性用于单例模式
