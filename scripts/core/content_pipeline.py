@@ -25,6 +25,7 @@ from .wechat_publisher import WechatPublisher
 from .managers.publish_manager import PublishingStatusManager
 from .processors.image_processor import ImageProcessor
 from .processors.ai_processor import AIProcessor
+from .processors.platform_processor import PlatformProcessor
 from ..utils.reward_system_manager import RewardSystemManager
 
 
@@ -262,6 +263,9 @@ class ContentPipeline:
             
             # 现在可以初始化AI处理器
             self.ai_processor = AIProcessor(self.model, self.logger)
+            
+            # 初始化平台处理器
+            self.platform_processor = PlatformProcessor(self.platforms_config, self.project_root, self.logger)
             
             # 测试连接
             try:
