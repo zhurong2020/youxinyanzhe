@@ -11,6 +11,7 @@ import subprocess
 from pathlib import Path
 from dotenv import load_dotenv
 from scripts.core.content_pipeline import ContentPipeline
+from scripts.cli.menu_handler import MenuHandler
 
 # 加载环境变量
 load_dotenv()
@@ -35,6 +36,9 @@ def main():
     # 初始化一次，避免重复日志
     pipeline = ContentPipeline("config/pipeline_config.yml", verbose=args.verbose)
     
+    # 初始化菜单处理器
+    menu_handler = MenuHandler(pipeline)
+    
     # 记录用户会话开始
     import time
     session_id = int(time.time() * 1000) % 100000  # 简短的会话 ID
@@ -43,37 +47,18 @@ def main():
     # session_count = 1  # 记录操作次数 - 暂未使用
     
     while True:  # 主循环，支持返回主菜单
-        # 选择操作
-        print("\n" + "="*60)
-        print("🛠️ 有心工坊 v2.0")
-        print("   YouXin Workshop")
-        print()
-        print("💡 为有心人打造的数字创作平台")
-        print("📝 学习 · 分享 · 进步")
-        print("="*60)
-        print("📝 内容工作流程：")
-        print("1. 智能内容发布")      # 合并1+2
-        print("2. 内容规范化处理")    # 保持原4
-        print("3. 智能内容创作")      # 合并5+3，提升位置
-        print("4. YouTube内容处理")   # 合并8+13
-        print("\n🛠️ 系统管理：")
-        print("5. OneDrive图床管理")  # 保持原14
-        print("6. 内容变现管理")      # 保持原6
-        print("7. 语音和音频工具")    # 合并12+相关
-        print("8. 文章更新工具")      # 保持原9
-        print("9. 系统工具集合")      # 合并7+10+11
-        print("\n0. 退出")
+        # 显示主菜单
+        menu_handler.display_main_menu()
         
-        choice = input("\n请输入选项 (1-9/0): ").strip()
+        # 获取用户选择
+        choice = menu_handler.get_user_choice()
         
-        # 记录用户选择的操作
-        choice_names = {
-            '1': '智能内容发布', '2': '内容规范化处理', '3': '智能内容创作',
-            '4': 'YouTube内容处理', '5': 'OneDrive图床管理', '6': '内容变现管理',
-            '7': '语音和音频工具', '8': '文章更新工具', '9': '系统工具集合', '0': '退出'
-        }
-        operation_name = choice_names.get(choice, '无效选择')
-        pipeline.log(f"用户选择操作: {choice} ({operation_name})", level="info", force=True)
+        # 验证并记录用户选择
+        if not menu_handler.is_valid_choice(choice):
+            menu_handler.display_invalid_choice_message(choice)
+            continue
+            
+        menu_handler.log_user_action(choice)
         
         draft = None
         
@@ -116,13 +101,8 @@ def main():
             handle_system_tools_menu(pipeline)
             continue  # 返回主菜单
         elif choice == "0":
-            print("👋 再见！")
-            pipeline.log("用户退出系统", level="info", force=True)
+            menu_handler.display_exit_message()
             return
-        else:
-            print("❌ 无效的选择，请输入 1-9 或 0")
-            pipeline.log(f"用户输入无效选择: {choice}", level="warning", force=True)
-            continue  # 返回主菜单
             
         # 到这里说明有有效的draft需要处理
         # 草稿预检机制 - 检查是否有需要预处理的问题
