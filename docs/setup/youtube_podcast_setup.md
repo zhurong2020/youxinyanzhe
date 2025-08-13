@@ -92,8 +92,8 @@ YOUTUBE_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ### 基本使用流程
 
 1. 运行主程序：`python run.py`
-2. 选择 `6. YouTube播客生成器`
-3. 选择 `1. 生成YouTube播客学习文章`
+2. 选择 `4. YouTube内容处理`
+3. 选择 `1. 视频转文章` (原YouTube播客生成器)
 4. **选择播客语言**：
    - `1. 中文播客`（默认，为中文用户学习英语）
    - `2. 英文播客`（为英语学习者提供英文内容）
@@ -133,7 +133,7 @@ python scripts/tools/youtube_oauth_setup.py
 
 在菜单中选择：
 ```
-run.py → 6. YouTube播客生成器 → 2. 查看配置状态
+run.py → 4. YouTube内容处理 → 2. 查看配置状态
 ```
 
 正确配置应显示：
@@ -230,7 +230,7 @@ ImportError: No module named 'gradio_client'
 ❌ ElevenLabs API quota exceeded
 ```
 **解决**: 
-- 使用 `python run.py` → 菜单5 → 选项3 检查ElevenLabs配额状态
+- 使用 `python run.py` → `7. 语音和音频工具` → `1. TTS语音测试` 检查ElevenLabs配额状态
 - 等待配额重置（通常为月度重置）
 - 或升级ElevenLabs订阅计划
 - 系统会自动显示预估剩余可生成音频时长
@@ -303,10 +303,10 @@ YouTube链接 → 视频信息提取 → 播客生成 → 导读生成 → Jekyl
 pip install --upgrade -r requirements.txt
 
 # 检查配置状态
-python run.py # 选择菜单6 → 2
+python run.py # 选择菜单4 → 2
 
 # 检查ElevenLabs配额状态
-python run.py # 选择菜单5 → 3
+python run.py # 选择菜单7 → 1
 ```
 
 ### 配置文件位置
@@ -331,11 +331,11 @@ python scripts/tools/youtube_video_generator.py
 ## 💡 技术支持
 
 遇到问题时的排查步骤：
-1. 检查配置状态（菜单6 → 2）
-2. 查看系统日志（菜单8 → 3）
+1. 检查配置状态（菜单4 → 2）
+2. 查看系统日志（菜单9 → 3 系统工具集合）
 3. 参考本文档故障排除部分
 4. 检查网络连接和API配额
 
 ---
 
-*最后更新：2025-07-30*
+*最后更新：2025-08-13 (重构后菜单系统)*
