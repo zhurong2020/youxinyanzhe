@@ -4,17 +4,17 @@ import yaml
 import logging
 import subprocess
 import frontmatter
-import json
 # tempfile在image_processor中使用
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.console import Console
 from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 from datetime import datetime
-import google.generativeai as genai
+# google.generativeai导入移动到AI处理器中
 from google.generativeai.client import configure
 from google.generativeai.generative_models import GenerativeModel
-from google.generativeai.types import GenerationConfig, BlockedPromptException
+from google.generativeai.types import GenerationConfig
+# BlockedPromptException移动到AI处理器中
 from google.api_core.exceptions import ResourceExhausted
 import argparse
 import requests
@@ -24,6 +24,7 @@ from dotenv import load_dotenv
 from .wechat_publisher import WechatPublisher
 from .managers.publish_manager import PublishingStatusManager
 from .processors.image_processor import ImageProcessor
+from .processors.ai_processor import AIProcessor
 from ..utils.reward_system_manager import RewardSystemManager
 
 
@@ -63,6 +64,9 @@ class ContentPipeline:
             
             # 初始化图片处理器
             self.image_processor = ImageProcessor(self.logger)
+            
+            # AI处理器将在模型初始化后设置
+            self.ai_processor = None
             
             # 初始化存量文档状态
             posts_dir = Path(self.config["paths"]["posts"])
@@ -255,6 +259,9 @@ class ContentPipeline:
                 self.log(f"使用配置的模型: {model_name}", level="debug")
             # 创建模型实例
             self.model = GenerativeModel(model_name)
+            
+            # 现在可以初始化AI处理器
+            self.ai_processor = AIProcessor(self.model, self.logger)
             
             # 测试连接
             try:
@@ -1159,59 +1166,7 @@ class ContentPipeline:
     
     def _polish_content(self, content: str) -> Optional[str]:
         """使用AI润色文章内容"""
-        if not self.api_available:
-            self.log("API不可用，跳过润色", level="warning")
-            return content
-        
-        try:
-            # 解析front matter
-            try:
-                post = frontmatter.loads(content)
-            except Exception as e:
-                self.log(f"解析front matter失败: {str(e)}", level="warning")
-                # 尝试修复
-                content = self._fix_frontmatter_quotes(content)
-                try:
-                    post = frontmatter.loads(content)
-                except Exception as e:
-                    self.log(f"修复后仍无法解析front matter: {str(e)}", level="error")
-                    return content
-            
-            # 提取正文内容
-            content_text = post.content
-            
-            # 如果内容太短，不进行润色
-            if len(content_text) < 100:
-                self.log("内容太短，不进行润色", level="warning")
-                return content
-            
-            # 构建提示词
-            prompt = f"""
-            请对以下文章内容进行润色，使其更加流畅、易读，同时保持原文的核心思想和信息。
-            不要添加任何额外的评论或前言，直接返回润色后的内容。
-            不要修改文章的结构或添加新的章节。
-            
-            {content_text}
-            """
-            
-            # 调用API
-            response = self.model.generate_content(prompt)
-            
-            if response and response.text:
-                # 更新内容
-                post.content = response.text.strip()
-                return frontmatter.dumps(post)
-            else:
-                self.log("API返回为空", level="warning")
-                return content
-            
-        except ResourceExhausted as e:
-            self.log(f"API配额已用尽: {str(e)}", level="error", force=True)
-            self.api_available = False
-            return content
-        except Exception as e:
-            self.log(f"润色内容时出错: {str(e)}", level="error")
-            return content
+        return self.ai_processor.polish_content(content)
     
     def _validate_required_fields(self, post: frontmatter.Post) -> Tuple[bool, List[str]]:
         """验证必需字段是否存在
@@ -1240,67 +1195,7 @@ class ContentPipeline:
         Returns:
             str: 生成的摘要
         """
-        try:
-            if not self.api_available:
-                self.log("API不可用，无法生成摘要", level="warning")
-                return ""
-            
-            # 构建提示词
-            prompt = f"""
-请为以下文章生成一个摘要，要求：
-1. 准确概括文章主要内容和核心价值
-2. 语言简洁明了，突出关键信息
-3. 吸引读者阅读，体现文章独特性
-4. 字数严格控制在50-60字范围内
-5. 避免使用引号，防止YAML解析错误
-6. 专注于核心价值主张，避免过多细节描述
-
-文章内容：
-{content[:2000]}  # 只取前2000字符避免过长
-"""
-            
-            # 调用API生成摘要
-            model = GenerativeModel(self.config['content_processing']['gemini']['model'])
-            response = model.generate_content(
-                prompt,
-                generation_config=GenerationConfig(
-                    temperature=0.7,
-                    max_output_tokens=200,  # 摘要不需要太长
-                    top_p=0.8,
-                ),
-                safety_settings=[
-                    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-                    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-                    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-                    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-                ]
-            )
-            
-            # 检查finish_reason
-            if response and hasattr(response, 'candidates') and response.candidates:
-                candidate = response.candidates[0]
-                if hasattr(candidate, 'finish_reason') and candidate.finish_reason != 1:  # 1 = STOP (正常完成)
-                    self.log(f"API响应被过滤，finish_reason: {candidate.finish_reason}", level="warning")
-                    return ""
-            
-            if response and hasattr(response, 'text') and response.text:
-                excerpt = response.text.strip()
-                self.log(f"生成摘要: {excerpt}", level="info")
-                return excerpt
-            elif response and hasattr(response, 'parts') and response.parts:
-                # 尝试从parts获取文本
-                text_parts = [part.text for part in response.parts if hasattr(part, 'text')]
-                if text_parts:
-                    excerpt = ''.join(text_parts).strip()
-                    self.log(f"生成摘要: {excerpt}", level="info")
-                    return excerpt
-            
-            self.log("API未返回有效摘要", level="warning")
-            return ""
-                
-        except Exception as e:
-            self.log(f"生成摘要时出错: {str(e)}", level="error")
-            return ""
+        return self.ai_processor.generate_excerpt(content)
 
     def _generate_platform_content(self, content: str, platform: str, draft_path: Path) -> str:
         """为特定平台生成内容"""
@@ -2221,193 +2116,17 @@ class ContentPipeline:
 
     def _analyze_content_categories(self, content: str) -> Tuple[List[str], List[str]]:
         """使用 Gemini 分析文章内容，返回建议的分类和标签"""
-        try:
-            # 获取可用分类
-            available_cats = self._get_available_categories()
-            if not available_cats:
-                self.log("❌ 无法获取可用分类", level="error")
-                return [], []
-                
-            self.log(f"可用分类: {list(available_cats.keys())}", level="debug")
-            
-            # 构建 prompt
-            prompt = f"""
-            请分析以下文章内容，并从博客的四大核心分类体系中选择最合适的分类，同时生成相关标签。
-
-            四大核心分类体系：
-            🧠 认知升级：思维模型、学习方法、认知心理学、决策科学相关内容
-            🛠️ 技术赋能：实用工具、技术教程、自动化方案、效率提升相关内容  
-            🌍 全球视野：国际趋势、文化观察、全球化思维、科技趋势分析相关内容
-            💰 投资理财：投资策略、理财方法、财务自由、量化分析相关内容
-
-            要求：
-            1. 只能从以上四个分类中选择一个最合适的主分类
-            2. 分类名称必须完全匹配：认知升级、技术赋能、全球视野、投资理财
-            3. 生成3-5个相关标签
-            4. 使用JSON格式返回结果：
-            {{
-                "categories": ["选择的主分类"],
-                "tags": ["标签1", "标签2", "标签3", "标签4", "标签5"]
-            }}
-            
-            文章内容：
-            {content[:3000]}
-            """
-            
-            self.log("开始分析文章分类和标签...", level="info")
-            response = self.model.generate_content(prompt)
-            
-            if response:
-                try:
-                    # 尝试解析JSON响应
-                    result_text = response.text.strip()
-                    # 如果响应不是以{开头，尝试提取JSON部分
-                    if not result_text.startswith('{'):
-                        json_start = result_text.find('{')
-                        json_end = result_text.rfind('}') + 1
-                        if json_start >= 0 and json_end > json_start:
-                            result_text = result_text[json_start:json_end]
-                    
-                    result = json.loads(result_text)
-                    categories = result.get('categories', [])
-                    tags = result.get('tags', [])
-                    
-                    self.log(f"✅ 分析完成，建议分类: {categories}", level="info")
-                    self.log(f"✅ 分析完成，建议标签: {tags}", level="info")
-                    
-                    return categories, tags
-                except json.JSONDecodeError as e:
-                    self.log(f"JSON解析失败: {str(e)}", level="warning")
-                    self.log(f"原始响应: {response.text[:200]}...", level="debug")
-                    # 失败时回退到简单匹配
-                    categories = self._suggest_categories(content)
-                    self.log(f"使用简单匹配的分类: {categories}", level="info")
-                    return categories, []
-            else:
-                self.log("❌ 模型未返回响应", level="error")
-                return self._suggest_categories(content), []
-                
-        except Exception as e:
-            self.log(f"分析文章分类时出错: {str(e)}", level="error")
-            # 失败时回退到简单匹配
-            categories = self._suggest_categories(content)
-            self.log(f"使用简单匹配的分类: {categories}", level="info")
-            return categories, []
+        # 获取可用分类
+        available_cats = self._get_available_categories()
+        if not available_cats:
+            self.log("❌ 无法获取可用分类", level="error")
+            return [], []
+        
+        return self.ai_processor.generate_categories_and_tags(content, available_cats)
     
     def _replace_images(self, content: str, images: Dict[str, str], temp_dir_path: Path) -> str:
         """替换文章中的图片链接"""
         return self.image_processor.replace_images_in_content(content, images, temp_dir_path)
-            
-            for match in matches:
-                match_count += 1
-                if 'src=' in pattern:  # HTML格式
-                    onedrive_url = match.group(1)
-                    alt_text = match.group(2) if (match.lastindex is not None and match.lastindex >= 2) else ""
-                else:  # Markdown格式
-                    alt_text = match.group(1)
-                    onedrive_url = match.group(2)
-                
-                self.log(f"找到OneDrive链接: {onedrive_url}", level="debug")
-                
-                # 检查是否已经处理过这个URL
-                if onedrive_url in processed_urls:
-                    local_url = processed_urls[onedrive_url]
-                    self.log(f"使用已处理的URL: {onedrive_url} -> {local_url}", level="debug")
-                else:
-                    # 查找是否有匹配的已上传图片
-                    found_match = False
-                    for img_name, _ in images.items():
-                        if self._is_same_onedrive_image(onedrive_url, img_name):
-                            # 使用本地路径替代Cloudflare URL
-                            local_url = f"/assets/images/posts/{img_name}"
-                            
-                            processed_urls[onedrive_url] = local_url
-                            found_match = True
-                            self.log(f"✅ 找到匹配的本地图片: {img_name} -> {local_url}", level="debug")
-                            break
-                    
-                    # 如果没有找到匹配的模型，使用任何可用的 Gemini 模型
-                    if not found_match:
-                        self.log(f"⚠️ 未找到匹配的已上传图片，尝试下载: {onedrive_url}", level="debug")
-                        img_name = self._download_onedrive_image(onedrive_url, temp_dir_path)
-                        if img_name:
-                            img_path = temp_dir_path / img_name
-                            # cloudflare_id = self.image_mapper.upload_image(img_path)
-                            # if cloudflare_id:
-                            #     cloudflare_url = f"https://imagedelivery.net/WQEpklwOF67ACUS0Tgsufw/{cloudflare_id}/public"
-                            #     processed_urls[onedrive_url] = cloudflare_url
-                            #     self.log(f"✅ 下载并上传成功: {onedrive_url} -> {cloudflare_url}", level="debug")
-                            # else:
-                            #     self.log(f"❌ 上传到Cloudflare失败: {img_name}", level="error")
-                            #     continue
-                            self.log("❌ 未实现图片上传功能（image_mapper 未定义），请实现上传逻辑", level="error")
-                            continue
-                        else:
-                            self.log(f"❌ 下载OneDrive图片失败: {onedrive_url}", level="error")
-                            continue
-                
-                # 替换内容中的OneDrive链接
-                local_url = processed_urls.get(onedrive_url)
-                if not local_url:
-                    self.log(f"⚠️ 未能获取本地路径，跳过替换: {onedrive_url}", level="warning")
-                    continue
-                if 'src=' in pattern:  # HTML格式
-                    replacement = f'<img src="{local_url}" alt="{alt_text}">'
-                else:  # Markdown格式
-                    replacement = f'![{alt_text}]({local_url})'
-                
-                # 使用精确位置替换，避免全局替换可能导致的问题
-                start, end = match.span()
-                content = content[:start] + replacement + content[end:]
-                total_replacements += 1
-                self.log(f"替换OneDrive图片链接: {onedrive_url} -> {local_url}", level="debug")
-        
-        # 处理本地图片路径标准化
-        for local_name, _ in images.items():
-            # 跳过OneDrive图片，因为它们已经在上面处理过了
-            if local_name.startswith('onedrive_'):
-                continue
-                
-            # 使用标准化的本地路径
-            local_url = f"/assets/images/posts/{local_name}"
-            
-            # 匹配各种可能的图片引用格式
-            patterns = [
-                f'!\\[([^\\]]*)\\]\\(/assets/images/posts/.*?/{re.escape(local_name)}\\)',  # 完整路径
-                f'!\\[([^\\]]*)\\]\\(/assets/images/{re.escape(local_name)}\\)',           # 简化路径
-                f'!\\[([^\\]]*)\\]\\({re.escape(local_name)}\\)'                           # 仅文件名
-            ]
-            
-            # 检查这个特定图片是否已经有正确的路径，避免重复替换
-            local_pattern = f'!\\[([^\\]]*)\\]\\({re.escape(local_url)}\\)'
-            if re.search(local_pattern, content):
-                self.log(f"⚠️ 图片 {local_name} 已有正确路径，跳过替换", level="debug")
-                continue
-            
-            replaced_this_image = False
-            
-            # 处理标准路径
-            for pattern in patterns:
-                matches = re.finditer(pattern, content)
-                for match in matches:
-                    alt_text = match.group(1)
-                    replacement = f'![{alt_text}]({local_url})'
-                    
-                    # 使用精确位置替换，避免全局替换可能导致的问题
-                    start, end = match.span()
-                    content = content[:start] + replacement + content[end:]
-                    replaced_this_image = True
-            
-            if replaced_this_image:
-                self.log(f"标准化本地图片路径: {local_name} -> {local_url}", level="debug")
-        
-        # 记录总替换数量
-        if total_replacements > 0:
-            self.log(f"✅ 总共替换了 {total_replacements} 个图片引用", level="info")
-        else:
-            self.log("⚠️ 未找到需要替换的图片引用", level="warning")
-            
-        return content
 
     def _is_same_onedrive_image(self, onedrive_url: str, image_name: str) -> bool:
         """判断OneDrive URL是否对应指定的图片名称
