@@ -76,7 +76,7 @@ class ImageValidator(ContentValidator):
         for pattern in image_patterns:
             matches = re.finditer(pattern, content, re.IGNORECASE | re.MULTILINE)
             for match in matches:
-                if len(match.groups()) >= 2:
+                if match.lastindex is not None and match.lastindex >= 2:
                     alt_text = match.group(1) if match.lastindex >= 1 else ""
                     image_url = match.group(2)
                 elif len(match.groups()) == 1:
@@ -218,15 +218,16 @@ class ImageValidator(ContentValidator):
     
     def _format_size(self, size_bytes: int) -> str:
         """格式化文件大小"""
+        size: float = float(size_bytes)
         for unit in ['B', 'KB', 'MB', 'GB']:
-            if size_bytes < 1024.0:
-                return f"{size_bytes:.1f}{unit}"
-            size_bytes /= 1024.0
-        return f"{size_bytes:.1f}TB"
+            if size < 1024.0:
+                return f"{size:.1f}{unit}"
+            size /= 1024.0
+        return f"{size:.1f}TB"
     
     def get_problematic_image_paths(self, content: str) -> List[str]:
         """获取有问题的图片路径列表（与原有方法兼容）"""
-        results = self.validate_content(content)
+        _ = self.validate_content(content)
         problematic_paths = []
         
         # 查找所有图片引用
