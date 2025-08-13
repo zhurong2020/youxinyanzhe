@@ -5,10 +5,9 @@
 """
 
 import json
-import os
 import sys
 from pathlib import Path
-import webbrowser
+from datetime import datetime, timedelta, timezone
 import urllib.parse
 
 # 添加项目根目录到 Python 路径
@@ -119,8 +118,7 @@ def exchange_code_for_tokens(auth_code):
             
             # 如果有expires_in，计算过期时间
             if 'expires_in' in token_data:
-                from datetime import datetime, timedelta
-                expiry = datetime.utcnow() + timedelta(seconds=token_data['expires_in'])
+                expiry = datetime.now(timezone.utc) + timedelta(seconds=token_data['expires_in'])
                 full_token['expiry'] = expiry.isoformat() + "Z"
             
             # 保存token文件

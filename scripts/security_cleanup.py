@@ -4,12 +4,11 @@
 清理代码库中的敏感信息，为开源发布做准备
 """
 
-import os
 import re
 import shutil
 import subprocess
 from pathlib import Path
-from typing import List, Dict
+from typing import List
 
 class SecurityCleanup:
     def __init__(self, project_root: str = "."):
