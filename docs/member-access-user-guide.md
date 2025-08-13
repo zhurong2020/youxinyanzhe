@@ -38,7 +38,7 @@
 # 启动内容管理系统
 python run.py
 
-# 选择：4. 内容变现管理
+# 选择：6. 内容变现管理
 # 选择：5. 生成测试访问码
 ```
 
@@ -94,7 +94,7 @@ python scripts/secure_member_manager.py validate --code VIP2_20250905_7K0J
 
 ```bash
 # 查看系统统计
-python run.py -> 4 -> 7  # 或使用命令行
+python run.py -> 6 -> 7  # 或使用命令行
 python scripts/secure_member_manager.py stats
 
 # 列出活跃访问码
@@ -274,7 +274,7 @@ $ python scripts/secure_member_manager.py validate --code VIP2_20250905_9I3S
 ## ❓ 常见问题
 
 ### Q: 管理员如何快速生成测试访问码？
-A: 使用 `python run.py` → 选择 "4" → 选择 "5"，或直接执行：
+A: 使用 `python run.py` → 选择 "6" → 选择 "5"，或直接执行：
 ```bash
 python scripts/secure_member_manager.py generate --level monthly
 ```
@@ -321,6 +321,6 @@ tail -50 .build/logs/pipeline.log
 
 ---
 
-**文档版本**: v1.0  
-**最后更新**: 2025-08-06  
-**适用系统**: 有心言者博客会员管理系统 v2.0
+**文档版本**: v1.1  
+**最后更新**: 2025-08-13  
+**适用系统**: 有心工坊重构后会员管理系统 (菜单6)
