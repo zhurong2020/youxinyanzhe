@@ -387,7 +387,7 @@ class ContentPipeline:
             if len(clean_content.strip()) < 500:
                 issues.append("📏 长度")
                 
-        except Exception as e:
+        except Exception:
             issues.append("❌ 读取")
         
         if issues:

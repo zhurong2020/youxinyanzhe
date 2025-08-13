@@ -2,7 +2,7 @@
 测试内容处理工作流模块
 """
 import unittest
-from unittest.mock import Mock, patch, mock_open
+from unittest.mock import Mock, patch
 from pathlib import Path
 import tempfile
 import os
@@ -354,7 +354,7 @@ class TestWorkflowRegistry(unittest.TestCase):
     def test_register_and_get_workflow(self):
         """测试注册和获取工作流"""
         class TestWorkflow(WorkflowEngine):
-            def execute(self, _: Dict[str, Any]) -> WorkflowResult:
+            def execute(self, context: Dict[str, Any]) -> WorkflowResult:
                 return WorkflowResult(
                     success=True,
                     steps_completed=0,
@@ -377,7 +377,7 @@ class TestWorkflowRegistry(unittest.TestCase):
     def test_list_workflows(self):
         """测试列出工作流"""
         class TestWorkflow1(WorkflowEngine):
-            def execute(self, _: Dict[str, Any]) -> WorkflowResult:
+            def execute(self, context: Dict[str, Any]) -> WorkflowResult:
                 return WorkflowResult(
                     success=True,
                     steps_completed=0,
@@ -388,7 +388,7 @@ class TestWorkflowRegistry(unittest.TestCase):
                 )
         
         class TestWorkflow2(WorkflowEngine):
-            def execute(self, _: Dict[str, Any]) -> WorkflowResult:
+            def execute(self, context: Dict[str, Any]) -> WorkflowResult:
                 return WorkflowResult(
                     success=True,
                     steps_completed=0,
