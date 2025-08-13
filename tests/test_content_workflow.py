@@ -7,6 +7,7 @@ from pathlib import Path
 import tempfile
 import os
 import logging
+from typing import Dict, Any
 
 # 添加项目根目录到Python路径
 import sys
@@ -296,7 +297,7 @@ class TestContentProcessingWorkflow(unittest.TestCase):
         self.assertTrue(validate_input_step.required)
         
         # 直接修改步骤的function来引发异常
-        def failing_function(context, results):
+        def failing_function(_, __):
             raise ValueError("Test error")
         
         validate_input_step.function = failing_function
@@ -323,7 +324,7 @@ class TestContentProcessingWorkflow(unittest.TestCase):
         self.assertFalse(process_images_step.required)  # 确认是可选步骤
         
         # 直接修改步骤的function来引发异常
-        def failing_function(context, results):
+        def failing_function(_, __):
             raise Exception("Image processing failed")
         
         process_images_step.function = failing_function
@@ -353,8 +354,15 @@ class TestWorkflowRegistry(unittest.TestCase):
     def test_register_and_get_workflow(self):
         """测试注册和获取工作流"""
         class TestWorkflow(WorkflowEngine):
-            def execute(self, context):
-                pass
+            def execute(self, _: Dict[str, Any]) -> WorkflowResult:
+                return WorkflowResult(
+                    success=True,
+                    steps_completed=0,
+                    steps_failed=0,
+                    steps_skipped=0,
+                    results={},
+                    errors=[]
+                )
         
         self.registry.register("test_workflow", TestWorkflow)
         retrieved_class = self.registry.get("test_workflow")
@@ -369,12 +377,26 @@ class TestWorkflowRegistry(unittest.TestCase):
     def test_list_workflows(self):
         """测试列出工作流"""
         class TestWorkflow1(WorkflowEngine):
-            def execute(self, context):
-                pass
+            def execute(self, _: Dict[str, Any]) -> WorkflowResult:
+                return WorkflowResult(
+                    success=True,
+                    steps_completed=0,
+                    steps_failed=0,
+                    steps_skipped=0,
+                    results={},
+                    errors=[]
+                )
         
         class TestWorkflow2(WorkflowEngine):
-            def execute(self, context):
-                pass
+            def execute(self, _: Dict[str, Any]) -> WorkflowResult:
+                return WorkflowResult(
+                    success=True,
+                    steps_completed=0,
+                    steps_failed=0,
+                    steps_skipped=0,
+                    results={},
+                    errors=[]
+                )
         
         self.registry.register("workflow1", TestWorkflow1)
         self.registry.register("workflow2", TestWorkflow2)

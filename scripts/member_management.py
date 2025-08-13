@@ -73,7 +73,7 @@ class MemberManager:
             if len(parts) != 3:
                 return {'valid': False, 'reason': '格式错误'}
             
-            level_code, expiry_str, random_part = parts
+            level_code, expiry_str, _ = parts
             
             # 验证等级代码
             level_map = {v['code']: k for k, v in self.member_levels.items()}

@@ -5,9 +5,8 @@
 """
 
 import re
-import os
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import List, Dict
 
 class SecurityChecker:
     def __init__(self, project_root: str = "."):
