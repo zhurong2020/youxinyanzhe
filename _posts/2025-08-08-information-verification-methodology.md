@@ -407,7 +407,18 @@ toc_sticky: true
 
 ## 🎧 播客版本
 
-[播客版本将在发布后更新]
+<div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000;">
+  <iframe src='https://www.youtube.com/embed/n9y3mQDOKpc?rel=0&showinfo=0&color=white&iv_load_policy=3' 
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+          frameborder='0' 
+          allowfullscreen>
+  </iframe>
+</div>
+
+**标题**: [拨开信息迷雾：武大图书馆事件下的信息核实与批判性思考指南](https://www.youtube.com/watch?v=n9y3mQDOKpc)  
+**平台**: YouTube | **类型**: 音频播客 | **隐私**: 仅限会员链接访问
+
+> 💡 **提示**: 此视频设为"非公开"状态，只有通过本站链接才能访问，保护会员专享内容。
 
 
 *注：本文中涉及的具体事实均基于公开信息整理，所有链接和引用均来自公开渠道，读者在参考时仍需根据最新情况进行核实。*
