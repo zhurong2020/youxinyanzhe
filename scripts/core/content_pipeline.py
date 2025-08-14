@@ -8,7 +8,7 @@ import frontmatter
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.console import Console
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional, Tuple, Any
 from datetime import datetime
 # google.generativeai导入移动到AI处理器中
 from google.generativeai.client import configure
