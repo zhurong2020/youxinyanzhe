@@ -47,7 +47,11 @@ toc_sticky: true
   </iframe>
 </div>
 
-**📻 音频说明**: [拨开信息迷雾：武大图书馆事件下的信息核实与批判性思考指南](https://www.youtube.com/watch?v=n9y3mQDOKpc) | **注意**：这是纯音频内容，YouTube视频中仅包含音频，没有视觉内容 | **隐私保护**：视频设为非公开状态，仅通过本链接访问
+**📻 音频获取方式**: 
+- **在线播放**: [YouTube播客](https://www.youtube.com/watch?v=n9y3mQDOKpc)（需要科学上网）
+- **离线下载**: [百度网盘](https://pan.baidu.com/s/1vRCLI-sVCXxrWJEyCOuu5g?pwd=grrv)（提取码: grrv）- **限年度会员访问**
+
+**注意**：这是纯音频内容，YouTube视频中仅包含音频，没有视觉内容 | **隐私保护**：视频设为非公开状态，仅通过本链接访问
 
 ---
 
@@ -458,10 +462,17 @@ toc_sticky: true
 
 ---
 
-*其它参考资料：*
+## 📦 会员专享资源
+
+**🎧 音频资源**（年度会员专享）：
+- **播客音频下载**: [百度网盘](https://pan.baidu.com/s/1vRCLI-sVCXxrWJEyCOuu5g?pwd=grrv)（提取码: grrv）
+- **格式**: MP3，7.2MB，7分25秒高品质音频
+- **内容**: Notebook LM生成的专业播客导读
+
+**📚 延伸资料**：
 - [知乎上小可爱游记发表的观点](https://www.zhihu.com/question/1933155274547499096/answer/1935448108264821773)
 - 本文中提及的所有官方文件截图、法院判决书、学校通报截图及其它图片等打包资料
-[相关图片资料百度网盘下载](https://pan.baidu.com/s/1KG6I8YGGWkVv86z7xkyBDg?pwd=vct6)
+- [相关图片资料百度网盘下载](https://pan.baidu.com/s/1KG6I8YGGWkVv86z7xkyBDg?pwd=vct6)
 
 
 *注：本文中涉及的具体事实均基于公开信息整理，所有链接和引用均来自公开渠道，读者在参考时仍需根据最新情况进行核实。*
