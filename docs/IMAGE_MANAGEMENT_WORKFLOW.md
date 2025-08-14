@@ -4,10 +4,28 @@
 
 ## ⚠️ 重要更新 (2025-08-14)
 
+### OneDrive图片链接格式优化 🔧
+- ✅ **修复图片显示问题** - 转换为SharePoint直接下载链接格式
+- ✅ **最佳实践确立** - 使用`_layouts/15/download.aspx?share=TOKEN`格式
+- ✅ **企业账户优化** - 专门适配企业Microsoft 365账户限制
+- ✅ **长期稳定性** - 选择永久有效且可直接嵌入的链接格式
+
+### 图片链接格式说明
+```
+❌ 之前使用: https://domain/:i:/g/personal/user/TOKEN (预览链接，需认证)
+✅ 现在使用: https://domain/personal/user/_layouts/15/download.aspx?share=TOKEN (直接下载)
+
+优势:
+- 可直接嵌入<img>标签
+- 无需用户认证
+- 长期稳定有效  
+- 适合博客图片展示
+```
+
 ### 企业账户适配优化
-- ✅ **企业账户兼容性** - 优化为企业Microsoft 365账户的view+anonymous分享模式
-- ✅ **避免embed模式** - 企业账户不支持embed+anonymous，使用view+anonymous替代
-- ✅ **配置自动检测** - 系统自动检测账户类型并选择最佳分享方式
+- ✅ **企业账户兼容性** - 优化为企业Microsoft 365账户的SharePoint直接下载模式
+- ✅ **避免embed模式** - 企业账户不支持embed+anonymous，使用直接下载替代
+- ✅ **智能链接生成** - 自动选择最适合博客展示的链接格式
 
 ### 新增功能 (2025-08-11)
 - ✅ **修复图片渲染问题** - OneDrive链接现在生成可直接嵌入Jekyll的图片URL
@@ -19,6 +37,9 @@
 - `enhanced_onedrive_processor.py` - 增强处理器(包含回退+备份)
 - `restore_local_image_links.py` - OneDrive链接恢复为本地链接
 - `cleanup_onedrive_images.py` - 安全清理OneDrive文件和记录
+
+### 📋 相关文档
+- **[OneDrive图片链接最佳实践指南](ONEDRIVE_IMAGE_URL_BEST_PRACTICES.md)** - 详细分析各种链接格式的特点和使用建议
 
 ## 工作流程概览
 
