@@ -14,7 +14,7 @@ import re
 
 # 添加项目根目录到 Python 路径
 project_root = Path(__file__).parent.parent.parent
-sys.path.append(str(project_root))
+sys.path.insert(0, str(project_root))
 
 class DraftFormatter:
     """草稿格式化器"""
@@ -30,8 +30,13 @@ class DraftFormatter:
             from scripts.core.content_pipeline import ContentPipeline
             self.content_pipeline = ContentPipeline()
             self.unified_check_available = True
-        except ImportError:
-            print("⚠️ ContentPipeline不可用，使用基础检查")
+            print("✅ 统一内容质量检查系统已启用")
+        except ImportError as e:
+            print(f"⚠️ ContentPipeline不可用，使用基础检查 (原因: {e})")
+            self.content_pipeline = None
+            self.unified_check_available = False
+        except Exception as e:
+            print(f"⚠️ 内容质量检查系统初始化失败: {e}")
             self.content_pipeline = None
             self.unified_check_available = False
         
@@ -692,6 +697,36 @@ class DraftFormatter:
         print(f"   标签: {', '.join(front_matter['tags'])}")
         print(f"   摘要: {front_matter['excerpt']}")
         print(f"   内容长度: {len(final_content)} 字符")
+        
+        # 执行统一的内容质量检查
+        if self.unified_check_available:
+            print(f"\n🔍 正在进行内容质量检查...")
+            check_results = self.content_pipeline.comprehensive_content_check(
+                output_file, auto_fix=True
+            )
+            
+            if check_results['check_passed']:
+                print("✅ 内容质量检查通过！")
+            else:
+                print("⚠️ 发现内容质量问题：")
+                
+                # 显示自动修复的问题
+                if check_results['auto_fixes_applied']:
+                    print(f"🔧 已自动修复：")
+                    for fix in check_results['auto_fixes_applied']:
+                        print(f"   • {fix}")
+                
+                # 显示需要手动处理的问题
+                if check_results['manual_fixes_needed']:
+                    print(f"\n💡 需要手动处理的问题：")
+                    for item in check_results['manual_fixes_needed']:
+                        print(f"   • {item['issue']}")
+                        for suggestion in item['suggestions']:
+                            print(f"     {suggestion}")
+                
+                print(f"\n📋 建议：使用 '2. 内容规范化处理' → '5. 查看内容质量检查' 了解详情")
+        else:
+            print("\n💡 提示：安装完整依赖可启用高级内容质量检查")
         
         return output_file
 
