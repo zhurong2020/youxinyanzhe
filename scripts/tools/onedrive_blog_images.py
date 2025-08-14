@@ -2,6 +2,11 @@
 """
 OneDrive博客图床自动化系统
 基于Microsoft Graph API实现博客图片自动上传和链接替换
+
+注意：
+- 企业Microsoft 365账户默认使用view+anonymous分享模式
+- 个人账户支持embed+anonymous模式，企业账户不支持
+- 配置文件中的links.type设置决定分享方式
 """
 
 import re
@@ -391,20 +396,15 @@ class OneDriveUploadManager:
             raise Exception(f"Failed to create sharing link: {response.text}")
     
     def get_direct_image_url(self, item_id: str) -> str:
-        """获取可直接嵌入Jekyll的图片链接"""
+        """获取可直接嵌入Jekyll的图片链接 - 优先使用view+anonymous分享模式"""
         try:
-            # 方法1: 优先使用永久分享链接转换为embed格式 (无临时令牌，更持久)
+            # 方法1: 使用view+anonymous分享链接 (适用于企业账户，永久有效)
             sharing_link = self.get_sharing_link(item_id, 'view')
-            embed_link = self.convert_to_embed_link(sharing_link)
-            if embed_link and embed_link != sharing_link:
-                logger.info("Using permanent embed link (no temp tokens)")
-                return embed_link
-            else:
-                logger.info("Using permanent sharing link (no temp tokens)")
-                return sharing_link
+            logger.info("Using view+anonymous sharing link (enterprise account compatible)")
+            return sharing_link
             
         except Exception as e:
-            logger.warning(f"Failed to get sharing link, trying direct download: {e}")
+            logger.warning(f"Failed to get view sharing link, trying direct download: {e}")
             
             try:
                 # 方法2: 回退到直接下载链接 (包含临时令牌，会过期)
@@ -438,7 +438,12 @@ class OneDriveUploadManager:
                 raise Exception(f"Could not generate any valid image URL: {e}, {e2}")
     
     def convert_to_embed_link(self, share_url: str, width: int = 800) -> str:
-        """将OneDrive分享链接转换为嵌入链接"""
+        """将OneDrive分享链接转换为嵌入链接
+        
+        注意：企业Microsoft 365账户不支持embed+anonymous模式，
+        因此此函数主要用于个人账户或特殊情况的链接转换。
+        企业账户建议使用view+anonymous分享模式。
+        """
         try:
             # 提取资源ID和认证密钥
             if '1drv.ms' in share_url:
@@ -727,20 +732,17 @@ class MarkdownImageProcessor:
                     logger.info(f"Uploading {local_path} to OneDrive...")
                     upload_result = self.uploader.upload_file(local_path, remote_path)
                     
-                    # 获取直接图片链接(优先)或分享链接(备用)
+                    # 获取view+anonymous分享链接
                     share_link = None
                     try:
-                        direct_link = self.uploader.get_direct_image_url(upload_result['id'])
-                        embed_link = direct_link
-                        share_link = direct_link  # 记录实际使用的链接
-                        logger.info(f"Using direct image URL: {direct_link[:100]}...")
+                        share_link = self.uploader.get_direct_image_url(upload_result['id'])
+                        embed_link = share_link  # 直接使用view+anonymous链接，不进行embed转换
+                        logger.info(f"Using view+anonymous sharing URL: {share_link[:100]}...")
                     except Exception as e:
-                        logger.warning(f"Direct link failed, using share link: {e}")
+                        logger.warning(f"Failed to get sharing link: {e}")
+                        # 如果主要方法失败，回退到基础分享链接
                         share_link = self.uploader.get_sharing_link(upload_result['id'])
-                        embed_link = self.uploader.convert_to_embed_link(
-                            share_link, 
-                            self.config['links']['width']
-                        )
+                        embed_link = share_link  # 不进行embed转换，保持原始分享链接
                     
                     # 添加到索引记录
                     if self.index:
@@ -765,7 +767,7 @@ class MarkdownImageProcessor:
                     processed_count += 1
                     
                     # 处理本地文件（备份到项目临时目录，可选删除）
-                    self._handle_local_file_after_upload(local_path, upload_result['remote_path'])
+                    self._handle_local_file_after_upload(local_path, remote_path)
                     
                     logger.info(f"✅ Processed image {i}/{len(local_images)}: {Path(local_path).name}")
                     

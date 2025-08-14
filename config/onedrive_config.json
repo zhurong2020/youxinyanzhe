@@ -38,7 +38,8 @@
     "max_search_depth": 3
   },
   "links": {
-    "type": "embed",
+    "type": "view",
+    "scope": "anonymous", 
     "width": 800,
     "height": null,
     "quality": "auto"
