@@ -632,6 +632,104 @@ class ContentPipeline:
         
         return suggestions
     
+    def comprehensive_content_check(self, file_path: Path, auto_fix: bool = False) -> Dict[str, Any]:
+        """
+        统一的内容质量检查和修复接口
+        
+        Args:
+            file_path: 要检查的文件路径
+            auto_fix: 是否自动修复可修复的问题
+            
+        Returns:
+            检查结果字典，包含问题列表、修复状态等
+        """
+        results = {
+            'file_path': str(file_path),
+            'issues': [],
+            'auto_fixes_applied': [],
+            'manual_fixes_needed': [],
+            'check_passed': False,
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        try:
+            # 1. 执行完整的草稿问题检查
+            issues = self.check_draft_issues(file_path)
+            results['issues'] = issues
+            
+            if not issues:
+                results['check_passed'] = True
+                self.log(f"✅ 内容质量检查通过: {file_path.name}", level="info")
+                return results
+            
+            # 2. 尝试自动修复
+            if auto_fix:
+                # 读取文件内容
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                # 自动修复excerpt缺失
+                excerpt_issues = [issue for issue in issues if "缺少excerpt字段" in issue]
+                if excerpt_issues:
+                    if self._auto_generate_excerpt_if_missing(file_path, content):
+                        results['auto_fixes_applied'].append("自动生成excerpt字段")
+                        # 重新读取更新后的内容
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            content = f.read()
+                
+                # 重新检查，更新问题列表
+                updated_issues = self.check_draft_issues(file_path)
+                results['issues'] = updated_issues
+                
+                if not updated_issues:
+                    results['check_passed'] = True
+            
+            # 3. 分类剩余问题
+            for issue in results['issues']:
+                if any(keyword in issue for keyword in ["excerpt", "more", "摘要"]):
+                    # 摘要相关问题需要手动处理
+                    results['manual_fixes_needed'].append({
+                        'issue': issue,
+                        'category': 'summary',
+                        'suggestions': self._get_summary_fix_suggestions([issue])
+                    })
+                elif "图片" in issue:
+                    # 图片相关问题
+                    results['manual_fixes_needed'].append({
+                        'issue': issue,
+                        'category': 'images',
+                        'suggestions': ["使用OneDrive图床管理处理图片路径"]
+                    })
+                elif any(keyword in issue for keyword in ["格式", "分页", "长度"]):
+                    # 格式相关问题
+                    results['manual_fixes_needed'].append({
+                        'issue': issue,
+                        'category': 'format',
+                        'suggestions': ["使用内容规范化处理修复格式问题"]
+                    })
+                else:
+                    # 其他问题
+                    results['manual_fixes_needed'].append({
+                        'issue': issue,
+                        'category': 'other',
+                        'suggestions': ["需要手动检查和修复"]
+                    })
+            
+            # 4. 记录处理结果
+            if results['auto_fixes_applied']:
+                self.log(f"🔧 自动修复完成: {', '.join(results['auto_fixes_applied'])}", level="info")
+            
+            if results['manual_fixes_needed']:
+                self.log(f"⚠️ 需要手动处理 {len(results['manual_fixes_needed'])} 个问题", level="warning")
+            else:
+                results['check_passed'] = True
+                
+        except Exception as e:
+            self.log(f"❌ 内容质量检查异常: {str(e)}", level="error")
+            results['issues'].append(f"检查过程异常: {str(e)}")
+        
+        return results
+    
     def get_preprocessing_suggestions(self, issues: List[str]) -> List[str]:
         """
         根据问题提供预处理建议

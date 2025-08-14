@@ -25,6 +25,16 @@ class DraftFormatter:
         self.drafts_dir = self.project_root / "_drafts"
         self.config_dir = self.project_root / "config"
         
+        # 初始化内容质量检查管道
+        try:
+            from scripts.core.content_pipeline import ContentPipeline
+            self.content_pipeline = ContentPipeline()
+            self.unified_check_available = True
+        except ImportError:
+            print("⚠️ ContentPipeline不可用，使用基础检查")
+            self.content_pipeline = None
+            self.unified_check_available = False
+        
         # 默认分类映射
         self.category_mapping = {
             '认知': 'cognitive-upgrade',
