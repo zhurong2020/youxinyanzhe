@@ -222,7 +222,7 @@ toc_sticky: true
 
 ![生活组fatieneirong](https://7fp1fj-my.sharepoint.com//personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EeVxcoU8eKdDr9GQLGIfI6QB_ot8BOtpTW_7bp_r72ONwg)
 
-平心而论，即便一方真有过错，这样有组织地放大事件，引导舆论，真的公平吗？或者针对对某一方有帮助吗？我甚至觉得，正因为如此，反而现在肖同学承受了原本不该有的反噬。
+平心而论，即便一方真有过错，这样有组织地放大事件，引导舆论，真的公平吗？或者真的会对肖同学有帮助吗？我甚至觉得，正因为如此，反而现在肖同学承受了原本不该有的反噬。
 
 有知乎的网友这样评价：
 
