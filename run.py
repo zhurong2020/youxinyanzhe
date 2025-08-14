@@ -3720,7 +3720,7 @@ def handle_onedrive_images_menu(pipeline):
             print("📊 图片处理统计...")
             
             # 检查日志文件
-            log_file = Path("logs/onedrive_blog_images.log")
+            log_file = Path(".build/logs/onedrive_blog_images.log")
             if log_file.exists():
                 try:
                     with open(log_file, 'r', encoding='utf-8') as f:
