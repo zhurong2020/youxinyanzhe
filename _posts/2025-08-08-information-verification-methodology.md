@@ -27,13 +27,15 @@ toc_label: 本页内容
 toc_sticky: true
 ---
 
+在信息爆炸的时代，如何在纷繁复杂的观点中找到真相？本文以武汉大学图书馆事件为例，展示系统性的信息核实方法。
+
+<!-- more -->
+
 ## 引言：当真相被情绪淹没
 
 在社交媒体主导的信息时代，每当一起社会事件爆发，我们往往被铺天盖地的观点、猜测、传言所包围。武汉大学图书馆事件就是一个典型案例——从2023年的性骚扰指控，到2025年法院判决的反转，再到学术诚信质疑，这起事件在近两年间经历了多次舆论反转。
 
 作为信息接受者，我们如何在纷繁复杂的信息中找到真相？本文将以这起事件为例，探讨在信息爆炸时代如何系统性地获取、核实和整合信息，最终形成对事件的完整认知。
-
-<!-- more -->
 
 ![xunzhaozhenxiang](https://7fp1fj-my.sharepoint.com//personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EZTJqMd_2oFFg5kCZ10q_Z0BwxxWT4--XB3fv945p2QiuQ)
 *此图为AI配图*
