@@ -469,6 +469,10 @@ class ContentPipeline:
             if 'excerpt:' not in content and content.strip().startswith('---'):
                 issues.append("📄 缺少摘要字段 (excerpt) 影响SEO")
             
+            # 检查摘要长度规范（新增）
+            summary_issues = self._check_summary_lengths(content)
+            issues.extend(summary_issues)
+            
             # 4. 检查内容质量
             clean_content = content.replace('---', '').replace('<!-- more -->', '')
             content_lines = [line.strip() for line in clean_content.split('\n') if line.strip()]
@@ -499,6 +503,134 @@ class ContentPipeline:
             issues.append(f"❌ 文件读取错误: {str(e)}")
         
         return issues
+    
+    def _clean_content_for_length_check(self, content: str) -> str:
+        """清理内容用于长度检查，移除Markdown语法标记"""
+        import re
+        clean = re.sub(r'!\[[^\]]*\]\([^)]*\)', '', content)  # 图片
+        clean = re.sub(r'\[[^\]]*\]\([^)]*\)', '', clean)     # 链接
+        clean = re.sub(r'`[^`]*`', '', clean)                 # 内联代码
+        clean = re.sub(r'```[^`]*```', '', clean, flags=re.DOTALL)  # 代码块
+        clean = re.sub(r'^#+\s*', '', clean, flags=re.MULTILINE)    # 标题
+        clean = re.sub(r'^\s*[-*+]\s*', '', clean, flags=re.MULTILINE)  # 列表
+        clean = re.sub(r'^\s*>\s*', '', clean, flags=re.MULTILINE)      # 引用
+        clean = re.sub(r'\*\*([^*]*)\*\*', r'\1', clean)     # 粗体
+        clean = re.sub(r'\*([^*]*)\*', r'\1', clean)         # 斜体
+        clean = re.sub(r'~~([^~]*)~~', r'\1', clean)         # 删除线
+        return clean
+    
+    def _extract_body_before_more(self, content: str) -> str:
+        """提取Front Matter后到<!-- more -->之间的内容"""
+        if content.strip().startswith('---'):
+            parts = content.split('---', 2)
+            if len(parts) >= 3:
+                body_content = parts[2].strip()
+                more_pos = body_content.find('<!-- more -->')
+                if more_pos != -1:
+                    return body_content[:more_pos].strip()
+        return ""
+    
+    def _check_summary_lengths(self, content: str) -> List[str]:
+        """检查excerpt字段和<!-- more -->前内容的长度规范"""
+        issues = []
+        
+        try:
+            # 1. 检查excerpt字段长度
+            if content.strip().startswith('---'):
+                import frontmatter
+                post = frontmatter.loads(content)
+                excerpt = post.metadata.get('excerpt', '')
+                
+                if not excerpt:
+                    issues.append("📝 缺少excerpt字段，将使用Gemini自动生成")
+                else:
+                    excerpt_len = len(excerpt.strip())
+                    if excerpt_len < 40:
+                        issues.append(f"📏 excerpt过短({excerpt_len}字符)，建议50字符左右")
+                    elif excerpt_len > 70:
+                        issues.append(f"📏 excerpt过长({excerpt_len}字符)，建议50字符左右")
+            
+            # 2. 检查<!-- more -->前内容长度
+            more_pos = content.find('<!-- more -->')
+            if more_pos != -1:
+                before_more = self._extract_body_before_more(content)
+                if before_more:
+                    clean_content = self._clean_content_for_length_check(before_more)
+                    clean_length = len(clean_content.strip())
+                    
+                    if clean_length < 40:
+                        issues.append(f"📏 <!-- more -->前内容过短({clean_length}字符)，建议50字符左右")
+                    elif clean_length > 70:
+                        issues.append(f"📏 <!-- more -->前内容过长({clean_length}字符)，建议50字符左右")
+        
+        except Exception as e:
+            self.log(f"检查摘要长度时出错: {str(e)}", level="error")
+        
+        return issues
+    
+    def _auto_generate_excerpt_if_missing(self, draft_path: Path, content: str) -> bool:
+        """如果缺少excerpt字段，自动生成并更新文件"""
+        try:
+            if not content.strip().startswith('---'):
+                return False
+                
+            import frontmatter
+            post = frontmatter.loads(content)
+            
+            if 'excerpt' not in post.metadata or not post.metadata['excerpt']:
+                self.log("检测到缺少excerpt，正在使用Gemini生成...", level="info", force=True)
+                print("🤖 检测到缺少excerpt，正在使用Gemini生成...")
+                
+                # 调用AI生成excerpt
+                if self.ai_processor:
+                    generated_excerpt = self.ai_processor.generate_excerpt(content)
+                    if generated_excerpt and generated_excerpt != "这是一篇有价值的文章，值得阅读。":
+                        # 更新front matter
+                        post.metadata['excerpt'] = generated_excerpt
+                        
+                        # 重新构建文件内容
+                        updated_content = frontmatter.dumps(post)
+                        
+                        # 写回文件
+                        with open(draft_path, 'w', encoding='utf-8') as f:
+                            f.write(updated_content)
+                        
+                        print(f"✅ 已自动生成excerpt: {generated_excerpt}")
+                        self.log(f"✅ 自动生成excerpt成功: {generated_excerpt}", level="info", force=True)
+                        return True
+                    else:
+                        print("❌ Gemini excerpt生成失败，请手动添加")
+                        self.log("❌ Gemini excerpt生成失败", level="warning")
+                        return False
+                else:
+                    print("❌ AI处理器不可用，无法生成excerpt")
+                    self.log("❌ AI处理器不可用，无法生成excerpt", level="warning")
+                    return False
+            
+            return True
+            
+        except Exception as e:
+            print(f"❌ excerpt生成异常: {str(e)}")
+            self.log(f"❌ excerpt生成异常: {str(e)}", level="error")
+            return False
+    
+    def _get_summary_fix_suggestions(self, issues: List[str]) -> List[str]:
+        """根据摘要问题提供修复建议"""
+        suggestions = []
+        
+        for issue in issues:
+            if "excerpt过短" in issue:
+                suggestions.append("💡 建议: 丰富excerpt描述，或使用Gemini重新生成")
+            elif "excerpt过长" in issue:
+                suggestions.append("💡 建议: 精简excerpt内容，保留核心要点")
+            elif "<!-- more -->前内容过短" in issue:
+                suggestions.append("💡 建议: 在<!-- more -->前添加背景说明或引言")
+            elif "<!-- more -->前内容过长" in issue:
+                suggestions.append("💡 建议: 将部分内容移至<!-- more -->后，保留精华开头")
+            elif "缺少excerpt" in issue:
+                suggestions.append("💡 系统将自动调用Gemini生成excerpt")
+        
+        return suggestions
     
     def get_preprocessing_suggestions(self, issues: List[str]) -> List[str]:
         """

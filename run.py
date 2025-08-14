@@ -108,6 +108,19 @@ def main():
         # 草稿预检机制 - 检查是否有需要预处理的问题
         pipeline.log("正在进行草稿质量预检...", level="info", force=True)
         draft_issues = pipeline.check_draft_issues(draft)
+        
+        # 自动处理excerpt缺失问题
+        excerpt_missing_issues = [issue for issue in draft_issues if "缺少excerpt字段" in issue]
+        if excerpt_missing_issues:
+            print("\n🤖 检测到缺少excerpt，正在自动生成...")
+            with open(draft, 'r', encoding='utf-8') as f:
+                current_content = f.read()
+            
+            if pipeline._auto_generate_excerpt_if_missing(draft, current_content):
+                # 重新检查问题列表，移除已解决的excerpt问题
+                draft_issues = pipeline.check_draft_issues(draft)
+                print("🔄 已重新检查草稿质量...")
+        
         if draft_issues:
             print(f"\n⚠️ 发现草稿质量问题：")
             for issue in draft_issues:
@@ -120,6 +133,13 @@ def main():
             
             if any("格式" in issue or "分页" in issue or "长度" in issue for issue in draft_issues):
                 print(f"   3. 使用 '2. 内容规范化处理' 来修复格式问题")
+            
+            # 添加摘要相关建议
+            summary_issues = [issue for issue in draft_issues if any(keyword in issue for keyword in ["excerpt", "more", "摘要"])]
+            if summary_issues:
+                summary_suggestions = pipeline._get_summary_fix_suggestions(summary_issues)
+                for suggestion in summary_suggestions:
+                    print(f"   {suggestion}")
                 
             print(f"\n💡 推荐工作流程：")
             print(f"   草稿预处理 → 2.内容规范化处理 → 1.智能内容发布")
