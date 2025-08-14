@@ -9,8 +9,24 @@ import logging
 from pathlib import Path
 from datetime import datetime
 
-# 添加项目路径
-project_root = Path(__file__).parent.parent.parent.parent
+# 添加项目路径 - 智能解析
+def find_project_root():
+    """智能查找项目根目录"""
+    current = Path(__file__).resolve()
+    
+    # 向上查找包含run.py和scripts目录的目录
+    for path in [current] + list(current.parents):
+        if (path / 'run.py').exists() and (path / 'scripts').exists():
+            return path
+    
+    # 后备：使用当前工作目录
+    if (Path.cwd() / 'run.py').exists():
+        return Path.cwd()
+    
+    # 最后后备：传统计算
+    return Path(__file__).parent.parent.parent
+
+project_root = find_project_root()
 sys.path.append(str(project_root))
 
 # 配置日志

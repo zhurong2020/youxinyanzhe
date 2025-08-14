@@ -11,7 +11,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 
 # 添加项目根目录到 Python 路径
-project_root = Path(__file__).parent.parent.parent
+project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root))
 
 def create_valid_token_structure():

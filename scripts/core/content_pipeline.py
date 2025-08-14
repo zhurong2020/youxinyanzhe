@@ -41,7 +41,7 @@ class ContentPipeline:
         """
         self.verbose = verbose
         self.logger = logging.getLogger("ContentPipeline")
-        self.project_root = Path(__file__).parent.parent.parent
+        self.project_root = Path(__file__).parent.parent
         
         # 初始化API状态
         self.api_available = True

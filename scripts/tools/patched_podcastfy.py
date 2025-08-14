@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 import re
 
 # 加载环境变量
-project_root = Path(__file__).parent.parent.parent
+project_root = Path(__file__).parent.parent
 load_dotenv(project_root / '.env')
 
 # 导入并修复gradio_client，移除未使用的re导入以清理代码

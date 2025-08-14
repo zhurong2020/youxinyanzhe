@@ -16,7 +16,7 @@ import re
 from urllib.parse import urlparse, parse_qs
 
 # 添加路径以导入本地模块
-sys.path.append(str(Path(__file__).parent))
+sys.path.append(str(Path(__file__).parent.parent))
 
 try:
     from onedrive_blog_images import BlogImageManager
