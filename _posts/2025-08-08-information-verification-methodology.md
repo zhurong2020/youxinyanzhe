@@ -403,7 +403,7 @@ toc_sticky: true
 *其它参考资料：*
 - [知乎上小可爱游记发表的观点](https://www.zhihu.com/question/1933155274547499096/answer/1935448108264821773)
 - 本文中提及的所有官方文件截图、法院判决书、学校通报截图及其它图片等打包资料
-
+[相关图片资料百度网盘下载](https://pan.baidu.com/s/1KG6I8YGGWkVv86z7xkyBDg?pwd=vct6)
 
 ## 🎧 播客版本
 
