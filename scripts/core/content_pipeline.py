@@ -1582,8 +1582,26 @@ class ContentPipeline:
             
             # Git 操作
             try:
-                # 先拉取最新代码
-                subprocess.run(["git", "pull"], check=True)
+                # 检查当前分支是否有上游跟踪分支
+                try:
+                    result = subprocess.run(
+                        ["git", "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"],
+                        capture_output=True,
+                        text=True,
+                        check=False
+                    )
+                    has_upstream = result.returncode == 0 and result.stdout.strip()
+                except:
+                    has_upstream = False
+                
+                # 如果有上游分支，先拉取最新代码
+                if has_upstream:
+                    try:
+                        subprocess.run(["git", "pull"], check=True)
+                    except subprocess.CalledProcessError:
+                        self.log("拉取代码失败，继续发布流程", level="warning")
+                else:
+                    self.log("当前分支无上游跟踪分支，跳过拉取", level="info")
                 
                 # 添加文件
                 subprocess.run(["git", "add", str(publish_path)], check=True)
@@ -1602,8 +1620,20 @@ class ContentPipeline:
                 # 提交更改
                 subprocess.run(["git", "commit", "-m", f"发布: {draft_path.name}"], check=True)
                 
-                # 推送
-                subprocess.run(["git", "push"], check=True)
+                # 推送（如果无上游分支，自动设置）
+                if has_upstream:
+                    subprocess.run(["git", "push"], check=True)
+                else:
+                    # 获取当前分支名
+                    current_branch = subprocess.run(
+                        ["git", "branch", "--show-current"],
+                        capture_output=True,
+                        text=True,
+                        check=True
+                    ).stdout.strip()
+                    
+                    # 设置上游分支并推送
+                    subprocess.run(["git", "push", "--set-upstream", "origin", current_branch], check=True)
                 self.log("✅ 已推送到 GitHub", force=True)
                 return True
                 
