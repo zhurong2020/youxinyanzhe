@@ -1377,6 +1377,19 @@ def handle_system_check_menu(pipeline):
         except Exception as e:
             print(f"❌ GitHub Token检查失败: {e}")
         
+        print("-" * 40)
+        
+        # 检查YouTube OAuth状态
+        try:
+            script_path = Path("scripts/tools/checks/check_youtube_oauth.py")
+            result = execute_script_with_logging(
+                pipeline, script_path, [], 
+                "综合检查-YouTube OAuth"
+            )
+            print(result.stdout)
+        except Exception as e:
+            print(f"❌ YouTube OAuth检查失败: {e}")
+        
         print("\n" + "-"*40)
         
         # 检查ElevenLabs配额
@@ -3016,10 +3029,11 @@ def handle_youtube_upload_menu(pipeline):
     print("1. 上传音频文件到YouTube")
     print("2. 查看assets/audio目录文件")
     print("3. 检查配置状态")
-    print("4. 使用说明")
+    print("4. YouTube OAuth管理")
+    print("5. 使用说明")
     print("0. 返回主菜单")
     
-    sub_choice = input("\n请输入选项 (1-4/0): ").strip()
+    sub_choice = input("\n请输入选项 (1-5/0): ").strip()
     pipeline.log(f"YouTube音频上传 - 用户选择: {sub_choice}", level="info", force=True)
     
     if sub_choice == "1":
@@ -3212,6 +3226,10 @@ def handle_youtube_upload_menu(pipeline):
             pipeline.log(f"YouTube音频上传 - 配置检查失败: {e}", level="error", force=True)
             
     elif sub_choice == "4":
+        # YouTube OAuth管理
+        handle_youtube_oauth_menu(pipeline)
+        
+    elif sub_choice == "5":
         # 使用说明
         print("\n📖 YouTube音频上传使用说明")
         print("="*50)
@@ -4710,6 +4728,265 @@ def handle_onedrive_date_download_menu(pipeline):
         
         if choice in ["1", "2", "3", "4"]:
             input("\n按Enter键继续...")
+
+
+def handle_youtube_oauth_menu(pipeline):
+    """YouTube OAuth认证管理菜单"""
+    print("\n" + "="*50)
+    print("🔐 YouTube OAuth认证管理")
+    print("="*50)
+    print("📋 功能说明：")
+    print("   • 管理YouTube上传所需的OAuth2认证")
+    print("   • 检查认证状态和token有效性")
+    print("   • 重新生成或修复认证问题")
+    print("   • 提供详细的配置指导")
+    
+    # 检查当前OAuth状态
+    try:
+        from pathlib import Path
+        import json
+        
+        credentials_file = Path("config/youtube_oauth_credentials.json")
+        token_file = Path("config/youtube_oauth_token.json")
+        
+        # 简单状态检查
+        credentials_exists = credentials_file.exists()
+        token_exists = token_file.exists()
+        
+        # 检查token是否是占位符
+        token_valid = False
+        if token_exists:
+            try:
+                with open(token_file, 'r') as f:
+                    token_data = json.load(f)
+                token_valid = not (token_data.get('token', '').startswith('placeholder_token_'))
+            except:
+                pass
+        
+        print("\n📊 当前OAuth状态:")
+        print(f"   凭据文件: {'✅ 存在' if credentials_exists else '❌ 缺失'}")
+        print(f"   认证Token: {'✅ 有效' if token_valid else '❌ 无效/缺失'}")
+        
+        oauth_ready = credentials_exists and token_valid
+        if oauth_ready:
+            print("🎉 OAuth认证状态: ✅ 完全配置，可以上传")
+        else:
+            print("⚠️  OAuth认证状态: ❌ 需要配置")
+            
+    except Exception as e:
+        print(f"⚠️ 状态检查失败: {e}")
+        oauth_ready = False
+    
+    print("\n请选择操作：")
+    print("1. 检查OAuth认证状态")
+    print("2. 生成新的OAuth授权链接")
+    print("3. 使用授权码完成认证")
+    print("4. 测试YouTube API连接")
+    print("5. 查看OAuth配置文档")
+    print("6. 重置OAuth配置")
+    print("0. 返回上级菜单")
+    
+    choice = input("\n请选择操作 (1-6/0): ").strip()
+    
+    if choice == "1":
+        # 检查OAuth认证状态
+        try:
+            import subprocess
+            result = subprocess.run([
+                "python", "scripts/tools/oauth/check_oauth_status.py"
+            ], capture_output=False, text=True)
+            
+        except Exception as e:
+            print(f"❌ 状态检查失败: {e}")
+            
+    elif choice == "2":
+        # 生成新的OAuth授权链接
+        print("\n🔐 生成OAuth授权链接")
+        print("=" * 40)
+        try:
+            from google_auth_oauthlib.flow import InstalledAppFlow
+            
+            SCOPES = [
+                'https://www.googleapis.com/auth/youtube.readonly',
+                'https://www.googleapis.com/auth/youtube.upload'
+            ]
+            
+            credentials_file = 'config/youtube_oauth_credentials.json'
+            if not Path(credentials_file).exists():
+                print("❌ OAuth凭据文件不存在")
+                print("💡 请先配置Google Cloud OAuth凭据文件")
+                return
+                
+            flow = InstalledAppFlow.from_client_secrets_file(credentials_file, SCOPES)
+            flow.redirect_uri = 'http://localhost:8080'
+            
+            auth_url, _ = flow.authorization_url(prompt='consent', access_type='offline')
+            print("✅ OAuth授权链接已生成")
+            print("\n请访问以下URL完成授权:")
+            print(f"{auth_url}")
+            print("\n📋 操作步骤:")
+            print("1. 复制上面的链接到浏览器打开")
+            print("2. 使用Google账号登录并授权")
+            print("3. 授权后会跳转到localhost:8080页面")
+            print("4. 复制地址栏中'code='后的授权码")
+            print("5. 选择选项3使用授权码完成认证")
+            
+        except Exception as e:
+            print(f"❌ 生成授权链接失败: {e}")
+            
+    elif choice == "3":
+        # 使用授权码完成认证
+        print("\n🔑 使用授权码完成认证")
+        print("=" * 40)
+        
+        auth_code = input("请输入授权码: ").strip()
+        if not auth_code:
+            print("❌ 授权码不能为空")
+            return
+            
+        try:
+            from google_auth_oauthlib.flow import InstalledAppFlow
+            import json
+            
+            SCOPES = [
+                'https://www.googleapis.com/auth/youtube.readonly',
+                'https://www.googleapis.com/auth/youtube.upload'
+            ]
+            
+            credentials_file = 'config/youtube_oauth_credentials.json'
+            token_file = 'config/youtube_oauth_token.json'
+            
+            flow = InstalledAppFlow.from_client_secrets_file(credentials_file, SCOPES)
+            flow.redirect_uri = 'http://localhost:8080'
+            
+            print("📝 正在使用授权码获取访问令牌...")
+            credentials = flow.fetch_token(code=auth_code)
+            
+            # 保存token
+            token_data = json.loads(flow.credentials.to_json())
+            with open(token_file, 'w') as f:
+                json.dump(token_data, f, indent=2)
+            
+            print("✅ OAuth认证完成！")
+            print(f"💾 Token已保存到: {token_file}")
+            print("🎉 现在可以使用YouTube上传功能了")
+            
+        except Exception as e:
+            print(f"❌ 认证失败: {e}")
+            
+    elif choice == "4":
+        # 测试YouTube API连接
+        print("\n🧪 测试YouTube API连接")
+        print("=" * 40)
+        
+        try:
+            from google.oauth2.credentials import Credentials
+            from googleapiclient.discovery import build
+            from google.auth.transport.requests import Request
+            import json
+            
+            token_file = 'config/youtube_oauth_token.json'
+            if not Path(token_file).exists():
+                print("❌ Token文件不存在，请先完成OAuth认证")
+                return
+                
+            with open(token_file, 'r') as f:
+                token_data = json.load(f)
+            
+            creds = Credentials.from_authorized_user_info(token_data)
+            
+            if not creds.valid:
+                if creds.refresh_token:
+                    print("🔄 刷新过期的OAuth令牌...")
+                    creds.refresh(Request())
+                    print("✅ OAuth令牌刷新成功")
+                else:
+                    print("❌ OAuth令牌无效且无法刷新")
+                    return
+            
+            youtube = build('youtube', 'v3', credentials=creds)
+            
+            # 测试API调用
+            channels_response = youtube.channels().list(
+                part='snippet,contentDetails',
+                mine=True
+            ).execute()
+            
+            if channels_response.get('items'):
+                channel = channels_response['items'][0]
+                print("✅ YouTube API连接测试成功")
+                print(f"📺 频道名称: {channel['snippet']['title']}")
+                print(f"🆔 频道ID: {channel['id']}")
+                print("🎉 具备完整的YouTube上传权限")
+            else:
+                print("⚠️ 未找到YouTube频道")
+                
+        except Exception as e:
+            print(f"❌ API连接测试失败: {e}")
+            
+    elif choice == "5":
+        # 查看OAuth配置文档
+        print("\n📖 YouTube OAuth配置文档")
+        print("=" * 50)
+        print("🎯 OAuth2认证配置步骤:")
+        print()
+        print("1️⃣ 创建Google Cloud项目")
+        print("   • 访问: https://console.cloud.google.com/")
+        print("   • 创建新项目或选择现有项目")
+        print("   • 启用YouTube Data API v3")
+        print()
+        print("2️⃣ 创建OAuth2凭据")
+        print("   • 转到 APIs & Services > Credentials")
+        print("   • 点击 Create Credentials > OAuth client ID")
+        print("   • 应用类型选择: Desktop application")
+        print("   • 下载JSON文件到 config/youtube_oauth_credentials.json")
+        print()
+        print("3️⃣ 配置OAuth范围")
+        print("   • YouTube.readonly: 读取频道信息")
+        print("   • YouTube.upload: 上传视频权限")
+        print()
+        print("4️⃣ 完成认证流程")
+        print("   • 选择选项2生成授权链接")
+        print("   • 浏览器中完成Google账号授权")
+        print("   • 选择选项3使用授权码完成认证")
+        print()
+        print("⚠️ 注意事项:")
+        print("   • 确保redirect_uri包含 http://localhost:8080")
+        print("   • 首次认证需要Google账号授权")
+        print("   • Token会自动刷新，无需重复认证")
+        
+    elif choice == "6":
+        # 重置OAuth配置
+        print("\n🔄 重置OAuth配置")
+        print("=" * 40)
+        print("⚠️ 这将删除现有的OAuth Token文件")
+        print("⚠️ 您需要重新完成OAuth认证流程")
+        
+        confirm = input("\n确认重置? (y/N): ").strip().lower()
+        if confirm in ['y', 'yes']:
+            try:
+                token_file = Path("config/youtube_oauth_token.json")
+                if token_file.exists():
+                    token_file.unlink()
+                    print("✅ OAuth Token文件已删除")
+                else:
+                    print("ℹ️ Token文件不存在")
+                    
+                print("🔄 请重新执行OAuth认证流程:")
+                print("   1. 选择选项2生成授权链接")
+                print("   2. 选择选项3使用授权码完成认证")
+                
+            except Exception as e:
+                print(f"❌ 重置失败: {e}")
+        else:
+            print("ℹ️ 操作已取消")
+            
+    elif choice == "0":
+        return
+    else:
+        print("❌ 无效选择，请重新输入")
+    
+    input("\n按Enter键继续...")
 
 
 if __name__ == "__main__":

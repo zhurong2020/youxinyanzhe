@@ -10,7 +10,7 @@ from pathlib import Path
 from datetime import datetime
 
 # 添加项目路径
-project_root = Path(__file__).parent.parent.parent
+project_root = Path(__file__).parent.parent.parent.parent
 sys.path.append(str(project_root))
 
 # 配置日志
