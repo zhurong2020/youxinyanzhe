@@ -8,7 +8,7 @@ comments: true
 date: '2025-08-08'
 excerpt: 探讨在信息爆炸时代如何系统性地获取、核实和整合信息，以武汉大学图书馆事件为例展示完整的求真方法论
 header:
-  teaser: https://7fp1fj-my.sharepoint.com/:i:/g/personal/zhurong_7fp1fj_onmicrosoft_com/ESs_Rp7PqldBgJDta5C4_OYBRqgphimnVhjNKHTnB6aABw
+  teaser: https://7fp1fj-my.sharepoint.com//personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EZTJqMd_2oFFg5kCZ10q_Z0BwxxWT4--XB3fv945p2QiuQ
 last_modified_at: '2025-08-14 09:08:16'
 layout: single
 related: true
