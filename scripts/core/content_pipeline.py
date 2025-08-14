@@ -482,9 +482,30 @@ class ContentPipeline:
             
             # 检查是否有明显的结尾
             if len(content_lines) > 0:
-                last_line = content_lines[-1]
-                if len(last_line) < 20 or not any(punct in last_line for punct in ['。', '？', '！', '.', '?', '!']):
-                    issues.append("📝 文章可能没有合适的结尾段落")
+                # 过滤掉Jekyll格式的结尾行，只检查实际文章内容
+                content_ending_lines = []
+                for line in reversed(content_lines):
+                    # 跳过Jekyll模板、打赏链接、评论提示等格式化内容
+                    if any(pattern in line for pattern in [
+                        '{% ', '%}', '{{', '}}',  # Jekyll液体模板
+                        'GitHub 账号', '发表评论', '请我喝咖啡',  # 标准页脚
+                        '<a href', '<img src', '](http',  # HTML和链接
+                        '💬', '☕', '💰', '🎯'  # 页脚常用emoji
+                    ]):
+                        continue
+                    # 找到实际内容行
+                    content_ending_lines.append(line)
+                    if len(content_ending_lines) >= 3:  # 检查最后3行实际内容
+                        break
+                
+                # 检查最后的实际内容是否有合适的结尾
+                if content_ending_lines:
+                    last_content_line = content_ending_lines[0]
+                    # 降低结尾要求，考虑到有些文章以清单、引用等结尾
+                    if (len(last_content_line) < 15 and 
+                        not any(punct in last_content_line for punct in ['。', '？', '！', '.', '?', '!']) and
+                        not any(ending in last_content_line for ending in ['思考', '总结', '展望', '参考', '资料', '清单'])):
+                        issues.append("📝 文章可能没有合适的结尾段落")
             
             # 5. 检查分类标签
             if content.strip().startswith('---'):
