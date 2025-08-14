@@ -11,14 +11,14 @@ from typing import Dict, Optional, Any
 from datetime import datetime
 
 # 添加项目根目录到Python路径
-project_root = Path(__file__).parent.parent.parent
+project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 class YouTubeLinkMapper:
     """YouTube链接映射管理器"""
     
     def __init__(self):
-        self.project_root = Path(__file__).parent.parent.parent
+        self.project_root = Path(__file__).parent.parent
         self.mapping_file = self.project_root / ".tmp" / "youtube_mappings.json"
         self.mapping_file.parent.mkdir(exist_ok=True)
         self._load_mappings()

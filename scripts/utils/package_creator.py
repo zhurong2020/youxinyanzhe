@@ -34,7 +34,7 @@ class PackageCreator:
         self.logger = logging.getLogger(__name__)
         
         # 项目路径
-        self.project_root = Path(__file__).parent.parent.parent
+        self.project_root = Path(__file__).parent.parent
         self.output_dir = self.project_root / ".tmp/output/packages"
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
@@ -587,7 +587,7 @@ class PackageCreator:
         try:
             # 导入映射管理器
             import sys
-            project_root = Path(__file__).parent.parent.parent
+            project_root = Path(__file__).parent.parent
             sys.path.insert(0, str(project_root))
             from .youtube_link_mapper import YouTubeLinkMapper
             

@@ -8,7 +8,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # 加载环境变量
-project_root = Path(__file__).parent.parent.parent
+project_root = Path(__file__).parent.parent
 load_dotenv(project_root / '.env')
 
 from gradio_client import Client

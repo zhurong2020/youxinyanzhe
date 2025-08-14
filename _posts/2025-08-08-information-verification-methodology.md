@@ -405,7 +405,7 @@ toc_sticky: true
 - 本文中提及的所有官方文件截图、法院判决书、学校通报截图及其它图片等打包资料
 [相关图片资料百度网盘下载](https://pan.baidu.com/s/1KG6I8YGGWkVv86z7xkyBDg?pwd=vct6)
 
-## 🎧 播客版本
+## 🎧 Notebook LM生成的播客版本（仅音频）
 
 <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000;">
   <iframe src='https://www.youtube.com/embed/n9y3mQDOKpc?rel=0&showinfo=0&color=white&iv_load_policy=3' 
