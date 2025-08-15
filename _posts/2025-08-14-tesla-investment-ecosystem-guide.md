@@ -228,22 +228,38 @@ toc_sticky: true
 
 <div class="member-preview-fade" data-target="VIP2">
   <div class="preview-content">
-    <h4>📊 VIP2专享：特斯拉SA专业评级深度解读</h4>
-    <p><strong>最新Seeking Alpha数据显示</strong>：</p>
+    <h4>📊 VIP2专享：特斯拉SA Premium专业数据深度解读</h4>
+    <p><strong>最新Seeking Alpha Premium数据震撼发现</strong>：</p>
     <ul>
-      <li>🎯 <strong>SA Quant评级</strong>：4.2/5 Strong Buy ⬆️ (较上周+0.4)</li>
-      <li>📈 <strong>华尔街一致预期</strong>：目标价区间$180-$350</li>
-      <li>⚡ <strong>评级变化驱动因素</strong>：Q3交付量预期上调...</li>
+      <li>🎯 <strong>评级分歧</strong>：SA分析师2.68/5 vs 华尔街3.34/5（巨大分歧！）</li>
+      <li>📉 <strong>看空比例</strong>：SA分析师49% vs 华尔街21%（几乎2.5倍差距）</li>
+      <li>💰 <strong>估值水平</strong>：PE 198.87倍，验证"乐观边际定价理论"</li>
+      <li>🔥 <strong>独家解读</strong>：James A. Kostohryz《空头犯的致命错误》完整翻译</li>
     </ul>
-    <blockquote>
-      <p>💡 <strong>个人解读</strong>：基于SA Premium数据，特斯拉当前估值相对合理，主要风险来自...</p>
-    </blockquote>
+    
+    <div class="exclusive-insight-preview">
+      <h5>💎 VIP2独家洞察预览</h5>
+      <blockquote>
+        <p><strong>核心发现</strong>：股价永远反映最乐观1%投资者的估值，而非大多数人的平均观点。这解释了为什么专业空头基本面分析正确，但股价预测持续失败...</p>
+        <p><strong>投资启示</strong>：不要等待"合理估值"，因为市场价格永远不会"合理"。关键是理解"乐观边际定价"机制...</p>
+      </blockquote>
+    </div>
+    
+    <div class="professional-data-preview">
+      <h5>📈 SA Premium数据优势</h5>
+      <ul>
+        <li>✅ 47位SA独立分析师 + 47位华尔街机构覆盖</li>
+        <li>✅ $299/年订阅服务的专业数据翻译解读</li>
+        <li>✅ 季节性表现、技术指标深度分析</li>
+        <li>✅ 基于专业数据的投资决策框架</li>
+      </ul>
+    </div>
   </div>
   <div class="fade-overlay">
     <div class="upgrade-prompt">
-      <span class="upgrade-text">🔓 解锁完整SA专业分析和个人投资策略</span>
+      <span class="upgrade-text">🔓 解锁完整SA Premium分析和专业投资策略</span>
       <button class="btn-upgrade" onclick="showUpgradeModal('VIP2')">
-        ¥108/月立即升级
+        ¥108/月获取华尔街级别分析
       </button>
     </div>
   </div>
@@ -251,14 +267,14 @@ toc_sticky: true
 
 <div class="content-progress-tracker">
   <div class="progress-bar">
-    <div class="progress-fill" style="width: 35%"></div>
+    <div class="progress-fill" style="width: 40%"></div>
   </div>
   <div class="progress-labels">
-    <span class="free-label">免费内容 35%</span>
-    <span class="member-label">会员专享 65%</span>
+    <span class="free-label">免费内容 40%</span>
+    <span class="member-label">VIP专享 60%</span>
   </div>
   <p class="upgrade-hint">
-    📊 VIP2月度会员可获取SA Premium数据解读、专业分析翻译等深度内容
+    💎 VIP2月度会员解锁SA Premium专业分析、VIP3获取ARK投资策略、VIP4享受专业咨询服务
   </p>
 </div>
 
@@ -330,47 +346,47 @@ toc_sticky: true
 ---
 
 <div class="member-only-preview" data-level="VIP3">
-  <h4>💼 VIP3专享：Cathie Wood特斯拉投资策略深度解读</h4>
+  <h4>🔥 VIP3专享：ARK Invest完整特斯拉投资策略解读</h4>
   
   <div class="personal-portfolio-preview">
-    <h5>📈 ARK Invest 2025年最新特斯拉操作分析</h5>
+    <h5>📈 Cathie Wood 2025年激进加仓完整时间线</h5>
     
     <div class="interactive-data-table clickable" onclick="showUpgradeModal('VIP3')">
       <table class="portfolio-table">
         <tr>
-          <th>时间</th>
-          <th>操作</th>
-          <th>价格区间</th>
-          <th>持仓变化</th>
-          <th>投资逻辑</th>
+          <th>日期</th>
+          <th>操作金额</th>
+          <th>股数变化</th>
+          <th>市场环境</th>
+          <th>Wood的判断</th>
         </tr>
         <tr>
-          <td><strong>2025-06</strong></td>
-          <td class="blur-text">大幅加仓</td>
-          <td class="blur-text">$325-340</td>
-          <td class="blur-text">+31.8万股</td>
-          <td class="blur-text">Robotaxi启动</td>
+          <td><strong>7月11日</strong></td>
+          <td class="blur-text">$18.7M</td>
+          <td class="blur-text">单次大买</td>
+          <td class="blur-text">股价回调期</td>
+          <td class="blur-text">逢低布局机会</td>
         </tr>
         <tr>
-          <td><strong>2025-07</strong></td>
-          <td class="blur-text">持续买入</td>
-          <td class="blur-text">$310-335</td>
-          <td class="blur-text">+17.9万股</td>
-          <td class="blur-text">FSD数据优势</td>
+          <td><strong>7月15-16日</strong></td>
+          <td class="blur-text">$48.8M</td>
+          <td class="blur-text">151,730股</td>
+          <td class="blur-text">连续2天加仓</td>
+          <td class="blur-text">坚定看好长期</td>
         </tr>
         <tr>
-          <td><strong>当前</strong></td>
-          <td class="blur-text">战略持有</td>
-          <td class="blur-text">平均$315</td>
-          <td class="blur-text">326万股/7.51%</td>
-          <td class="blur-text">AI转型价值</td>
+          <td><strong>7月25日</strong></td>
+          <td class="blur-text">ARKK+ARKQ</td>
+          <td class="blur-text">143,190股</td>
+          <td class="blur-text">多基金协同</td>
+          <td class="blur-text">全线重仓策略</td>
         </tr>
         <tr>
-          <td><strong>目标</strong></td>
-          <td class="blur-text">长期看涨</td>
-          <td class="blur-text">$2,600</td>
-          <td class="blur-text">核心持仓</td>
-          <td class="blur-text">万亿级市场</td>
+          <td><strong>当前持仓</strong></td>
+          <td class="blur-text">$1.055B</td>
+          <td class="blur-text">335万股</td>
+          <td class="blur-text">第一大重仓</td>
+          <td class="blur-text">10.28%权重</td>
         </tr>
       </table>
       <div class="click-overlay">
@@ -381,21 +397,22 @@ toc_sticky: true
   </div>
   
   <div class="trading-insights-preview">
-    <h5>📋 ARK Invest核心投资洞察（VIP3专享）</h5>
+    <h5>🚀 ARK $2,600目标价推导过程（VIP3专享）</h5>
     <ul>
-      <li>✅ <strong>数据优势</strong>：特斯拉500万英里/天 vs Waymo 7万英里/天...</li>
-      <li>✅ <strong>估值模型</strong>：Robotaxi将占企业价值90%的深度分析...</li>
-      <li>✅ <strong>风险评估</strong>：为何ARK在高位($325+)持续加仓？</li>
-      <li>💡 <strong>学习价值</strong>：顶级机构如何做长期价值投资</li>
+      <li>✅ <strong>Robotaxi占比88%</strong>：企业价值分解模型完整推导</li>
+      <li>✅ <strong>Big Ideas 2025</strong>：棋盘后半段指数级增长理论翻译</li>
+      <li>✅ <strong>数据护城河</strong>：特斯拉500万 vs Waymo 7万英里/天对比</li>
+      <li>✅ <strong>颠覆性创新框架</strong>：ARK投资方法论完整学习指南</li>
+      <li>💡 <strong>实战价值</strong>：基于ARK方法论的投资决策检查清单</li>
     </ul>
   </div>
   
   <div class="upgrade-cta-inline">
-    <p>📋 <strong>想学习世界顶级投资机构的完整投资逻辑？</strong></p>
+    <p>🎯 <strong>想学习ARK Invest的完整颠覆性创新投资框架？</strong></p>
     <button class="btn-upgrade-vip3" onclick="showUpgradeModal('VIP3')">
       VIP3季度会员 ¥288/90天 →
     </button>
-    <small>获取ARK研报深度解读、专业投资策略分析和实战案例学习</small>
+    <small>获取ARK官方研报解读、Cathie Wood投资哲学和Big Ideas 2025核心观点</small>
   </div>
 </div>
 
@@ -496,40 +513,49 @@ toc_sticky: true
 ---
 
 <div class="member-premium-preview" data-level="VIP4">
-  <h4>⚡ VIP4专享：ARK Invest深度研究资源包</h4>
+  <h4>👑 VIP4专享：ARK Invest完整研究资源包+专业咨询</h4>
   
   <div class="quantitative-tools-preview">
-    <h5>🛠️ ARK Invest研报+Cathie Wood精选视频</h5>
+    <h5>🎥 Cathie Wood精选视频库+ARK官方研报中文版</h5>
     
     <div class="code-preview">
       <div class="code-header">
-        <span>VIP4_ARK_Resources_Package.zip</span>
+        <span>VIP4_Tesla_Investment_Masterclass.zip</span>
         <div class="code-lock" onclick="showUpgradeModal('VIP4')">
           <i class="fas fa-lock"></i>
           <span>VIP4解锁</span>
         </div>
       </div>
       <pre><code class="python">
-# VIP4独家资源包目录结构
-📁 ARK_Tesla_Research_2025/
-├── 🎥 Cathie_Wood_Videos/
-│   ├── Tesla_2600_Price_Target_Analysis.mp4
-│   ├── Robotaxi_Revolution_Deep_Dive.mp4
+# VIP4顶级投资者资源包结构
+📁 Tesla_Investment_Professional_Package/
+├── 🎥 Cathie_Wood_Masterclass/
+│   ├── Tesla_2600_Target_Deep_Dive.mp4（中文字幕）
+│   ├── Robotaxi_Business_Model_Analysis.mp4
 │   <span class="blur-code">
-│   ├── Why_Tesla_Beats_Traditional_Automakers.mp4
-│   └── AI_Autonomous_Driving_Market_Size.mp4
+│   ├── Innovation_Investment_Philosophy.mp4
+│   ├── Tesla_vs_Traditional_Automakers.mp4
+│   └── Big_Ideas_2025_Exponential_Growth.mp4
 │   ...</span>
-├── 📊 ARK_Official_Reports/
+├── 📊 ARK_Official_Reports_CN/
 │   <span class="blur-code">
-│   ├── Tesla_Valuation_Model_2029_CN.pdf
-│   ├── Robotaxi_TAM_Analysis_Chinese.pdf
-│   └── Innovation_Investment_Framework.pdf
+│   ├── Tesla_Big_Ideas_2025_Complete.pdf
+│   ├── Robotaxi_Market_Analysis_CN.pdf
+│   ├── Autonomous_Driving_Tech_Roadmap_CN.pdf
+│   └── Disruptive_Innovation_Framework_CN.pdf
 │   ...</span>
-└── 💡 Investment_Strategies/
+├── 🛠️ Professional_Investment_Tools/
+│   <span class="blur-code">
+│   ├── Tesla_Valuation_Calculator.xlsx
+│   ├── Robotaxi_Revenue_Model.xlsx
+│   ├── Portfolio_Optimization_Tool.xlsx
+│   └── TeslaMate_Investment_Edition/
+│   ...</span>
+└── 💬 Personal_Consultation_System/
     <span class="blur-code">
-    ├── Wood_Investment_Philosophy_Guide.pdf
-    ├── Disruptive_Innovation_Checklist.pdf
-    └── High_Growth_Tech_Valuation_Methods.pdf
+    ├── Monthly_Strategy_Sessions（每月2次）
+    ├── 24h_Emergency_Consultation
+    └── Written_Investment_Reports
     ...</span>
 </code></pre>
     </div>
@@ -537,42 +563,42 @@ toc_sticky: true
   
   <div class="tool-features-grid">
     <div class="feature-item">
-      <h6>📊 研报资料</h6>
-      <p>ARK官方研报中文版：<strong class="blur-text">**份</strong>完整翻译</p>
+      <h6>🎥 视频资源库</h6>
+      <p>Cathie Wood精选视频：<strong class="blur-text">12小时</strong>完整解读</p>
     </div>
     <div class="feature-item">
-      <h6>🎯 视频资源</h6>
-      <p>Cathie Wood精选分析视频，<strong class="blur-text">**小时</strong>内容</p>
+      <h6>📚 研报资料</h6>
+      <p>ARK官方研报中文版：<strong class="blur-text">5份</strong>完整翻译</p>
+    </div>
+    <div class="feature-item">
+      <h6>🛠️ 专业工具</h6>
+      <p>Excel投资模型：<strong class="blur-text">3套</strong>专业估值工具</p>
     </div>
     <div class="feature-item">
       <h6>💬 专业咨询</h6>
-      <p>每月<strong class="blur-text">*</strong>次1对1投资策略咨询</p>
-    </div>
-    <div class="feature-item">
-      <h6>🔄 持续更新</h6>
-      <p>最新ARK观点实时解读，<strong class="blur-text">***</strong>更新</p>
+      <p>每月<strong class="blur-text">2</strong>次1对1投资策略咨询</p>
     </div>
   </div>
   
   <div class="premium-upgrade-section">
     <div class="benefits-highlight">
-      <h6>🎁 VIP4年度会员独享权益</h6>
+      <h6>🎁 VIP4年度会员顶级权益</h6>
       <ul>
-        <li>✅ ARK Invest官方研报完整中文版</li>
-        <li>✅ Cathie Wood精选投资分析视频库</li>
-        <li>✅ 专业投资框架和方法论指导</li>
-        <li>✅ 个人投资策略1对1咨询（每月2次）</li>
-        <li>✅ 最新ARK观点实时解读和分析</li>
-        <li>✅ VIP4专享深度交流和专业讨论</li>
+        <li>✅ Cathie Wood精选投资视频库（12小时+中文字幕）</li>
+        <li>✅ ARK Invest官方研报完整中文版（5份核心研报）</li>
+        <li>✅ 专业投资工具包（Excel估值模型+数据监控）</li>
+        <li>✅ 个人投资策略1对1咨询（每月2次60分钟）</li>
+        <li>✅ 24小时紧急投资咨询响应服务</li>
+        <li>✅ TeslaMate投资定制版+完整使用指南</li>
       </ul>
     </div>
     <div class="upgrade-action">
       <button class="btn-upgrade-vip4" onclick="showUpgradeModal('VIP4')">
-        🚀 VIP4年度会员 ¥720/365天
+        👑 VIP4年度会员 ¥720/365天
       </button>
       <p class="value-proposition">
-        <small>💎 日均不到¥2，获得专业量化工具+个人咨询服务</small><br>
-        <small>⚠️ 投资工具有风险，使用前请充分了解原理和风险</small>
+        <small>💎 日均¥2，获得华尔街级投资资源+专业咨询服务</small><br>
+        <small>🎯 对标专业投资机构服务标准，助您成为顶级投资者</small>
       </p>
     </div>
   </div>
@@ -763,26 +789,3 @@ toc_sticky: true
 
 <!-- 引入会员升级模态框功能 -->
 {% include member-upgrade-modal.html %}
-
-
-{% assign investment_tags = 'QDII基金,指数投资,标普500,纳斯达克100,定投策略,基金投资,股票投资,投资理财,量化交易,投资策略,风险管理,资产配置,投资心理,美股投资,ETF投资' | split: ',' %}
-{% assign show_investment_disclaimer = false %}
-{% for tag in page.tags %}
-  {% if investment_tags contains tag %}
-    {% assign show_investment_disclaimer = true %}
-    {% break %}
-  {% endif %}
-{% endfor %}
-
-{% if show_investment_disclaimer %}
----
-
-**💭 学习分享声明**：这里记录的是我在投资理财学习路上的个人思考和实践心得。正如《金钱心理学》所言："每个人的情况不同"，投资决策需要结合您的具体情况、风险承受能力和投资目标。本文仅供学习交流，不构成投资建议，请保持独立思考，持续学习。
-
-{% endif %}
-
-如果你觉得我的文章对你有帮助，可以[请我喝咖啡](https://www.buymeacoffee.com/zhurong052Q)
-
-<a href="https://www.buymeacoffee.com/zhurong052Q" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
-
-> 💬 **发表评论**: 您需要有一个 GitHub 账号来发表评论。
