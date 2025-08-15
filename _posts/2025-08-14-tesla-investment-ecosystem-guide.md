@@ -75,7 +75,7 @@ toc_sticky: true
 特斯拉的投资价值远不止于汽车制造。作为全球市值排名前列的企业，其股价波动不仅影响着整个新能源汽车板块，更辐射至锂电池、充电设施、自动驾驶技术等相关产业链。
 
 **关键数据一览**：
--   特斯拉在全球电动车市场的占有率约为15-20%。
+-   特斯拉在全球电动车市场的占有率在2024年约为10-11%（纯电动车市场约为17.6%），尽管面临竞争，其市场地位依然显著。
 -   其超级充电网络已覆盖全球超过50个国家。
 -   FSD（完全自动驾驶）技术积累的数据里程已达数十亿英里。
 
@@ -201,26 +201,25 @@ toc_sticky: true
 ### 看涨杠杆ETF
 
 **TSLL (Direxion Daily TSLA Bull 2X Shares)**
--   提供特斯拉股价日内2倍的涨跌幅。
+-   旨在提供特斯拉股价日内2倍（2x）的涨跌幅（即2倍做多TSLA）。
 -   适合执行短期看涨特斯拉的交易策略。
--   管理规模通常在5亿至10亿美元之间。
+-   管理规模已达60-70亿美元。
 
 **TSL (GraniteShares 2x Long TSLA Daily ETF)**
--   同样提供2倍杠杆，是TSLL的替代选择之一。
+-   提供1.25倍杠杆，是TSLL的替代选择之一。
 -   费用率相对较低。
 
 ### 看跌/反向ETF
 
 **TSLQ (AXS TSLA Bear Daily ETF)**
--   提供与特斯拉股价相反的日内回报。
+-   旨在提供与特斯拉股价相反的日内回报（即2倍做空TSLA）。
 -   适合认为特斯拉股价被高估的投资者。
 -   可用于对冲现有的$TSLA多头仓位。
 
 ### 收益策略ETF
 
-**TSLS (YieldMax TSLA Option Income Strategy ETF)**
--   通过卖出特斯拉的备兑看涨期权来产生收益。
--   月度分红率通常在8-15%区间。
+**TSLY (YieldMax TSLA Option Income Strategy ETF)**
+-   通过卖出特斯拉的备兑看涨期权来产生收益，旨在提供高额月度分红。
 -   适合希望获得稳定现金流，同时愿意放弃部分上涨空间的投资者。
 
 这些工具为投资者提供了更为灵活的策略选择，但使用前必须充分理解其风险特性。
@@ -280,8 +279,8 @@ toc_sticky: true
 4.  **成本控制**：通过期权策略以更低的资金成本参与市场。
 
 **为什么选择特斯拉期权**：
--   **高流动性**：作为全球热门股票，其期权合约交易十分活跃。
--   **高波动性**：为各类期权策略提供了丰富的获利机会。
+-   **高流动性**：作为全球热门股票，其期权合约交易十分活跃，常年位居美股期权交易量榜首，为投资者提供了极佳的进出场便利。
+-   **高波动性**：为各类期权策略提供了丰富的获利机会。对于喜欢利用市场波动获取收益的投资者，特斯拉期权提供了如跨式组合（Straddle）、宽跨式组合（Strangle）等波动率策略的实践空间。
 -   **多样的到期日选择**：从周度期权到长期期权（LEAPs）一应俱全。
 -   **广泛的行权价区间**：适合不同风险偏好的策略构建。
 
@@ -295,18 +294,19 @@ toc_sticky: true
 
 **$ALB (Albemarle Corporation)**
 -   全球最大的锂生产商之一。
--   市值：约150-200亿美元。
+-   市值：约90-100亿美元。
 -   直接受益于全球电动汽车普及带来的锂需求增长。
 
 **$PANASONIC (6752.T / PCRFY ADR)**
 -   特斯拉长期的电池合作伙伴。
 -   在电池技术研发与生产方面拥有深厚积累。
+-   **补充说明**：除了松下，中国宁德时代（CATL）也是特斯拉重要的电池供应商，尤其为其上海超级工厂提供磷酸铁锂（LFP）电池。尽管宁德时代是全球最大的电池制造商，但其主要在深圳证券交易所上市，目前没有在美国市场广泛交易的ADR，因此未在美股产业链投资标的中列出。
 
 **半导体与AI芯片**
 
 **$NVDA (NVIDIA Corporation)**
 -   自动驾驶AI训练所需算力的核心供应商。
--   市值常年位列全球前十，是整个AI行业的“军火商”。
+-   市值已位列全球第一，是整个AI行业的“军火商”。
 -   其业务增长不仅依赖特斯拉，更受益于全球AI产业的蓬勃发展。
 
 **$ON (ON Semiconductor)**
@@ -605,11 +605,11 @@ toc_sticky: true
 投资特斯拉生态，不仅是对单一公司的押注，更是对未来交通、能源、AI等多个领域变革的全面投资，甚至是对人类走向多行星文明的提前布局。历史经验表明，能够把握住重大技术变革的投资者，往往能获得超额回报。
 
 **历史参考**：
--   2020-2021年，特斯拉股价涨幅超过800%。
--   同期，$NVDA涨幅超过300%。
+-   2025年至今（截至8月15日），特斯拉股价涨幅约为-15.96%。
+-   同期（截至8月14日），$NVDA涨幅约为+35.56%。
 -   新能源汽车相关的ETF普遍取得了显著的正收益。
 
-然而，我们必须认识到，高额回报并非常态。所有投资决策都应建立在理性分析和严格的风险管理之上。
+然而，市场表现瞬息万变，高额回报并非常态。所有投资决策都应建立在理性分析和严格的风险管理之上。
 
 ### 构建可持续的投资体系
 
@@ -699,6 +699,9 @@ toc_sticky: true
 -   **使用性质**：订阅用户基于教育目的的合理使用、翻译与整理。
 -   **版权说明**：原始数据版权归Seeking Alpha所有。
 -   **获取时间**：2025年8月15日，数据具有时效性。
+-   **主要权威英文来源**：本文所引用的数据和信息主要来源于以下权威英文网站，读者可自行查阅核实：
+    *   **金融数据与分析**：Seeking Alpha (seekingalpha.com), TradingView (tradingview.com), StockAnalysis (stockanalysis.com), Macrotrends (macrotrends.net), Nasdaq (nasdaq.com), StatMuse (statmuse.com), Macroaxis (macroaxis.com), Morningstar (morningstar.com), Investing.com
+    *   **新闻与行业报告**：Wikipedia (wikipedia.org), Fool.com, Supercharge.info, AutoEvolution (autoevolution.com), Wikimedia.org, Tesla.com, Teslarati (teslarati.com), DriveTeslaCanada (driveteslacanada.ca), EV-A2Z (ev-a2z.com), Dig.Watch (dig.watch), PoliticoPro (politicopro.com), CBT News (cbtnews.com), SCMP (scmp.com), EnergyNewsBeat (energynewsbeat.co), Ainvest (ainvest.com), CompaniesMarketCap (companiesmarketcap.com), Dividend.com, YieldMaxETFs (yieldmaxetfs.com)
 
 ---
 
