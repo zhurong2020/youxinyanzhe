@@ -329,66 +329,72 @@ toc_sticky: true
 ---
 
 <div class="member-only-preview" data-level="VIP3">
-  <h4>💼 VIP3专享：我的特斯拉产业链投资实战记录</h4>
+  <h4>💼 VIP3专享：Cathie Wood特斯拉投资策略深度解读</h4>
   
   <div class="personal-portfolio-preview">
-    <h5>📈 个人持仓透明分享（仅供参考）</h5>
+    <h5>📈 ARK Invest 2025年最新特斯拉操作分析</h5>
     
     <div class="interactive-data-table clickable" onclick="showUpgradeModal('VIP3')">
       <table class="portfolio-table">
         <tr>
-          <th>标的</th>
-          <th>仓位比例</th>
-          <th>成本价</th>
-          <th>当前策略</th>
+          <th>时间</th>
+          <th>操作</th>
+          <th>价格区间</th>
+          <th>持仓变化</th>
+          <th>投资逻辑</th>
         </tr>
         <tr>
-          <td><strong>TSLA</strong></td>
-          <td>15%</td>
-          <td class="blur-text">$***</td>
-          <td>逐步建仓</td>
+          <td><strong>2025-06</strong></td>
+          <td class="blur-text">大幅加仓</td>
+          <td class="blur-text">$325-340</td>
+          <td class="blur-text">+31.8万股</td>
+          <td class="blur-text">Robotaxi启动</td>
         </tr>
         <tr>
-          <td><strong>NVDA</strong></td>
-          <td>8%</td>
-          <td class="blur-text">$***</td>
-          <td>核心持有</td>
+          <td><strong>2025-07</strong></td>
+          <td class="blur-text">持续买入</td>
+          <td class="blur-text">$310-335</td>
+          <td class="blur-text">+17.9万股</td>
+          <td class="blur-text">FSD数据优势</td>
         </tr>
         <tr>
-          <td><strong>ALB</strong></td>
-          <td>5%</td>
-          <td class="blur-text">$***</td>
-          <td>等待回调</td>
+          <td><strong>当前</strong></td>
+          <td class="blur-text">战略持有</td>
+          <td class="blur-text">平均$315</td>
+          <td class="blur-text">326万股/7.51%</td>
+          <td class="blur-text">AI转型价值</td>
         </tr>
         <tr>
-          <td><strong>ARKK</strong></td>
-          <td>6%</td>
-          <td class="blur-text">$***</td>
-          <td>定投策略</td>
+          <td><strong>目标</strong></td>
+          <td class="blur-text">长期看涨</td>
+          <td class="blur-text">$2,600</td>
+          <td class="blur-text">核心持仓</td>
+          <td class="blur-text">万亿级市场</td>
         </tr>
       </table>
       <div class="click-overlay">
         <i class="fas fa-unlock"></i>
-        <span>点击查看完整持仓和操作记录</span>
+        <span>点击解锁完整ARK策略分析</span>
       </div>
     </div>
   </div>
   
   <div class="trading-insights-preview">
-    <h5>📋 本月操作复盘（VIP3专享）</h5>
+    <h5>📋 ARK Invest核心投资洞察（VIP3专享）</h5>
     <ul>
-      <li>✅ <strong>8月5日</strong>：TSLA跌破$200，加仓500股的决策逻辑...</li>
-      <li>✅ <strong>8月12日</strong>：获利了结TSLL短线操作，收益12%...</li>
-      <li>⚠️ <strong>风险提示</strong>：以上仅为个人记录，非投资建议</li>
+      <li>✅ <strong>数据优势</strong>：特斯拉500万英里/天 vs Waymo 7万英里/天...</li>
+      <li>✅ <strong>估值模型</strong>：Robotaxi将占企业价值90%的深度分析...</li>
+      <li>✅ <strong>风险评估</strong>：为何ARK在高位($325+)持续加仓？</li>
+      <li>💡 <strong>学习价值</strong>：顶级机构如何做长期价值投资</li>
     </ul>
   </div>
   
   <div class="upgrade-cta-inline">
-    <p>📋 <strong>想获取我的完整投资日记和决策过程？</strong></p>
+    <p>📋 <strong>想学习世界顶级投资机构的完整投资逻辑？</strong></p>
     <button class="btn-upgrade-vip3" onclick="showUpgradeModal('VIP3')">
       VIP3季度会员 ¥288/90天 →
     </button>
-    <small>获取个人持仓透明分享、深度策略分析和社群交流机会</small>
+    <small>获取ARK研报深度解读、专业投资策略分析和实战案例学习</small>
   </div>
 </div>
 
@@ -491,57 +497,61 @@ toc_sticky: true
 ---
 
 <div class="member-premium-preview" data-level="VIP4">
-  <h4>⚡ VIP4专享：特斯拉量化交易工具包</h4>
+  <h4>⚡ VIP4专享：ARK Invest深度研究资源包</h4>
   
   <div class="quantitative-tools-preview">
-    <h5>🛠️ 网格交易策略实盘展示</h5>
+    <h5>🛠️ ARK Invest研报+Cathie Wood精选视频</h5>
     
     <div class="code-preview">
       <div class="code-header">
-        <span>Tesla_Grid_Strategy.py</span>
+        <span>VIP4_ARK_Resources_Package.zip</span>
         <div class="code-lock" onclick="showUpgradeModal('VIP4')">
           <i class="fas fa-lock"></i>
           <span>VIP4解锁</span>
         </div>
       </div>
       <pre><code class="python">
-# Tesla网格交易核心参数 (简化展示版)
-class TeslaGridStrategy:
-    def __init__(self):
-        self.symbol = "TSLA"
-        self.grid_range = [180, 300]  # 价格区间
-        self.grid_num = 20           # 网格数量
-        self.investment = 10000      # 总投资额
-        <span class="blur-code">
-        # 完整策略代码VIP4专享
-        # 包含风险控制、动态调参等
-        ...</span>
-    
-    def execute_strategy(self):
-        <span class="blur-code">
-        # 实盘交易逻辑
-        # 回测数据：2020-2025年收益表现
-        ...</span>
+# VIP4独家资源包目录结构
+📁 ARK_Tesla_Research_2025/
+├── 🎥 Cathie_Wood_Videos/
+│   ├── Tesla_2600_Price_Target_Analysis.mp4
+│   ├── Robotaxi_Revolution_Deep_Dive.mp4
+│   <span class="blur-code">
+│   ├── Why_Tesla_Beats_Traditional_Automakers.mp4
+│   └── AI_Autonomous_Driving_Market_Size.mp4
+│   ...</span>
+├── 📊 ARK_Official_Reports/
+│   <span class="blur-code">
+│   ├── Tesla_Valuation_Model_2029_CN.pdf
+│   ├── Robotaxi_TAM_Analysis_Chinese.pdf
+│   └── Innovation_Investment_Framework.pdf
+│   ...</span>
+└── 💡 Investment_Strategies/
+    <span class="blur-code">
+    ├── Wood_Investment_Philosophy_Guide.pdf
+    ├── Disruptive_Innovation_Checklist.pdf
+    └── High_Growth_Tech_Valuation_Methods.pdf
+    ...</span>
 </code></pre>
     </div>
   </div>
   
   <div class="tool-features-grid">
     <div class="feature-item">
-      <h6>📊 回测数据</h6>
-      <p>2020-2025年TSLA网格策略年化收益：<strong class="blur-text">**%</strong></p>
+      <h6>📊 研报资料</h6>
+      <p>ARK官方研报中文版：<strong class="blur-text">**份</strong>完整翻译</p>
     </div>
     <div class="feature-item">
-      <h6>🎯 风控模块</h6>
-      <p>自动止损、仓位管理、<strong class="blur-text">***</strong></p>
+      <h6>🎯 视频资源</h6>
+      <p>Cathie Wood精选分析视频，<strong class="blur-text">**小时</strong>内容</p>
     </div>
     <div class="feature-item">
-      <h6>💬 咨询服务</h6>
-      <p>每月<strong class="blur-text">*</strong>次1对1策略优化咨询</p>
+      <h6>💬 专业咨询</h6>
+      <p>每月<strong class="blur-text">*</strong>次1对1投资策略咨询</p>
     </div>
     <div class="feature-item">
-      <h6>🔄 实时更新</h6>
-      <p>策略参数动态调整，<strong class="blur-text">***</strong></p>
+      <h6>🔄 持续更新</h6>
+      <p>最新ARK观点实时解读，<strong class="blur-text">***</strong>更新</p>
     </div>
   </div>
   
@@ -549,12 +559,12 @@ class TeslaGridStrategy:
     <div class="benefits-highlight">
       <h6>🎁 VIP4年度会员独享权益</h6>
       <ul>
-        <li>✅ 完整量化交易软件源码</li>
-        <li>✅ Tesla专用网格策略参数</li>
-        <li>✅ 历史回测数据和性能报告</li>
-        <li>✅ 个人投资组合1对1咨询（每月2次）</li>
-        <li>✅ 策略优化和参数调整指导</li>
-        <li>✅ VIP4专享微信群深度交流</li>
+        <li>✅ ARK Invest官方研报完整中文版</li>
+        <li>✅ Cathie Wood精选投资分析视频库</li>
+        <li>✅ 专业投资框架和方法论指导</li>
+        <li>✅ 个人投资策略1对1咨询（每月2次）</li>
+        <li>✅ 最新ARK观点实时解读和分析</li>
+        <li>✅ VIP4专享深度交流和专业讨论</li>
       </ul>
     </div>
     <div class="upgrade-action">
