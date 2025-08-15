@@ -69,7 +69,7 @@ def find_project_root(start_path: Optional[Path] = None) -> Path:
     return Path.cwd()
 
 
-def setup_project_imports(script_file: str = None) -> Path:
+def setup_project_imports(script_file: Optional[str] = None) -> Path:
     """
     设置项目导入路径
     
@@ -92,7 +92,7 @@ def setup_project_imports(script_file: str = None) -> Path:
     return project_root
 
 
-def get_relative_path(file_path: Path, base_path: Path = None) -> Path:
+def get_relative_path(file_path: Path, base_path: Optional[Path] = None) -> Path:
     """
     获取相对于项目根目录的路径
     

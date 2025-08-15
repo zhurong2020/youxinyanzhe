@@ -105,20 +105,24 @@ def main():
             return
             
         # 到这里说明有有效的draft需要处理
+        if draft is None:
+            continue  # 返回主菜单如果没有草稿
+            
         # 草稿预检机制 - 检查是否有需要预处理的问题
         pipeline.log("正在进行草稿质量预检...", level="info", force=True)
-        draft_issues = pipeline.check_draft_issues(draft)
+        draft_path = Path(draft) if isinstance(draft, str) else draft
+        draft_issues = pipeline.check_draft_issues(draft_path)
         
         # 自动处理excerpt缺失问题
         excerpt_missing_issues = [issue for issue in draft_issues if "缺少excerpt字段" in issue]
         if excerpt_missing_issues:
             print("\n🤖 检测到缺少excerpt，正在自动生成...")
-            with open(draft, 'r', encoding='utf-8') as f:
+            with open(draft_path, 'r', encoding='utf-8') as f:
                 current_content = f.read()
             
-            if pipeline._auto_generate_excerpt_if_missing(draft, current_content):
+            if pipeline._auto_generate_excerpt_if_missing(draft_path, current_content):
                 # 重新检查问题列表，移除已解决的excerpt问题
-                draft_issues = pipeline.check_draft_issues(draft)
+                draft_issues = pipeline.check_draft_issues(draft_path)
                 print("🔄 已重新检查草稿质量...")
         
         if draft_issues:
