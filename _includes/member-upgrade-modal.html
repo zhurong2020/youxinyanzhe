@@ -1,0 +1,474 @@
+<!-- 会员升级模态框和JavaScript功能 -->
+<div id="upgrade-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modal-title">升级会员</h3>
+      <button class="modal-close" onclick="closeUpgradeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <!-- 动态内容将在这里加载 -->
+    </div>
+  </div>
+</div>
+
+<script>
+// 会员升级模态框功能
+function showUpgradeModal(level) {
+    const modal = document.getElementById('upgrade-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body');
+    
+    // 定义不同等级的内容
+    const upgradeContent = {
+        'VIP2': {
+            title: '🎯 VIP2月度会员：专业数据解读',
+            price: '¥108/月',
+            features: [
+                '✅ Seeking Alpha Premium数据深度解读',
+                '✅ 华尔街分析师评级和目标价分析', 
+                '✅ 每周市场热点追踪和投资机会',
+                '✅ 专业投资报告中文翻译',
+                '✅ 基础投资策略指导',
+                '✅ 邮件订阅和及时更新通知'
+            ],
+            description: '获取专业级别的投资数据分析，基于$300+年费的海外订阅服务，为您提供本土化解读。',
+            cta: 'VIP2月度会员 ¥108/30天',
+            bgColor: '#3b82f6'
+        },
+        'VIP3': {
+            title: '💼 VIP3季度会员：个人实战分享',
+            price: '¥288/90天',
+            features: [
+                '✅ 包含VIP2所有功能',
+                '✅ 个人投资组合透明分享',
+                '✅ 真实交易记录和决策过程',
+                '✅ 深度策略分析和复盘总结',
+                '✅ VIP3专享微信群交流',
+                '✅ 每月投资策略直播答疑',
+                '✅ 个性化投资建议和咨询'
+            ],
+            description: '获取作者的真实投资经验分享，包括成功案例和失败教训，与志同道合的投资者深度交流。',
+            cta: 'VIP3季度会员 ¥288/90天',
+            bgColor: '#f59e0b'
+        },
+        'VIP4': {
+            title: '🚀 VIP4年度会员：深度服务+量化工具',
+            price: '¥720/365天',
+            features: [
+                '✅ 包含VIP2、VIP3所有功能',
+                '✅ 完整量化交易软件源码',
+                '✅ Tesla专用网格策略工具',
+                '✅ 历史回测数据和性能报告',
+                '✅ 每月2次1对1投资咨询（30分钟）',
+                '✅ 策略优化和参数调整指导',
+                '✅ 年度会员专属资源和工具包',
+                '✅ 优先获得新策略和工具更新'
+            ],
+            description: '全方位的投资服务体验，包含专业工具、个人咨询和持续支持，助力您的投资成长之路。',
+            cta: 'VIP4年度会员 ¥720/365天 (仅¥2/天)',
+            bgColor: '#8b5cf6'
+        }
+    };
+    
+    const content = upgradeContent[level];
+    if (!content) {
+        console.error('Unknown upgrade level:', level);
+        return;
+    }
+    
+    modalTitle.textContent = content.title;
+    
+    modalBody.innerHTML = `
+        <div class="upgrade-modal-content">
+            <div class="upgrade-hero" style="background: linear-gradient(135deg, ${content.bgColor}, ${content.bgColor}dd);">
+                <h4 style="color: white; margin: 0; text-align: center;">
+                    ${content.price}
+                </h4>
+                <p style="color: rgba(255,255,255,0.9); font-size: 0.9em; margin: 8px 0 0 0; text-align: center;">
+                    ${content.description}
+                </p>
+            </div>
+            
+            <div class="upgrade-features">
+                <h5>🎁 会员权益详情：</h5>
+                <ul class="features-list">
+                    ${content.features.map(feature => `<li>${feature}</li>`).join('')}
+                </ul>
+            </div>
+            
+            <div class="upgrade-actions">
+                <button class="btn-upgrade-primary" style="background: ${content.bgColor};" onclick="redirectToMemberPage('${level}')">
+                    ${content.cta}
+                </button>
+                <p class="upgrade-note">
+                    <small>💡 提示：升级后立即获得访问权限，支持微信/支付宝付款</small>
+                </p>
+            </div>
+            
+            <div class="risk-reminder">
+                <p style="font-size: 0.8em; color: #6b7280; text-align: center; margin-top: 15px;">
+                    ⚠️ 风险提示：所有投资内容仅供学习参考，不构成投资建议。投资有风险，决策需谨慎。
+                </p>
+            </div>
+        </div>
+    `;
+    
+    // 显示模态框
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // 跟踪升级模态框显示
+    trackMembershipAction('modal_shown', level);
+}
+
+function closeUpgradeModal() {
+    const modal = document.getElementById('upgrade-modal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    
+    trackMembershipAction('modal_closed', '');
+}
+
+function redirectToMemberPage(level) {
+    // 跟踪升级按钮点击
+    trackMembershipAction('upgrade_button_clicked', level);
+    
+    // 重定向到会员页面，并带上目标等级参数
+    window.location.href = `/members/?target=${level}`;
+}
+
+// 分析跟踪函数
+function trackMembershipAction(action, level) {
+    // Google Analytics 4 跟踪
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'membership_interaction', {
+            'action': action,
+            'level': level,
+            'page_title': document.title,
+            'page_location': window.location.href
+        });
+    }
+    
+    // 控制台调试信息
+    console.log(`📊 Membership Action: ${action}`, { level, timestamp: new Date() });
+}
+
+// 点击模态框外部关闭
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('upgrade-modal');
+    if (event.target === modal) {
+        closeUpgradeModal();
+    }
+});
+
+// ESC键关闭模态框
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modal = document.getElementById('upgrade-modal');
+        if (modal && modal.style.display === 'flex') {
+            closeUpgradeModal();
+        }
+    }
+});
+
+// 阅读时间跟踪引流
+let readingStartTime = Date.now();
+let hasShownTimeBasedModal = false;
+
+// 3分钟后显示引流提示（仅对非会员用户）
+setTimeout(() => {
+    if (!hasShownTimeBasedModal && !localStorage.getItem('memberAccess')) {
+        showReadingTimeModal();
+        hasShownTimeBasedModal = true;
+    }
+}, 180000); // 3分钟
+
+function showReadingTimeModal() {
+    // 创建非侵入式的阅读时间提示
+    const timeModal = document.createElement('div');
+    timeModal.className = 'reading-time-modal';
+    timeModal.innerHTML = `
+        <div class="reading-time-content">
+            <div class="reading-time-icon">📚</div>
+            <h4>您已阅读3分钟</h4>
+            <p>喜欢这篇深度分析吗？升级VIP2获取更多专业投资洞察</p>
+            <div class="reading-time-actions">
+                <button onclick="showUpgradeModal('VIP2')" class="btn-reading-upgrade">
+                    了解VIP2会员
+                </button>
+                <button onclick="closeReadingTimeModal()" class="btn-reading-later">
+                    稍后再说
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(timeModal);
+    
+    setTimeout(() => {
+        timeModal.classList.add('show');
+    }, 100);
+    
+    trackMembershipAction('reading_time_modal_shown', 'VIP2');
+}
+
+function closeReadingTimeModal() {
+    const modal = document.querySelector('.reading-time-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.remove();
+        }, 300);
+    }
+    
+    trackMembershipAction('reading_time_modal_closed', '');
+}
+</script>
+
+<style>
+/* 模态框样式 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px 15px 25px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #374151;
+    font-size: 1.2em;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.modal-body {
+    padding: 0;
+}
+
+.upgrade-modal-content {
+    padding: 0;
+}
+
+.upgrade-hero {
+    padding: 25px;
+    text-align: center;
+    border-radius: 12px 12px 0 0;
+}
+
+.upgrade-features {
+    padding: 25px;
+}
+
+.upgrade-features h5 {
+    color: #374151;
+    margin: 0 0 15px 0;
+    font-size: 1.1em;
+}
+
+.features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.features-list li {
+    padding: 8px 0;
+    color: #4b5563;
+    font-size: 0.9em;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.features-list li:last-child {
+    border-bottom: none;
+}
+
+.upgrade-actions {
+    padding: 0 25px 25px 25px;
+    text-align: center;
+}
+
+.btn-upgrade-primary {
+    width: 100%;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.btn-upgrade-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+.upgrade-note {
+    margin: 0;
+    color: #6b7280;
+}
+
+/* 阅读时间模态框 */
+.reading-time-modal {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    max-width: 320px;
+    z-index: 999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.reading-time-modal.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.reading-time-content {
+    text-align: center;
+}
+
+.reading-time-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.reading-time-content h4 {
+    margin: 0 0 10px 0;
+    color: #374151;
+    font-size: 1.1em;
+}
+
+.reading-time-content p {
+    margin: 0 0 15px 0;
+    color: #6b7280;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.reading-time-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-reading-upgrade {
+    flex: 1;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9em;
+}
+
+.btn-reading-later {
+    flex: 1;
+    background: #f3f4f6;
+    color: #6b7280;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9em;
+}
+
+.btn-reading-upgrade:hover {
+    background: #2563eb;
+}
+
+.btn-reading-later:hover {
+    background: #e5e7eb;
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 移动端响应式 */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .reading-time-modal {
+        right: 10px;
+        bottom: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .reading-time-actions {
+        flex-direction: column;
+    }
+}
+</style>

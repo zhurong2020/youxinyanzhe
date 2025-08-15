@@ -484,3 +484,512 @@ audio {
   }
 }
 
+/* ================================
+   会员引流组件样式
+   ================================ */
+
+/* 渐变遮罩预览组件 */
+.member-preview-fade {
+  position: relative;
+  margin: 25px 0;
+  border: 2px solid #e0e7ff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+}
+
+.preview-content {
+  padding: 25px;
+  background: linear-gradient(to bottom, rgba(255,255,255,1) 70%, rgba(255,255,255,0.3) 100%);
+}
+
+.preview-content h4 {
+  color: #1e40af;
+  margin-bottom: 15px;
+  font-size: 1.1em;
+}
+
+.preview-content ul {
+  margin: 15px 0;
+  padding-left: 20px;
+}
+
+.preview-content li {
+  margin: 8px 0;
+  color: #374151;
+}
+
+.preview-content blockquote {
+  background: rgba(59, 130, 246, 0.1);
+  border-left: 4px solid #3b82f6;
+  margin: 15px 0;
+  padding: 10px 15px;
+  font-style: italic;
+  border-radius: 0 8px 8px 0;
+}
+
+.fade-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to top, rgba(248,250,252,0.98) 0%, rgba(248,250,252,0.8) 50%, transparent 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upgrade-prompt {
+  text-align: center;
+  padding: 0 20px;
+}
+
+.upgrade-text {
+  display: block;
+  color: #374151;
+  font-weight: 500;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+}
+
+/* 进度条引流组件 */
+.content-progress-tracker {
+  margin: 20px 0;
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  margin-bottom: 10px;
+}
+
+.free-label {
+  color: #059669;
+  font-weight: 500;
+}
+
+.member-label {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.upgrade-hint {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.9em;
+  margin: 5px 0 0 0;
+}
+
+/* VIP3个人实战预览组件 */
+.member-only-preview {
+  margin: 25px 0;
+  padding: 25px;
+  background: linear-gradient(135deg, #fefce8, #fef3c7);
+  border: 2px solid #f59e0b;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+}
+
+.member-only-preview h4 {
+  color: #92400e;
+  margin-bottom: 20px;
+  font-size: 1.1em;
+}
+
+.personal-portfolio-preview {
+  margin-bottom: 20px;
+}
+
+.personal-portfolio-preview h5 {
+  color: #78350f;
+  margin-bottom: 15px;
+  font-size: 1em;
+}
+
+/* 互动数据表格 */
+.interactive-data-table {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.interactive-data-table:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.portfolio-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.portfolio-table th,
+.portfolio-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.portfolio-table th {
+  background-color: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+}
+
+.portfolio-table td {
+  color: #6b7280;
+}
+
+.blur-text {
+  filter: blur(3px);
+  user-select: none;
+  transition: filter 0.3s ease;
+}
+
+.click-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 8px;
+}
+
+.interactive-data-table:hover .click-overlay {
+  opacity: 1;
+}
+
+.click-overlay i {
+  font-size: 24px;
+  color: #f59e0b;
+  margin-bottom: 8px;
+}
+
+.click-overlay span {
+  color: #78350f;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* 交易洞察预览 */
+.trading-insights-preview {
+  margin: 20px 0;
+}
+
+.trading-insights-preview h5 {
+  color: #78350f;
+  margin-bottom: 12px;
+}
+
+.trading-insights-preview ul {
+  list-style: none;
+  padding: 0;
+}
+
+.trading-insights-preview li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+  color: #6b7280;
+}
+
+/* 内联升级CTA */
+.upgrade-cta-inline {
+  background: rgba(245, 158, 11, 0.1);
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.upgrade-cta-inline p {
+  margin-bottom: 12px;
+  color: #78350f;
+}
+
+.btn-upgrade-vip3 {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.btn-upgrade-vip3:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.3);
+  color: white;
+  text-decoration: none;
+}
+
+.upgrade-cta-inline small {
+  display: block;
+  margin-top: 8px;
+  color: #92400e;
+  font-size: 0.85em;
+}
+
+/* VIP4量化工具预览组件 */
+.member-premium-preview {
+  margin: 30px 0;
+  padding: 30px;
+  background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+  border: 2px solid #8b5cf6;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.15);
+}
+
+.member-premium-preview h4 {
+  color: #6b21a8;
+  margin-bottom: 25px;
+  font-size: 1.2em;
+  text-align: center;
+}
+
+.quantitative-tools-preview h5 {
+  color: #7c2d12;
+  margin-bottom: 15px;
+}
+
+/* 代码预览区块 */
+.code-preview {
+  position: relative;
+  margin: 15px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #d1d5db;
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #374151;
+  padding: 8px 15px;
+  color: white;
+  font-size: 0.9em;
+}
+
+.code-lock {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #fbbf24;
+  font-size: 0.8em;
+  transition: color 0.3s ease;
+}
+
+.code-lock:hover {
+  color: #f59e0b;
+}
+
+.code-lock i {
+  margin-right: 5px;
+}
+
+.code-preview pre {
+  margin: 0;
+  padding: 15px;
+  background: #1f2937;
+  color: #e5e7eb;
+  overflow-x: auto;
+}
+
+.blur-code {
+  filter: blur(2px);
+  user-select: none;
+  color: #9ca3af !important;
+}
+
+/* 工具特性网格 */
+.tool-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.feature-item {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.feature-item h6 {
+  color: #6b21a8;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+}
+
+.feature-item p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.85em;
+}
+
+/* VIP4升级区域 */
+.premium-upgrade-section {
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 25px;
+}
+
+.benefits-highlight h6 {
+  color: #6b21a8;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.benefits-highlight ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+}
+
+.benefits-highlight li {
+  padding: 6px 0;
+  color: #4c1d95;
+  font-size: 0.9em;
+}
+
+.upgrade-action {
+  text-align: center;
+}
+
+.btn-upgrade-vip4 {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.1em;
+  transition: all 0.3s ease;
+  display: inline-block;
+  text-decoration: none;
+  margin-bottom: 10px;
+}
+
+.btn-upgrade-vip4:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+  color: white;
+  text-decoration: none;
+}
+
+.value-proposition {
+  margin: 0;
+}
+
+.value-proposition small {
+  display: block;
+  color: #6b21a8;
+  font-size: 0.85em;
+  margin: 3px 0;
+}
+
+/* 通用升级按钮样式 */
+.btn-upgrade {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.btn-upgrade:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+  color: white;
+  text-decoration: none;
+}
+
+/* 移动端响应式调整 */
+@media (max-width: 768px) {
+  .member-preview-fade,
+  .member-only-preview,
+  .member-premium-preview {
+    margin: 20px 0;
+    padding: 20px 15px;
+  }
+  
+  .fade-overlay {
+    height: 70px;
+  }
+  
+  .tool-features-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .portfolio-table {
+    font-size: 0.9em;
+  }
+  
+  .portfolio-table th,
+  .portfolio-table td {
+    padding: 8px 10px;
+  }
+  
+  .btn-upgrade-vip4 {
+    padding: 12px 20px;
+    font-size: 1em;
+  }
+  
+  .upgrade-prompt {
+    padding: 0 15px;
+  }
+  
+  .upgrade-text {
+    font-size: 0.85em;
+  }
+}
+
