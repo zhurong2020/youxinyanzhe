@@ -458,28 +458,38 @@ def handle_content_normalization_menu(pipeline):
                 
             print("\n🔄 开始批量格式化...")
             success_count = 0
+            total_issues_fixed = 0
             
             for file in files_to_process:
                 try:
                     print(f"\n处理: {file}")
-                    script_path = Path("scripts/tools/content/format_draft.py")
-                    result = execute_script_with_logging(
-                        pipeline, script_path, [file], 
-                        f"批量格式化-{Path(file).name}"
-                    )
                     
-                    if result.returncode == 0:
+                    # 使用统一的格式化接口
+                    result = pipeline.format_content_file(Path(file))
+                    
+                    if result['success']:
                         success_count += 1
                         print(f"✅ 成功: {file}")
+                        print(f"   输出: {result['output_file']}")
+                        
+                        # 统计修复的问题
+                        if result.get('auto_fixes_applied'):
+                            total_issues_fixed += len(result['auto_fixes_applied'])
+                            
+                        # 显示需要手动处理的问题
+                        if result.get('manual_fixes_needed'):
+                            print(f"   ⚠️ {len(result['manual_fixes_needed'])} 个问题需要手动处理")
                     else:
                         print(f"❌ 失败: {file}")
-                        if result.stderr:
-                            print(f"   错误: {result.stderr}")
+                        print(f"   错误: {result['error']}")
                             
                 except Exception as e:
                     print(f"❌ 处理 {file} 时出错: {e}")
                     
-            print(f"\n📊 批量处理完成：成功 {success_count}/{len(files_to_process)} 个文件")
+            print(f"\n📊 批量处理完成：")
+            print(f"   • 成功文件: {success_count}/{len(files_to_process)}")
+            print(f"   • 自动修复: {total_issues_fixed} 个问题")
+            print("💡 您可以选择 '1. 智能内容发布' 来发布格式化后的文章")
             
         except Exception as e:
             print(f"❌ 批量操作失败: {e}")
