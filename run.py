@@ -1530,10 +1530,11 @@ def handle_post_update_menu(pipeline):
     print("\n请选择操作：")
     print("1. 更新已发布文章 (直接编辑模式)")
     print("2. 更新已发布文章 (流水线处理模式)")
-    print("3. 查看文章更新帮助")
+    print("3. 修改文章会员等级")
+    print("4. 查看文章更新帮助")
     print("0. 返回主菜单")
     
-    sub_choice = input("\n请输入选项 (1-3/0): ").strip()
+    sub_choice = input("\n请输入选项 (1-4/0): ").strip()
     choice_display = sub_choice if sub_choice else "(空选择)"
     pipeline.log(f"文章更新工具 - 用户选择: {choice_display}", level="info", force=True)
     
@@ -1593,6 +1594,108 @@ def handle_post_update_menu(pipeline):
         # 用户未输入任何内容，提示并返回
         print("❌ 未选择任何选项")
     elif sub_choice == "3":
+        # 修改文章会员等级
+        print("\n📊 修改文章会员等级")
+        print("="*40)
+        
+        # 列出已发布文章
+        posts_dir = Path("_posts")
+        if not posts_dir.exists():
+            print("❌ 未找到_posts目录")
+            return
+            
+        posts = list(posts_dir.glob("*.md"))
+        if not posts:
+            print("❌ 未找到已发布的文章")
+            return
+            
+        # 显示文章列表
+        print("\n📄 已发布文章列表：")
+        for i, post in enumerate(posts[-10:]):  # 显示最新10篇
+            print(f"  {i+1}. {post.name}")
+        
+        choice = input("\n请选择文章 (输入编号或文章名): ").strip()
+        
+        # 确定文章文件
+        selected_post = None
+        if choice.isdigit() and 1 <= int(choice) <= len(posts[-10:]):
+            selected_post = posts[-(10-int(choice)+1)]
+        else:
+            # 根据名称搜索
+            for post in posts:
+                if choice in post.name:
+                    selected_post = post
+                    break
+        
+        if not selected_post:
+            print("❌ 未找到指定的文章")
+            return
+            
+        print(f"\n📝 选择的文章: {selected_post.name}")
+        
+        # 读取当前文章内容获取现有会员等级
+        try:
+            import yaml
+            with open(selected_post, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # 解析front matter
+            if content.startswith('---'):
+                parts = content.split('---', 2)
+                if len(parts) >= 3:
+                    front_matter = yaml.safe_load(parts[1])
+                    current_level = front_matter.get('member_level', '免费')
+                    print(f"当前会员等级: {current_level}")
+                    
+                    # 显示会员等级选项
+                    print("\n请选择新的会员等级:")
+                    print("0. 免费文章")
+                    print("1. VIP1 体验会员")
+                    print("2. VIP2 月度会员") 
+                    print("3. VIP3 季度会员")
+                    print("4. VIP4 年度会员")
+                    
+                    level_choice = input("\n请输入选项 (0-4): ").strip()
+                    
+                    level_map = {
+                        '0': '免费',
+                        '1': 'VIP1', 
+                        '2': 'VIP2',
+                        '3': 'VIP3',
+                        '4': 'VIP4'
+                    }
+                    
+                    if level_choice in level_map:
+                        new_level = level_map[level_choice]
+                        front_matter['member_level'] = new_level
+                        
+                        # 重新构建文件内容
+                        new_front_matter = yaml.dump(front_matter, allow_unicode=True, default_flow_style=False)
+                        new_content = f"---\n{new_front_matter}---\n{parts[2]}"
+                        
+                        # 写入文件
+                        with open(selected_post, 'w', encoding='utf-8') as f:
+                            f.write(new_content)
+                        
+                        print(f"✅ 会员等级已更新: {current_level} → {new_level}")
+                        
+                        # Git提交
+                        commit_msg = f"Update member level: {selected_post.name} → {new_level}"
+                        try:
+                            import subprocess
+                            subprocess.run(["git", "add", str(selected_post)], check=True)
+                            subprocess.run(["git", "commit", "-m", commit_msg], check=True)
+                            print("✅ 更改已提交到Git")
+                        except Exception as e:
+                            print(f"⚠️ Git提交失败: {e}")
+                    else:
+                        print("❌ 无效的选择")
+                else:
+                    print("❌ 文章格式错误，未找到front matter")
+        except Exception as e:
+            print(f"❌ 处理文章失败: {e}")
+            
+    elif sub_choice == "4":
         # 显示帮助信息
         print("\n📖 文章更新工具帮助")
         print("="*40)

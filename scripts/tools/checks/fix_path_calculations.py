@@ -5,9 +5,9 @@
 
 import re
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Any
 
-def fix_file_path_calculation(file_path: Path) -> Dict[str, any]:
+def fix_file_path_calculation(file_path: Path) -> Dict[str, Any]:
     """修复单个文件的路径计算"""
     result = {
         'file': str(file_path),
