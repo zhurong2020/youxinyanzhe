@@ -401,20 +401,30 @@ def handle_content_normalization_menu(pipeline):
                 
             print(f"\n🔄 正在格式化草稿: {input_file}")
             
-            # 调用format_draft.py脚本
-            script_path = Path("scripts/tools/content/format_draft.py")
-            result = execute_script_with_logging(
-                pipeline, script_path, [input_file], 
-                "格式化单个草稿文件"
-            )
+            # 使用统一的格式化接口
+            result = pipeline.format_content_file(Path(input_file))
             
-            print(result.stdout)
-            if result.stderr:
-                print(f"❌ 错误: {result.stderr}")
-            elif result.returncode == 0:
+            if result['success']:
                 print("✅ 格式化完成！")
-                print("💡 格式化后的文件已保存到 _drafts/ 目录")
-                print("💡 您可以选择 '1. 处理现有草稿' 来发布格式化后的文章")
+                print(f"📄 输出文件: {result['output_file']}")
+                
+                # 显示质量检查结果
+                if result.get('check_passed', False):
+                    print("✅ 内容质量检查通过")
+                else:
+                    if result.get('auto_fixes_applied'):
+                        print("🔧 自动修复的问题:")
+                        for fix in result['auto_fixes_applied']:
+                            print(f"   • {fix}")
+                    
+                    if result.get('manual_fixes_needed'):
+                        print("💡 需要手动处理的问题:")
+                        for item in result['manual_fixes_needed']:
+                            print(f"   • {item['issue']}")
+                
+                print("💡 您可以选择 '1. 智能内容发布' 来发布格式化后的文章")
+            else:
+                print(f"❌ 格式化失败: {result['error']}")
                 
         except Exception as e:
             print(f"❌ 操作失败: {e}")
@@ -3676,15 +3686,17 @@ def handle_onedrive_images_menu(pipeline):
                     selected_draft = draft_files[file_index]
                     print(f"📝 处理草稿: {selected_draft.name}")
                     
-                    result = subprocess.run([
-                        "python3", "scripts/tools/onedrive_blog_images.py",
-                        "--draft", str(selected_draft)
-                    ], check=False)
+                    # 使用统一的OneDrive图片处理接口
+                    result = pipeline.process_onedrive_images(selected_draft)
                     
-                    if result.returncode == 0:
-                        print("✅ 草稿图片处理完成")
+                    if result['success']:
+                        print(f"✅ 图片处理完成，处理了 {result['processed_images']} 张图片")
+                        if result['issues']:
+                            print("⚠️ 仍有部分图片问题需要手动处理:")
+                            for issue in result['issues'][:3]:  # 显示前3个问题
+                                print(f"   • {issue}")
                     else:
-                        print("❌ 草稿图片处理失败")
+                        print(f"❌ 图片处理失败: {result['error']}")
                 else:
                     print("❌ 无效的文件选择")
                     
@@ -3696,15 +3708,36 @@ def handle_onedrive_images_menu(pipeline):
             print("📁 批量处理所有草稿图片...")
             
             try:
-                result = subprocess.run([
-                    "python3", "scripts/tools/onedrive_blog_images.py",
-                    "--batch", "_drafts"
-                ], check=False)
+                drafts_dir = Path("_drafts")
+                if not drafts_dir.exists():
+                    print("❌ 草稿目录不存在")
+                    continue
                 
-                if result.returncode == 0:
-                    print("✅ 批量处理完成")
-                else:
-                    print("❌ 批量处理失败")
+                draft_files = list(drafts_dir.glob("*.md"))
+                if not draft_files:
+                    print("❌ 没有找到草稿文件")
+                    continue
+                
+                total_processed = 0
+                successful_files = 0
+                
+                for draft_file in draft_files:
+                    print(f"📝 处理: {draft_file.name}")
+                    result = pipeline.process_onedrive_images(draft_file)
+                    
+                    if result['success']:
+                        successful_files += 1
+                        total_processed += result['processed_images']
+                        if result['processed_images'] > 0:
+                            print(f"   ✅ 处理了 {result['processed_images']} 张图片")
+                        else:
+                            print(f"   ✅ 无需图片处理")
+                    else:
+                        print(f"   ❌ 失败: {result['error']}")
+                
+                print(f"\n📊 批量处理完成:")
+                print(f"   • 处理文件: {successful_files}/{len(draft_files)}")
+                print(f"   • 处理图片: {total_processed} 张")
                     
             except Exception as e:
                 print(f"❌ 批量处理出错: {e}")

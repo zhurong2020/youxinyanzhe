@@ -2567,6 +2567,165 @@ class ContentPipeline:
                 
         return None
 
+    # ===================== 统一处理接口 =====================
+    
+    def format_content_file(self, input_file: Path, **kwargs) -> Dict[str, Any]:
+        """
+        统一的内容文件格式化接口
+        
+        Args:
+            input_file: 输入文件路径
+            **kwargs: 传递给format_draft.py的参数
+            
+        Returns:
+            处理结果字典
+        """
+        from pathlib import Path
+        import subprocess
+        import sys
+        
+        result = {
+            'success': False,
+            'output_file': None,
+            'issues': [],
+            'error': None
+        }
+        
+        try:
+            if not input_file.exists():
+                result['error'] = f"输入文件不存在: {input_file}"
+                return result
+            
+            # 构建format_draft.py调用参数
+            script_path = Path("scripts/tools/content/format_draft.py")
+            if not script_path.exists():
+                result['error'] = f"格式化脚本不存在: {script_path}"
+                return result
+            
+            cmd = [sys.executable, str(script_path), str(input_file)]
+            
+            # 添加可选参数
+            if 'title' in kwargs:
+                cmd.extend(['-t', kwargs['title']])
+            if 'category' in kwargs:
+                cmd.extend(['-c', kwargs['category']])
+            if 'tags' in kwargs:
+                cmd.extend(['--tags'] + kwargs['tags'])
+            if 'output' in kwargs:
+                cmd.extend(['-o', str(kwargs['output'])])
+            
+            # 执行格式化
+            process_result = subprocess.run(
+                cmd, 
+                capture_output=True, 
+                text=True, 
+                cwd=Path.cwd()
+            )
+            
+            if process_result.returncode == 0:
+                result['success'] = True
+                
+                # 解析输出找到生成的文件路径
+                output_lines = process_result.stdout.split('\n')
+                for line in output_lines:
+                    if '格式化完成:' in line:
+                        output_file_str = line.split('格式化完成:')[-1].strip()
+                        result['output_file'] = Path(output_file_str)
+                        break
+                
+                # 如果格式化成功，进行质量检查
+                if result['output_file'] and result['output_file'].exists():
+                    check_result = self.comprehensive_content_check(
+                        result['output_file'], 
+                        auto_fix=True
+                    )
+                    result.update(check_result)
+                    
+                    self.log(f"统一格式化完成: {input_file} → {result['output_file']}", level="info")
+                else:
+                    result['error'] = "无法确定输出文件路径"
+                    result['success'] = False
+            else:
+                result['error'] = process_result.stderr or "格式化失败"
+                
+        except Exception as e:
+            result['error'] = f"格式化过程异常: {str(e)}"
+            self.log(f"格式化文件失败: {input_file}, 错误: {str(e)}", level="error")
+            
+        return result
+    
+    def process_onedrive_images(self, draft_file: Path, mode: str = "single") -> Dict[str, Any]:
+        """
+        统一的OneDrive图片处理接口
+        
+        Args:
+            draft_file: 草稿文件路径
+            mode: 处理模式 ("single" 或 "batch")
+            
+        Returns:
+            处理结果字典
+        """
+        import subprocess
+        import sys
+        
+        result = {
+            'success': False,
+            'processed_images': 0,
+            'issues': [],
+            'error': None
+        }
+        
+        try:
+            if not draft_file.exists():
+                result['error'] = f"草稿文件不存在: {draft_file}"
+                return result
+            
+            # 检查草稿中的图片问题
+            with open(draft_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            image_issues = self.check_image_paths(content)
+            if not image_issues:
+                result['success'] = True
+                result['processed_images'] = 0
+                self.log(f"草稿无需图片处理: {draft_file}", level="info")
+                return result
+            
+            # 调用OneDrive图片处理脚本
+            script_path = Path("scripts/tools/onedrive_blog_images.py")
+            if not script_path.exists():
+                result['error'] = f"OneDrive处理脚本不存在: {script_path}"
+                return result
+            
+            cmd = [sys.executable, str(script_path), "--draft", str(draft_file)]
+            
+            process_result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                cwd=Path.cwd()
+            )
+            
+            if process_result.returncode == 0:
+                result['success'] = True
+                result['processed_images'] = len(image_issues)
+                
+                # 重新检查处理后的图片状态
+                with open(draft_file, 'r', encoding='utf-8') as f:
+                    updated_content = f.read()
+                remaining_issues = self.check_image_paths(updated_content)
+                result['issues'] = remaining_issues
+                
+                self.log(f"OneDrive图片处理完成: {draft_file}, 处理 {result['processed_images']} 张图片", level="info")
+            else:
+                result['error'] = process_result.stderr or "OneDrive图片处理失败"
+                
+        except Exception as e:
+            result['error'] = f"OneDrive图片处理异常: {str(e)}"
+            self.log(f"OneDrive图片处理失败: {draft_file}, 错误: {str(e)}", level="error")
+            
+        return result
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, default='config/pipeline_config.yml', help='Path to config file')
