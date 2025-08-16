@@ -1,4 +1,5 @@
 ---
+layout: member-post
 title: "VIP3专享：ARK Invest特斯拉投资策略完整解读"
 date: 2025-08-16
 categories: [投资理财, VIP专享]
