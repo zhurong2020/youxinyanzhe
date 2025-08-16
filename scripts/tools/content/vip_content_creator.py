@@ -352,6 +352,7 @@ class VIPContentCreator:
         
         post = frontmatter.Post("")
         post.metadata = {
+            'layout': 'member-post',  # 确保使用会员文章布局
             'title': f"{topic_info['title']} {tier_config['display_name']}专享分析",
             'date': topic_info['date'],
             'category': topic_info['category'],
