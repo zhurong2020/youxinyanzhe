@@ -146,3 +146,8 @@ config/azure_app_info.md
 
 # 会员系统安全文件
 .tmp/member_data/.security_key
+
+# 研究报告和PDF文档（版权保护，避免法律风险）
+assets/research-reports/
+*.pdf
+!docs/*.pdf
