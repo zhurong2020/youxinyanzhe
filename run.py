@@ -4416,9 +4416,10 @@ def handle_smart_creation_menu(pipeline):
     print("2. 快速测试文章") 
     print("3. 内容大纲创建")
     print("4. 创作辅助工具")
+    print("5. 📊 VIP多层内容创作")  # 新增VIP内容创作
     print("0. 返回主菜单")
     
-    choice = input("\n请选择 (1-4/0): ").strip()
+    choice = input("\n请选择 (1-5/0): ").strip()
     
     if choice == "1":
         # AI主题生成 (原主题灵感生成器)
@@ -4455,11 +4456,111 @@ def handle_smart_creation_menu(pipeline):
         # TODO: 实现创作辅助工具
         return None
         
+    elif choice == "5":
+        # VIP多层内容创作
+        return handle_vip_content_creation_menu(pipeline)
+        
     elif choice == "0":
         return None
     else:
         print("❌ 无效选择，请重新输入")
         return handle_smart_creation_menu(pipeline)
+
+
+def handle_vip_content_creation_menu(pipeline):
+    """VIP多层内容创作菜单"""
+    from scripts.tools.content.vip_content_creator import VIPContentCreator
+    
+    print("\n" + "="*50)
+    print("📊 VIP多层内容创作")
+    print("="*50)
+    print("🎯 基于《草稿管理规范》的标准化多层VIP内容创作")
+    print("\n📋 功能说明：")
+    print("- 创建完整的四层内容架构 (免费 + VIP2 + VIP3 + VIP4)")
+    print("- 自动生成标准化的Front Matter")
+    print("- 遵循草稿管理和发布流程规范")
+    print("- 支持Tesla投资系列的成功模式")
+    
+    vip_creator = VIPContentCreator(pipeline)
+    
+    while True:
+        print("\n请选择操作：")
+        print("1. 🆕 创建新的VIP内容系列")
+        print("2. 📁 管理现有VIP内容")
+        print("3. 📊 查看VIP内容配置")
+        print("4. 📋 显示创作流程指南")
+        print("0. 返回上级菜单")
+        
+        choice = input("\n请选择 (1-4/0): ").strip()
+        
+        if choice == "1":
+            # 创建新的VIP内容系列
+            try:
+                strategy_file = vip_creator.create_vip_content_series()
+                if strategy_file:
+                    pipeline.log(f"VIP内容系列创建成功: {strategy_file}", level="info", force=True)
+                    return strategy_file
+                else:
+                    print("❌ VIP内容系列创建已取消")
+            except Exception as e:
+                print(f"❌ 创建VIP内容系列时出错: {e}")
+                pipeline.log(f"VIP内容创建失败: {e}", level="error", force=True)
+                
+        elif choice == "2":
+            # 管理现有VIP内容
+            try:
+                vip_creator.manage_existing_vip_content()
+            except Exception as e:
+                print(f"❌ 管理VIP内容时出错: {e}")
+                pipeline.log(f"VIP内容管理失败: {e}", level="error", force=True)
+                
+        elif choice == "3":
+            # 查看VIP内容配置
+            print("\n" + "="*40)
+            print("📊 VIP内容配置概览")
+            print("="*40)
+            
+            config = vip_creator.vip_config
+            for tier_key, tier_config in config['tiers'].items():
+                print(f"\n{tier_config['display_name']} ({tier_config['price']}):")
+                print(f"  技术字段: {tier_config['technical_field']}")
+                print(f"  最小字数: {tier_config['min_length']}")
+                print(f"  服务描述: {tier_config['description']}")
+                print(f"  目标用户: {tier_config['target_audience']}")
+            
+            print(f"\n支持的内容分类:")
+            for cat_key, cat_name in config['categories'].items():
+                print(f"  {cat_key}: {cat_name}")
+                
+        elif choice == "4":
+            # 显示创作流程指南
+            print("\n" + "="*50)
+            print("📋 VIP多层内容创作流程指南")
+            print("="*50)
+            print("\n🎯 创作流程概览:")
+            print("1. 📋 主题确定和资源评估")
+            print("2. 📝 创建内容策略文档")
+            print("3. 📁 生成标准化草稿结构")
+            print("4. ✍️ 按层级创作内容")
+            print("5. 🔍 质量检查和优化")
+            print("6. 🚀 分步发布策略")
+            print("7. 📊 草稿管理和归档")
+            
+            print("\n📊 内容层级标准:")
+            print("🆓 免费内容: 3000+字, 40%价值, 建立信任")
+            print("💎 VIP2: 8000+字, 专业数据+实用工具")
+            print("🔥 VIP3: 12000+字, 机构策略+高管洞察") 
+            print("👑 VIP4: 20000+字等值, 独家资源+专业服务")
+            
+            print("\n🔗 相关文档:")
+            print("- docs/DRAFT_MANAGEMENT_GUIDELINES.md")
+            print("- config/vip_content_config.yml")
+            print("- Tesla投资系列作为成功案例参考")
+            
+        elif choice == "0":
+            return None
+        else:
+            print("❌ 无效选择，请重新输入")
 
 
 def handle_youtube_processing_menu(pipeline):
