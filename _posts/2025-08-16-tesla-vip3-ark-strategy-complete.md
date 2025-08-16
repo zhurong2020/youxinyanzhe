@@ -6,7 +6,7 @@ tags: [特斯拉, ARK Invest, Cathie Wood, 颠覆性创新, VIP3]
 header:
   teaser: "{{ site.baseurl }}/assets/images/ark-tesla-strategy-teaser.jpg"
 excerpt: "全面解读ARK Invest $2,600目标价推导过程，深度学习Cathie Wood颠覆性创新投资方法论。"
-vip_level: 3
+member_tier: quarterly
 estimated_reading_time: 25分钟
 last_updated: 2025-08-16
 ---
