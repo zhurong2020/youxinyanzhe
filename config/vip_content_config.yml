@@ -1,0 +1,184 @@
+# VIP多层内容创作配置文件
+# 用于标准化VIP内容创作流程
+
+# VIP等级配置
+tiers:
+  vip2:
+    display_name: "VIP2"
+    technical_field: "monthly"
+    price: "¥99/月"
+    min_length: 8000
+    description: "专业数据 + 实用工具"
+    target_audience: "投资爱好者和数据分析师"
+    value_proposition: "权威数据源深度解读、专业工具使用指南、技术分析方法、实战案例研究"
+    
+  vip3:
+    display_name: "VIP3"
+    technical_field: "quarterly" 
+    price: "¥288/季"
+    min_length: 12000
+    description: "机构策略 + 高管洞察"
+    target_audience: "专业投资人和机构投资者"
+    value_proposition: "顶级机构策略分析、高管访谈深度解读、前瞻性研究报告、专业决策框架"
+    
+  vip4:
+    display_name: "VIP4"
+    technical_field: "yearly"
+    price: "¥1999/年"
+    min_length: 20000
+    description: "独家资源 + 专业服务"
+    target_audience: "高净值投资者和机构客户"
+    value_proposition: "完整研报翻译、1对1专属咨询、实时事件解读、定制化工具包"
+
+# 内容分类配置
+categories:
+  cognitive-upgrade: "🧠 认知升级"
+  tech-empowerment: "🛠️ 技术赋能"
+  global-perspective: "🌍 全球视野"
+  investment-finance: "💰 投资理财"
+
+# 内容质量标准
+quality_standards:
+  free_content:
+    min_length: 3000
+    value_percentage: 40
+    purpose: "建立信任和价值感知"
+    
+  vip2_content:
+    min_length: 8000
+    required_sources: 10
+    professional_tools: true
+    case_studies: true
+    
+  vip3_content:
+    min_length: 12000
+    institutional_analysis: true
+    expert_interviews: true
+    forecasting_reports: true
+    
+  vip4_content:
+    min_length: 20000
+    exclusive_translations: true
+    personal_consultation: true
+    real_time_analysis: true
+    custom_tools: true
+
+# 文件命名规范
+naming_conventions:
+  main_document: "{date}-{topic}-guide.md"
+  vip2_document: "{topic}-vip2-{technical_field}-analysis.md"
+  vip3_document: "{topic}-vip3-{technical_field}-analysis.md"
+  vip4_preparation: "{topic}-vip4-premium-service-package.md"
+  strategy_document: "{topic}-content-strategy.md"
+
+# 目录结构配置
+directory_structure:
+  drafts_root: "_drafts"
+  vip4_preparation: "_drafts/vip4-preparation"
+  archived_projects: "_drafts/archived/project-management"
+  published_posts: "_posts"
+
+# Front Matter模板
+front_matter_templates:
+  main_document:
+    title: "文章标题(25-35字符)"
+    date: "YYYY-MM-DD"
+    category: "分类标识"
+    header: "引人入胜的开头钩子(50-60字符)"
+    vip_preview: true
+    member_tiers: ["monthly", "quarterly", "yearly"]
+    
+  vip_document:
+    title: "标题 VIP等级专享分析"
+    date: "YYYY-MM-DD"
+    category: "分类标识"
+    member_tier: "技术字段值"
+    vip_level_display: "VIP显示名称"
+    target_length: "目标字数"
+    header: "服务描述 - 价格"
+    
+  vip4_preparation:
+    title: "标题 VIP4顶级服务包"
+    date: "YYYY-MM-DD"
+    category: "分类标识"
+    service_type: "vip4_preparation"
+    status: "planning"
+
+# 内容模板结构
+content_templates:
+  main_document_sections:
+    - "引言钩子 (免费)"
+    - "核心概念介绍 (免费)"
+    - "<!-- more -->"
+    - "深度分析预览 (免费)"
+    - "VIP2专享预览"
+    - "VIP3专享预览"
+    - "VIP4专享预览"
+    - "延伸资源 (免费)"
+    - "播客版本 (免费)"
+    
+  vip_document_sections:
+    - "专享内容概览"
+    - "专享价值点"
+    - "核心分析内容"
+    - "专业工具包"
+    - "实战应用指南"
+    - "后续更新计划"
+
+# 发布流程配置
+publishing_workflow:
+  recommended_sequence:
+    - step: 1
+      action: "发布主文档"
+      timing: "Day 1"
+      
+    - step: 2
+      action: "发布VIP2内容"
+      timing: "Day 2-3"
+      
+    - step: 3
+      action: "发布VIP3内容"
+      timing: "Day 4-5"
+      
+    - step: 4
+      action: "准备VIP4服务"
+      timing: "根据需求"
+
+# 质量检查清单
+quality_checklist:
+  content_quality:
+    - "主文档字数 ≥3000字"
+    - "VIP2文档字数 ≥8000字"
+    - "VIP3文档字数 ≥12000字"
+    - "权威数据源引用 ≥10个"
+    - "专业术语解释完整"
+    
+  technical_compliance:
+    - "Front Matter字段完整正确"
+    - "member_tier字段使用技术值"
+    - "图片路径使用 {{ site.baseurl }}/assets/..."
+    - "Markdown语法正确"
+    - "移动端显示测试通过"
+    
+  business_value:
+    - "免费内容建立足够价值感知"
+    - "VIP预览有效引导升级"
+    - "各层级内容差异化明显"
+    - "升级路径清晰合理"
+
+# 成功指标配置
+success_metrics:
+  conversion_targets:
+    free_to_vip2: 0.05  # 5%
+    vip2_to_vip3: 0.20  # 20%
+    vip3_to_vip4: 0.15  # 15%
+    
+  content_engagement:
+    reading_completion_rate: 0.60  # 60%
+    sharing_rate: 0.05  # 5%
+    user_satisfaction: 4.5  # 4.5/5
+    
+  business_targets:
+    monthly_vip2_users: 30
+    monthly_vip3_users: 15
+    annual_vip4_users: 8
