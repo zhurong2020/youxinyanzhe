@@ -459,6 +459,24 @@ class ContentPipeline:
                             if teaser_path.startswith('c:') or teaser_path.startswith('C:'):
                                 issues.append("🖼️ 头图使用了本地路径，需要OneDrive处理")
                     
+                    # 检查VIP文章的特殊要求
+                    member_tier = post.metadata.get('member_tier')
+                    if member_tier and member_tier != 'free':
+                        # 检查VIP文章必须有member-post布局
+                        if post.metadata.get('layout') != 'member-post':
+                            issues.append("🔐 VIP文章缺少 'layout: member-post' 设置，访问控制将失效")
+                        
+                        # 检查VIP等级合法性
+                        valid_tiers = ['experience', 'monthly', 'quarterly', 'yearly']
+                        if member_tier not in valid_tiers:
+                            issues.append(f"🔐 无效的会员等级: {member_tier}，有效值: {', '.join(valid_tiers)}")
+                        
+                        # 检查VIP文章标题是否包含等级标识
+                        title = str(post.metadata.get('title', ''))
+                        vip_indicators = ['VIP2', 'VIP3', 'VIP4', '专享', '会员']
+                        if not any(indicator in title for indicator in vip_indicators):
+                            issues.append("🔐 VIP文章标题建议包含等级标识 (如 VIP2专享、VIP3专享)")
+                
                 except Exception as e:
                     issues.append(f"📋 Front Matter格式错误: {str(e)}")
             
