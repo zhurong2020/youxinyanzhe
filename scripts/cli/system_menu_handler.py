@@ -446,3 +446,107 @@ echo "💡 可运行 'env | grep ANTHROPIC' 查看配置"
 """
         
         return script_content
+    
+    def handle_audio_tools_menu(self) -> None:
+        """语音和音频工具菜单 (合并原功能12+相关)"""
+        menu_title = "🔊 语音和音频工具"
+        menu_description = "🎙️ TTS服务管理和音频处理工具"
+        
+        options = [
+            "1. TTS语音测试",
+            "2. 音频质量评估", 
+            "3. 语音服务切换",
+            "4. 音频格式转换"
+        ]
+        
+        handlers = [
+            self._tts_voice_test,
+            self._audio_quality_assessment,
+            self._voice_service_switch,
+            self._audio_format_conversion
+        ]
+        
+        self.create_menu_loop(menu_title, menu_description, options, handlers)
+    
+    def _tts_voice_test(self) -> Optional[str]:
+        """TTS语音测试 (原ElevenLabs测试)"""
+        print("\n🎙️ TTS语音测试")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _audio_quality_assessment(self) -> Optional[str]:
+        """音频质量评估"""
+        print("\n📊 音频质量评估")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _voice_service_switch(self) -> Optional[str]:
+        """语音服务切换"""
+        print("\n🔄 语音服务切换")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _audio_format_conversion(self) -> Optional[str]:
+        """音频格式转换"""
+        print("\n🔊 音频格式转换")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def handle_system_tools_menu(self) -> None:
+        """系统工具集合菜单 (合并原功能7+10+11)"""
+        menu_title = "⚙️ 系统工具集合"
+        menu_description = "🛠️ 系统维护和配置管理"
+        
+        options = [
+            "1. 系统状态检查",
+            "2. LLM引擎切换",
+            "3. 调试和维护",
+            "4. 配置管理",
+            "5. 日志查看"
+        ]
+        
+        handlers = [
+            self._system_status_check,
+            self._llm_engine_switch,
+            self._debug_maintenance,
+            self._config_management,
+            self._log_viewer
+        ]
+        
+        self.create_menu_loop(menu_title, menu_description, options, handlers)
+    
+    def _system_status_check(self) -> Optional[str]:
+        """系统状态检查 (原功能7)"""
+        print("\n🔍 系统状态检查")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _llm_engine_switch(self) -> Optional[str]:
+        """LLM引擎切换 (原功能10)"""
+        return self.handle_llm_engine_menu()
+    
+    def _debug_maintenance(self) -> Optional[str]:
+        """调试和维护 (原功能11)"""
+        print("\n🔧 调试和维护")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _config_management(self) -> Optional[str]:
+        """配置管理"""
+        print("\n⚙️ 配置管理")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _log_viewer(self) -> Optional[str]:
+        """日志查看"""
+        print("\n📋 日志查看")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None

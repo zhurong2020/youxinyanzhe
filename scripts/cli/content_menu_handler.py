@@ -7,6 +7,7 @@
 from scripts.cli.base_menu_handler import BaseMenuHandler
 from scripts.core.content_pipeline import ContentPipeline
 from typing import Optional
+from pathlib import Path
 
 
 class ContentMenuHandler(BaseMenuHandler):
@@ -212,32 +213,325 @@ class ContentMenuHandler(BaseMenuHandler):
         return None
     
     def handle_content_normalization_menu(self) -> Optional[str]:
-        """
-        处理内容规范化菜单
-        
-        Returns:
-            处理结果或None
-        """
+        """处理内容规范化处理菜单"""
         menu_title = "📝 内容规范化处理"
-        menu_description = "🔧 文章格式化、Front Matter生成、内容优化"
+        menu_description = "🔧 多源内容统一处理：手工草稿、YouTube内容、灵感生成内容\n📋 Jekyll规范检查：Front Matter、语法、路径验证\n🎯 智能内容结构：摘要(50-60字) + 背景介绍 + 主体内容"
         
         options = [
-            "1. 📄 格式化现有草稿",
-            "2. 🏷️ 生成Front Matter",
-            "3. 🔍 内容质量检查",
-            "4. 📊 批量处理草稿",
-            "5. ⚙️ 规范化配置"
+            "2.1 处理单个内容文件",
+            "2.2 批量处理多个文件", 
+            "2.3 查看使用示例",
+            "2.4 查看分类关键词",
+            "2.5 内容质量检查",
+            "2.6 YouTube内容规范化"
         ]
         
         handlers = [
-            self._format_existing_draft,
-            self._generate_front_matter,
+            self._process_single_content_file,
+            self._batch_process_content_files,
+            self._show_usage_examples,
+            self._show_classification_keywords,
             self._content_quality_check,
-            self._batch_process_drafts,
-            self._normalization_config
+            self._youtube_content_normalization
         ]
         
-        return self.create_menu_loop(menu_title, menu_description, options, handlers)
+        return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "2")
+    
+    def _process_single_content_file(self) -> None:
+        """处理单个内容文件"""
+        try:
+            # 列出可能的草稿文件
+            import glob
+            from pathlib import Path
+            
+            potential_files = []
+            for pattern in ["*.txt", "*.md"]:
+                potential_files.extend(glob.glob(pattern))
+                potential_files.extend(glob.glob(f"_drafts/**/{pattern}", recursive=True))
+                potential_files.extend(glob.glob(f"drafts/**/{pattern}", recursive=True))
+            
+            if potential_files:
+                print(f"\n📄 发现 {len(potential_files)} 个可能的草稿文件：")
+                for i, file in enumerate(potential_files[:20], 1):  # 最多显示20个
+                    print(f"  {i}. {file}")
+                if len(potential_files) > 20:
+                    print(f"  ... 和其他 {len(potential_files) - 20} 个文件")
+                print("  0. 手动输入文件路径")
+                
+                file_choice = input(f"\n请选择文件 (1-{min(len(potential_files), 20)}/0): ").strip()
+                
+                if file_choice == "0":
+                    input_file = input("请输入文件路径: ").strip()
+                elif file_choice.isdigit() and 1 <= int(file_choice) <= min(len(potential_files), 20):
+                    input_file = potential_files[int(file_choice) - 1]
+                else:
+                    print("❌ 无效选择")
+                    return
+            else:
+                input_file = input("请输入草稿文件路径: ").strip()
+            
+            from pathlib import Path
+            if not input_file or not Path(input_file).exists():
+                print("❌ 文件不存在或路径无效")
+                return
+                
+            print(f"\n🔄 正在格式化草稿: {input_file}")
+            
+            # 使用统一的格式化接口
+            result = self.pipeline.format_content_file(Path(input_file))
+            
+            if result['success']:
+                print("✅ 格式化完成！")
+                print(f"📄 输出文件: {result['output_file']}")
+                
+                # 显示质量检查结果
+                if result.get('check_passed', False):
+                    print("✅ 内容质量检查通过")
+                else:
+                    if result.get('auto_fixes_applied'):
+                        print("🔧 自动修复的问题:")
+                        for fix in result['auto_fixes_applied']:
+                            print(f"   • {fix}")
+                    
+                    if result.get('manual_fixes_needed'):
+                        print("💡 需要手动处理的问题:")
+                        for item in result['manual_fixes_needed']:
+                            print(f"   • {item['issue']}")
+                
+                print("💡 您可以选择 '1. 智能内容发布' 来发布格式化后的文章")
+            else:
+                print(f"❌ 格式化失败: {result['error']}")
+                
+        except Exception as e:
+            print(f"❌ 操作失败: {e}")
+            
+    def _batch_process_content_files(self) -> None:
+        """批量处理多个内容文件"""
+        batch_dir = input("\n请输入包含草稿文件的目录路径: ").strip()
+        if not batch_dir or not Path(batch_dir).exists():
+            print("❌ 目录不存在")
+            return
+            
+        try:
+            import glob
+            
+            files_to_process = []
+            for pattern in ["*.txt", "*.md"]:
+                files_to_process.extend(glob.glob(f"{batch_dir}/{pattern}"))
+                files_to_process.extend(glob.glob(f"{batch_dir}/**/{pattern}", recursive=True))
+            
+            if not files_to_process:
+                print("❌ 未找到可处理的草稿文件")
+                return
+                
+            print(f"\n📄 找到 {len(files_to_process)} 个文件:")
+            for file in files_to_process:
+                print(f"  • {file}")
+                
+            confirm = input(f"\n确定要批量处理这些文件吗？(y/N): ").strip().lower()
+            if confirm not in ['y', 'yes']:
+                print("❌ 用户取消操作")
+                return
+                
+            print("\n🔄 开始批量格式化...")
+            success_count = 0
+            total_issues_fixed = 0
+            
+            for file in files_to_process:
+                try:
+                    print(f"\n处理: {file}")
+                    
+                    # 使用统一的格式化接口
+                    result = self.pipeline.format_content_file(Path(file))
+                    
+                    if result['success']:
+                        success_count += 1
+                        print(f"✅ 成功: {file}")
+                        print(f"   输出: {result['output_file']}")
+                        
+                        # 统计修复的问题
+                        if result.get('auto_fixes_applied'):
+                            total_issues_fixed += len(result['auto_fixes_applied'])
+                            
+                        # 显示需要手动处理的问题
+                        if result.get('manual_fixes_needed'):
+                            print(f"   ⚠️ {len(result['manual_fixes_needed'])} 个问题需要手动处理")
+                    else:
+                        print(f"❌ 失败: {file}")
+                        print(f"   错误: {result['error']}")
+                            
+                except Exception as e:
+                    print(f"❌ 处理 {file} 时出错: {e}")
+                    
+            print(f"\n📊 批量处理完成：")
+            print(f"   • 成功文件: {success_count}/{len(files_to_process)}")
+            print(f"   • 自动修复: {total_issues_fixed} 个问题")
+            print("💡 您可以选择 '1. 智能内容发布' 来发布格式化后的文章")
+            
+        except Exception as e:
+            print(f"❌ 批量操作失败: {e}")
+    
+    def _show_usage_examples(self) -> None:
+        """显示使用示例"""
+        print("\n" + "="*40)
+        print("📖 格式化草稿使用示例")
+        print("="*40)
+        
+        example_content = '''
+📝 示例输入文件 (example_draft.txt):
+深度学习的最新进展与应用前景
+人工智能领域在2024年取得了重大突破，特别是在大语言模型和计算机视觉方面。
+本文将探讨这些技术的最新发展和未来应用前景。
+## 大语言模型的突破
+GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
+## 计算机视觉的进展
+多模态模型如GPT-4V在图像理解方面展现出惊人的能力...
+---
+🔄 工具会自动生成:
+- 智能分类: tech-empowerment (技术赋能)
+- 自动标签: ["人工智能", "深度学习", "机器学习", "技术趋势"]
+- 生成摘要: 探讨2024年人工智能领域的最新突破，重点分析大语言模型和计算机视觉的发展
+- 完整front matter: 包含日期、分类、标签等元数据
+- 格式化内容: 符合Jekyll和项目规范的完整文章
+💡 输出文件会保存到 _drafts/ 目录，可直接用于发布流程
+        '''
+        
+        print(example_content)
+        self.pause_for_user()
+    
+    def _show_classification_keywords(self) -> None:
+        """显示分类关键词"""
+        print("\n" + "="*40)
+        print("🔍 内容智能分类关键词")
+        print("="*40)
+        
+        categories_info = '''
+🧠 认知升级 (cognitive-upgrade):
+   关键词: 思维、学习、认知、心理学、方法论、习惯、效率、自我提升
+   
+🛠️ 技术赋能 (tech-empowerment):  
+   关键词: 技术、工具、自动化、编程、软件、AI、效率工具、数字化
+   
+🌍 全球视野 (global-perspective):
+   关键词: 国际、全球、文化、跨国、趋势、政策、经济、社会
+   
+💰 投资理财 (investment-finance):
+   关键词: 投资、理财、金融、股票、基金、财务、经济、资产配置
+        '''
+        
+        print(categories_info)
+        self.pause_for_user()
+    
+    def _content_quality_check(self) -> None:
+        """内容质量检查"""
+        print("\n🔍 内容质量检查")
+        print("="*40)
+        
+        # 允许用户选择检查草稿文件
+        from pathlib import Path
+        drafts_dir = Path("_drafts")
+        
+        if not drafts_dir.exists():
+            print("❌ 草稿目录不存在")
+            self.pause_for_user()
+            return
+            
+        draft_files = list(drafts_dir.glob("*.md"))
+        if not draft_files:
+            print("❌ 没有找到草稿文件")
+            self.pause_for_user()
+            return
+            
+        print("\n可用的草稿文件:")
+        for i, draft in enumerate(draft_files, 1):
+            print(f"{i}. {draft.name}")
+            
+        try:
+            file_choice = input(f"\n请选择文件 (1-{len(draft_files)}/0取消): ").strip()
+            if file_choice == "0":
+                return
+                
+            file_index = int(file_choice) - 1
+            if 0 <= file_index < len(draft_files):
+                selected_draft = draft_files[file_index]
+                print(f"📝 检查草稿: {selected_draft.name}")
+                
+                # 使用pipeline的质量检查功能
+                issues = self.pipeline.check_draft_issues(selected_draft)
+                
+                if not issues:
+                    print("✅ 内容质量检查通过，无发现问题")
+                else:
+                    print(f"⚠️ 发现 {len(issues)} 个问题:")
+                    for i, issue in enumerate(issues, 1):
+                        print(f"   {i}. {issue}")
+                        
+                    print("\n💡 建议:")
+                    print("   • 使用 '1. 处理单个内容文件' 自动修复问题")
+                    print("   • 或使用 '5. OneDrive图床管理' 处理图片问题")
+            else:
+                print("❌ 无效的文件选择")
+                
+        except (ValueError, IndexError):
+            print("❌ 无效的输入")
+        
+        self.pause_for_user()
+    
+    def _youtube_content_normalization(self) -> None:
+        """YouTube内容规范化"""
+        print("\n📺 YouTube内容规范化")
+        print("="*40)
+        print("🎯 处理YouTube生成的内容，规范化为符合Jekyll的格式")
+        
+        # 检查是否有YouTube生成的内容
+        import glob
+        youtube_files = []
+        patterns = ["*youtube*.txt", "*podcast*.txt", "*youtube*.md", "*podcast*.md"]
+        
+        for pattern in patterns:
+            youtube_files.extend(glob.glob(pattern))
+            youtube_files.extend(glob.glob(f"_drafts/**/{pattern}", recursive=True))
+            youtube_files.extend(glob.glob(f"drafts/**/{pattern}", recursive=True))
+        
+        if youtube_files:
+            print(f"\n📄 发现 {len(youtube_files)} 个可能的YouTube内容文件:")
+            for i, file in enumerate(youtube_files[:10], 1):  # 显示前10个
+                print(f"  {i}. {file}")
+            
+            if len(youtube_files) > 10:
+                print(f"  ... 和其他 {len(youtube_files) - 10} 个文件")
+            
+            try:
+                file_choice = input(f"\n请选择文件 (1-{min(len(youtube_files), 10)}/0取消): ").strip()
+                
+                if file_choice == "0":
+                    return
+                    
+                file_index = int(file_choice) - 1
+                if 0 <= file_index < min(len(youtube_files), 10):
+                    selected_file = youtube_files[file_index]
+                    print(f"📝 处理文件: {selected_file}")
+                    
+                    # 使用内容规范化功能处理
+                    from pathlib import Path
+                    result = self.pipeline.format_content_file(Path(selected_file))
+                    
+                    if result['success']:
+                        print("✅ YouTube内容规范化完成！")
+                        print(f"📄 输出文件: {result['output_file']}")
+                        print("💡 文件已准备好发布流程")
+                    else:
+                        print(f"❌ 规范化失败: {result['error']}")
+                else:
+                    print("❌ 无效的文件选择")
+                    
+            except (ValueError, IndexError):
+                print("❌ 无效的输入")
+        else:
+            print("📄 未找到YouTube相关的内容文件")
+            print("💡 提示: 请确保文件名包含'youtube'或'podcast'关键词")
+        
+        self.pause_for_user()
     
     def _format_existing_draft(self) -> Optional[str]:
         """格式化现有草稿"""
@@ -253,12 +547,6 @@ class ContentMenuHandler(BaseMenuHandler):
         self.pause_for_user()
         return None
     
-    def _content_quality_check(self) -> Optional[str]:
-        """内容质量检查"""
-        print("\n🔍 内容质量检查")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
     
     def _batch_process_drafts(self) -> Optional[str]:
         """批量处理草稿"""
@@ -270,6 +558,548 @@ class ContentMenuHandler(BaseMenuHandler):
     def _normalization_config(self) -> Optional[str]:
         """规范化配置"""
         print("\n⚙️ 规范化配置")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def handle_smart_publishing_menu(self) -> Optional[str]:
+        """智能内容发布菜单 (合并原功能1+2)"""
+        menu_title = "📤 智能内容发布"
+        menu_description = "🎯 统一发布入口，支持新草稿和重新发布"
+        
+        options = [
+            "1.1 发布新草稿",
+            "1.2 重新发布已发布文章", 
+            "1.3 查看发布历史"
+        ]
+        
+        handlers = [
+            self._publish_new_draft,
+            self._republish_article,
+            self._view_publish_history
+        ]
+        
+        return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "1")
+    
+    def _publish_new_draft(self) -> Optional[str]:
+        """发布新草稿"""
+        self.log_action("智能发布：开始发布新草稿")
+        draft = self.pipeline.select_draft()
+        if not draft:
+            self.log_action("用户取消或无草稿可处理")
+            return None
+        return str(draft)
+    
+    def _republish_article(self) -> Optional[str]:
+        """重新发布已发布文章"""
+        self.log_action("智能发布：开始重新发布已发布文章")
+        
+        try:
+            # 使用ContentPipeline的内置方法
+            post = self.pipeline.select_published_post()
+            if not post:
+                self.log_action("用户取消或无文章可重新发布")
+                return None
+            
+            draft = self.pipeline.copy_post_to_draft(post)
+            if not draft:
+                print("复制文章到草稿失败")
+                self.log_action("复制文章到草稿失败", "error")
+                return None
+            
+            return str(draft)
+        except Exception as e:
+            print(f"❌ 重新发布功能出错: {e}")
+            return None
+    
+    def _view_publish_history(self) -> Optional[str]:
+        """查看发布历史"""
+        print("\n📋 发布历史记录")
+        print("="*40)
+        
+        try:
+            from pathlib import Path
+            
+            # 直接扫描_posts目录来获取发布历史
+            posts_dir = Path("_posts")
+            
+            published_articles = []
+            
+            # 从_posts目录获取已发布文章
+            if posts_dir.exists():
+                for post_file in posts_dir.glob("*.md"):
+                    article_name = post_file.stem
+                    
+                    # 检查是否有发布状态记录
+                    if hasattr(self.pipeline, 'status_manager'):
+                        platforms = self.pipeline.status_manager.get_published_platforms(article_name)
+                        summary = self.pipeline.status_manager.get_platform_status_summary(article_name)
+                        
+                        published_articles.append({
+                            'name': article_name,
+                            'file': post_file,
+                            'platforms': platforms,
+                            'summary': summary
+                        })
+                    else:
+                        published_articles.append({
+                            'name': article_name,
+                            'file': post_file,
+                            'platforms': [],
+                            'summary': {}
+                        })
+            
+            if not published_articles:
+                print("📄 暂无发布历史记录")
+                self.pause_for_user()
+                return None
+            
+            # 按文件修改时间排序显示最近的发布
+            published_articles.sort(key=lambda x: x['file'].stat().st_mtime, reverse=True)
+            
+            print(f"📊 共找到 {len(published_articles)} 篇已发布文章:")
+            print()
+            
+            for i, article in enumerate(published_articles[:20], 1):  # 显示最近20篇
+                print(f"{i}. {article['name']}")
+                
+                # 显示发布平台状态
+                if article['platforms']:
+                    print(f"   ✅ 已发布: {', '.join(article['platforms'])}")
+                else:
+                    print("   📝 Jekyll发布 (无平台记录)")
+                
+                # 显示文件修改时间
+                mtime = article['file'].stat().st_mtime
+                import datetime
+                formatted_time = datetime.datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M")
+                print(f"   🕒 文件时间: {formatted_time}")
+                
+                print()
+            
+            if len(published_articles) > 20:
+                print(f"... 和其他 {len(published_articles) - 20} 篇文章")
+            
+        except Exception as e:
+            print(f"❌ 查看发布历史失败: {e}")
+        
+        self.pause_for_user()
+        return None
+    
+    def handle_smart_creation_menu(self) -> Optional[str]:
+        """智能内容创作菜单 (合并原功能5+3)"""
+        menu_title = "🎯 智能内容创作"
+        menu_description = "🤖 AI驱动的内容创作和灵感生成"
+        
+        options = [
+            "1. AI主题生成",
+            "2. 快速测试文章", 
+            "3. 内容大纲创建",
+            "4. 创作辅助工具",
+            "5. 📊 VIP多层内容创作"
+        ]
+        
+        handlers = [
+            self._ai_topic_generation,
+            self._quick_test_article,
+            self._content_outline_creation,
+            self._creation_assistance_tools,
+            self._vip_content_creation
+        ]
+        
+        return self.create_menu_loop(menu_title, menu_description, options, handlers)
+    
+    def _ai_topic_generation(self) -> Optional[str]:
+        """AI主题生成"""
+        return self.handle_topic_inspiration_menu()
+    
+    def _quick_test_article(self) -> Optional[str]:
+        """快速测试文章"""
+        print("\n📝 快速测试文章")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _content_outline_creation(self) -> Optional[str]:
+        """内容大纲创建"""
+        print("\n📋 内容大纲创建")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _creation_assistance_tools(self) -> Optional[str]:
+        """创作辅助工具"""
+        print("\n🛠️ 创作辅助工具")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _vip_content_creation(self) -> Optional[str]:
+        """VIP多层内容创作"""
+        try:
+            from scripts.cli.vip_menu_handler import VIPMenuHandler
+            vip_handler = VIPMenuHandler(self.pipeline)
+            return vip_handler.handle_vip_content_creation()
+        except ImportError:
+            print("❌ VIP内容创作模块不可用")
+            return None
+    
+    def handle_monetization_menu(self) -> None:
+        """处理内容变现管理菜单"""
+        menu_title = "💰 内容变现管理"
+        menu_description = "🏦 管理文章的内容变现包创建和发送、奖励系统管理"
+        
+        options = [
+            "1. 为文章创建内容变现包",
+            "2. 查看奖励发送状态",
+            "3. 手动发送奖励给用户",
+            "4. 运行奖励系统测试",
+            "5. 生成测试访问码",
+            "6. 验证访问码",
+            "7. 会员统计分析",
+            "8. 处理注册申请",
+            "9. 导出会员数据"
+        ]
+        
+        handlers = [
+            self._create_monetization_package,
+            self._view_reward_status,
+            self._manual_send_reward,
+            self._run_reward_test,
+            self._generate_access_code,
+            self._validate_access_code,
+            self._member_statistics,
+            self._process_registrations,
+            self._export_member_data
+        ]
+        
+        self.create_menu_loop(menu_title, menu_description, options, handlers)
+    
+    def _create_monetization_package(self) -> Optional[str]:
+        """创建内容变现包"""
+        print("\n📦 创建内容变现包")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _view_reward_status(self) -> Optional[str]:
+        """查看奖励发送状态"""
+        print("\n📊 奖励发送状态")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _manual_send_reward(self) -> Optional[str]:
+        """手动发送奖励给用户"""
+        print("\n📧 手动发送奖励")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _run_reward_test(self) -> Optional[str]:
+        """运行奖励系统测试"""
+        print("\n🧪 奖励系统测试")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _generate_access_code(self) -> Optional[str]:
+        """生成测试访问码"""
+        print("\n🔑 生成测试访问码")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _validate_access_code(self) -> Optional[str]:
+        """验证访问码"""
+        print("\n✅ 验证访问码")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _member_statistics(self) -> Optional[str]:
+        """会员统计分析"""
+        print("\n📈 会员统计分析")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _process_registrations(self) -> Optional[str]:
+        """处理注册申请"""
+        print("\n📝 处理注册申请")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _export_member_data(self) -> Optional[str]:
+        """导出会员数据"""
+        print("\n💾 导出会员数据")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def handle_post_update_menu(self) -> None:
+        """处理文章更新工具菜单"""
+        menu_title = "📝 文章更新工具"
+        menu_description = "🔄 更新已发布的文章内容，支持直接编辑或完整处理流程"
+        
+        options = [
+            "1. 更新已发布文章 (直接编辑模式)",
+            "2. 更新已发布文章 (流水线处理模式)",
+            "3. 修改文章会员等级",
+            "4. 查看文章更新帮助"
+        ]
+        
+        handlers = [
+            self._update_article_direct,
+            self._update_article_pipeline,
+            self._modify_article_tier,
+            self._view_update_help
+        ]
+        
+        self.create_menu_loop(menu_title, menu_description, options, handlers)
+    
+    def _update_article_direct(self) -> Optional[str]:
+        """直接编辑模式更新文章"""
+        print("\n✏️ 直接编辑模式")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _update_article_pipeline(self) -> Optional[str]:
+        """流水线处理模式更新文章"""
+        print("\n🔄 流水线处理模式")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _modify_article_tier(self) -> Optional[str]:
+        """修改文章会员等级"""
+        print("\n🎯 修改文章会员等级")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _view_update_help(self) -> Optional[str]:
+        """查看文章更新帮助"""
+        print("\n❓ 文章更新帮助")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def handle_onedrive_images_menu(self) -> None:
+        """OneDrive图床管理菜单"""
+        while True:
+            print("\n" + "="*50)
+            print("📁 OneDrive图床管理")
+            print("="*50)
+            print("1. 初始化OneDrive认证")
+            print("2. 处理单个草稿的图片")
+            print("3. 批量处理所有草稿图片")
+            print("4. 检查OneDrive连接状态")
+            print("5. 查看图片处理统计")
+            print("6. 图片索引管理")
+            print("7. 🆕 混合图片管理（支持任意位置）")
+            print("8. 🧹 管理处理会话")
+            print("9. 🗑️ OneDrive云端清理工具")
+            print("10. 📅 按日期下载图片备份")
+            print("\n0. 返回主菜单")
+            
+            choice = input("\n请选择操作 (1-10/0): ").strip()
+            
+            if choice == "1":
+                self._init_onedrive_auth()
+            elif choice == "2":
+                self._process_single_draft_images()
+            elif choice == "3":
+                self._batch_process_images()
+            elif choice == "4":
+                self._check_onedrive_status()
+            elif choice == "5":
+                self._view_image_statistics()
+            elif choice == "6":
+                self._image_index_management()
+            elif choice == "7":
+                self._mixed_image_management()
+            elif choice == "8":
+                self._manage_processing_sessions()
+            elif choice == "9":
+                self._onedrive_cleanup_tools()
+            elif choice == "10":
+                self._date_download_backup()
+            elif choice == "0":
+                return
+            else:
+                print("❌ 无效选择")
+    
+    def _init_onedrive_auth(self) -> Optional[str]:
+        """初始化OneDrive认证"""
+        print("🔐 启动OneDrive认证...")
+        try:
+            import subprocess
+            result = subprocess.run([
+                "python3", "scripts/tools/onedrive_blog_images.py", 
+                "--setup"
+            ], check=False, capture_output=False)
+            
+            if result.returncode == 0:
+                print("✅ 认证设置完成")
+                return "认证设置完成"
+            else:
+                print("❌ 认证设置失败")
+                return None
+                
+        except Exception as e:
+            print(f"❌ 认证过程出错: {e}")
+            return None
+    
+    def _process_single_draft_images(self) -> Optional[str]:
+        """处理单个草稿的图片"""
+        print("📝 选择要处理的草稿文件...")
+        
+        # 显示草稿列表
+        from pathlib import Path
+        drafts_dir = Path("_drafts")
+        if not drafts_dir.exists():
+            print("❌ 草稿目录不存在")
+            return None
+            
+        draft_files = list(drafts_dir.glob("*.md"))
+        if not draft_files:
+            print("❌ 没有找到草稿文件")
+            return None
+            
+        print("\n可用的草稿文件:")
+        for i, draft in enumerate(draft_files, 1):
+            print(f"{i}. {draft.name}")
+            
+        try:
+            file_choice = input(f"\n请选择文件 (1-{len(draft_files)}/0取消): ").strip()
+            if file_choice == "0":
+                return None
+                
+            file_index = int(file_choice) - 1
+            if 0 <= file_index < len(draft_files):
+                selected_draft = draft_files[file_index]
+                print(f"📝 处理草稿: {selected_draft.name}")
+                
+                # 使用统一的OneDrive图片处理接口
+                result = self.pipeline.process_onedrive_images(selected_draft)
+                
+                if result['success']:
+                    print(f"✅ 图片处理完成，处理了 {result['processed_images']} 张图片")
+                    if result['issues']:
+                        print("⚠️ 仍有部分图片问题需要手动处理:")
+                        for issue in result['issues'][:3]:  # 显示前3个问题
+                            print(f"   • {issue}")
+                    return f"处理了 {result['processed_images']} 张图片"
+                else:
+                    print(f"❌ 图片处理失败: {result['error']}")
+                    return None
+            else:
+                print("❌ 无效的文件选择")
+                return None
+                
+        except (ValueError, IndexError):
+            print("❌ 无效的输入")
+            return None
+    
+    def _batch_process_images(self) -> Optional[str]:
+        """批量处理所有草稿图片"""
+        print("📁 批量处理所有草稿图片...")
+        
+        try:
+            from pathlib import Path
+            drafts_dir = Path("_drafts")
+            if not drafts_dir.exists():
+                print("❌ 草稿目录不存在")
+                return None
+            
+            draft_files = list(drafts_dir.glob("*.md"))
+            if not draft_files:
+                print("❌ 没有找到草稿文件")
+                return None
+            
+            total_processed = 0
+            successful_files = 0
+            
+            print(f"📄 找到 {len(draft_files)} 个草稿文件，开始批量处理...")
+            
+            for draft_file in draft_files:
+                print(f"\n处理: {draft_file.name}")
+                
+                try:
+                    # 使用统一的OneDrive图片处理接口
+                    result = self.pipeline.process_onedrive_images(draft_file)
+                    
+                    if result['success']:
+                        successful_files += 1
+                        total_processed += result['processed_images']
+                        print(f"✅ 成功处理 {result['processed_images']} 张图片")
+                        
+                        if result['issues']:
+                            print(f"⚠️ {len(result['issues'])} 个问题需要手动处理")
+                    else:
+                        print(f"❌ 处理失败: {result['error']}")
+                        
+                except Exception as e:
+                    print(f"❌ 处理文件时出错: {e}")
+            
+            print(f"\n📊 批量处理完成:")
+            print(f"   • 成功文件: {successful_files}/{len(draft_files)}")
+            print(f"   • 总计处理图片: {total_processed} 张")
+            
+            return f"批量处理完成: {successful_files} 个文件, {total_processed} 张图片"
+            
+        except Exception as e:
+            print(f"❌ 批量处理失败: {e}")
+            return None
+    
+    def _check_onedrive_status(self) -> Optional[str]:
+        """检查OneDrive连接状态"""
+        print("\n🔍 检查OneDrive连接状态")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _view_image_statistics(self) -> Optional[str]:
+        """查看图片处理统计"""
+        print("\n📊 图片处理统计")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _image_index_management(self) -> Optional[str]:
+        """图片索引管理"""
+        print("\n🗂️ 图片索引管理")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _mixed_image_management(self) -> Optional[str]:
+        """混合图片管理"""
+        print("\n🔄 混合图片管理")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _manage_processing_sessions(self) -> Optional[str]:
+        """管理处理会话"""
+        print("\n🧹 管理处理会话")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _onedrive_cleanup_tools(self) -> Optional[str]:
+        """OneDrive云端清理工具"""
+        print("\n🗑️ OneDrive云端清理工具")
+        print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _date_download_backup(self) -> Optional[str]:
+        """按日期下载图片备份"""
+        print("\n📅 按日期下载图片备份")
         print("(功能开发中...)")
         self.pause_for_user()
         return None
