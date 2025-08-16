@@ -48,7 +48,7 @@ class YouTubeMenuHandler(BaseMenuHandler):
             self._handle_oauth_management
         ]
         
-        return self.create_menu_loop(menu_title, menu_description, options, handlers)
+        return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "4")
     
     def handle_youtube_podcast_menu(self) -> Optional[str]:
         """
@@ -78,7 +78,7 @@ class YouTubeMenuHandler(BaseMenuHandler):
             self._show_podcast_usage
         ]
         
-        return self.create_menu_loop(menu_title, menu_description, options, handlers)
+        return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "4.1")
     
     def _generate_podcast_article(self) -> Optional[str]:
         """生成YouTube播客学习文章"""
@@ -268,7 +268,7 @@ class YouTubeMenuHandler(BaseMenuHandler):
             self._batch_upload_audio
         ]
         
-        return self.create_menu_loop("🎬 YouTube音频上传", "", upload_options, upload_handlers)
+        return self.create_menu_loop_with_path("🎬 YouTube音频上传", "", upload_options, upload_handlers, "4.2")
     
     def _handle_oauth_management(self) -> Optional[str]:
         """处理OAuth认证管理"""
@@ -297,7 +297,7 @@ class YouTubeMenuHandler(BaseMenuHandler):
             self._show_oauth_guide
         ]
         
-        return self.create_menu_loop("🔐 OAuth认证管理", "", oauth_options, oauth_handlers)
+        return self.create_menu_loop_with_path("🔐 OAuth认证管理", "", oauth_options, oauth_handlers, "4.3")
     
     def _check_oauth_status(self) -> Dict[str, Any]:
         """

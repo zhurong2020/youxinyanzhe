@@ -48,7 +48,7 @@ class ContentMenuHandler(BaseMenuHandler):
             self._configure_generation_params
         ]
         
-        return self.create_menu_loop(menu_title, menu_description, options, handlers)
+        return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "3.1")
     
     def _quick_topic_generation(self) -> Optional[str]:
         """快速主题生成"""
@@ -707,7 +707,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
             self._vip_content_creation
         ]
         
-        return self.create_menu_loop(menu_title, menu_description, options, handlers)
+        return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "3")
     
     def _ai_topic_generation(self) -> Optional[str]:
         """AI主题生成"""
@@ -773,7 +773,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
             self._export_member_data
         ]
         
-        self.create_menu_loop(menu_title, menu_description, options, handlers)
+        self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "6")
     
     def _create_monetization_package(self) -> Optional[str]:
         """创建内容变现包"""
@@ -857,7 +857,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
             self._view_update_help
         ]
         
-        self.create_menu_loop(menu_title, menu_description, options, handlers)
+        self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "8")
     
     def _update_article_direct(self) -> Optional[str]:
         """直接编辑模式更新文章"""
