@@ -6,7 +6,7 @@ tags: [特斯拉, SA Premium, 投资分析, VIP2]
 header:
   teaser: "{{ site.baseurl }}/assets/images/tesla-sa-analysis-teaser.jpg"
 excerpt: "基于Seeking Alpha Premium最新数据，深度解读特斯拉评级分歧与估值逻辑，揭示198倍PE背后的投资密码。"
-vip_level: 2
+member_tier: monthly
 estimated_reading_time: 15分钟
 last_updated: 2025-08-16
 ---
