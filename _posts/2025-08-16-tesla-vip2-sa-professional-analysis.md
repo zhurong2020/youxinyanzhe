@@ -1,4 +1,5 @@
 ---
+layout: member-post
 title: "VIP2专享：特斯拉SA Premium专业数据深度解读"
 date: 2025-08-16
 categories: [投资理财, VIP专享]
