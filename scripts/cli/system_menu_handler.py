@@ -70,7 +70,7 @@ class SystemMenuHandler(BaseMenuHandler):
             self._generate_wsl_env_script
         ]
         
-        return self.create_menu_loop(menu_title, menu_description, options, handlers)
+        return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "9.2")
     
     def _get_current_engine_status(self) -> Dict[str, str]:
         """获取当前引擎状态信息"""
@@ -466,7 +466,7 @@ echo "💡 可运行 'env | grep ANTHROPIC' 查看配置"
             self._audio_format_conversion
         ]
         
-        self.create_menu_loop(menu_title, menu_description, options, handlers)
+        self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "7")
     
     def _tts_voice_test(self) -> Optional[str]:
         """TTS语音测试 (原ElevenLabs测试)"""
@@ -517,7 +517,7 @@ echo "💡 可运行 'env | grep ANTHROPIC' 查看配置"
             self._log_viewer
         ]
         
-        self.create_menu_loop(menu_title, menu_description, options, handlers)
+        self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "9")
     
     def _system_status_check(self) -> Optional[str]:
         """系统状态检查 (原功能7)"""
