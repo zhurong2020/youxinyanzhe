@@ -358,6 +358,7 @@ toc_sticky: true
 
 <div class="member-only-preview" data-level="VIP3">
   <h4>🔥 VIP3专享：ARK Invest完整特斯拉投资策略解读</h4>
+  <p><strong>🆕 2025年8月16日重磅发布</strong> - ARK Big Ideas 2025核心内容完整解读：</p>
   
   <div class="personal-portfolio-preview">
     <h5>📈 Cathie Wood 2025年激进加仓完整时间线</h5>
@@ -416,6 +417,14 @@ toc_sticky: true
       <li>✅ <strong>颠覆性创新框架</strong>：ARK投资方法论完整学习指南</li>
       <li>💡 <strong>实战价值</strong>：基于ARK方法论的投资决策检查清单</li>
     </ul>
+  </div>
+  
+  <div class="vip-content-links">
+    <h5>🎯 立即获取完整ARK策略：</h5>
+    <a href="{{ site.baseurl }}/tesla-vip3-ark-strategy-complete" class="vip-direct-link">
+      🏆 VIP3专享：ARK投资策略完整版 (25分钟深度阅读) →
+    </a>
+    <p class="link-description">包含Cathie Wood操作记录、$2,600推导过程、颠覆性投资方法论</p>
   </div>
   
   <div class="upgrade-cta-inline">
@@ -501,10 +510,12 @@ toc_sticky: true
         立即查看 →
       </a>
     </div>
-    <div class="analysis-link-card coming-soon">
+    <div class="analysis-link-card">
       <h5>🏆 VIP3: ARK策略完整版</h5>
       <p>Cathie Wood $2,600目标价推导过程</p>
-      <span class="coming-soon-badge">即将发布</span>
+      <a href="{{ site.baseurl }}/tesla-vip3-ark-strategy-complete" class="analysis-btn">
+        立即查看 →
+      </a>
     </div>
   </div>
 </div>
