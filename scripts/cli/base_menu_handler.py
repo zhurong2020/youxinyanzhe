@@ -21,18 +21,56 @@ class BaseMenuHandler:
         """
         self.pipeline = pipeline
         self.module_name = module_name
+        self.menu_path = []  # 面包屑路径跟踪
     
-    def display_menu_header(self, title: str, description: str = "") -> None:
+    def push_menu_path(self, menu_id: str, menu_name: str) -> None:
+        """
+        添加菜单路径
+        
+        Args:
+            menu_id: 菜单ID (如 "1", "1.1")
+            menu_name: 菜单名称
+        """
+        self.menu_path.append({"id": menu_id, "name": menu_name})
+    
+    def pop_menu_path(self) -> None:
+        """移除最后一层菜单路径"""
+        if self.menu_path:
+            self.menu_path.pop()
+    
+    def get_breadcrumb(self) -> str:
+        """
+        获取面包屑导航字符串
+        
+        Returns:
+            面包屑导航路径
+        """
+        if not self.menu_path:
+            return ""
+        
+        return " → ".join([f"{item['id']} {item['name']}" for item in self.menu_path])
+    
+    def display_menu_header(self, title: str, description: str = "", menu_id: str = "") -> None:
         """
         显示标准菜单头部
         
         Args:
             title: 菜单标题
             description: 菜单描述
+            menu_id: 菜单ID，用于路径跟踪
         """
-        print("\n" + "="*50)
+        print("\n" + "="*60)
+        
+        # 显示面包屑导航
+        breadcrumb = self.get_breadcrumb()
+        if breadcrumb:
+            print(f"📍 路径: {breadcrumb}")
+            if menu_id:
+                print(f"📍 当前: {menu_id} {title}")
+            print("="*60)
+        
         print(title)
-        print("="*50)
+        print("="*60)
         if description:
             print(description)
     
@@ -185,6 +223,60 @@ class BaseMenuHandler:
             
             try:
                 choice_index = int(choice) - 1
+                result = handlers[choice_index]()
+                
+                # 如果处理函数返回值，则退出菜单循环
+                if result is not None:
+                    return result
+                    
+            except Exception as e:
+                self.handle_error(e, f"执行选项{choice}")
+                continue
+    
+    def create_menu_loop_with_path(self, menu_title: str, menu_description: str, 
+                                  options: List[str], handlers: List[Callable], 
+                                  menu_id: str) -> Optional[Any]:
+        """
+        创建带路径跟踪的标准菜单循环
+        
+        Args:
+            menu_title: 菜单标题
+            menu_description: 菜单描述
+            options: 选项列表
+            handlers: 对应的处理函数列表
+            menu_id: 菜单ID
+            
+        Returns:
+            处理函数的返回值，或None表示退出
+        """
+        if len(options) != len(handlers):
+            raise ValueError("选项和处理函数数量不匹配")
+        
+        max_choice = len(options)
+        
+        while True:
+            self.display_menu_header(menu_title, menu_description, menu_id)
+            self.display_menu_options(options)
+            
+            choice = self.get_user_choice(max_choice)
+            
+            if choice == "0":
+                return None
+            
+            if not self.is_valid_choice(choice, max_choice):
+                self.display_invalid_choice_message(choice, max_choice)
+                continue
+            
+            try:
+                choice_index = int(choice) - 1
+                
+                # 记录选择的子菜单路径
+                selected_option = options[choice_index]
+                option_id = selected_option.split()[0]  # 提取类似"1.1"的ID
+                option_name = " ".join(selected_option.split()[1:])  # 提取名称
+                
+                self.log_action(f"用户选择: {option_id} {option_name}")
+                
                 result = handlers[choice_index]()
                 
                 # 如果处理函数返回值，则退出菜单循环
