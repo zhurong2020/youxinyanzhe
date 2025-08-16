@@ -4476,44 +4476,11 @@ def handle_vip_content_creation_menu(pipeline):
 
 
 def handle_youtube_processing_menu(pipeline):
-    """YouTube内容处理菜单 (合并原功能8+13)"""
-    print("\n" + "="*50)
-    print("🎬 YouTube内容处理")
-    print("="*50)
-    print("📺 视频→文章→音频→上传的完整工作流程")
+    """YouTube内容处理菜单 - 委托给CLI模块处理"""
+    from scripts.cli.youtube_menu_handler import YouTubeMenuHandler
     
-    print("\n请选择处理类型：")
-    print("1. 视频转文章")
-    print("2. 音频生成和处理") 
-    print("3. YouTube平台上传")
-    print("4. 完整视频处理流程")
-    print("0. 返回主菜单")
-    
-    choice = input("\n请选择 (1-4/0): ").strip()
-    
-    if choice == "1":
-        # 视频转文章 (原YouTube播客生成器)
-        handle_youtube_podcast_menu(pipeline)
-        
-    elif choice == "2":
-        # 音频生成和处理
-        print("\n🎙️ 音频生成和处理功能开发中...")
-        # TODO: 实现音频处理功能
-        
-    elif choice == "3":
-        # YouTube平台上传 (原YouTube音频上传)
-        handle_youtube_upload_menu(pipeline)
-        
-    elif choice == "4":
-        # 完整视频处理流程
-        print("\n🔄 完整视频处理流程功能开发中...")
-        # TODO: 实现完整流程
-        
-    elif choice == "0":
-        return
-    else:
-        print("❌ 无效选择，请重新输入")
-        handle_youtube_processing_menu(pipeline)
+    youtube_handler = YouTubeMenuHandler(pipeline)
+    return youtube_handler.handle_youtube_processing_menu()
 
 
 def handle_audio_tools_menu(pipeline):
