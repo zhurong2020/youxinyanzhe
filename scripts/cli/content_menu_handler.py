@@ -903,9 +903,10 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
             print("8. 🧹 管理处理会话")
             print("9. 🗑️ OneDrive云端清理工具")
             print("10. 📅 按日期下载图片备份")
+            print("11. 🚀 智能Header+图片处理（推荐）")
             print("\n0. 返回主菜单")
             
-            choice = input("\n请选择操作 (1-10/0): ").strip()
+            choice = input("\n请选择操作 (1-11/0): ").strip()
             
             if choice == "1":
                 self._init_onedrive_auth()
@@ -927,6 +928,8 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
                 self._onedrive_cleanup_tools()
             elif choice == "10":
                 self._date_download_backup()
+            elif choice == "11":
+                self._enhanced_header_image_processing()
             elif choice == "0":
                 return
             else:
@@ -1101,5 +1104,123 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
         """按日期下载图片备份"""
         print("\n📅 按日期下载图片备份")
         print("(功能开发中...)")
+        self.pause_for_user()
+        return None
+    
+    def _enhanced_header_image_processing(self) -> Optional[str]:
+        """智能Header+图片处理"""
+        print("\n🚀 智能Header+图片处理")
+        print("📋 功能说明:")
+        print("   1. 自动使用正文第一张图片设置header")
+        print("   2. 上传所有图片到OneDrive云端")
+        print("   3. 替换所有图片链接（包括header）")
+        print("   4. 保留本地备份以便后续编辑")
+        print()
+        
+        # 显示可处理的文件
+        from pathlib import Path
+        
+        # 查找草稿和已发布的文章
+        all_files = []
+        
+        drafts_dir = Path("_drafts")
+        if drafts_dir.exists():
+            draft_files = list(drafts_dir.glob("*.md"))
+            for f in draft_files:
+                all_files.append(("草稿", f))
+        
+        posts_dir = Path("_posts")
+        if posts_dir.exists():
+            post_files = list(posts_dir.glob("*.md"))
+            for f in post_files:
+                all_files.append(("文章", f))
+                
+        if not all_files:
+            print("❌ 没有找到可处理的Markdown文件")
+            self.pause_for_user()
+            return None
+            
+        print("📝 可处理的文件:")
+        for i, (file_type, file_path) in enumerate(all_files, 1):
+            print(f"{i:2d}. [{file_type}] {file_path.name}")
+            
+        try:
+            file_choice = input(f"\n请选择文件 (1-{len(all_files)}/0取消): ").strip()
+            if file_choice == "0":
+                return None
+                
+            file_index = int(file_choice) - 1
+            if 0 <= file_index < len(all_files):
+                file_type, selected_file = all_files[file_index]
+                print(f"\n📝 选择处理: [{file_type}] {selected_file.name}")
+                
+                # 询问处理选项
+                print("\n🔧 处理选项:")
+                print("1. 完整处理（自动header + 图片上传）")
+                print("2. 仅设置header（不上传图片）")
+                print("3. 演练模式（预览更改）")
+                
+                option = input("请选择选项 (1-3): ").strip()
+                
+                try:
+                    import subprocess
+                    import sys
+                    
+                    if option == "1":
+                        # 完整处理
+                        print(f"\n🚀 启动完整处理: {selected_file}")
+                        cmd = [
+                            sys.executable, 
+                            "scripts/tools/enhanced_blog_image_processor.py",
+                            str(selected_file)
+                        ]
+                        result = subprocess.run(cmd, check=False)
+                        
+                        if result.returncode == 0:
+                            print("✅ 完整处理成功")
+                            return "完整处理成功"
+                        else:
+                            print("❌ 处理过程中出现问题")
+                            
+                    elif option == "2":
+                        # 仅header处理
+                        print(f"\n📋 仅设置header: {selected_file}")
+                        cmd = [
+                            sys.executable,
+                            "scripts/tools/auto_header_image_processor.py", 
+                            str(selected_file)
+                        ]
+                        result = subprocess.run(cmd, check=False)
+                        
+                        if result.returncode == 0:
+                            print("✅ Header设置成功")
+                            return "Header设置成功"
+                        else:
+                            print("❌ Header设置失败")
+                            
+                    elif option == "3":
+                        # 演练模式
+                        print(f"\n🔍 演练模式: {selected_file}")
+                        cmd = [
+                            sys.executable,
+                            "scripts/tools/enhanced_blog_image_processor.py",
+                            str(selected_file),
+                            "--dry-run"
+                        ]
+                        result = subprocess.run(cmd, check=False)
+                        print("\n💡 提示: 演练模式不会修改任何文件")
+                        
+                    else:
+                        print("❌ 无效选项")
+                        
+                except Exception as e:
+                    print(f"❌ 处理失败: {e}")
+                    
+            else:
+                print("❌ 无效的文件选择")
+                
+        except (ValueError, IndexError):
+            print("❌ 无效的输入")
+        
         self.pause_for_user()
         return None
