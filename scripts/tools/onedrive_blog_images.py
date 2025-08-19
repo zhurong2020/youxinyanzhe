@@ -396,40 +396,80 @@ class OneDriveUploadManager:
             raise Exception(f"Failed to create sharing link: {response.text}")
     
     def get_direct_image_url(self, item_id: str) -> str:
-        """获取可直接嵌入Jekyll的图片链接 - 优先使用直接下载链接"""
+        """获取可直接嵌入Jekyll的图片链接 - 优先使用view+anonymous分享模式"""
         try:
-            # 方法1: 优先使用@microsoft.graph.downloadUrl (直接图片链接，适合嵌入)
-            response = self._make_request('GET', f"/me/drive/items/{item_id}")
-            if response.status_code == 200:
-                item_data = response.json()
-                
-                # 检查是否有直接下载链接
-                download_url = item_data.get('@microsoft.graph.downloadUrl')
-                if download_url:
-                    logger.info("Using @microsoft.graph.downloadUrl (direct embeddable image URL)")
-                    return download_url
-                
-                # 方法2: 尝试构建SharePoint直接访问链接
-                web_url = item_data.get('webUrl', '')
-                if web_url and 'sharepoint.com' in web_url:
-                    unique_id = item_data.get('id', '')
-                    base_url = web_url.split('/personal/')[0] + '/personal/' + web_url.split('/personal/')[1].split('/')[0]
-                    direct_url = f"{base_url}/_layouts/15/download.aspx?UniqueId={unique_id}"
-                    logger.info("Using SharePoint direct download URL")
-                    return direct_url
-        
-        except Exception as e:
-            logger.warning(f"Failed to get direct download URL: {e}")
-            
-        try:
-            # 方法3: 回退到view+anonymous分享链接 (预览链接，需要认证)
+            # 方法1: 使用view+anonymous分享链接 (适用于企业账户，永久有效)
             sharing_link = self.get_sharing_link(item_id, 'view')
-            logger.warning("Using view+anonymous sharing link (requires authentication in browser)")
-            return sharing_link
+            # 转换为直接下载链接格式
+            download_link = self.convert_to_direct_download_link(sharing_link)
+            logger.info("Using view+anonymous sharing link converted to direct download format")
+            return download_link
             
         except Exception as e:
-            logger.error(f"All methods failed to get image URL: {e}")
-            raise
+            logger.warning(f"Failed to get view sharing link, trying direct download: {e}")
+            
+            try:
+                # 方法2: 回退到直接下载链接 (包含临时令牌，会过期)
+                response = self._make_request('GET', f"/me/drive/items/{item_id}")
+                if response.status_code == 200:
+                    item_data = response.json()
+                    
+                    # 检查是否有直接下载链接
+                    download_url = item_data.get('@microsoft.graph.downloadUrl')
+                    if download_url:
+                        logger.warning("Using @microsoft.graph.downloadUrl (contains temp tokens, may expire)")
+                        return download_url
+                    
+                    # 方法3: 构建直接访问链接
+                    web_url = item_data.get('webUrl', '')
+                    if web_url and 'sharepoint.com' in web_url:
+                        unique_id = item_data.get('id', '')
+                        base_url = web_url.split('/personal/')[0] + '/personal/' + web_url.split('/personal/')[1].split('/')[0]
+                        direct_url = f"{base_url}/_layouts/15/download.aspx?UniqueId={unique_id}"
+                        logger.info("Using SharePoint direct download URL")
+                        return direct_url
+                    else:
+                        logger.error("No valid download URL found in item data")
+                        raise Exception("No valid download URL found in item data")
+                else:
+                    logger.error(f"Failed to get item data: {response.status_code} - {response.text}")
+                    raise Exception(f"Failed to get item data: {response.status_code}")
+                        
+            except Exception as e2:
+                logger.error(f"All methods failed: {e2}")
+                raise Exception(f"Could not generate any valid image URL: {e}, {e2}")
+    
+    def convert_to_direct_download_link(self, share_url: str) -> str:
+        """将SharePoint预览链接转换为直接下载链接
+        
+        将形如 https://domain/:i:/g/personal/user/TOKEN?e=hash 
+        转换为 https://domain/personal/user/_layouts/15/download.aspx?share=TOKEN
+        """
+        try:
+            if 'sharepoint.com' in share_url and ':i:' in share_url:
+                # 解析SharePoint链接
+                # 格式: https://7fp1fj-my.sharepoint.com/:i:/g/personal/zhurong_7fp1fj_onmicrosoft_com/TOKEN?e=hash
+                parts = share_url.split('/:i:/g/personal/')
+                if len(parts) == 2:
+                    base_domain = parts[0]
+                    user_and_token = parts[1].split('?')[0]  # 移除查询参数
+                    
+                    # 分离用户路径和token
+                    path_parts = user_and_token.split('/')
+                    if len(path_parts) >= 2:
+                        user_path = path_parts[0]
+                        token = path_parts[1]
+                        
+                        # 构建直接下载链接
+                        download_url = f"{base_domain}/personal/{user_path}/_layouts/15/download.aspx?share={token}"
+                        return download_url
+            
+            # 如果无法转换，返回原链接
+            return share_url
+            
+        except Exception as e:
+            logger.warning(f"Failed to convert to direct download link: {e}")
+            return share_url
     
     def convert_to_embed_link(self, share_url: str, width: int = 800) -> str:
         """将OneDrive分享链接转换为嵌入链接

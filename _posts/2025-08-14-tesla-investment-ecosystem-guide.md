@@ -7,9 +7,7 @@ categories:
 comments: true
 date: '2025-08-14'
 excerpt: 探索特斯拉投资生态系统：从直接持股到产业链布局，掌握多元化美股投资策略，开启财富自由之路
-header:
-  teaser: /assets/images/default-teaser.jpg
-last_modified_at: '2025-08-15 12:17:09'
+last_modified_at: '2025-08-18 12:17:09'
 layout: single
 related: true
 share: true
@@ -29,8 +27,11 @@ toc: true
 toc_icon: list
 toc_label: 本页内容
 toc_sticky: true
+header:
+  overlay_image: 'https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EdxTGuLNZ6tAjrI86Z6vjAUBGYQkhJlM5DJBgTJ_jutkBQ'
+  teaser: 'https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EdxTGuLNZ6tAjrI86Z6vjAUBGYQkhJlM5DJBgTJ_jutkBQ'
+  overlay_filter: 0.5
 ---
-
 在全球科技投资的浪潮中，特斯拉已超越了电动汽车制造商的单一身份，成为一个融合新能源、人工智能与自动驾驶等前沿领域的科技巨擘。
 
 <!-- more -->
@@ -57,6 +58,10 @@ toc_sticky: true
 4.  **竞争对手**：新能源汽车赛道中的多元化选择
 5.  **主题投资**：通过行业ETF实现分散化布局
 
+![TESILATOUZI](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EdxTGuLNZ6tAjrI86Z6vjAUBGYQkhJlM5DJBgTJ_jutkBQ)
+*概念示意图*
+
+
 ### 🧠 财富增长要点
 
 -   **分散投资**：避免将所有资本集中于单一资产
@@ -73,6 +78,10 @@ toc_sticky: true
 ### 超越单一公司的生态系统
 
 特斯拉的投资价值远不止于汽车制造。作为全球市值排名前列的企业，其股价波动不仅影响着整个新能源汽车板块，更辐射至锂电池、充电设施、自动驾驶技术等相关产业链。
+
+![TESILACHANYELIAN](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=ERhbjKBWL0BFjr6gGYhVetoBFiQL3fJ4oQD1vXOOhps_NA)
+*概念示意图*
+
 
 **关键数据一览**：
 -   特斯拉在全球电动车市场的占有率在2024年约为10-11%（纯电动车市场约为17.6%），尽管面临竞争，其市场地位依然显著。
@@ -91,6 +100,9 @@ toc_sticky: true
 
 这种多元化的投资布局，是现代美股投资者实现财富增长的关键策略之一。
 
+![TESILATOUZIBUJU](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EcBZ1_q8PIlFtGDTcg-O8RMBBwai7SCZSA2Y1Jl0ZxO-lQ)
+*概念示意图*
+
 ## 核心标的：特斯拉公司（$TSLA）
 
 ### 业务版图
@@ -108,8 +120,11 @@ toc_sticky: true
 -   **机器人项目**：Optimus人形机器人。
 -   **AI计算架构转型**：从Dojo专用芯片转向更通用的AI5/AI6芯片战略。
 
+![TESILASHENGTAI](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EeuYUFSrualAl8mMeMp9tSwBtykj5_tHmI8mheEgD2nsLw)
+*概念示意图*
+
 **🔥 2025年8月最新动态**：
-特斯拉确认解散Dojo超级计算机团队，此举反映了公司AI战略的重大调整。首席执行官马斯克在近期的财报会议上表示，特斯拉将把AI计算资源重点转向成本效益更高的AI5和AI6芯片架构，并加强与英伟达（NVIDIA）等外部伙伴的合作。
+特斯拉确认解散Dojo超级计算机团队，这一举措反映了公司AI战略的重大调整。马斯克在近期财报会议上表示，特斯拉将把AI计算资源重点转向成本效益更高的AI5和AI6芯片架构，并加强与英伟达（NVIDIA）等外部伙伴的合作。
 
 **这一变化的投资启示**：
 -   **成本优化**：减少自研芯片的巨额投入，提升研发资金效率。
@@ -130,6 +145,9 @@ toc_sticky: true
 -   面临来自传统车企与新兴势力的激烈竞争。
 
 对于追求财富增长的投资者而言，$TSLA提供了直接参与科技革命的通道，但同时也需承担相应的市场波动风险。
+
+![TESILAGUANDIAN](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EdKQ6pZrdDhIq6G2QzTYYscBuQ5HINK31ATo_YwCN9PX2Q)
+*概念示意图*
 
 ### 🔍 市场分歧与理性决策框架
 
@@ -158,6 +176,9 @@ toc_sticky: true
 -   **能源业务**：储能和太阳能业务的增长轨迹。
 -   **投资意义**：高估值的核心支撑，任何技术突破都可能成为股价催化剂。
 
+![TESILAXUSHI](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EY2ruRQkRANCi2xd7PxussMB7HDTwgH348nNKElT1lSp6g)
+*概念示意图*
+
 **2. 核心风险监控（潜在威胁因素）**
 
 **市场竞争加剧**：
@@ -174,6 +195,7 @@ toc_sticky: true
 -   **CEO精力分配**：马斯克在多个项目间的精力分散问题。
 -   **品牌形象影响**：个人言行对消费者情绪的潜在影响。
 -   **公司治理结构**：对单一领导者过度依赖的组织风险。
+
 
 **3. 理性投资决策指南**
 
@@ -193,6 +215,9 @@ toc_sticky: true
 -   保持对新技术的持续学习和理解。
 
 > 💡 **投资智慧**：特斯拉的投资故事，本质上是“未来愿景”与“当前现实”之间的一场持续博弈。成功的投资者并非试图预测最终结果，而是客观评估博弈进程，并根据最新信息不断调整策略。
+
+![TESILAMUBIAO](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EVe_1xCvmgFKilkqFNifnkEBOswlN3rVqRpIeJt35q5XlQ)
+*概念示意图*
 
 ## 杠杆工具：放大您的投资观点
 
@@ -223,6 +248,9 @@ toc_sticky: true
 -   适合希望获得稳定现金流，同时愿意放弃部分上涨空间的投资者。
 
 这些工具为投资者提供了更为灵活的策略选择，但使用前必须充分理解其风险特性。
+
+![TESILAGANGGAN](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EWLRuinxjadMp3eR9AzZlysByl-sJnJjxU--DsAB35c_eg)
+*概念示意图*
 
 ---
 
@@ -311,6 +339,9 @@ toc_sticky: true
 -   **多样的到期日选择**：从周度期权到长期期权（LEAPs）一应俱全。
 -   **广泛的行权价区间**：适合不同风险偏好的策略构建。
 
+![tesilaqiquan](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EVKPAJv7Oe9BrcYCyC2Y05sBobDGQ2fwyjbzdNRxv4Ps2g)
+*期权市场数据概览*
+
 *我们将在后续的专题文章中深入探讨特斯拉期权投资的具体策略与实战技巧，敬请关注。*
 
 ## 产业链生态：投资“卖铲人”的智慧
@@ -340,6 +371,9 @@ toc_sticky: true
 -   汽车功率半导体领域的重要供应商。
 -   受益于电动汽车对功率管理芯片需求的持续增长。
 
+![CALIFORNIAGOLDRUSH](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EQOt3CFE1blNunTM3iYL4XQBHCkQdyXI0__syqlvI8Zztg)
+*概念示意图*
+
 ### 下游基础设施
 
 **充电网络运营商**
@@ -357,82 +391,83 @@ toc_sticky: true
 ---
 
 <div class="member-only-preview" data-level="VIP3">
-  <h4>🔥 VIP3专享：ARK Invest完整特斯拉投资策略解读</h4>
-  <p><strong>🆕 2025年8月16日重磅发布</strong> - ARK Big Ideas 2025核心内容完整解读：</p>
+  <h4>🔥 VIP3专享：ARK Big Ideas 2025 Robotaxi革命解读</h4>
+  <p><strong>🆕 2025年8月17日重磅更新</strong> - ARK Big Ideas 2025完整核心内容深度解读：</p>
   
-  <div class="personal-portfolio-preview">
-    <h5>📈 Cathie Wood 2025年激进加仓完整时间线</h5>
+  <div class="robotaxi-market-preview">
+    <h5>🚗 $34万亿Robotaxi市场机会深度分析</h5>
     
-    <div class="interactive-data-table clickable" onclick="showUpgradeModal('VIP3')">
-      <table class="portfolio-table">
+    <div class="market-prediction-table clickable" onclick="showUpgradeModal('VIP3')">
+      <table class="prediction-table">
         <tr>
-          <th>日期</th>
-          <th>操作金额</th>
-          <th>股数变化</th>
-          <th>市场环境</th>
-          <th>Wood的判断</th>
+          <th>预测维度</th>
+          <th>2025现状</th>
+          <th>2030目标</th>
+          <th>增长倍数</th>
+          <th>核心驱动</th>
         </tr>
         <tr>
-          <td><strong>7月11日</strong></td>
-          <td class="blur-text">$18.7M</td>
-          <td class="blur-text">单次大买</td>
-          <td class="blur-text">股价回调期</td>
-          <td class="blur-text">逢低布局机会</td>
+          <td><strong>市场估值</strong></td>
+          <td class="blur-text">$0.1万亿</td>
+          <td class="blur-text">$34万亿</td>
+          <td class="blur-text">340倍</td>
+          <td class="blur-text">技术突破</td>
         </tr>
         <tr>
-          <td><strong>7月15-16日</strong></td>
-          <td class="blur-text">$48.8M</td>
-          <td class="blur-text">151,730股</td>
-          <td class="blur-text">连续2天加仓</td>
-          <td class="blur-text">坚定看好长期</td>
+          <td><strong>车队规模</strong></td>
+          <td class="blur-text">10万辆</td>
+          <td class="blur-text">5000万辆</td>
+          <td class="blur-text">500倍</td>
+          <td class="blur-text">成本下降</td>
         </tr>
         <tr>
-          <td><strong>7月25日</strong></td>
-          <td class="blur-text">ARKK+ARKQ</td>
-          <td class="blur-text">143,190股</td>
-          <td class="blur-text">多基金协同</td>
-          <td class="blur-text">全线重仓策略</td>
+          <td><strong>每英里成本</strong></td>
+          <td class="blur-text">$0.70</td>
+          <td class="blur-text">$0.25</td>
+          <td class="blur-text">64%降幅</td>
+          <td class="blur-text">自动化</td>
         </tr>
         <tr>
-          <td><strong>当前持仓</strong></td>
-          <td class="blur-text">$1.055B</td>
-          <td class="blur-text">335万股</td>
-          <td class="blur-text">第一大重仓</td>
-          <td class="blur-text">10.28%权重</td>
+          <td><strong>自动物流市场</strong></td>
+          <td class="blur-text">$50亿</td>
+          <td class="blur-text">$9000亿</td>
+          <td class="blur-text">180倍</td>
+          <td class="blur-text">效率革命</td>
         </tr>
       </table>
       <div class="click-overlay">
         <i class="fas fa-unlock"></i>
-        <span>点击解锁完整ARK策略分析</span>
+        <span>解锁ARK Big Ideas 2025完整分析</span>
       </div>
     </div>
   </div>
   
-  <div class="trading-insights-preview">
-    <h5>🚀 ARK $2,600目标价推导过程（VIP3专享）</h5>
+  <div class="ark-methodology-preview">
+    <h5>🧠 ARK颠覆性创新投资方法论（VIP3专享）</h5>
     <ul>
-      <li>✅ <strong>Robotaxi占比88%</strong>：企业价值分解模型完整推导</li>
-      <li>✅ <strong>Big Ideas 2025</strong>：棋盘后半段指数级增长理论翻译</li>
-      <li>✅ <strong>数据护城河</strong>：特斯拉500万 vs Waymo 7万英里/天对比</li>
-      <li>✅ <strong>颠覆性创新框架</strong>：ARK投资方法论完整学习指南</li>
-      <li>💡 <strong>实战价值</strong>：基于ARK方法论的投资决策检查清单</li>
+      <li>✅ <strong>"象棋板后半段"理论</strong>：指数增长的投资机会识别框架</li>
+      <li>✅ <strong>五大创新平台</strong>：AI、机器人、能源、区块链、多组学技术融合</li>
+      <li>✅ <strong>Robotaxi商业模式</strong>：从$0.70到$0.25每英里的成本革命</li>
+      <li>✅ <strong>自动物流机会</strong>：94%成本下降的配送革命分析</li>
+      <li>✅ <strong>技术驱动分析</strong>：AI、电池、自动驾驶的协同突破</li>
+      <li>💡 <strong>投资决策框架</strong>：基于ARK方法论的完整投资检查清单</li>
     </ul>
   </div>
   
   <div class="vip-content-links">
-    <h5>🎯 立即获取完整ARK策略：</h5>
+    <h5>🎯 立即获取ARK Big Ideas 2025核心解读：</h5>
     <a href="{{ site.baseurl }}/tesla-vip3-ark-strategy-complete" class="vip-direct-link">
-      🏆 VIP3专享：ARK投资策略完整版 (25分钟深度阅读) →
+      🏆 VIP3专享：Robotaxi革命与$34万亿投资机会 (30分钟深度阅读) →
     </a>
-    <p class="link-description">包含Cathie Wood操作记录、$2,600推导过程、颠覆性投资方法论</p>
+    <p class="link-description">包含Robotaxi市场分析、自动物流机会、ARK颠覆性投资方法论完整学习</p>
   </div>
   
   <div class="upgrade-cta-inline">
-    <p>🎯 <strong>想学习ARK Invest的完整颠覆性创新投资框架？</strong></p>
+    <p>🎯 <strong>想深度学习ARK Big Ideas 2025的完整投资策略？</strong></p>
     <button class="btn-upgrade-vip3" onclick="showUpgradeModal('VIP3')">
       VIP3季度会员 ¥288/90天 →
     </button>
-    <small>获取ARK官方研报解读、Cathie Wood投资哲学和Big Ideas 2025核心观点</small>
+    <small>获取ARK官方研报核心解读、Robotaxi投资机会分析、颠覆性创新方法论</small>
   </div>
 </div>
 
@@ -464,6 +499,9 @@ toc_sticky: true
 
 投资竞争对手有助于在整个新能源汽车赛道中分散风险，以期获得更稳健的回报。
 
+![tesilashangxiayou](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=ERE7MG0famtBjHiPVlEIpuYBrcnSxpiRtcrbNMZbSHTvCA)
+上图罗列了上述大部分股票，供参考。
+
 ## 权威机构观点汇总 (2025年8月最新)
 
 ### 📊 主要评级机构最新观点
@@ -488,6 +526,9 @@ toc_sticky: true
 - **核心担忧**: 198倍PE估值过高，技术实现不确定
 - **基本面**: 当前汽车业务增长放缓，竞争加剧
 - **监管风险**: 自动驾驶审批可能拖延数年
+
+![diffpoint](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=ERBdb4YqeRNJh0C3mx-KT8cBidWfpLLd_Jm29D8Le1wL_g)
+*概念示意图*
 
 ### 💡 投资者解读
 
@@ -550,6 +591,9 @@ toc_sticky: true
 
 主题ETF为投资者提供了“一篮子”解决方案，既能参与行业成长，又能有效分散个股风险。
 
+![TESILAETF](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=ETeEstmCZrZNrpzuvdhDF9kBuaqAULL-4CLXrRmZPm7G5Q)
+以上为上面所罗列的股票今年以来的日K线。
+
 ## 投资策略匹配：找到适合您的财富增长路径
 
 ### 根据投资目标选择策略
@@ -568,6 +612,9 @@ toc_sticky: true
 -   **收益策略**：配置$TSLS等期权收益型ETF（占组合30-40%）。
 -   **成熟企业**：投资于正在转型的传统车企，如$F、$GM（占组合30-40%）。
 -   **基础设施**：布局充电网络运营商，如$CHPT、$EVGO（占组合20-30%）。
+
+![tesilachangqijiazhi](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EWnjijhusL1KpI8kDpPJpV8BFBDwaZXeeeLnoP2D91r5RQ)
+上图为假设的长期价值积累组合方案，仅供参考。
 
 ### 风险管理建议
 
@@ -589,49 +636,62 @@ toc_sticky: true
 ---
 
 <div class="member-premium-preview" data-level="VIP4">
-  <h4>👑 VIP4专享：ARK Invest完整研究资源包+专业咨询</h4>
+  <h4>👑 VIP4专享：专业投资分析+开源工具部署+资料本地化服务</h4>
   
   <div class="quantitative-tools-preview">
-    <h5>🎥 Cathie Wood精选视频库+ARK官方研报中文版</h5>
+    <h5>📊 特斯拉投资专业分析包（已完成资料+工具部署）</h5>
     
     <div class="code-preview">
       <div class="code-header">
-        <span>VIP4_Tesla_Investment_Masterclass.zip</span>
+        <span>Tesla_Investment_Professional_Package.zip</span>
         <div class="code-lock" onclick="showUpgradeModal('VIP4')">
           <i class="fas fa-lock"></i>
           <span>VIP4解锁</span>
         </div>
       </div>
       <pre><code class="python">
-# VIP4顶级投资者资源包结构
+# VIP4专业投资者专享：特斯拉投资完整资源包
 📁 Tesla_Investment_Professional_Package/
-├── 🎥 Cathie_Wood_Masterclass/
-│   ├── Tesla_2600_Target_Deep_Dive.mp4（中文字幕）
-│   ├── Robotaxi_Business_Model_Analysis.mp4
-│   <span class="blur-code">
-│   ├── Innovation_Investment_Philosophy.mp4
-│   ├── Tesla_vs_Traditional_Automakers.mp4
-│   └── Big_Ideas_2025_Exponential_Growth.mp4
+├── 📊 SA_Premium_Complete_Analysis/
+│   ├── Tesla_Rating_Analysis_40Pages.pdf（已完成）
+│   ├── Dual_Rating_System_Comparison.pdf
+│   └── Valuation_Framework_Professional.pdf
+├── 🎙️ Musk_2025_Key_Interviews/
+│   ├── Q2_Earnings_Call_Deep_Analysis.pdf（已完成50页）
+│   ├── Robotaxi_Timeline_Updates.pdf
+│   └── FSD_Technology_Progress.pdf
+├── 🌐 Tesla_OpenSource_Ecosystem/
+│   ├── Investment_Framework_Innovation.pdf（独家方法论）
+│   ├── TeslaMate_Deployment_Guide.md
+│   ├── Monitoring_Tools_Setup.md
+│   └── Community_Health_Metrics.py
+├── 📦 Integrated_Resources_Package/
+│   ├── SA_Premium_Data_Localized.zip（无需VPN）
+│   ├── ARK_Analysis_Summary.pdf
+│   └── Tesla_Investment_Toolkit.xlsx
 │   ...</span>
-├── 📊 ARK_Official_Reports_CN/
+├── 🎯 Consultation_Services/
 │   <span class="blur-code">
-│   ├── Tesla_Big_Ideas_2025_Complete.pdf
-│   ├── Robotaxi_Market_Analysis_CN.pdf
-│   ├── Autonomous_Driving_Tech_Roadmap_CN.pdf
-│   └── Disruptive_Innovation_Framework_CN.pdf
+│   ├── Article_Content_QA_Service.md（文章内容专项答疑）
+│   ├── OpenSource_Deployment_Guide.md（开源工具部署指导）
+│   ├── Investment_Strategy_Guidance.md（投资策略咨询）
+│   ├── Resource_Package_Updates.md（资料包持续更新）
+│   └── Technical_Support.md（技术支持服务）
 │   ...</span>
-├── 🛠️ Professional_Investment_Tools/
+├── 🛠️ Professional_Tools_Package/
 │   <span class="blur-code">
-│   ├── Tesla_Valuation_Calculator.xlsx
-│   ├── Robotaxi_Revenue_Model.xlsx
-│   ├── Portfolio_Optimization_Tool.xlsx
-│   └── TeslaMate_Investment_Edition/
+│   ├── TeslaMate_Monitoring_Setup.sh（一键部署脚本）
+│   ├── Tesla_Investment_Analysis.xlsx（估值模型）
+│   ├── OpenSource_Health_Metrics.py（生态评估工具）
+│   ├── SA_Data_Parser.py（数据处理工具）
+│   └── Resource_Update_Notification.py（资料更新提醒）
 │   ...</span>
-└── 💬 Personal_Consultation_System/
+└── 💬 Article_Based_Consultation/
     <span class="blur-code">
-    ├── Monthly_Strategy_Sessions（每月2次）
-    ├── 24h_Emergency_Consultation
-    └── Written_Investment_Reports
+    ├── Content_QA_Service（文章内容问答服务）
+    ├── Deployment_Support（开源工具部署支持）
+    ├── Investment_Strategy_Guidance（投资策略指导）
+    └── Resource_Update_Service（资料包持续更新）
     ...</span>
 </code></pre>
     </div>
@@ -640,32 +700,34 @@ toc_sticky: true
   <div class="tool-features-grid">
     <div class="feature-item">
       <h6>🎥 视频资源库</h6>
-      <p>Cathie Wood精选视频：<strong class="blur-text">12小时</strong>完整解读</p>
+      <p>Cathie Wood大师课：<strong class="blur-text">12小时</strong>+中文字幕完整版</p>
     </div>
     <div class="feature-item">
       <h6>📚 研报资料</h6>
-      <p>ARK官方研报中文版：<strong class="blur-text">5份</strong>完整翻译</p>
+      <p>ARK官方研报中文版：<strong class="blur-text">107页</strong>+8份专题报告</p>
     </div>
     <div class="feature-item">
       <h6>🛠️ 专业工具</h6>
-      <p>Excel投资模型：<strong class="blur-text">3套</strong>专业估值工具</p>
+      <p>投资分析工具包：<strong class="blur-text">5套</strong>Excel专业模型</p>
     </div>
     <div class="feature-item">
       <h6>💬 专业咨询</h6>
-      <p>每月<strong class="blur-text">2</strong>次1对1投资策略咨询</p>
+      <p>1对1投资咨询：每月<strong class="blur-text">2次</strong>×60分钟服务</p>
     </div>
   </div>
   
   <div class="premium-upgrade-section">
     <div class="benefits-highlight">
-      <h6>🎁 VIP4年度会员顶级权益</h6>
+      <h6>🎁 VIP4年度会员专业权益（价值¥8,000+）</h6>
       <ul>
-        <li>✅ Cathie Wood精选投资视频库（12小时+中文字幕）</li>
-        <li>✅ ARK Invest官方研报完整中文版（5份核心研报）</li>
-        <li>✅ 专业投资工具包（Excel估值模型+数据监控）</li>
-        <li>✅ 个人投资策略1对1咨询（每月2次60分钟）</li>
-        <li>✅ 24小时紧急投资咨询响应服务</li>
-        <li>✅ TeslaMate投资定制版+完整使用指南</li>
+        <li>🔄 ARK Big Ideas 2025核心内容深度解读（持续更新中）</li>
+        <li>✅ 马斯克2025年关键访谈完整分析（已完成50页）</li>
+        <li>✅ 特斯拉开源生态投资分析框架（独家创新方法论）</li>
+        <li>✅ SA Premium专业数据完整解读（已完成40页）</li>
+        <li>✅ 文章涉及开源项目部署指导（TeslaMate、监控工具等）</li>
+        <li>✅ 专业投资资料统一打包下载（无需科学上网）</li>
+        <li>✅ 文章内容专项咨询服务（投资策略、技术部署等）</li>
+        <li>✅ SA Premium + ARK资料本地化服务</li>
       </ul>
     </div>
     <div class="upgrade-action">
@@ -673,14 +735,25 @@ toc_sticky: true
         👑 VIP4年度会员 ¥720/365天
       </button>
       <p class="value-proposition">
-        <small>💎 日均¥2，获得华尔街级投资资源+专业咨询服务</small><br>
-        <small>🎯 对标专业投资机构服务标准，助您成为顶级投资者</small>
+        <small>💎 日均¥1.97，获得专业投资分析+开源工具部署+统一资料包</small><br>
+        <small>🎯 对标专业投资机构服务，助您掌握颠覆性创新投资精髓</small>
       </p>
+    </div>
+    
+    <div class="vip4-direct-link">
+      <h6>🔗 立即查看VIP4完整服务详情</h6>
+      <a href="{{ site.baseurl }}/tesla-vip4-ark-complete-research-package" class="vip-premium-link">
+        👑 VIP4完整资源包详情页面 →
+      </a>
+      <p class="service-description">查看专业投资分析、开源工具部署指导、资料打包服务和专项咨询详细介绍</p>
     </div>
   </div>
 </div>
 
 ## 从“马斯克帝国”视角，理解特斯拉的投资逻辑
+
+![muskscosmicventures](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EQGkgB9vm7dGhBbThVVQ9VQBGhsd_ATJGXOQazfgZEcIkw)
+*概念示意图*
 
 ### 超越单一公司的生态思维
 
@@ -701,6 +774,9 @@ toc_sticky: true
 -   **AI技术**：自动驾驶AI将演化为适应火星环境的智能决策系统。
 
 在这个宏伟蓝图中，特斯拉扮演着“技术孵化器”和“现金流引擎”的双重角色，为整个“马斯克帝国”提供坚实的技术基础和资金支持。
+
+![marscolonizationscene](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=ET_S7LpMAipJr4gbyurEPUYBQ3iAjczYaqi6RTHorhxp3g)
+*概念示意图*
 
 ### 理解生态投资的复利效应
 
@@ -730,6 +806,9 @@ toc_sticky: true
 -   平衡投资与职业发展、家庭开支等方面的关系。
 -   努力建立多元化的收入来源。
 
+![financialplanning](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EdgQcfCChExNvjzpXbt136QBenui9wd7OeeY7PJ_fS-ohw)
+*概念示意图*
+
 ### 通往财富自由的现实路径
 
 真正的财富自由并非源于一夜暴富，而是通过合理的资产配置、持续的学习成长和耐心的复利积累来实现。特斯拉投资生态为我们提供了参与未来的机遇，但成功的关键在于：
@@ -742,6 +821,9 @@ toc_sticky: true
 ## 📋 实用投资清单
 
 > 💡 **核心摘要**：本节汇总了特斯拉投资生态的完整清单，可供快速查阅参考。
+
+![journeytoff](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EYm2xEKHi8pBl8JqVy7w22wBMnnRQsPJxkBtH4WKVTDVyw)
+*概念示意图*
 
 ### 核心投资标的速查表
 
@@ -775,6 +857,9 @@ toc_sticky: true
 4.  我的投资期限是否与风险承受能力相匹配？
 5.  我是否预留了足够的应急资金？
 6.  我是否了解相关的税务影响？
+
+![TESILATOUQIANGONGKE](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=ETnjwNSDccdBtzh6XiYNPCoBQ3CzeAxCT_R8K37eQnYsOQ)
+*概念示意图*
 
 ---
 
