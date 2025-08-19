@@ -418,24 +418,194 @@ class YouTubeMenuHandler(BaseMenuHandler):
     
     def _view_upload_history(self) -> Optional[str]:
         """查看上传历史"""
-        print("\n📋 YouTube上传历史")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        try:
+            from pathlib import Path
+            import json
+            
+            print("\n📋 YouTube上传历史")
+            print("="*40)
+            
+            # 检查上传记录文件
+            upload_log = Path(".tmp/youtube_uploads/upload_history.json")
+            temp_dir = Path(".tmp/youtube_uploads")
+            
+            if upload_log.exists():
+                try:
+                    with open(upload_log, 'r', encoding='utf-8') as f:
+                        history = json.load(f)
+                    
+                    if history:
+                        print(f"🎥 共找到 {len(history)} 条上传记录:")
+                        
+                        # 显示最近10条记录
+                        for i, record in enumerate(history[-10:], 1):
+                            upload_time = record.get('upload_time', '未知')
+                            filename = record.get('filename', '未知文件')
+                            video_url = record.get('video_url', '')
+                            status = record.get('status', '未知')
+                            
+                            status_emoji = "✅" if status == 'success' else "❌"
+                            print(f"   {i}. {status_emoji} {filename}")
+                            print(f"      时间: {upload_time}")
+                            if video_url:
+                                print(f"      链接: {video_url}")
+                            print()
+                    else:
+                        print("📄 上传记录为空")
+                        
+                except json.JSONDecodeError:
+                    print("❌ 无法解析上传记录文件")
+            else:
+                print("📄 暂无上传记录")
+                
+            # 检查临时文件
+            if temp_dir.exists():
+                temp_files = list(temp_dir.glob("*.mp4")) + list(temp_dir.glob("*.avi"))
+                if temp_files:
+                    print(f"\n📁 临时视频文件 ({len(temp_files)} 个):")
+                    for temp_file in temp_files[-5:]:
+                        print(f"   • {temp_file.name}")
+            
+            self.pause_for_user()
+            return "上传历史查看完成"
+            
+        except Exception as e:
+            self.handle_error(e, "查看上传历史")
+            return None
     
     def _configure_upload_params(self) -> Optional[str]:
         """配置上传参数"""
-        print("\n⚙️ YouTube上传参数配置")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        try:
+            from pathlib import Path
+            import json
+            
+            print("\n⚙️ YouTube上传参数配置")
+            print("="*40)
+            
+            config_file = Path("config/youtube_upload_config.json")
+            
+            # 默认配置
+            default_config = {
+                "title_template": "{filename} - 有心工坊音频",
+                "description_template": "来自有心工坊的优质音频内容\n\n访问我们: https://youxinyanzhe.github.io",
+                "tags": ["教育", "学习", "有心工坊"],
+                "privacy": "public",
+                "category": "22",  # People & Blogs
+                "thumbnail_default": "assets/images/default_thumbnail.jpg"
+            }
+            
+            # 加载现有配置
+            if config_file.exists():
+                try:
+                    with open(config_file, 'r', encoding='utf-8') as f:
+                        current_config = json.load(f)
+                except:
+                    current_config = default_config
+            else:
+                current_config = default_config
+            
+            print("📄 当前配置:")
+            for key, value in current_config.items():
+                if isinstance(value, list):
+                    print(f"   {key}: {', '.join(value)}")
+                else:
+                    print(f"   {key}: {value}")
+            
+            # 配置菜单
+            while True:
+                print("\n可修改的选项:")
+                print("1. 📝 修改标题模板")
+                print("2. 📄 修改描述模板")
+                print("3. 🏷️ 修改标签")
+                print("4. 🔒 修改隐私设置")
+                print("5. 💾 保存配置")
+                print("0. 返回")
+                
+                choice = input("\n请选择 (0-5): ").strip()
+                
+                if choice == "0":
+                    break
+                elif choice == "1":
+                    new_title = input(f"输入新标题模板 (当前: {current_config['title_template']}): ").strip()
+                    if new_title:
+                        current_config['title_template'] = new_title
+                        print("✅ 标题模板已更新")
+                elif choice == "2":
+                    print("输入新描述模板 (空行结束):")
+                    description_lines = []
+                    while True:
+                        line = input()
+                        if not line:
+                            break
+                        description_lines.append(line)
+                    if description_lines:
+                        current_config['description_template'] = '\n'.join(description_lines)
+                        print("✅ 描述模板已更新")
+                elif choice == "3":
+                    tags_input = input(f"输入标签 (逗号分隔, 当前: {', '.join(current_config['tags'])}): ").strip()
+                    if tags_input:
+                        current_config['tags'] = [tag.strip() for tag in tags_input.split(',')]
+                        print("✅ 标签已更新")
+                elif choice == "4":
+                    print("选择隐私设置:")
+                    print("1. public (公开)")
+                    print("2. unlisted (不公开列表)")
+                    print("3. private (私人)")
+                    privacy_choice = input("选择 (1-3): ").strip()
+                    privacy_map = {"1": "public", "2": "unlisted", "3": "private"}
+                    if privacy_choice in privacy_map:
+                        current_config['privacy'] = privacy_map[privacy_choice]
+                        print("✅ 隐私设置已更新")
+                elif choice == "5":
+                    # 保存配置
+                    config_file.parent.mkdir(parents=True, exist_ok=True)
+                    with open(config_file, 'w', encoding='utf-8') as f:
+                        json.dump(current_config, f, indent=2, ensure_ascii=False)
+                    print(f"✅ 配置已保存到 {config_file}")
+                    return "上传参数配置完成"
+            
+            return None
+            
+        except Exception as e:
+            self.handle_error(e, "配置上传参数")
+            return None
     
     def _batch_upload_audio(self) -> Optional[str]:
         """批量上传音频"""
-        print("\n🔄 批量上传音频文件")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        try:
+            import subprocess
+            from pathlib import Path
+            
+            print("\n🔄 批量上传音频文件")
+            print("="*40)
+            
+            # 检查OAuth状态
+            oauth_status = self._check_oauth_status()
+            if not oauth_status['valid']:
+                print(f"❌ OAuth认证状态: {oauth_status['message']}")
+                print("💡 请先配置OAuth认证")
+                self.pause_for_user()
+                return None
+            
+            print("🚀 启动YouTube批量上传工具...")
+            print("💡 提示: 工具将自动扫描assets/audio目录中的所有音频文件")
+            print()
+            
+            # 调用YouTube上传测试工具
+            result = subprocess.run([
+                "python", "scripts/tools/youtube/youtube_upload_tester.py"
+            ], check=False)
+            
+            if result.returncode == 0:
+                print("\n✅ 批量上传完成")
+                return "批量上传音频完成"
+            else:
+                print("\n⚠️ 批量上传过程中遇到问题")
+                return None
+                
+        except Exception as e:
+            self.handle_error(e, "批量上传音频")
+            return None
     
     def _check_oauth_detailed(self) -> Optional[str]:
         """详细检查OAuth状态"""
