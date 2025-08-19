@@ -2,7 +2,7 @@
 
 > **项目概述**: 有心工坊 (YouXin Workshop) - 为有心人打造的数字创作平台  
 > **最后整理**: 2025-08-19  
-> **文档总数**: 20个主要文档 (已从35个精简)  
+> **文档总数**: 17个主要文档 (已从35个精简52%)  
 
 ---
 
@@ -16,8 +16,6 @@
 
 ### 系统管理
 - **[SYSTEM_MENU_ARCHITECTURE.md](SYSTEM_MENU_ARCHITECTURE.md)** - 菜单系统架构
-- **[PROJECT_SOFTWARE_ENGINEERING_FINAL_AUDIT.md](PROJECT_SOFTWARE_ENGINEERING_FINAL_AUDIT.md)** - 软件工程审计
-- **[INTEGRATION_RESULTS_SUMMARY.md](INTEGRATION_RESULTS_SUMMARY.md)** - 集成结果总结
 
 ---
 
@@ -39,8 +37,9 @@
   - *原MEMBER_CONTENT_MANAGEMENT_SYSTEM.md* ✅ 已合并
   - *原member-system-guide.md* ✅ 已合并  
   - *原member-access-user-guide.md* ✅ 已合并
+  - *原investment-content-guidelines.md* ✅ 已合并
   
-**涵盖内容**: VIP会员体系、技术架构、访问控制、定价策略、系统管理
+**涵盖内容**: VIP会员体系、技术架构、访问控制、定价策略、投资内容规范、系统管理
 
 ### VIP内容创作 (已合并)
 - **[VIP_CONTENT_CREATION_GUIDE.md](VIP_CONTENT_CREATION_GUIDE.md)** ⭐ **(主文档 - 已合并)**
@@ -77,8 +76,9 @@
   - *原MAJOR_DISCOVERY_REPORT.md* ✅ 已合并
   - *原FINAL_FUNCTION_RECOVERY_REPORT.md* ✅ 已合并
   - *原REFACTOR_COMPARISON_REPORT.md* ✅ 已合并
+  - *原INTEGRATION_RESULTS_SUMMARY.md* ✅ 已合并
 
-**核心价值**: 记录功能发现方法论，恢复11个完整功能，建立系统性审计标准
+**核心价值**: 记录功能发现方法论，恢复11个完整功能，项目集成完成总结，建立系统性审计标准
 
 ### 项目演进
 - **[CHANGELOG_DETAILED.md](CHANGELOG_DETAILED.md)** - 详细更新历史
@@ -88,11 +88,7 @@
 
 ## 📋 规划指导类
 
-### 投资内容
-- **[investment-content-guidelines.md](investment-content-guidelines.md)** - 投资内容创作指导
-
 ### 平台集成
-- **[ximalaya-developer-requirements.md](ximalaya-developer-requirements.md)** - 喜马拉雅开发者要求
 - **[AZURE_INTEGRATION_ROADMAP.md](AZURE_INTEGRATION_ROADMAP.md)** - Azure服务集成规划
 
 ---
@@ -105,6 +101,7 @@
 - **[setup/gemini_setup.md](setup/gemini_setup.md)** - Gemini AI配置
 - **[setup/tts_comprehensive_setup.md](setup/tts_comprehensive_setup.md)** - TTS综合配置
 - **[setup/youtube_podcast_setup.md](setup/youtube_podcast_setup.md)** - YouTube播客配置
+- **[setup/ximalaya-developer-requirements.md](setup/ximalaya-developer-requirements.md)** - 喜马拉雅开发者要求
 
 ---
 
@@ -125,12 +122,12 @@
 
 ### 数量优化
 - **整理前**: 35个主要文档 + 多个重复/过时文档
-- **整理后**: 20个主要文档 + 配置/指南分类
-- **优化效果**: 减少43%数量，提高查找效率
+- **整理后**: 17个主要文档 + 配置/指南分类
+- **优化效果**: 减少52%数量，提高查找效率
 
 ### 内容优化
-- **合并策略**: 4大类主题文档合并 (考古发现、图片管理、会员系统、VIP内容)
-- **删除清理**: 11个过时/重复文档删除
+- **合并策略**: 5大类主题文档合并 (考古发现、图片管理、会员系统、VIP内容、投资规范)
+- **删除清理**: 13个过时/重复文档删除
 - **结构优化**: 配置类文档移至setup目录，指南类移至guides目录
 
 ### 维护改进
@@ -160,10 +157,10 @@
 ---
 
 **📊 统计信息**: 
-- 主要文档: 20个
-- 配置指南: 6个  
+- 主要文档: 17个
+- 配置指南: 7个  
 - 使用指南: 2个
 - 归档文档: 1个
-- 总体精简比例: 43%
+- 总体精简比例: 52%
 
 **🔄 维护策略**: 每季度检查一次文档有效性，及时更新过时信息，保持文档体系的整洁和实用性。
