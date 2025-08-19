@@ -5,7 +5,8 @@ date: 2025-08-16
 categories: [投资理财, VIP专享]
 tags: [特斯拉, SA Premium, 投资分析, VIP2]
 header:
-  teaser: "{{ site.baseurl }}/assets/images/tesla-sa-analysis-teaser.jpg"
+  overlay_image: "https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EVD1FoPOiRRGubpVxfmUdK8BJ3EjFNJIcv6PTdyh2bv3gg"
+  teaser: "https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EVD1FoPOiRRGubpVxfmUdK8BJ3EjFNJIcv6PTdyh2bv3gg"
 excerpt: "基于Seeking Alpha Premium最新数据，深度解读特斯拉评级分歧与估值逻辑，揭示198倍PE背后的投资密码。"
 member_tier: monthly
 estimated_reading_time: 15分钟
@@ -19,6 +20,8 @@ last_updated: 2025-08-16
 > **核心价值**: 专业机构数据翻译 + 投资决策框架
 
 ---
+
+![vip2](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EVD1FoPOiRRGubpVxfmUdK8BJ3EjFNJIcv6PTdyh2bv3gg)
 
 ## 📊 核心评级数据分析
 

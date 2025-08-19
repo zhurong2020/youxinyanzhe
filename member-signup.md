@@ -35,7 +35,7 @@ excerpt: "完成付费后，请填写以下信息以便我们为您发放访问�
         <option value="experience">体验会员 (￥35/7天) - 基础学习资源</option>
         <option value="monthly">月度会员 (￥108/30天) - 专业分析报告</option>
         <option value="quarterly">季度会员 (￥288/90天) - 个性化服务+社群</option>
-        <option value="yearly">年度会员 (￥720/365天) - 深度服务+咨询</option>
+        <option value="yearly">年度会员 (￥720/365天) - 专业分析+工具部署+本地化服务</option>
       </select>
     </div>
 
