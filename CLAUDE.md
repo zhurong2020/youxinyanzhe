@@ -88,10 +88,11 @@
 **相关文档**:
 - `docs/TECHNICAL_ARCHITECTURE.md` - 详细技术架构说明
 - `docs/CHANGELOG_DETAILED.md` - 完整更新历史
-- `docs/project-completion-summary.md` - 项目完成状态总结
-- `docs/MEMBER_CONTENT_RULES_AND_STANDARDS.md` - 会员内容管理规范
-- `docs/MEMBER_CONTENT_MANAGEMENT_SYSTEM.md` - 会员内容技术实现
+- `docs/MEMBER_CONTENT_RULES_AND_STANDARDS.md` - 会员内容管理规范（已合并）
+- `docs/VIP_CONTENT_CREATION_GUIDE.md` - VIP内容创作指南（已合并）
 - `docs/CONTENT_SERIES_INTEGRATION_STRATEGY.md` - 内容系列集成策略
-- `docs/IMAGE_MANAGEMENT_WORKFLOW.md` - 图片管理完整工作流程
+- `docs/IMAGE_MANAGEMENT_WORKFLOW.md` - 图片管理完整工作流程（已合并）
 - `docs/SYSTEM_MENU_ARCHITECTURE.md` - 系统菜单架构设计
 - `docs/AUDIO_RESOURCE_MANAGEMENT.md` - 音频资源管理系统
+- `docs/ARCHAEOLOGY_DISCOVERY_ROUND2.md` - 功能考古发现记录（已合并）
+- `docs/FUNCTION_REGRESSION_PREVENTION.md` - 功能退化防控系统
