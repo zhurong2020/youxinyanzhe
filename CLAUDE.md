@@ -18,6 +18,21 @@
 
 **详细进展**: 查看 `docs/CHANGELOG_DETAILED.md` 获取完整的开发历史和重构成果
 
+## ⚠️ 重要提示：代码重构说明
+**原因**: 原`run.py`代码3394行，采用单体式架构，维护困难  
+**重构方式**: 拆分为模块化架构，新入口为`run.py`，原文件归档为`docs/archived/run_old.py`
+
+**功能问题排查**:
+1. 如发现功能异常，首先检查新模块化实现 (`scripts/core/`, `scripts/cli/`)
+2. 若新实现有缺失，可参考 `docs/archived/run_old.py` 对应功能
+3. **⚠️ 重要**: 原文件3394行，**超过LLM单次读取限制**，需具体定位功能后分段阅读
+4. 参考归档文件的详细说明: `docs/archived/README.md`
+
+**重构对照**: 原单体文件 → 新模块化架构  
+- 菜单系统: `scripts/cli/` (MenuHandler → MenuRouter → 专门处理器)
+- 内容处理: `scripts/core/content_pipeline.py` 
+- 工具脚本: `scripts/tools/` (按功能分类)
+
 ## 核心开发约定
 
 ### 代码规范
