@@ -767,7 +767,208 @@ echo "💡 可运行 'env | grep ANTHROPIC' 查看配置"
     
     def _log_viewer(self) -> Optional[str]:
         """日志查看"""
-        print("\n📋 日志查看")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        try:
+            from pathlib import Path
+            import os
+            from datetime import datetime
+            
+            print("\n📋 系统日志查看")
+            print("="*40)
+            
+            # 定义日志目录和文件
+            log_locations = [
+                Path(".build/logs/pipeline.log"),
+                Path("logs/onedrive_blog_images.log"), 
+                Path(".build/logs/onedrive_blog_images.log")
+            ]
+            
+            # 查找存在的日志文件
+            available_logs = []
+            for log_path in log_locations:
+                if log_path.exists():
+                    stat = log_path.stat()
+                    size_mb = stat.st_size / (1024 * 1024)
+                    modified = datetime.fromtimestamp(stat.st_mtime)
+                    available_logs.append({
+                        'path': log_path,
+                        'size': size_mb,
+                        'modified': modified,
+                        'name': log_path.name
+                    })
+            
+            if not available_logs:
+                print("📂 未找到系统日志文件")
+                print("💡 日志文件可能在系统首次运行后生成")
+                self.pause_for_user()
+                return None
+            
+            # 显示可用日志
+            print(f"📊 发现 {len(available_logs)} 个日志文件:")
+            for i, log in enumerate(available_logs, 1):
+                print(f"   {i}. {log['name']}")
+                print(f"      大小: {log['size']:.2f}MB")
+                print(f"      修改: {log['modified'].strftime('%Y-%m-%d %H:%M:%S')}")
+                print()
+            
+            # 日志查看选项
+            while True:
+                print("日志查看选项:")
+                print("1. 📄 查看最新日志 (最后50行)")
+                print("2. 🔍 搜索日志内容")
+                print("3. 📊 日志统计信息")
+                print("4. 🧹 清理旧日志")
+                print("0. 返回")
+                
+                choice = input("\n请选择 (0-4): ").strip()
+                
+                if choice == "0":
+                    break
+                elif choice == "1":
+                    self._show_recent_logs(available_logs)
+                elif choice == "2":
+                    self._search_logs(available_logs)
+                elif choice == "3":
+                    self._show_log_stats(available_logs)
+                elif choice == "4":
+                    self._cleanup_logs(available_logs)
+                else:
+                    print("❌ 无效选择")
+            
+            return "日志查看完成"
+            
+        except Exception as e:
+            self.handle_error(e, "日志查看")
+            return None
+    
+    def _show_recent_logs(self, available_logs):
+        """显示最新日志"""
+        if len(available_logs) == 1:
+            log_file = available_logs[0]['path']
+        else:
+            print("\n选择要查看的日志文件:")
+            for i, log in enumerate(available_logs, 1):
+                print(f"   {i}. {log['name']}")
+            
+            choice = input(f"请选择 (1-{len(available_logs)}): ").strip()
+            try:
+                idx = int(choice) - 1
+                if 0 <= idx < len(available_logs):
+                    log_file = available_logs[idx]['path']
+                else:
+                    print("❌ 无效选择")
+                    return
+            except ValueError:
+                print("❌ 请输入有效数字")
+                return
+        
+        try:
+            print(f"\n📄 {log_file.name} - 最新50行:")
+            print("="*50)
+            
+            with open(log_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                recent_lines = lines[-50:] if len(lines) > 50 else lines
+                
+                for line in recent_lines:
+                    # 简单的颜色标记
+                    line = line.rstrip()
+                    if 'ERROR' in line:
+                        print(f"❌ {line}")
+                    elif 'WARNING' in line:
+                        print(f"⚠️ {line}")
+                    elif 'INFO' in line:
+                        print(f"ℹ️ {line}")
+                    else:
+                        print(f"   {line}")
+            
+            print("="*50)
+            input("按Enter继续...")
+            
+        except Exception as e:
+            print(f"❌ 读取日志失败: {e}")
+    
+    def _search_logs(self, available_logs):
+        """搜索日志内容"""
+        search_term = input("\n🔍 请输入搜索关键词: ").strip()
+        if not search_term:
+            return
+        
+        print(f"\n搜索结果 (关键词: '{search_term}'):")
+        print("="*50)
+        
+        total_matches = 0
+        for log in available_logs:
+            try:
+                with open(log['path'], 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                    
+                matches = []
+                for i, line in enumerate(lines, 1):
+                        if search_term.lower() in line.lower():
+                            matches.append((i, line.rstrip()))
+                    
+                if matches:
+                    print(f"\n📄 {log['name']} ({len(matches)} 条匹配):")
+                    for line_num, line in matches[-10:]:  # 显示最新10条
+                        print(f"   {line_num:4d}: {line}")
+                    total_matches += len(matches)
+                    
+            except Exception as e:
+                print(f"❌ 搜索 {log['name']} 时出错: {e}")
+        
+        print(f"\n总共找到 {total_matches} 条匹配记录")
+        input("按Enter继续...")
+    
+    def _show_log_stats(self, available_logs):
+        """显示日志统计"""
+        print("\n📊 日志统计信息:")
+        print("="*40)
+        
+        for log in available_logs:
+            try:
+                with open(log['path'], 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                
+                # 统计不同级别的日志
+                info_count = sum(1 for line in lines if 'INFO' in line)
+                warn_count = sum(1 for line in lines if 'WARNING' in line)
+                error_count = sum(1 for line in lines if 'ERROR' in line)
+                
+                print(f"\n📄 {log['name']}:")
+                print(f"   总行数: {len(lines)}")
+                print(f"   ℹ️ INFO: {info_count}")
+                print(f"   ⚠️ WARNING: {warn_count}")
+                print(f"   ❌ ERROR: {error_count}")
+                print(f"   文件大小: {log['size']:.2f}MB")
+                
+            except Exception as e:
+                print(f"❌ 分析 {log['name']} 时出错: {e}")
+        
+        input("按Enter继续...")
+    
+    def _cleanup_logs(self, available_logs):
+        """清理旧日志"""
+        print("\n🧹 日志清理选项:")
+        print("1. 清空所有日志文件 (保留文件)")
+        print("2. 删除7天前的日志行")
+        print("3. 压缩大型日志文件")
+        print("0. 取消")
+        
+        choice = input("\n请选择 (0-3): ").strip()
+        
+        if choice == "1":
+            if input("⚠️ 确认清空所有日志？(y/N): ").lower() == 'y':
+                for log in available_logs:
+                    try:
+                        with open(log['path'], 'w', encoding='utf-8') as f:
+                            f.write(f"# 日志已于 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} 清空\n")
+                        print(f"✅ 已清空 {log['name']}")
+                    except Exception as e:
+                        print(f"❌ 清空 {log['name']} 失败: {e}")
+        elif choice == "2":
+            print("💡 按日期清理功能需要更复杂的日志解析，当前版本暂不支持")
+        elif choice == "3":
+            print("💡 日志压缩功能将在未来版本中实现")
+        
+        if choice != "0":
+            input("按Enter继续...")
