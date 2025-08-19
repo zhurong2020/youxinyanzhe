@@ -729,10 +729,33 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
     
     def _quick_test_article(self) -> Optional[str]:
         """快速测试文章"""
-        print("\n📝 快速测试文章")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        self.log_action("智能创作：开始生成测试文章")
+        
+        try:
+            draft = self.pipeline.generate_test_content()
+            if not draft:
+                print("❌ 生成测试文章失败")
+                self.log_action("生成测试文章失败", "error")
+                self.pause_for_user()
+                return None
+            
+            # 测试文章生成成功后，询问是否要发布
+            print(f"\n✅ 测试文章已生成: {draft}")
+            publish_choice = input("\n是否要发布此测试文章？(y/N): ").strip().lower()
+            
+            self.log_action(f"测试文章生成成功: {draft}, 用户选择{'发布' if publish_choice in ['y', 'yes'] else '不发布'}")
+            
+            if publish_choice not in ['y', 'yes']:
+                print("📄 测试文章已保存到草稿目录，您可以稍后通过'智能内容发布'来发布它")
+                self.pause_for_user()
+                return None
+                
+            return str(draft)
+            
+        except Exception as e:
+            print(f"❌ 生成测试文章时出错: {e}")
+            self.pause_for_user()
+            return None
     
     def _content_outline_creation(self) -> Optional[str]:
         """内容大纲创建"""
@@ -791,31 +814,154 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
     
     def _create_monetization_package(self) -> Optional[str]:
         """创建内容变现包"""
-        print("\n📦 创建内容变现包")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        try:
+            # 列出可用的已发布文章
+            from pathlib import Path
+            import subprocess
+            posts_dir = Path("_posts")
+            
+            if not posts_dir.exists():
+                print("📋 _posts目录不存在")
+                return None
+                
+            posts = list(posts_dir.glob("*.md"))
+            if not posts:
+                print("📋 未找到已发布文章")
+                return None
+                
+            print("\n📄 已发布文章列表：")
+            for i, post in enumerate(posts[:10]):  # 显示最新10篇
+                print(f"  {i+1}. {post.stem}")
+            print("  0. 返回上级菜单")
+            
+            choice = input("\n请输入文章编号，或直接输入文章路径 (0返回): ").strip()
+            
+            if choice == "0" or choice == "":
+                print("📋 返回内容变现管理菜单")
+                return None
+            
+            if choice.isdigit() and 1 <= int(choice) <= len(posts):
+                article_path = str(posts[int(choice)-1])
+            else:
+                article_path = choice
+            
+            if article_path and Path(article_path).exists():
+                print(f"\n🔄 正在为文章创建内容变现包: {article_path}")
+                # 调用reward_system_manager
+                script_path = Path("scripts/utils/reward_system_manager.py")
+                if not script_path.exists():
+                    print(f"❌ 脚本文件不存在: {script_path}")
+                    return None
+                    
+                result = subprocess.run([
+                    "python", str(script_path), "create", article_path
+                ], capture_output=True, text=True, check=False)
+                
+                print(result.stdout)
+                if result.stderr:
+                    print(f"❌ 错误: {result.stderr}")
+                    
+                return "内容变现包创建完成" if result.returncode == 0 else None
+            else:
+                print("❌ 文章文件不存在")
+                return None
+                
+        except Exception as e:
+            self.handle_error(e, "创建内容变现包")
+            return None
     
     def _view_reward_status(self) -> Optional[str]:
         """查看奖励发送状态"""
-        print("\n📊 奖励发送状态")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        try:
+            from pathlib import Path
+            import subprocess
+            
+            script_path = Path("scripts/utils/reward_system_manager.py")
+            if not script_path.exists():
+                print(f"❌ 脚本文件不存在: {script_path}")
+                self.pause_for_user()
+                return None
+                
+            result = subprocess.run([
+                "python", str(script_path), "stats"
+            ], capture_output=True, text=True, check=False)
+            
+            print(result.stdout)
+            if result.stderr:
+                print(f"❌ 错误: {result.stderr}")
+                
+            self.pause_for_user()
+            return "奖励状态查看完成" if result.returncode == 0 else None
+            
+        except Exception as e:
+            self.handle_error(e, "查看奖励发送状态")
+            self.pause_for_user()
+            return None
     
     def _manual_send_reward(self) -> Optional[str]:
         """手动发送奖励给用户"""
-        print("\n📧 手动发送奖励")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        try:
+            email = input("\n请输入用户邮箱: ").strip()
+            article_title = input("请输入文章标题: ").strip()
+            
+            if not email or not article_title:
+                print("❌ 邮箱和文章标题不能为空")
+                self.pause_for_user()
+                return None
+                
+            from pathlib import Path
+            import subprocess
+            
+            script_path = Path("scripts/utils/reward_system_manager.py")
+            if not script_path.exists():
+                print(f"❌ 脚本文件不存在: {script_path}")
+                self.pause_for_user()
+                return None
+                
+            result = subprocess.run([
+                "python", str(script_path), "send", email, article_title
+            ], capture_output=True, text=True, check=False)
+            
+            print(result.stdout)
+            if result.stderr:
+                print(f"❌ 错误: {result.stderr}")
+                
+            self.pause_for_user()
+            return "奖励发送完成" if result.returncode == 0 else None
+            
+        except Exception as e:
+            self.handle_error(e, "手动发送奖励")
+            self.pause_for_user()
+            return None
     
     def _run_reward_test(self) -> Optional[str]:
         """运行奖励系统测试"""
-        print("\n🧪 奖励系统测试")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        try:
+            from pathlib import Path
+            import subprocess
+            
+            script_path = Path("scripts/utils/reward_system_manager.py")
+            if not script_path.exists():
+                print(f"❌ 脚本文件不存在: {script_path}")
+                self.pause_for_user()
+                return None
+                
+            print("\n🧪 正在运行奖励系统测试...")
+            result = subprocess.run([
+                "python", str(script_path), "test"
+            ], capture_output=True, text=True, check=False)
+            
+            print(result.stdout)
+            if result.stderr:
+                print(f"❌ 错误: {result.stderr}")
+                
+            self.pause_for_user()
+            return "奖励系统测试完成" if result.returncode == 0 else None
+            
+        except Exception as e:
+            self.handle_error(e, "运行奖励系统测试")
+            self.pause_for_user()
+            return None
     
     def _generate_access_code(self) -> Optional[str]:
         """生成测试访问码"""
