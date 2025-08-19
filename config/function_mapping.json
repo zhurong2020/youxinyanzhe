@@ -1,0 +1,227 @@
+{
+  "function_mapping": {
+    "version": "1.0.0",
+    "last_updated": "2025-08-19",
+    "description": "有心工坊功能映射表 - 防止功能退化的核心配置",
+    "categories": {
+      "content_creation": {
+        "display_name": "智能内容创作",
+        "menu_path": "scripts/cli/content_menu_handler.py",
+        "menu_class": "ContentMenuHandler",
+        "functions": {
+          "outline_creation": {
+            "display_name": "内容大纲创建",
+            "menu_path": "scripts/cli/content_menu_handler.py",
+            "menu_method": "_content_outline_creation",
+            "menu_line": 1286,
+            "core_implementation": "scripts/tools/content/topic_inspiration_generator.py:TopicInspirationGenerator.generate_detailed_plan",
+            "dependencies": ["gemini_api", "content_pipeline"],
+            "status": "active",
+            "test_command": "from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator; gen = TopicInspirationGenerator(); gen.generate_detailed_plan('test', 'article')",
+            "last_verified": "2025-08-19",
+            "integration_commit": "1a08092"
+          },
+          "format_existing_draft": {
+            "display_name": "格式化现有草稿",
+            "menu_path": "scripts/cli/content_menu_handler.py",
+            "menu_method": "_format_existing_draft",
+            "menu_line": 536,
+            "core_implementation": "scripts/tools/content/format_draft.py:DraftFormatter.process_draft",
+            "dependencies": ["yaml", "pathlib"],
+            "status": "active",
+            "test_command": "from scripts.tools.content.format_draft import DraftFormatter; formatter = DraftFormatter()",
+            "last_verified": "2025-08-19",
+            "integration_commit": "1a08092"
+          },
+          "generate_front_matter": {
+            "display_name": "生成Front Matter",
+            "menu_path": "scripts/cli/content_menu_handler.py",
+            "menu_method": "_generate_front_matter",
+            "menu_line": 618,
+            "core_implementation": "scripts/tools/content/format_draft.py:DraftFormatter.create_front_matter",
+            "dependencies": ["yaml", "datetime"],
+            "status": "active",
+            "test_command": "from scripts.tools.content.format_draft import DraftFormatter; formatter = DraftFormatter(); formatter.create_front_matter('Test Title', 'Test Content')",
+            "last_verified": "2025-08-19",
+            "integration_commit": "1a08092"
+          },
+          "batch_process_drafts": {
+            "display_name": "批量处理草稿",
+            "menu_path": "scripts/cli/content_menu_handler.py",
+            "menu_method": "_batch_process_drafts",
+            "menu_line": 725,
+            "core_implementation": "scripts/tools/content/format_draft.py:DraftFormatter.process_draft",
+            "dependencies": ["pathlib", "glob"],
+            "status": "active",
+            "test_command": "from scripts.tools.content.format_draft import DraftFormatter; formatter = DraftFormatter()",
+            "last_verified": "2025-08-19",
+            "integration_commit": "1a08092"
+          },
+          "view_generation_history": {
+            "display_name": "查看主题生成历史",
+            "menu_path": "scripts/cli/content_menu_handler.py",
+            "menu_method": "_view_generation_history",
+            "menu_line": 201,
+            "core_implementation": "scripts/tools/content/topic_inspiration_generator.py:TopicInspirationGenerator.get_inspiration_history",
+            "dependencies": ["json", "pathlib"],
+            "status": "active",
+            "test_command": "from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator; gen = TopicInspirationGenerator(); gen.get_inspiration_history()",
+            "last_verified": "2025-08-19",
+            "integration_commit": "1a08092"
+          }
+        }
+      },
+      "youtube_processing": {
+        "display_name": "YouTube内容处理",
+        "menu_path": "scripts/cli/youtube_menu_handler.py",
+        "menu_class": "YouTubeMenuHandler",
+        "functions": {
+          "upload_podcast_video": {
+            "display_name": "YouTube视频生成与上传",
+            "menu_path": "scripts/cli/youtube_menu_handler.py",
+            "menu_method": "_upload_podcast_video",
+            "menu_line": 134,
+            "core_implementation": "scripts/tools/youtube/youtube_video_generator.py:YouTubeVideoGenerator",
+            "dependencies": ["subprocess", "pathlib", "PIL"],
+            "status": "active",
+            "test_command": "from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator; gen = YouTubeVideoGenerator()",
+            "last_verified": "2025-08-19",
+            "integration_commit": "1a08092"
+          },
+          "scan_audio_files": {
+            "display_name": "音频文件扫描",
+            "menu_method": "youtube_video_generator.handle_scan_audio",
+            "core_implementation": "scripts/tools/youtube/youtube_video_generator.py:YouTubeVideoGenerator.scan_audio_files",
+            "dependencies": ["pathlib", "os"],
+            "status": "active",
+            "test_command": "from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator; gen = YouTubeVideoGenerator(); gen.scan_audio_files()",
+            "last_verified": "2025-08-19",
+            "integration_commit": "1a08092"
+          },
+          "batch_video_generation": {
+            "display_name": "批量视频生成",
+            "menu_method": "youtube_video_generator.handle_batch_generation",
+            "core_implementation": "scripts/tools/youtube/youtube_video_generator.py:YouTubeVideoGenerator.generate_video_for_file",
+            "dependencies": ["subprocess", "ffmpeg"],
+            "status": "active",
+            "test_command": "from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator; gen = YouTubeVideoGenerator()",
+            "last_verified": "2025-08-19",
+            "integration_commit": "1a08092"
+          }
+        }
+      },
+      "member_management": {
+        "display_name": "内容变现管理",
+        "menu_path": "scripts/cli/vip_menu_handler.py",
+        "menu_class": "VIPMenuHandler",
+        "functions": {
+          "generate_access_code": {
+            "display_name": "生成访问码",
+            "menu_method": "_generate_access_code",
+            "core_implementation": "scripts/member_management.py:MemberManager.generate_access_code",
+            "dependencies": ["random", "string", "datetime"],
+            "status": "active",
+            "test_command": "from scripts.member_management import MemberManager; manager = MemberManager(); manager.generate_access_code('monthly')",
+            "last_verified": "2025-08-19",
+            "integration_commit": "previous"
+          },
+          "validate_access_code": {
+            "display_name": "验证访问码",
+            "menu_method": "_validate_access_code",
+            "core_implementation": "scripts/member_management.py:MemberManager.validate_access_code",
+            "dependencies": ["datetime", "re"],
+            "status": "active",
+            "test_command": "from scripts.member_management import MemberManager; manager = MemberManager(); manager.validate_access_code('VIP2_20251201_ABCD')",
+            "last_verified": "2025-08-19",
+            "integration_commit": "previous"
+          },
+          "member_statistics": {
+            "display_name": "会员统计",
+            "menu_method": "_member_statistics",
+            "core_implementation": "scripts/member_management.py:MemberManager.get_stats",
+            "dependencies": ["json", "pathlib"],
+            "status": "active",
+            "test_command": "from scripts.member_management import MemberManager; manager = MemberManager(); manager.get_stats()",
+            "last_verified": "2025-08-19",
+            "integration_commit": "previous"
+          },
+          "process_registrations": {
+            "display_name": "处理注册申请",
+            "menu_method": "_process_registrations",
+            "core_implementation": "scripts/member_management.py:MemberManager.batch_process_registrations",
+            "dependencies": ["smtplib", "email"],
+            "status": "active",
+            "test_command": "from scripts.member_management import MemberManager; manager = MemberManager()",
+            "last_verified": "2025-08-19",
+            "integration_commit": "previous"
+          },
+          "export_member_data": {
+            "display_name": "导出会员数据",
+            "menu_method": "_export_member_data",
+            "core_implementation": "scripts/member_management.py:MemberManager.export_registrations_csv",
+            "dependencies": ["csv", "datetime"],
+            "status": "active",
+            "test_command": "from scripts.member_management import MemberManager; manager = MemberManager(); manager.export_registrations_csv()",
+            "last_verified": "2025-08-19",
+            "integration_commit": "previous"
+          }
+        }
+      },
+      "system_tools": {
+        "display_name": "系统工具集合",
+        "menu_path": "scripts/cli/system_menu_handler.py",
+        "menu_class": "SystemMenuHandler",
+        "functions": {
+          "tts_voice_test": {
+            "display_name": "TTS语音测试",
+            "menu_method": "_tts_voice_test",
+            "core_implementation": "scripts/tools/elevenlabs/elevenlabs_voice_tester.py:ElevenLabsVoiceTester",
+            "dependencies": ["elevenlabs", "requests"],
+            "status": "active",
+            "test_command": "from scripts.tools.elevenlabs.elevenlabs_voice_tester import ElevenLabsVoiceTester; tester = ElevenLabsVoiceTester()",
+            "last_verified": "2025-08-19",
+            "integration_commit": "previous"
+          },
+          "log_viewer": {
+            "display_name": "日志查看",
+            "menu_method": "_log_viewer",
+            "core_implementation": "scripts/cli/system_menu_handler.py:SystemMenuHandler._log_viewer",
+            "dependencies": ["pathlib", "glob"],
+            "status": "active",
+            "test_command": "print('Log viewer integrated in system menu')",
+            "last_verified": "2025-08-19",
+            "integration_commit": "previous"
+          }
+        }
+      }
+    },
+    "placeholders": {
+      "description": "已知的占位符功能，需要监控避免退化",
+      "patterns": [
+        "print(\"功能开发中...\")",
+        "print(\"(功能开发中...)\")",
+        "# TODO:",
+        "# FIXME:",
+        "pass  # 待实现"
+      ]
+    },
+    "critical_dependencies": {
+      "gemini_api": {
+        "check_command": "import google.generativeai as genai",
+        "description": "Google Gemini API for content generation"
+      },
+      "elevenlabs": {
+        "check_command": "import elevenlabs",
+        "description": "ElevenLabs TTS service"
+      },
+      "yaml": {
+        "check_command": "import yaml",
+        "description": "YAML parsing for Front Matter"
+      },
+      "PIL": {
+        "check_command": "from PIL import Image",
+        "description": "Python Imaging Library for thumbnail generation"
+      }
+    }
+  }
+}

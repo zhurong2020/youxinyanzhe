@@ -1,0 +1,209 @@
+{
+  "created_at": "2025-08-19T14:10:39.387823",
+  "version": "1.0.0",
+  "total_functions": 15,
+  "status_summary": {
+    "active": 6,
+    "implementation_ready": 9
+  },
+  "functions": {
+    "content_creation.outline_creation": {
+      "status": "active",
+      "details": {
+        "status": "active",
+        "menu_ok": true,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": []
+      },
+      "display_name": "内容大纲创建",
+      "last_checked": "2025-08-19T14:10:21.384442"
+    },
+    "content_creation.format_existing_draft": {
+      "status": "active",
+      "details": {
+        "status": "active",
+        "menu_ok": true,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": []
+      },
+      "display_name": "格式化现有草稿",
+      "last_checked": "2025-08-19T14:10:28.514298"
+    },
+    "content_creation.generate_front_matter": {
+      "status": "active",
+      "details": {
+        "status": "active",
+        "menu_ok": true,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": []
+      },
+      "display_name": "生成Front Matter",
+      "last_checked": "2025-08-19T14:10:34.795453"
+    },
+    "content_creation.batch_process_drafts": {
+      "status": "active",
+      "details": {
+        "status": "active",
+        "menu_ok": true,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": []
+      },
+      "display_name": "批量处理草稿",
+      "last_checked": "2025-08-19T14:10:38.432160"
+    },
+    "content_creation.view_generation_history": {
+      "status": "active",
+      "details": {
+        "status": "active",
+        "menu_ok": true,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": []
+      },
+      "display_name": "查看主题生成历史",
+      "last_checked": "2025-08-19T14:10:38.457322"
+    },
+    "youtube_processing.upload_podcast_video": {
+      "status": "active",
+      "details": {
+        "status": "active",
+        "menu_ok": true,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": []
+      },
+      "display_name": "YouTube视频生成与上传",
+      "last_checked": "2025-08-19T14:10:38.461626"
+    },
+    "youtube_processing.scan_audio_files": {
+      "status": "implementation_ready",
+      "details": {
+        "status": "implementation_ready",
+        "menu_ok": false,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": [
+          "菜单路径或方法名未配置"
+        ]
+      },
+      "display_name": "音频文件扫描",
+      "last_checked": "2025-08-19T14:10:38.462032"
+    },
+    "youtube_processing.batch_video_generation": {
+      "status": "implementation_ready",
+      "details": {
+        "status": "implementation_ready",
+        "menu_ok": false,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": [
+          "菜单路径或方法名未配置"
+        ]
+      },
+      "display_name": "批量视频生成",
+      "last_checked": "2025-08-19T14:10:38.462147"
+    },
+    "member_management.generate_access_code": {
+      "status": "implementation_ready",
+      "details": {
+        "status": "implementation_ready",
+        "menu_ok": false,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": [
+          "菜单路径或方法名未配置"
+        ]
+      },
+      "display_name": "生成访问码",
+      "last_checked": "2025-08-19T14:10:38.462639"
+    },
+    "member_management.validate_access_code": {
+      "status": "implementation_ready",
+      "details": {
+        "status": "implementation_ready",
+        "menu_ok": false,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": [
+          "菜单路径或方法名未配置"
+        ]
+      },
+      "display_name": "验证访问码",
+      "last_checked": "2025-08-19T14:10:38.463516"
+    },
+    "member_management.member_statistics": {
+      "status": "implementation_ready",
+      "details": {
+        "status": "implementation_ready",
+        "menu_ok": false,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": [
+          "菜单路径或方法名未配置"
+        ]
+      },
+      "display_name": "会员统计",
+      "last_checked": "2025-08-19T14:10:38.463672"
+    },
+    "member_management.process_registrations": {
+      "status": "implementation_ready",
+      "details": {
+        "status": "implementation_ready",
+        "menu_ok": false,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": [
+          "菜单路径或方法名未配置"
+        ]
+      },
+      "display_name": "处理注册申请",
+      "last_checked": "2025-08-19T14:10:38.463755"
+    },
+    "member_management.export_member_data": {
+      "status": "implementation_ready",
+      "details": {
+        "status": "implementation_ready",
+        "menu_ok": false,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": [
+          "菜单路径或方法名未配置"
+        ]
+      },
+      "display_name": "导出会员数据",
+      "last_checked": "2025-08-19T14:10:38.463861"
+    },
+    "system_tools.tts_voice_test": {
+      "status": "implementation_ready",
+      "details": {
+        "status": "implementation_ready",
+        "menu_ok": false,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": [
+          "菜单路径或方法名未配置"
+        ]
+      },
+      "display_name": "TTS语音测试",
+      "last_checked": "2025-08-19T14:10:39.387726"
+    },
+    "system_tools.log_viewer": {
+      "status": "implementation_ready",
+      "details": {
+        "status": "implementation_ready",
+        "menu_ok": false,
+        "implementation_ok": true,
+        "dependencies_ok": true,
+        "issues": [
+          "菜单路径或方法名未配置"
+        ]
+      },
+      "display_name": "日志查看",
+      "last_checked": "2025-08-19T14:10:39.387815"
+    }
+  }
+}
