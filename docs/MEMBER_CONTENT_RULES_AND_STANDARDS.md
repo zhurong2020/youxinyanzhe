@@ -494,6 +494,59 @@ python scripts/content_quality_checker.py --scan-all
 python scripts/generate_analytics_report.py
 ```
 
+## 📈 投资理财内容创作规范
+
+### 投资内容分层原则
+```
+免费内容 (80%框架) → VIP1 (+实操指南) → VIP2 (+SA数据) → VIP3 (+个人经验) → VIP4 (+工具咨询)
+```
+
+### Seeking Alpha内容使用规范
+
+#### 1. 市场数据中心 (VIP2基础服务)
+**可用内容**：
+- 实时指数数据：道指、标普500、纳指当日表现
+- 商品价格：原油、黄金、比特币价格变化
+- 历史图表：多时间周期走势分析
+
+**使用示例**：
+```markdown
+### 📊 VIP2专享：今日市场概览
+*数据来源：Seeking Alpha Premium*
+
+**美股三大指数表现**：
+- 道琼斯：44,934.89 (+0.05%)
+- 标普500：6,456.26 (-0.19%) 
+- 纳斯达克：21,669.45 (-0.19%)
+
+*完整市场分析和投资机会，VIP3会员专享*
+```
+
+#### 2. 评级系统 (VIP2核心价值)
+**可用内容**：
+- SA分析师评级：Buy/Strong Buy/Hold/Sell
+- 华尔街评级：机构一致预期
+- Quant评级：4.0-5.0数值化评分
+
+#### 3. 投资策略筛选 (VIP3深度服务)
+- Buys and Strong Buys with Momentum
+- Safe Dividend Ideas, Top Yielding Stocks
+- Latest Growth/Value Ideas
+
+### 投资内容风险声明标准
+**所有投资相关内容必须包含以下风险声明**：
+```markdown
+> **⚠️ 投资风险声明**
+> 本文内容仅供学习和参考，不构成投资建议。投资有风险，入市需谨慎。
+> 请根据个人财务状况和风险承受能力做出投资决策。
+```
+
+### 合规要求
+- **数据来源标注**: 使用第三方数据需明确标注来源
+- **个人观点标识**: 主观分析需明确标识为个人观点
+- **免责声明**: 所有投资建议需包含免责声明
+- **定期更新**: 市场数据相关内容需定期更新
+
 **🔗 相关文档**:
 - `/docs/CONTENT_SERIES_INTEGRATION_STRATEGY.md` - 系列集成策略
 - `/docs/TECHNICAL_ARCHITECTURE.md` - 系统技术架构
