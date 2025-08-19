@@ -2042,6 +2042,120 @@ toc_sticky: true
             "remaining": len(kept_reports)
         }
 
+    def generate_detailed_plan(self, topic: str, content_type: str) -> Optional[str]:
+        """
+        生成详细的内容规划和大纲
+        
+        Args:
+            topic: 主题
+            content_type: 内容类型
+            
+        Returns:
+            详细的内容规划文本
+        """
+        try:
+            if not topic or not content_type:
+                return None
+                
+            # 根据内容类型构建专门的规划提示
+            plan_prompt = self._build_detailed_plan_prompt(topic, content_type)
+            
+            # 使用Gemini生成详细规划
+            if self.gemini_client:
+                try:
+                    model = genai.GenerativeModel('gemini-1.5-flash')
+                    response = model.generate_content(plan_prompt)
+                    return response.text
+                except Exception as e:
+                    print(f"⚠️ Gemini生成失败: {e}")
+                    return self._generate_fallback_plan(topic, content_type)
+            else:
+                return self._generate_fallback_plan(topic, content_type)
+                
+        except Exception as e:
+            print(f"❌ 生成详细规划时出错: {e}")
+            return None
+    
+    def _build_detailed_plan_prompt(self, topic: str, content_type: str) -> str:
+        """构建详细规划的提示词"""
+        return f"""请为《{topic}》这个主题创建一个详细的内容规划和大纲。
+
+内容类型：{content_type}
+
+请按以下结构生成：
+
+## 📋 内容大纲
+
+### 🎯 核心观点
+- [3-5个关键观点]
+
+### 📊 内容结构
+1. **引言** (10%)
+   - 背景介绍
+   - 问题提出
+   
+2. **主体部分** (70%)
+   - 核心论点1: [具体描述]
+   - 核心论点2: [具体描述] 
+   - 核心论点3: [具体描述]
+   
+3. **结论与启示** (20%)
+   - 总结要点
+   - 实践建议
+   - 未来展望
+
+### 🔍 支撑素材建议
+- 数据来源建议
+- 案例分析方向
+- 参考资料类型
+
+### 📝 写作要点
+- 目标读者群体
+- 文章风格定位
+- 预估字数：[具体数字]
+- 关键词建议：[3-5个]
+
+请确保内容具体、可操作，适合{content_type}类型的文章创作。"""
+
+    def _generate_fallback_plan(self, topic: str, content_type: str) -> str:
+        """生成后备的内容规划"""
+        return f"""## 📋 《{topic}》内容大纲
+
+### 🎯 核心观点
+- 深入分析{topic}的核心要素
+- 探讨{topic}的实际应用价值  
+- 预测{topic}的发展趋势
+
+### 📊 内容结构
+1. **引言部分** (约300字)
+   - {topic}的背景介绍
+   - 当前面临的主要问题或机遇
+   
+2. **主体分析** (约1200字)
+   - **核心要素分析**: 详细解析{topic}的关键组成部分
+   - **实践案例研究**: 结合具体案例说明{topic}的应用
+   - **比较分析**: 与相关领域或传统方法的对比
+   
+3. **总结展望** (约300字)
+   - 主要观点总结
+   - 实践建议和行动指南
+   - 未来发展趋势预测
+
+### 🔍 建议素材方向
+- 权威研究报告和统计数据
+- 行业专家观点和分析
+- 成功案例和最佳实践
+- 相关工具和资源推荐
+
+### 📝 写作要点
+- **目标读者**: 对{topic}感兴趣的学习者和从业者
+- **文章风格**: {content_type}风格，注重实用性和前瞻性
+- **预估字数**: 1800-2000字
+- **关键词**: {topic}、{content_type}、实践指南、趋势分析
+
+---
+*此大纲为AI生成的基础框架，请根据实际需求调整内容结构和重点。*"""
+
 def main():
     """主函数 - 供独立运行使用"""
     print("💡 主题灵感生成器 - 专业化版本")
