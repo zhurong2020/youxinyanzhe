@@ -26,6 +26,43 @@
 
 ---
 
+## 🔧 会员系统技术架构
+
+### 访问控制系统
+会员系统采用**白名单验证机制 + HMAC签名**的三层安全架构：
+
+1. **格式验证**: 检查访问码格式和过期时间
+2. **白名单验证**: 只有官方管理器生成的访问码才被加入白名单  
+3. **签名验证**: 使用HMAC-SHA256签名确保访问码真实性
+
+### 会员等级配置
+
+| 等级 | 代码 | 价格 | 有效期 | 美元等值 | 每月成本 | 核心价值 |
+|------|------|------|--------|----------|----------|----------|
+| 体验会员 | VIP1 | ¥35 | 7天 | ~$5 | - | 基础学习资源和概念解析 |
+| 月度会员 | VIP2 | ¥108 | 30天 | ~$15 | ¥108 | 专业分析报告和深度解读 |
+| 季度会员 | VIP3 | ¥288 | 90天 | ~$40 | ¥96 | 个性化服务+社群交流 |
+| 年度会员 | VIP4 | ¥720 | 365天 | ~$100 | ¥60 | 深度服务+1对1咨询 |
+
+**会员核心理念**: 为志同道合的终身学习者构建递进式成长体系，从基础认知建立到深度个性化指导，在共同探索中拓展视野、提升认知、实现成长。
+
+### 访问码格式标准
+- **普通会员码**: `LEVEL_EXPIRY_RANDOM` (如：VIP2_20250905_7K0J)
+- **管理员码**: `ADMIN_EXPIRY_RANDOM` (如：ADMIN_20250915_X1Y2Z3)
+- **安全文件**: `.tmp/member_data/access_codes_whitelist.json` (受Git忽略保护)
+
+### 用户验证流程
+**优化后的用户体验**:
+1. 用户访问会员专享文章
+2. 在文章页面直接输入访问码
+3. 验证成功后即时解锁内容，无需跳转
+
+### 管理功能
+- **访问码生成**: `python run.py → 6. 内容变现管理 → 5. 生成测试访问码`
+- **访问码验证**: `python scripts/secure_member_manager.py validate --code CODE`
+- **系统统计**: `python scripts/secure_member_manager.py stats`
+- **访问码撤销**: `python scripts/secure_member_manager.py revoke --code CODE`
+
 ## 📁 文件组织标准
 
 ### 标准目录结构
@@ -369,7 +406,95 @@ trackUserEngagement({
 
 ---
 
+## 🔧 系统管理和维护指南
+
+### 版本控制系统
+采用Python实现的内容版本管理器，支持：
+- **版本创建**: 自动备份和哈希计算
+- **版本回滚**: 一键恢复到任意历史版本
+- **变更追踪**: 详细记录每次修改的内容和原因
+- **质量检查**: 自动化内容质量评估
+
+```python
+# 创建新版本
+version_manager.create_version("tesla", "file_path.md", "更新Q3财报数据")
+
+# 回滚到指定版本  
+version_manager.rollback_to_version("tesla", "v1.2.0")
+
+# 查看版本信息
+version_manager.get_version_info("tesla")
+```
+
+### 内容质量自动检查
+```python
+# 质量检查清单
+quality_checks = {
+    "word_count": {"min": 5000, "max": 25000},
+    "heading_structure": {"required_levels": ["h2", "h3"]},
+    "code_blocks": {"min_examples": 2},
+    "links": {"min_external": 3},
+    "member_references": {"required_keywords": ["VIP", "会员", "专享"]}
+}
+```
+
+### 访问控制矩阵
+```javascript
+// 会员权限系统
+const MemberAccessControl = {
+    permissions: {
+        'VIP2': ['sa_premium_analysis', 'teslamate_guides', 'musk_interviews'],
+        'VIP3': ['ark_strategy_analysis', 'cathie_wood_insights', 'big_ideas_translation'],
+        'VIP4': ['video_library', 'research_reports', 'consultation_service']
+    }
+};
+```
+
+### 智能推荐引擎
+基于用户行为的内容推荐系统：
+- **行为追踪**: 阅读时间、代码复制、链接点击
+- **兴趣建模**: 技术分析、研究深度、付费内容倾向
+- **个性化推荐**: 根据用户兴趣和会员等级推荐相关内容
+- **转化优化**: 智能升级引导和价值感知提升
+
+### 内容表现监控
+```python
+# 关键指标追踪
+metrics = {
+    "view_count": "文章浏览量",
+    "completion_rate": "完读率 (≥60%为合格)",
+    "upgrade_conversion_rate": "升级转化率 (≥3%为合格)",
+    "user_rating": "用户评分 (≥4.2/5为合格)",
+    "engagement_score": "用户参与度综合评分"
+}
+```
+
+### 安全机制和数据保护
+- **白名单验证**: 防止Fork用户绕过系统
+- **HMAC签名**: 确保访问码真实性
+- **环境变量保护**: 敏感配置不进入版本控制
+- **定期备份**: 自动备份重要会员数据
+
+### 故障排除和技术支持
+**常见问题处理**:
+1. **访问码验证失败**: 检查格式、有效期和白名单状态
+2. **内容显示异常**: 验证Jekyll构建状态和权限设置
+3. **升级流程问题**: 检查JavaScript代码和邮件配置
+4. **数据统计异常**: 验证追踪代码和数据存储完整性
+
+**调试命令**:
+```bash
+# 系统状态检查
+python scripts/secure_member_manager.py stats
+
+# 内容质量检查  
+python scripts/content_quality_checker.py --scan-all
+
+# 生成分析报告
+python scripts/generate_analytics_report.py
+```
+
 **🔗 相关文档**:
-- `/docs/MEMBER_CONTENT_MANAGEMENT_SYSTEM.md` - 技术实现细节
 - `/docs/CONTENT_SERIES_INTEGRATION_STRATEGY.md` - 系列集成策略
+- `/docs/TECHNICAL_ARCHITECTURE.md` - 系统技术架构
 - `/docs/CLAUDE.md` - 项目总体状况

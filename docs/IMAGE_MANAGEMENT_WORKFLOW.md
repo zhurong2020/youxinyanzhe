@@ -38,8 +38,163 @@
 - `restore_local_image_links.py` - OneDrive链接恢复为本地链接
 - `cleanup_onedrive_images.py` - 安全清理OneDrive文件和记录
 
-### 📋 相关文档
-- **[OneDrive图片链接最佳实践指南](ONEDRIVE_IMAGE_URL_BEST_PRACTICES.md)** - 详细分析各种链接格式的特点和使用建议
+## 📋 OneDrive图片链接最佳实践
+
+### URL格式对比分析
+
+#### 1. SharePoint直接下载链接 ✅ 推荐
+**格式**: `https://domain/personal/user/_layouts/15/download.aspx?share=TOKEN`
+
+**特点**:
+- ✅ 可直接嵌入`<img>`标签
+- ✅ 理论上永久有效
+- ✅ 适合企业Microsoft 365账户
+- ⚠️ 依赖SharePoint服务可用性
+
+#### 2. view+anonymous分享链接 ❌ 不推荐
+**格式**: `https://domain/:i:/g/personal/user/TOKEN`
+
+**特点**:
+- ✅ 永久有效，不会过期
+- ❌ 指向预览页面，需要用户认证  
+- ❌ 无法直接嵌入`<img>`标签
+
+#### 3. @microsoft.graph.downloadUrl ⚠️ 临时使用
+**格式**: `https://graph.microsoft.com/v1.0/...` (含临时令牌)
+
+**特点**:
+- ✅ 最适合直接嵌入
+- ❌ 包含临时令牌，通常1小时后过期
+- ❌ 需要定期更新链接
+
+#### 4. embed+anonymous分享链接 ❌ 企业账户不支持
+**格式**: `https://domain/:i:/g/personal/user/EMBED_TOKEN`
+
+**特点**:
+- ✅ 永久有效 + 直接嵌入
+- ❌ 企业Microsoft 365账户不支持
+- ✅ 个人账户的理想选择
+
+### 当前推荐策略
+对于企业Microsoft 365环境，采用**SharePoint直接下载链接 + 智能回退**策略。
+
+## 🚀 自动Header图片功能
+
+### 功能概述
+系统可以自动使用正文第一张图片作为文章的header图片，并自动处理所有图片上传。
+
+### 使用方法
+
+#### 方法1: 通过run.py菜单（推荐）
+```bash
+python run.py
+# 选择：14. OneDrive图床管理 → 智能Header+图片处理
+```
+
+#### 方法2: 直接命令行
+```bash
+# 完整处理（header + 图片上传）
+python scripts/tools/enhanced_blog_image_processor.py "文章路径.md"
+
+# 仅设置header（不上传图片）
+python scripts/tools/auto_header_image_processor.py "文章路径.md"
+
+# 演练模式（预览更改）
+python scripts/tools/enhanced_blog_image_processor.py "文章路径.md" --dry-run
+```
+
+### 推荐创作工作流程
+
+1. **创作阶段**
+   ```markdown
+   ---
+   title: "文章标题"
+   date: "2025-08-18"
+   categories: ["技术赋能"]
+   # header字段可以留空，系统会自动设置
+   ---
+   
+   文章内容...
+   
+   ![第一张图片](temp/drafting/images/example.png)
+   ![其他图片](temp/drafting/screenshots/screenshot.png)
+   ```
+
+2. **发布前处理**
+   - 运行智能Header+图片处理功能
+   - 系统自动使用第一张图片设置header
+   - 上传所有图片到OneDrive并替换链接
+
+3. **最终结果**
+   ```markdown
+   ---
+   title: "文章标题"
+   date: "2025-08-18"
+   categories: ["技术赋能"]
+   header:
+     overlay_filter: 0.5
+     overlay_image: "https://onedrive链接..."
+     teaser: "https://onedrive链接..."
+   ---
+   
+   文章内容...
+   
+   ![第一张图片](https://onedrive链接...)
+   ![其他图片](https://onedrive链接...)
+   ```
+
+### 智能处理特性
+
+1. **路径智能识别**: 支持临时目录、相对路径、Jekyll变量等多种格式
+2. **重复检查**: 避免重复上传相同图片
+3. **备份机制**: 自动备份原文件和图片
+4. **错误恢复**: 处理失败时自动回滚
+
+## 🏗️ 混合图片管理系统
+
+### 设计理念
+四阶段管理模式：临时创作 → 项目缓存 → 云端归档 → 安全清理
+
+### 完整目录架构
+```
+项目根目录/
+├── assets/images/
+│   ├── processing/              # 临时处理区 (git忽略)
+│   │   ├── pending/            # 待处理图片
+│   │   ├── uploaded/           # 已上传待确认
+│   │   └── failed/             # 处理失败
+│   └── temp/                   # 其他临时文件
+└── _data/
+    └── onedrive_image_index.json  # 云端索引记录
+```
+
+### 工作流程详解
+
+#### 阶段1: 创作期 (用户工作区)
+- **位置**: 任意目录 (Desktop, Downloads等)
+- **特点**: 完全的创作自由度
+
+#### 阶段2: 处理期 (项目缓存)
+- **pending/**: 待处理图片和元数据
+- **uploaded/**: 已上传文件和链接映射
+
+#### 阶段3: 归档期 (云端存储)
+- **位置**: OneDrive `/BlogImages/YYYY/MM/`
+- **命名**: `YYYYMMDD_article-slug_NN.ext`
+
+#### 阶段4: 清理期 (用户确认)
+- **触发**: 用户确认文章发布成功
+- **操作**: 安全删除本地备份文件
+
+### 安全机制
+- **原始文件备份**: 完整保存在uploaded目录
+- **操作日志记录**: 详细记录所有处理步骤
+- **回滚机制**: 支持完整恢复到处理前状态
+
+### 监控和维护
+- **自动化维护**: 清理过期文件，检查失败上传
+- **存储监控**: 定期报告存储使用情况
+- **链接验证**: 验证云端链接有效性
 
 ## 博客创作工作流程
 
