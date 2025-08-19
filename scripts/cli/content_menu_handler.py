@@ -201,7 +201,123 @@ class ContentMenuHandler(BaseMenuHandler):
     def _view_generation_history(self) -> Optional[str]:
         """查看历史记录"""
         print("\n📋 主题生成历史记录")
-        print("(功能开发中...)")
+        print("查看之前生成的主题灵感和对应的草稿状态")
+        
+        try:
+            from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator
+            
+            # 初始化生成器
+            generator = TopicInspirationGenerator()
+            
+            # 获取历史记录
+            history = generator.get_inspiration_history()
+            
+            if not history:
+                print("❌ 没有找到历史记录")
+                self.pause_for_user()
+                return None
+            
+            print(f"\n📋 找到 {len(history)} 条历史记录:")
+            
+            for i, record in enumerate(history):
+                print(f"\n📄 记录 {i+1}:")
+                print(f"  🎯 主题: {record.get('topic', 'Unknown')}")
+                print(f"  📅 生成时间: {record.get('generated_time', 'Unknown')}")
+                print(f"  📂 内容类型: {record.get('content_type', 'Unknown')}")
+                
+                if record.get('draft_path'):
+                    draft_exists = record.get('draft_exists', False)
+                    status_icon = "✅" if draft_exists else "❌"
+                    print(f"  📝 草稿文件: {status_icon} {record['draft_path']}")
+                else:
+                    print(f"  📝 草稿文件: 未生成")
+                
+                if record.get('tokens_used'):
+                    print(f"  🔢 AI用量: {record['tokens_used']} tokens")
+                
+                # 显示生成的内容预览
+                if record.get('summary'):
+                    summary = record['summary'][:100] + "..." if len(record['summary']) > 100 else record['summary']
+                    print(f"  📋 摘要: {summary}")
+            
+            # 提供操作选项
+            print(f"\n🔧 可执行操作:")
+            print("1. 重新生成某个主题")
+            print("2. 查看详细内容")
+            print("3. 清理失效记录")
+            print("4. 导出历史记录")
+            print("5. 返回上级菜单")
+            
+            try:
+                choice = int(input("\n请选择操作: "))
+                
+                if choice == 1:  # 重新生成
+                    try:
+                        record_num = int(input("请输入要重新生成的记录编号: "))
+                        if 1 <= record_num <= len(history):
+                            record = history[record_num - 1]
+                            print(f"🔄 重新生成主题: {record.get('topic', 'Unknown')}")
+                            # 这里可以调用重新生成逻辑
+                            print("💡 提示: 请使用主菜单中的'AI主题生成'功能")
+                        else:
+                            print("❌ 记录编号无效")
+                    except ValueError:
+                        print("❌ 请输入有效的数字")
+                
+                elif choice == 2:  # 查看详细
+                    try:
+                        record_num = int(input("请输入要查看的记录编号: "))
+                        if 1 <= record_num <= len(history):
+                            record = history[record_num - 1]
+                            print(f"\n📋 详细内容:")
+                            for key, value in record.items():
+                                if key not in ['draft_exists']:  # 排除计算字段
+                                    print(f"  {key}: {value}")
+                        else:
+                            print("❌ 记录编号无效")
+                    except ValueError:
+                        print("❌ 请输入有效的数字")
+                
+                elif choice == 3:  # 清理失效记录
+                    removed_count = 0
+                    for record in history:
+                        if record.get('draft_path') and not record.get('draft_exists', False):
+                            removed_count += 1
+                    print(f"🗑️ 发现 {removed_count} 个失效记录 (草稿文件不存在)")
+                    if removed_count > 0:
+                        confirm = input("是否清理这些记录? (y/n): ").lower().strip()
+                        if confirm == 'y':
+                            # 这里需要实现清理逻辑
+                            print("💡 提示: 清理功能需要在TopicInspirationGenerator中实现")
+                
+                elif choice == 4:  # 导出记录
+                    import json
+                    from datetime import datetime
+                    
+                    export_file = f"inspiration_history_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                    with open(export_file, 'w', encoding='utf-8') as f:
+                        # 清理不可序列化的字段
+                        clean_history = []
+                        for record in history:
+                            clean_record = {k: v for k, v in record.items() if k != 'draft_exists'}
+                            clean_history.append(clean_record)
+                        json.dump(clean_history, f, ensure_ascii=False, indent=2)
+                    
+                    print(f"✅ 历史记录已导出到: {export_file}")
+                
+                elif choice == 5:
+                    print("↩️ 返回上级菜单")
+                else:
+                    print("❌ 选择无效")
+                    
+            except ValueError:
+                print("❌ 请输入有效的数字")
+        
+        except ImportError as e:
+            print(f"❌ 无法导入主题生成器: {e}")
+        except Exception as e:
+            print(f"❌ 查看历史记录时出错: {e}")
+        
         self.pause_for_user()
         return None
     
@@ -536,14 +652,188 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
     def _format_existing_draft(self) -> Optional[str]:
         """格式化现有草稿"""
         print("\n📄 格式化现有草稿")
-        print("(功能开发中...)")
+        print("使用专业的草稿格式化工具，支持智能分类、标签生成和结构优化")
+        
+        try:
+            # 导入格式化工具
+            from scripts.tools.content.format_draft import DraftFormatter
+            
+            # 获取草稿目录中的文件
+            drafts_dir = Path("_drafts")
+            if not drafts_dir.exists():
+                print("❌ 草稿目录不存在")
+                self.pause_for_user()
+                return None
+            
+            # 扫描草稿文件
+            draft_files = []
+            for ext in ['.txt', '.md']:
+                draft_files.extend(list(drafts_dir.glob(f"*{ext}")))
+            
+            if not draft_files:
+                print("❌ 草稿目录中没有找到可格式化的文件 (.txt/.md)")
+                self.pause_for_user()
+                return None
+            
+            print(f"\n📋 找到 {len(draft_files)} 个草稿文件:")
+            for i, file in enumerate(draft_files):
+                print(f"  {i+1}. {file.name}")
+            
+            # 选择文件
+            try:
+                choice = int(input("\n请选择要格式化的文件编号: "))
+                if 1 <= choice <= len(draft_files):
+                    selected_file = draft_files[choice-1]
+                else:
+                    print("❌ 选择无效")
+                    self.pause_for_user()
+                    return None
+            except ValueError:
+                print("❌ 请输入有效的数字")
+                self.pause_for_user()
+                return None
+            
+            # 初始化格式化器并处理
+            formatter = DraftFormatter()
+            print(f"\n🔄 正在格式化: {selected_file.name}")
+            
+            # 生成输出文件名
+            output_file = drafts_dir / f"{selected_file.stem}_formatted.md"
+            
+            # 执行格式化
+            result = formatter.process_draft(
+                input_file=selected_file,
+                output_file=output_file,
+                preview=False
+            )
+            
+            if result:
+                print(f"✅ 格式化完成!")
+                print(f"📄 输出文件: {output_file}")
+                print(f"🎯 分类: {result.get('category', 'unknown')}")
+                print(f"🏷️ 标签数: {len(result.get('tags', []))}")
+                print(f"📝 摘要长度: {len(result.get('excerpt', ''))}")
+                
+                # 询问是否替换原文件
+                replace = input("\n是否替换原文件? (y/n): ").lower().strip()
+                if replace == 'y':
+                    selected_file.unlink()  # 删除原文件
+                    output_file.rename(selected_file)  # 重命名格式化后的文件
+                    print(f"✅ 已替换原文件: {selected_file.name}")
+            else:
+                print("❌ 格式化失败")
+            
+        except ImportError as e:
+            print(f"❌ 无法导入格式化工具: {e}")
+        except Exception as e:
+            print(f"❌ 格式化过程出错: {e}")
+        
         self.pause_for_user()
         return None
     
     def _generate_front_matter(self) -> Optional[str]:
         """生成Front Matter"""
         print("\n🏷️ 生成Front Matter")
-        print("(功能开发中...)")
+        print("为现有文件生成或更新Jekyll Front Matter元数据")
+        
+        try:
+            from scripts.tools.content.format_draft import DraftFormatter
+            
+            # 获取草稿目录中的文件
+            drafts_dir = Path("_drafts")
+            if not drafts_dir.exists():
+                print("❌ 草稿目录不存在")
+                self.pause_for_user()
+                return None
+            
+            # 扫描文件
+            draft_files = []
+            for ext in ['.txt', '.md']:
+                draft_files.extend(list(drafts_dir.glob(f"*{ext}")))
+            
+            if not draft_files:
+                print("❌ 草稿目录中没有找到文件")
+                self.pause_for_user()
+                return None
+            
+            print(f"\n📋 找到 {len(draft_files)} 个文件:")
+            for i, file in enumerate(draft_files):
+                print(f"  {i+1}. {file.name}")
+            
+            # 选择文件
+            try:
+                choice = int(input("\n请选择文件编号: "))
+                if 1 <= choice <= len(draft_files):
+                    selected_file = draft_files[choice-1]
+                else:
+                    print("❌ 选择无效")
+                    self.pause_for_user()
+                    return None
+            except ValueError:
+                print("❌ 请输入有效的数字")
+                self.pause_for_user()
+                return None
+            
+            # 读取文件内容
+            with open(selected_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # 提取标题
+            title_line = content.split('\n')[0].strip()
+            if title_line.startswith('#'):
+                title = title_line.lstrip('#').strip()
+            else:
+                title = input("\n请输入文章标题: ").strip()
+                if not title:
+                    print("❌ 标题不能为空")
+                    self.pause_for_user()
+                    return None
+            
+            # 初始化格式化器
+            formatter = DraftFormatter()
+            
+            # 生成Front Matter
+            front_matter = formatter.create_front_matter(title, content)
+            
+            print(f"\n📋 生成的Front Matter:")
+            print("---")
+            for key, value in front_matter.items():
+                if isinstance(value, list):
+                    print(f"{key}: {value}")
+                elif isinstance(value, dict):
+                    print(f"{key}:")
+                    for subkey, subvalue in value.items():
+                        print(f"  {subkey}: {subvalue}")
+                else:
+                    print(f"{key}: {value}")
+            print("---")
+            
+            # 询问是否保存
+            save = input("\n是否保存到文件? (y/n): ").lower().strip()
+            if save == 'y':
+                # 创建带Front Matter的完整内容
+                import yaml
+                front_matter_yaml = yaml.dump(front_matter, allow_unicode=True, default_flow_style=False)
+                
+                # 移除原有的Front Matter (如果存在)
+                if content.startswith('---'):
+                    # 找到第二个---的位置
+                    second_delimiter = content.find('---', 3)
+                    if second_delimiter != -1:
+                        content = content[second_delimiter + 3:].lstrip('\n')
+                
+                new_content = f"---\n{front_matter_yaml}---\n{content}"
+                
+                with open(selected_file, 'w', encoding='utf-8') as f:
+                    f.write(new_content)
+                
+                print(f"✅ Front Matter已保存到: {selected_file.name}")
+            
+        except ImportError as e:
+            print(f"❌ 无法导入必要工具: {e}")
+        except Exception as e:
+            print(f"❌ 生成Front Matter时出错: {e}")
+        
         self.pause_for_user()
         return None
     
@@ -551,7 +841,126 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
     def _batch_process_drafts(self) -> Optional[str]:
         """批量处理草稿"""
         print("\n📊 批量处理草稿")
-        print("(功能开发中...)")
+        print("批量格式化多个草稿文件，支持智能分类和标签生成")
+        
+        try:
+            from scripts.tools.content.format_draft import DraftFormatter
+            
+            # 获取草稿目录
+            drafts_dir = Path("_drafts")
+            if not drafts_dir.exists():
+                print("❌ 草稿目录不存在")
+                self.pause_for_user()
+                return None
+            
+            # 扫描草稿文件
+            draft_files = []
+            for ext in ['.txt', '.md']:
+                files = list(drafts_dir.glob(f"*{ext}"))
+                # 排除已经格式化的文件
+                files = [f for f in files if not f.name.endswith('_formatted.md')]
+                draft_files.extend(files)
+            
+            if not draft_files:
+                print("❌ 没有找到可批量处理的草稿文件")
+                self.pause_for_user()
+                return None
+            
+            print(f"\n📋 找到 {len(draft_files)} 个待处理的草稿文件:")
+            for i, file in enumerate(draft_files):
+                print(f"  {i+1}. {file.name}")
+            
+            # 选择处理方式
+            print("\n🔧 批量处理选项:")
+            print("1. 格式化所有文件 (保留原文件)")
+            print("2. 格式化所有文件 (替换原文件)")
+            print("3. 只生成Front Matter")
+            print("4. 预览模式 (不保存)")
+            
+            try:
+                mode = int(input("\n请选择处理模式: "))
+                if mode not in [1, 2, 3, 4]:
+                    print("❌ 选择无效")
+                    self.pause_for_user()
+                    return None
+            except ValueError:
+                print("❌ 请输入有效的数字")
+                self.pause_for_user()
+                return None
+            
+            # 初始化格式化器
+            formatter = DraftFormatter()
+            success_count = 0
+            error_count = 0
+            
+            print(f"\n🔄 开始批量处理...")
+            
+            for i, draft_file in enumerate(draft_files):
+                print(f"\n📄 处理 ({i+1}/{len(draft_files)}): {draft_file.name}")
+                
+                try:
+                    if mode == 4:  # 预览模式
+                        result = formatter.process_draft(
+                            input_file=draft_file,
+                            preview=True
+                        )
+                        if result:
+                            print(f"  ✅ 预览完成 - 分类: {result.get('category', 'unknown')}")
+                            success_count += 1
+                        else:
+                            print(f"  ❌ 预览失败")
+                            error_count += 1
+                    
+                    elif mode == 3:  # 只生成Front Matter
+                        with open(draft_file, 'r', encoding='utf-8') as f:
+                            content = f.read()
+                        
+                        # 提取标题
+                        title_line = content.split('\n')[0].strip()
+                        if title_line.startswith('#'):
+                            title = title_line.lstrip('#').strip()
+                        else:
+                            title = draft_file.stem  # 使用文件名作为标题
+                        
+                        front_matter = formatter.create_front_matter(title, content)
+                        print(f"  ✅ Front Matter生成 - 分类: {front_matter.get('categories', ['unknown'])[0]}")
+                        success_count += 1
+                    
+                    else:  # 格式化模式
+                        if mode == 1:  # 保留原文件
+                            output_file = drafts_dir / f"{draft_file.stem}_formatted.md"
+                        else:  # 替换原文件
+                            output_file = draft_file
+                        
+                        result = formatter.process_draft(
+                            input_file=draft_file,
+                            output_file=output_file,
+                            preview=False
+                        )
+                        
+                        if result:
+                            print(f"  ✅ 格式化完成 - 分类: {result.get('category', 'unknown')}")
+                            if mode == 2 and output_file != draft_file:
+                                draft_file.unlink()  # 删除原文件
+                                output_file.rename(draft_file)  # 重命名
+                            success_count += 1
+                        else:
+                            print(f"  ❌ 格式化失败")
+                            error_count += 1
+                
+                except Exception as e:
+                    print(f"  ❌ 处理失败: {e}")
+                    error_count += 1
+            
+            print(f"\n📊 批量处理完成:")
+            print(f"  ✅ 成功: {success_count} 个文件")
+            print(f"  ❌ 失败: {error_count} 个文件")
+            
+        except ImportError as e:
+            print(f"❌ 无法导入格式化工具: {e}")
+        except Exception as e:
+            print(f"❌ 批量处理时出错: {e}")
+        
         self.pause_for_user()
         return None
     

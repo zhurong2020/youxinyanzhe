@@ -136,8 +136,65 @@ class YouTubeMenuHandler(BaseMenuHandler):
         self.display_menu_header("🎬 上传已生成的播客视频",
                                 "将本地播客视频上传到YouTube")
         
-        print("功能开发中...")
-        print("💡 该功能将与音频上传功能集成")
+        print("🎬 YouTube视频生成与上传工具")
+        print("支持音频转视频、批量处理和上传管理")
+        
+        try:
+            from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator
+            
+            # 初始化视频生成器
+            generator = YouTubeVideoGenerator()
+            
+            # 显示主菜单
+            while True:
+                print("\n🔧 YouTube视频处理选项:")
+                print("1. 扫描音频文件")
+                print("2. 单个视频生成")
+                print("3. 批量视频生成")
+                print("4. 查看输出目录")
+                print("5. 清理输出文件")
+                print("6. 返回上级菜单")
+                
+                try:
+                    choice = int(input("\n请选择操作: "))
+                    
+                    if choice == 1:  # 扫描音频文件
+                        generator.handle_scan_audio()
+                    
+                    elif choice == 2:  # 单个视频生成
+                        generator.handle_single_generation()
+                    
+                    elif choice == 3:  # 批量视频生成
+                        generator.handle_batch_generation()
+                    
+                    elif choice == 4:  # 查看输出目录
+                        generator.handle_view_output()
+                    
+                    elif choice == 5:  # 清理输出文件
+                        generator.handle_cleanup()
+                    
+                    elif choice == 6:  # 返回
+                        break
+                    
+                    else:
+                        print("❌ 选择无效，请输入1-6之间的数字")
+                        
+                except ValueError:
+                    print("❌ 请输入有效的数字")
+                except KeyboardInterrupt:
+                    print("\n⚠️ 用户中断操作")
+                    break
+                except Exception as e:
+                    print(f"❌ 操作失败: {e}")
+                
+                input("\n按Enter键继续...")
+        
+        except ImportError as e:
+            print(f"❌ 无法导入YouTube视频生成器: {e}")
+            print("💡 请确保scripts/tools/youtube/youtube_video_generator.py文件存在")
+        except Exception as e:
+            print(f"❌ YouTube视频处理时出错: {e}")
+        
         self.pause_for_user()
         return None
     
