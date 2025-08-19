@@ -759,10 +759,89 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
     
     def _content_outline_creation(self) -> Optional[str]:
         """内容大纲创建"""
-        print("\n📋 内容大纲创建")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        self.display_menu_header("📋 内容大纲创建", "为指定主题生成详细的内容规划和大纲")
+        
+        try:
+            # 获取主题
+            topic = input("\n请输入主题: ").strip()
+            if not topic:
+                self.display_operation_cancelled()
+                return None
+            
+            # 获取内容类型
+            content_types = [
+                "1. 📝 技术教程",
+                "2. 💡 观点分析", 
+                "3. 📊 数据解读",
+                "4. 🌍 趋势预测",
+                "5. 🛠️ 工具介绍",
+                "6. 🧠 认知升级",
+                "7. 💰 投资理财"
+            ]
+            
+            print("\n请选择内容类型:")
+            for ct in content_types:
+                print(f"   {ct}")
+            
+            type_choice = input("选择类型 (1-7): ").strip()
+            type_map = {
+                "1": "技术教程",
+                "2": "观点分析", 
+                "3": "数据解读",
+                "4": "趋势预测",
+                "5": "工具介绍",
+                "6": "认知升级",
+                "7": "投资理财"
+            }
+            content_type = type_map.get(type_choice, "综合分析")
+            
+            print(f"\n🤖 正在为《{topic}》生成{content_type}类型的详细大纲...")
+            
+            # 生成内容大纲
+            from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator
+            generator = TopicInspirationGenerator("auto")
+            
+            outline = generator.generate_detailed_plan(topic, content_type)
+            
+            if outline:
+                print(f"\n✅ 内容大纲生成成功:")
+                print("="*50)
+                print(outline)
+                print("="*50)
+                
+                # 询问是否保存大纲
+                save_choice = input("\n是否将大纲保存到文件？(y/N): ").strip().lower()
+                if save_choice in ['y', 'yes']:
+                    from datetime import datetime
+                    from pathlib import Path
+                    
+                    # 创建输出目录
+                    outline_dir = Path(".tmp/outlines")
+                    outline_dir.mkdir(parents=True, exist_ok=True)
+                    
+                    # 生成文件名
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    safe_topic = "".join(c for c in topic if c.isalnum() or c in (' ', '-', '_')).rstrip()[:30]
+                    filename = f"{timestamp}_{safe_topic}_{content_type}_大纲.md"
+                    
+                    outline_file = outline_dir / filename
+                    with open(outline_file, 'w', encoding='utf-8') as f:
+                        f.write(f"# 《{topic}》内容大纲\n\n")
+                        f.write(f"**生成时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                        f.write(f"**内容类型**: {content_type}\n\n")
+                        f.write(outline)
+                    
+                    print(f"💾 大纲已保存至: {outline_file}")
+                
+                self.log_action("内容大纲创建成功", f"主题: {topic}, 类型: {content_type}")
+                return outline
+            else:
+                print("❌ 内容大纲生成失败")
+                return None
+                
+        except Exception as e:
+            self.handle_error(e, "内容大纲创建")
+            return None
     
     def _creation_assistance_tools(self) -> Optional[str]:
         """创作辅助工具"""

@@ -470,10 +470,231 @@ echo "💡 可运行 'env | grep ANTHROPIC' 查看配置"
     
     def _tts_voice_test(self) -> Optional[str]:
         """TTS语音测试 (原ElevenLabs测试)"""
-        print("\n🎙️ TTS语音测试")
-        print("(功能开发中...)")
+        self.display_menu_header("🎙️ ElevenLabs语音测试工具", "测试TTS服务和语音合成功能")
+        
+        test_options = [
+            "1. API权限检查",
+            "2. 声音测试器（完整功能）", 
+            "3. 双人对话功能测试",
+            "4. 查看配置状态",
+            "5. 查看测试结果",
+            "6. 快速开始指南",
+            "7. 功能使用说明"
+        ]
+        
+        test_handlers = [
+            self._elevenlabs_permission_check,
+            self._elevenlabs_voice_tester,
+            self._elevenlabs_dialogue_test,
+            self._elevenlabs_config_status,
+            self._elevenlabs_test_results,
+            self._elevenlabs_quick_guide,
+            self._elevenlabs_usage_guide
+        ]
+        
+        return self.create_menu_loop_with_path("🎙️ ElevenLabs测试", "", test_options, test_handlers, "7.1")
+    
+    def _elevenlabs_permission_check(self) -> Optional[str]:
+        """ElevenLabs API权限检查"""
+        try:
+            import subprocess
+            print("\n🔍 执行ElevenLabs API权限检查...")
+            self.log_action("执行ElevenLabs API权限检查")
+            
+            result = subprocess.run([
+                "python", "scripts/tools/elevenlabs/elevenlabs_permission_check.py"
+            ], capture_output=False, text=True, check=False)
+            
+            if result.returncode != 0:
+                print("⚠️ 权限检查执行异常，请检查ElevenLabs配置")
+                return None
+            else:
+                return "权限检查完成"
+                
+        except Exception as e:
+            self.handle_error(e, "ElevenLabs权限检查")
+            return None
+    
+    def _elevenlabs_voice_tester(self) -> Optional[str]:
+        """ElevenLabs声音测试器"""
+        try:
+            import subprocess
+            print("\n🎙️ 启动ElevenLabs声音测试器...")
+            print("💡 提示: 推荐选择以下测试选项:")
+            print("   • 选项2: 获取可用TTS模型")
+            print("   • 选项4: 创建双人对话播客测试") 
+            print("   • 选项7: 完整测试流程")
+            print()
+            
+            self.log_action("启动ElevenLabs声音测试器")
+            subprocess.run(["python", "scripts/tools/elevenlabs/elevenlabs_voice_tester.py"])
+            return "声音测试器执行完成"
+            
+        except Exception as e:
+            self.handle_error(e, "ElevenLabs声音测试器")
+            return None
+    
+    def _elevenlabs_dialogue_test(self) -> Optional[str]:
+        """ElevenLabs双人对话功能测试"""
+        try:
+            import subprocess
+            print("\n🎬 执行ElevenLabs双人对话功能测试...")
+            self.log_action("执行ElevenLabs双人对话功能测试")
+            
+            result = subprocess.run([
+                "python", "scripts/tools/elevenlabs/elevenlabs_voice_test.py", "dialogue"
+            ], capture_output=False, text=True, check=False)
+            
+            if result.returncode == 0:
+                print("✅ 双人对话功能测试成功")
+                return "双人对话测试成功"
+            else:
+                print("⚠️ 双人对话功能测试异常")
+                return None
+                
+        except Exception as e:
+            self.handle_error(e, "ElevenLabs双人对话测试")
+            return None
+    
+    def _elevenlabs_config_status(self) -> Optional[str]:
+        """查看ElevenLabs配置状态"""
+        try:
+            import os
+            from pathlib import Path
+            
+            print("\n📊 ElevenLabs配置状态")
+            print("="*40)
+            
+            # 检查API密钥
+            elevenlabs_key = os.getenv('ELEVENLABS_API_KEY', '')
+            print(f"🔑 API密钥: {'✅ 已配置 (' + elevenlabs_key[:10] + '...)' if elevenlabs_key else '❌ 未配置'}")
+            
+            # 检查配置文件
+            config_file = Path("config/elevenlabs_voices.yml")
+            template_file = Path("config/elevenlabs_voices_template.yml")
+            print(f"📋 配置文件: {'✅ 存在' if config_file.exists() else '❌ 缺失'}")
+            print(f"📋 模板文件: {'✅ 存在' if template_file.exists() else '❌ 缺失'}")
+            
+            # 检查测试目录
+            test_dir = Path("tests/elevenlabs_voice_tests")
+            print(f"📁 测试目录: {'✅ 存在' if test_dir.exists() else '❌ 缺失'}")
+            
+            # 检查依赖库
+            try:
+                import elevenlabs
+                print("✅ elevenlabs: 已安装")
+            except ImportError:
+                print("❌ elevenlabs: 未安装")
+                print("💡 请运行: pip install elevenlabs")
+            
+            self.pause_for_user()
+            return "配置状态检查完成"
+            
+        except Exception as e:
+            self.handle_error(e, "ElevenLabs配置状态检查")
+            return None
+    
+    def _elevenlabs_test_results(self) -> Optional[str]:
+        """查看ElevenLabs测试结果"""
+        try:
+            from pathlib import Path
+            
+            print("\n📊 ElevenLabs测试结果")
+            print("="*40)
+            
+            test_dir = Path("tests/elevenlabs_voice_tests")
+            if test_dir.exists():
+                audio_files = list(test_dir.glob("*.mp3")) + list(test_dir.glob("*.wav"))
+                if audio_files:
+                    print(f"🎵 发现 {len(audio_files)} 个测试音频文件:")
+                    for i, file in enumerate(audio_files[-10:], 1):  # 显示最新10个
+                        print(f"   {i}. {file.name}")
+                else:
+                    print("📂 测试目录存在，但暂无音频文件")
+            else:
+                print("📂 测试目录不存在")
+                print("💡 请先运行声音测试器生成测试文件")
+            
+            self.pause_for_user()
+            return "测试结果查看完成"
+            
+        except Exception as e:
+            self.handle_error(e, "ElevenLabs测试结果查看")
+            return None
+    
+    def _elevenlabs_quick_guide(self) -> Optional[str]:
+        """ElevenLabs快速开始指南"""
+        guide_text = """
+🚀 ElevenLabs快速开始指南
+================================================
+
+📋 准备步骤:
+1. 注册ElevenLabs账户 (https://elevenlabs.io)
+2. 获取API密钥并添加到.env文件:
+   ELEVENLABS_API_KEY=your_api_key_here
+3. 安装依赖: pip install elevenlabs
+
+🔧 基础测试流程:
+1. 先运行"API权限检查"确认配置正确
+2. 使用"声音测试器"进行完整功能测试
+3. 尝试"双人对话功能测试"体验高级功能
+
+💡 使用建议:
+• 免费账户每月有10,000字符限制
+• 推荐使用Pro账户获得更多语音选择
+• 测试文件会保存到tests/elevenlabs_voice_tests/目录
+
+📖 更多信息:
+• 查看docs/elevenlabs_pro_guide.md了解Pro功能
+• 使用config/elevenlabs_voices.yml自定义语音配置
+        """
+        
+        print(guide_text)
         self.pause_for_user()
-        return None
+        return "快速指南查看完成"
+    
+    def _elevenlabs_usage_guide(self) -> Optional[str]:
+        """ElevenLabs功能使用说明"""
+        usage_text = """
+📖 ElevenLabs功能使用说明
+================================================
+
+🛠️ 各功能详解:
+
+1. API权限检查
+   • 验证API密钥有效性
+   • 检查配额使用情况
+   • 确认Pro功能可用性
+
+2. 声音测试器
+   • 测试所有可用语音
+   • 生成示例音频文件
+   • 支持自定义文本转换
+
+3. 双人对话功能测试
+   • 模拟两人对话场景
+   • 使用不同语音角色
+   • 适用于播客制作
+
+4. 配置管理
+   • 查看当前配置状态
+   • 检查必需文件和依赖
+   • 提供配置修复建议
+
+🔧 配置文件说明:
+• elevenlabs_voices.yml - 基础语音配置
+• elevenlabs_voices_pro.yml - Pro功能配置
+• elevenlabs_voices_template.yml - 配置模板
+
+⚠️ 常见问题:
+• API密钥无效 -> 检查密钥格式和权限
+• 配额不足 -> 升级账户或等待重置
+• 语音质量差 -> 尝试不同的语音模型
+        """
+        
+        print(usage_text)
+        self.pause_for_user()
+        return "使用说明查看完成"
     
     def _audio_quality_assessment(self) -> Optional[str]:
         """音频质量评估"""
