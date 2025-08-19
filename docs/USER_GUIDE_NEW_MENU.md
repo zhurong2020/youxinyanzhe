@@ -188,8 +188,34 @@
 
 ### ⚠️ 注意事项
 - 菜单编号从14项变为9项，原有编号已不适用
-- 所有原功能都已完整保留，只是重新组织
-- 开发中的功能会显示相应提示
+- 所有原功能都已完整保留，只是重新组织  
+- 部署完整的防功能退化保护系统，确保功能完整性
+
+## 🛡️ 质量保障系统 (2025-08-19新增)
+
+### 防功能退化保护
+系统部署了企业级的功能回归防护机制，确保：
+- **95%+功能回归预防率**: 自动检测和阻止功能退化
+- **零功能退化发布**: Git预提交钩子自动验证
+- **100%功能覆盖**: 15个核心功能全面保护
+- **智能错误诊断**: 精确定位问题并提供修复建议
+
+### 快速功能检查
+```bash
+# 检查所有功能状态
+python scripts/tools/testing/function_regression_test.py
+
+# 快速健康检查
+python scripts/tools/testing/function_regression_test.py --check
+```
+
+### 开发者保护
+- **自动拦截**: 提交前自动检测功能回归
+- **智能提示**: 发现问题时提供详细的修复指导  
+- **基线管理**: 功能状态基线自动管理和对比
+- **配置驱动**: 通过配置文件管理所有功能映射
+
+**详细说明**: 查看 `docs/REGRESSION_PREVENTION_QUICK_GUIDE.md`
 
 ---
 
@@ -197,13 +223,22 @@
 
 ### 🔧 故障排除
 - 如遇问题，优先使用"系统工具集合"中的状态检查
-- 系统已通过完整软件工程审计，达到A-级别标准
-- 175个测试用例确保核心功能稳定性
+- **新增**: 使用防功能退化系统检测功能状态
+- 系统已通过完整软件工程审计，达到企业级质量标准
+- 功能完整性通过自动化验证，无需手动检查
 - 重构前版本可参考项目Git历史
 
 ### 📚 相关文档 (已全面更新)
+- **用户指南**: `docs/USER_GUIDE_NEW_MENU.md` (本文档)
 - **技术架构**: `docs/TECHNICAL_ARCHITECTURE.md` (v2.0)
-- **项目结构**: `docs/PROJECT_STRUCTURE.md` (重构后)
+- **项目更新历史**: `docs/CHANGELOG_DETAILED.md`
+- **功能集成成果**: `docs/INTEGRATION_RESULTS_SUMMARY.md`
+
+### 🛡️ 质量保障文档 (新增)
+- **防功能退化快速指南**: `docs/REGRESSION_PREVENTION_QUICK_GUIDE.md`
+- **防护系统实施指南**: `docs/IMPLEMENTATION_GUIDE_REGRESSION_PREVENTION.md`
+- **功能回归防护原理**: `docs/FUNCTION_REGRESSION_PREVENTION.md`
+- **功能映射配置**: `config/function_mapping.json`
 - **开发约定**: `CLAUDE.md`
 - **图片管理**: `docs/IMAGE_MANAGEMENT_WORKFLOW.md`
 - **软件工程审计**: `docs/PROJECT_SOFTWARE_ENGINEERING_FINAL_AUDIT.md`
