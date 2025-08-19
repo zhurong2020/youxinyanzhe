@@ -1044,38 +1044,220 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
     
     def _generate_access_code(self) -> Optional[str]:
         """生成测试访问码"""
-        print("\n🔑 生成测试访问码")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        try:
+            from scripts.member_management import MemberManager
+            
+            print("\n🔑 生成访问码")
+            print("="*40)
+            
+            manager = MemberManager()
+            
+            # 显示会员等级
+            print("请选择会员等级:")
+            levels = {
+                '1': 'experience',
+                '2': 'monthly', 
+                '3': 'quarterly',
+                '4': 'yearly'
+            }
+            
+            for key, level in levels.items():
+                config = manager.member_levels[level]
+                print(f"   {key}. {config['name']} - {config['days']}天 (¥{config['price']})")
+            
+            choice = input("\n请选择 (1-4): ").strip()
+            
+            if choice not in levels:
+                print("❌ 无效选择")
+                return None
+            
+            level = levels[choice]
+            config = manager.member_levels[level]
+            
+            # 生成访问码
+            access_code = manager.generate_access_code(level)
+            
+            print(f"\n✅ {config['name']}访问码生成成功！")
+            print(f"🔑 访问码: {access_code}")
+            print(f"⏰ 有效期: {config['days']}天")
+            
+            # 询问是否发送邮件
+            send_email = input("\n是否发送邮件？(y/N): ").strip().lower()
+            if send_email in ['y', 'yes']:
+                email = input("请输入邮箱地址: ").strip()
+                if email:
+                    if manager.send_access_code_email(email, access_code, config['name']):
+                        print(f"✅ 访问码已发送到 {email}")
+                    else:
+                        print("❌ 邮件发送失败，请检查邮件配置")
+            
+            self.log_action("生成访问码成功", f"等级: {config['name']}, 码: {access_code}")
+            return access_code
+            
+        except Exception as e:
+            self.handle_error(e, "生成访问码")
+            return None
     
     def _validate_access_code(self) -> Optional[str]:
         """验证访问码"""
-        print("\n✅ 验证访问码")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        try:
+            from scripts.member_management import MemberManager
+            
+            print("\n✅ 验证访问码")
+            print("="*40)
+            
+            access_code = input("请输入访问码: ").strip()
+            if not access_code:
+                print("❌ 访问码不能为空")
+                return None
+            
+            manager = MemberManager()
+            result = manager.validate_access_code(access_code)
+            
+            if result['valid']:
+                print(f"\n✅ 访问码有效！")
+                print(f"💳 会员等级: {result['level_name']}")
+                print(f"⏰ 过期时间: {result['expires_at']}")
+                print(f"📅 剩余天数: {result['days_remaining']}天")
+                
+                if result['days_remaining'] <= 3:
+                    print("⚠️ 访问码即将过期，请及时续费")
+                    
+                return "访问码有效"
+            else:
+                print(f"\n❌ 访问码验证失败")
+                print(f"原因: {result['message']}")
+                return None
+                
+        except Exception as e:
+            self.handle_error(e, "验证访问码")
+            return None
     
     def _member_statistics(self) -> Optional[str]:
         """会员统计分析"""
-        print("\n📈 会员统计分析")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        try:
+            from scripts.member_management import MemberManager
+            
+            print("\n📈 会员统计分析")
+            print("="*40)
+            
+            manager = MemberManager()
+            stats = manager.get_stats()
+            
+            print("📋 注册统计:")
+            print(f"   总注册数: {stats['total_registrations']}")
+            print(f"   待处理: {stats['pending_registrations']}")
+            print(f"   已处理: {stats['processed_registrations']}")
+            
+            print(f"\n🔑 访问码统计:")
+            print(f"   已生成: {stats['total_access_codes']}")
+            print(f"   有效的: {stats['active_access_codes']}")
+            print(f"   已过期: {stats['expired_access_codes']}")
+            
+            if stats['level_distribution']:
+                print(f"\n📊 会员等级分布:")
+                for level, count in stats['level_distribution'].items():
+                    print(f"   {level}: {count}人")
+            
+            if stats['recent_activity']:
+                print(f"\n🕒 最近活动 (近7天):")
+                print(f"   新注册: {stats['recent_activity']['registrations']}人")
+                print(f"   新访问码: {stats['recent_activity']['access_codes']}个")
+            
+            self.pause_for_user()
+            return "会员统计分析完成"
+            
+        except Exception as e:
+            self.handle_error(e, "会员统计分析")
+            return None
     
     def _process_registrations(self) -> Optional[str]:
         """处理注册申请"""
-        print("\n📝 处理注册申请")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        try:
+            from scripts.member_management import MemberManager
+            
+            print("\n📝 处理注册申请")
+            print("="*40)
+            
+            manager = MemberManager()
+            pending = manager.get_pending_registrations()
+            
+            if not pending:
+                print("📄 当前没有待处理的注册申请")
+                self.pause_for_user()
+                return None
+            
+            print(f"📋 发现 {len(pending)} 个待处理注册:")
+            for i, reg in enumerate(pending[:10], 1):  # 显示前10个
+                print(f"   {i}. {reg.get('email', 'N/A')} - {reg.get('level', 'N/A')} ({reg.get('created_at', 'N/A')})")
+            
+            print("\n处理选项:")
+            print("1. 批量处理全部 (生成访问码+发送邮件)")
+            print("2. 批量处理全部 (仅生成访问码)")
+            print("3. 逐个处理")
+            print("0. 取消")
+            
+            choice = input("\n请选择 (0-3): ").strip()
+            
+            if choice == "1":
+                print("\n正在批量处理注册 (包含邮件发送)...")
+                manager.batch_process_registrations(send_email=True)
+                print("✅ 批量处理完成")
+                
+            elif choice == "2":
+                print("\n正在批量处理注册 (不发送邮件)...")
+                manager.batch_process_registrations(send_email=False)
+                print("✅ 批量处理完成")
+                
+            elif choice == "3":
+                print("💡 逐个处理功能尚未实现，请使用批量处理")
+                
+            elif choice == "0":
+                return None
+            
+            return "注册处理完成"
+            
+        except Exception as e:
+            self.handle_error(e, "处理注册申请")
+            return None
     
     def _export_member_data(self) -> Optional[str]:
         """导出会员数据"""
-        print("\n💾 导出会员数据")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        try:
+            from scripts.member_management import MemberManager
+            from datetime import datetime
+            
+            print("\n💾 导出会员数据")
+            print("="*40)
+            
+            manager = MemberManager()
+            
+            # 生成文件名
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            default_filename = f"member_export_{timestamp}.csv"
+            
+            filename = input(f"\n输入文件名 (默认: {default_filename}): ").strip()
+            if not filename:
+                filename = default_filename
+            
+            # 导出数据
+            print(f"\n正在导出会员数据...")
+            export_path = manager.export_registrations_csv(filename)
+            
+            print(f"✅ 会员数据已导出到: {export_path}")
+            
+            # 显示统计信息
+            stats = manager.get_stats()
+            print(f"\n📋 导出统计:")
+            print(f"   总记录数: {stats['total_registrations']}")
+            print(f"   导出文件: {export_path}")
+            
+            self.pause_for_user()
+            return f"会员数据已导出到 {export_path}"
+            
+        except Exception as e:
+            self.handle_error(e, "导出会员数据")
+            return None
     
     def handle_post_update_menu(self) -> None:
         """处理文章更新工具菜单"""
