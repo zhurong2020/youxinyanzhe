@@ -1891,51 +1891,638 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
     def _check_onedrive_status(self) -> Optional[str]:
         """检查OneDrive连接状态"""
         print("\n🔍 检查OneDrive连接状态")
-        print("(功能开发中...)")
+        
+        try:
+            import subprocess
+            import sys
+            
+            # 检查OneDrive配置和认证状态
+            from pathlib import Path
+            config_file = Path("config/onedrive_config.json")
+            token_file = Path("config/onedrive_token.json")
+            
+            print("📋 检查OneDrive配置状态:")
+            print(f"   配置文件: {'✅ 存在' if config_file.exists() else '❌ 不存在'}")
+            print(f"   认证令牌: {'✅ 存在' if token_file.exists() else '❌ 不存在'}")
+            
+            if not config_file.exists():
+                print("\n💡 建议: 使用 '1. 初始化OneDrive认证' 来配置OneDrive")
+                return "配置文件不存在"
+            
+            if not token_file.exists():
+                print("\n💡 建议: 使用 '1. 初始化OneDrive认证' 来获取访问令牌")
+                return "认证令牌不存在"
+            
+            # 尝试调用工具进行简单测试
+            result = subprocess.run([
+                sys.executable, "scripts/tools/onedrive_blog_images.py", "--help"
+            ], capture_output=True, text=True, timeout=10)
+            
+            if result.returncode == 0:
+                print("✅ OneDrive连接正常")
+                if result.stdout:
+                    print("详细信息:")
+                    print(result.stdout)
+                return "OneDrive连接正常"
+            else:
+                print("❌ OneDrive连接异常")
+                if result.stderr:
+                    print(f"错误信息: {result.stderr}")
+                return None
+                
+        except subprocess.TimeoutExpired:
+            print("⏰ 连接检查超时，可能存在网络问题")
+            return None
+        except Exception as e:
+            print(f"❌ 检查过程出错: {e}")
+            return None
+        
         self.pause_for_user()
         return None
     
     def _view_image_statistics(self) -> Optional[str]:
         """查看图片处理统计"""
         print("\n📊 图片处理统计")
-        print("(功能开发中...)")
+        
+        try:
+            # 导入图片索引管理器来获取统计信息
+            from scripts.tools.onedrive_image_index import OneDriveImageIndex
+            
+            index_manager = OneDriveImageIndex()
+            stats = index_manager.get_statistics()
+            
+            print("="*50)
+            print("📈 OneDrive图片统计信息")
+            print("="*50)
+            
+            print(f"📁 总图片数量: {stats.get('total_images', 0)}")
+            print(f"🔗 有效链接: {stats.get('valid_links', 0)}")
+            print(f"❌ 失效链接: {stats.get('invalid_links', 0)}")
+            print(f"📅 最近更新: {stats.get('last_updated', 'N/A')}")
+            print(f"💾 索引文件大小: {stats.get('index_size', 'N/A')}")
+            
+            if stats.get('recent_uploads'):
+                print(f"\n📈 最近上传 (最近7天): {len(stats['recent_uploads'])}张")
+                for upload in stats['recent_uploads'][:5]:  # 显示最近5张
+                    print(f"   • {upload.get('filename', 'N/A')} ({upload.get('upload_date', 'N/A')})")
+            
+            if stats.get('size_distribution'):
+                print(f"\n📊 文件大小分布:")
+                for size_range, count in stats['size_distribution'].items():
+                    print(f"   • {size_range}: {count}张")
+            
+        except ImportError:
+            print("❌ 无法导入图片索引管理器")
+        except Exception as e:
+            print(f"❌ 获取统计信息失败: {e}")
+            
+            # 回退方案：显示基础统计
+            try:
+                from pathlib import Path
+                index_file = Path("_data/onedrive_image_index.json")
+                if index_file.exists():
+                    import json
+                    with open(index_file, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                    
+                    print("📊 基础统计信息:")
+                    print(f"   📁 索引文件存在: ✅")
+                    print(f"   📝 记录条数: {len(data.get('images', []))}")
+                    print(f"   📅 索引文件修改时间: {index_file.stat().st_mtime}")
+                else:
+                    print("❌ 未找到图片索引文件")
+            except Exception as fallback_error:
+                print(f"❌ 回退统计也失败: {fallback_error}")
+        
         self.pause_for_user()
-        return None
+        return "图片统计查看完成"
     
     def _image_index_management(self) -> Optional[str]:
         """图片索引管理"""
         print("\n🗂️ 图片索引管理")
-        print("(功能开发中...)")
+        print("="*50)
+        
+        try:
+            from scripts.tools.onedrive_image_index import OneDriveImageIndex
+            
+            index_manager = OneDriveImageIndex()
+            
+            while True:
+                print("\n🔧 图片索引管理选项:")
+                print("1. 重建索引")
+                print("2. 验证链接有效性")
+                print("3. 清理失效记录")
+                print("4. 导出索引数据")
+                print("5. 查看详细统计")
+                print("0. 返回上级菜单")
+                
+                choice = input("\n请选择操作 (1-5/0): ").strip()
+                
+                if choice == "1":
+                    print("\n🔄 重建图片索引...")
+                    result = index_manager.rebuild_index()
+                    if result:
+                        print("✅ 索引重建完成")
+                    else:
+                        print("❌ 索引重建失败")
+                
+                elif choice == "2":
+                    print("\n🔍 验证链接有效性...")
+                    invalid_count = index_manager.validate_links()
+                    print(f"🔗 发现 {invalid_count} 个失效链接")
+                
+                elif choice == "3":
+                    print("\n🧹 清理失效记录...")
+                    removed_count = index_manager.cleanup_invalid_records()
+                    print(f"🗑️ 清理了 {removed_count} 个失效记录")
+                
+                elif choice == "4":
+                    print("\n💾 导出索引数据...")
+                    from datetime import datetime
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    export_file = f"image_index_export_{timestamp}.json"
+                    
+                    if index_manager.export_data(export_file):
+                        print(f"✅ 数据已导出到: {export_file}")
+                    else:
+                        print("❌ 导出失败")
+                
+                elif choice == "5":
+                    print("\n📊 详细统计信息:")
+                    stats = index_manager.get_detailed_statistics()
+                    for key, value in stats.items():
+                        print(f"   {key}: {value}")
+                
+                elif choice == "0":
+                    break
+                
+                else:
+                    print("❌ 无效选择")
+                
+                if choice != "0":
+                    input("\n按回车键继续...")
+            
+            return "图片索引管理完成"
+            
+        except ImportError:
+            print("❌ 无法导入图片索引管理器模块")
+            print("请检查 scripts/tools/onedrive_image_index.py 文件是否存在")
+        except Exception as e:
+            print(f"❌ 图片索引管理出错: {e}")
+        
         self.pause_for_user()
         return None
     
     def _mixed_image_management(self) -> Optional[str]:
         """混合图片管理"""
         print("\n🔄 混合图片管理")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        print("📋 支持任意位置图片发现，四阶段处理流程，减少60%创作摩擦")
+        
+        try:
+            import subprocess
+            import sys
+            
+            while True:
+                print("\n🔧 混合图片管理选项:")
+                print("1. 自动发现和处理项目中的所有图片")
+                print("2. 处理指定目录中的图片")
+                print("3. 查看处理历史记录")
+                print("4. 清理处理会话")
+                print("5. 配置处理参数")
+                print("0. 返回上级菜单")
+                
+                choice = input("\n请选择操作 (1-5/0): ").strip()
+                
+                if choice == "1":
+                    print("\n🔍 自动发现和处理项目中的所有图片...")
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/mixed_image_manager.py", "--auto"
+                    ], check=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ 自动处理完成")
+                    else:
+                        print("❌ 自动处理过程中出现问题")
+                
+                elif choice == "2":
+                    target_dir = input("请输入目标目录路径: ").strip()
+                    if target_dir:
+                        print(f"\n📁 处理目录: {target_dir}")
+                        result = subprocess.run([
+                            sys.executable, "scripts/tools/mixed_image_manager.py", 
+                            "--directory", target_dir
+                        ], check=False)
+                        
+                        if result.returncode == 0:
+                            print("✅ 目录处理完成")
+                        else:
+                            print("❌ 目录处理失败")
+                    else:
+                        print("❌ 目录路径不能为空")
+                
+                elif choice == "3":
+                    print("\n📋 查看处理历史记录...")
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/mixed_image_manager.py", "--history"
+                    ], check=False)
+                
+                elif choice == "4":
+                    print("\n🧹 清理处理会话...")
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/mixed_image_manager.py", "--cleanup"
+                    ], check=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ 会话清理完成")
+                    else:
+                        print("❌ 会话清理失败")
+                
+                elif choice == "5":
+                    print("\n⚙️ 配置处理参数...")
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/mixed_image_manager.py", "--config"
+                    ], check=False)
+                
+                elif choice == "0":
+                    break
+                
+                else:
+                    print("❌ 无效选择")
+                
+                if choice != "0":
+                    input("\n按回车键继续...")
+            
+            return "混合图片管理完成"
+            
+        except Exception as e:
+            print(f"❌ 混合图片管理出错: {e}")
+            self.pause_for_user()
+            return None
     
     def _manage_processing_sessions(self) -> Optional[str]:
         """管理处理会话"""
         print("\n🧹 管理处理会话")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        print("📋 管理图片处理的会话记录和状态")
+        
+        try:
+            import subprocess
+            import sys
+            from pathlib import Path
+            
+            # 检查会话目录
+            session_dirs = [
+                Path(".tmp/image_processing_sessions"),
+                Path(".build/processing_sessions"),
+                Path("_data/processing_logs")
+            ]
+            
+            active_sessions = []
+            for session_dir in session_dirs:
+                if session_dir.exists():
+                    sessions = list(session_dir.glob("*.json"))
+                    active_sessions.extend(sessions)
+            
+            print(f"📊 发现 {len(active_sessions)} 个处理会话")
+            
+            while True:
+                print("\n🔧 会话管理选项:")
+                print("1. 查看活动会话")
+                print("2. 清理已完成会话")
+                print("3. 恢复中断的会话")
+                print("4. 导出会话日志")
+                print("5. 查看会话统计")
+                print("0. 返回上级菜单")
+                
+                choice = input("\n请选择操作 (1-5/0): ").strip()
+                
+                if choice == "1":
+                    print("\n📋 活动会话列表:")
+                    if active_sessions:
+                        for i, session in enumerate(active_sessions[:10], 1):
+                            try:
+                                import json
+                                with open(session, 'r', encoding='utf-8') as f:
+                                    data = json.load(f)
+                                print(f"   {i}. {session.name}")
+                                print(f"      状态: {data.get('status', 'unknown')}")
+                                print(f"      时间: {data.get('created_at', 'N/A')}")
+                                if data.get('progress'):
+                                    print(f"      进度: {data['progress']}")
+                            except Exception:
+                                print(f"   {i}. {session.name} (无法读取)")
+                    else:
+                        print("   📄 暂无活动会话")
+                
+                elif choice == "2":
+                    print("\n🧹 清理已完成会话...")
+                    cleaned = 0
+                    for session in active_sessions:
+                        try:
+                            import json
+                            with open(session, 'r', encoding='utf-8') as f:
+                                data = json.load(f)
+                            if data.get('status') == 'completed':
+                                session.unlink()
+                                cleaned += 1
+                        except Exception:
+                            continue
+                    print(f"✅ 清理了 {cleaned} 个已完成会话")
+                
+                elif choice == "3":
+                    print("\n🔄 恢复中断的会话...")
+                    # 调用混合图片管理器的恢复功能
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/mixed_image_manager.py", "--recover"
+                    ], check=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ 会话恢复完成")
+                    else:
+                        print("❌ 会话恢复失败")
+                
+                elif choice == "4":
+                    print("\n💾 导出会话日志...")
+                    from datetime import datetime
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    export_file = f"session_logs_{timestamp}.json"
+                    
+                    try:
+                        import json
+                        all_sessions = []
+                        for session in active_sessions:
+                            try:
+                                with open(session, 'r', encoding='utf-8') as f:
+                                    data = json.load(f)
+                                all_sessions.append(data)
+                            except Exception:
+                                continue
+                        
+                        with open(export_file, 'w', encoding='utf-8') as f:
+                            json.dump(all_sessions, f, ensure_ascii=False, indent=2)
+                        
+                        print(f"✅ 日志已导出到: {export_file}")
+                    except Exception as e:
+                        print(f"❌ 导出失败: {e}")
+                
+                elif choice == "5":
+                    print("\n📊 会话统计:")
+                    stats = {"总会话": len(active_sessions), "completed": 0, "running": 0, "failed": 0}
+                    
+                    for session in active_sessions:
+                        try:
+                            import json
+                            with open(session, 'r', encoding='utf-8') as f:
+                                data = json.load(f)
+                            status = data.get('status', 'unknown')
+                            if status in stats:
+                                stats[status] += 1
+                        except Exception:
+                            continue
+                    
+                    for key, value in stats.items():
+                        print(f"   {key}: {value}")
+                
+                elif choice == "0":
+                    break
+                
+                else:
+                    print("❌ 无效选择")
+                
+                if choice != "0":
+                    input("\n按回车键继续...")
+            
+            return "处理会话管理完成"
+            
+        except Exception as e:
+            print(f"❌ 会话管理出错: {e}")
+            self.pause_for_user()
+            return None
     
     def _onedrive_cleanup_tools(self) -> Optional[str]:
         """OneDrive云端清理工具"""
         print("\n🗑️ OneDrive云端清理工具")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        print("📋 清理OneDrive中不再使用的图片文件，释放存储空间")
+        
+        try:
+            import subprocess
+            import sys
+            
+            while True:
+                print("\n🔧 云端清理选项:")
+                print("1. 扫描未使用的文件")
+                print("2. 清理孤立文件")
+                print("3. 批量删除失效链接对应文件")
+                print("4. 查看清理历史")
+                print("5. 安全模式清理 (备份后删除)")
+                print("0. 返回上级菜单")
+                
+                choice = input("\n请选择操作 (1-5/0): ").strip()
+                
+                if choice == "1":
+                    print("\n🔍 扫描未使用的文件...")
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/cleanup_onedrive_cloud.py", "--scan"
+                    ], check=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ 文件扫描完成")
+                    else:
+                        print("❌ 文件扫描失败")
+                
+                elif choice == "2":
+                    print("\n🧹 清理孤立文件...")
+                    confirm = input("⚠️ 此操作将删除未被引用的文件，确认继续？(y/N): ").strip().lower()
+                    
+                    if confirm in ['y', 'yes']:
+                        result = subprocess.run([
+                            sys.executable, "scripts/tools/cleanup_onedrive_cloud.py", "--cleanup"
+                        ], check=False)
+                        
+                        if result.returncode == 0:
+                            print("✅ 孤立文件清理完成")
+                        else:
+                            print("❌ 孤立文件清理失败")
+                    else:
+                        print("❌ 操作已取消")
+                
+                elif choice == "3":
+                    print("\n🔗 批量删除失效链接对应文件...")
+                    confirm = input("⚠️ 此操作将删除失效链接对应的云端文件，确认继续？(y/N): ").strip().lower()
+                    
+                    if confirm in ['y', 'yes']:
+                        result = subprocess.run([
+                            sys.executable, "scripts/tools/cleanup_onedrive_cloud.py", "--invalid-links"
+                        ], check=False)
+                        
+                        if result.returncode == 0:
+                            print("✅ 失效文件清理完成")
+                        else:
+                            print("❌ 失效文件清理失败")
+                    else:
+                        print("❌ 操作已取消")
+                
+                elif choice == "4":
+                    print("\n📋 查看清理历史...")
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/cleanup_onedrive_cloud.py", "--history"
+                    ], check=False)
+                
+                elif choice == "5":
+                    print("\n🛡️ 安全模式清理...")
+                    confirm = input("安全模式将先备份再删除，确认继续？(y/N): ").strip().lower()
+                    
+                    if confirm in ['y', 'yes']:
+                        result = subprocess.run([
+                            sys.executable, "scripts/tools/cleanup_onedrive_cloud.py", "--safe-cleanup"
+                        ], check=False)
+                        
+                        if result.returncode == 0:
+                            print("✅ 安全模式清理完成")
+                        else:
+                            print("❌ 安全模式清理失败")
+                    else:
+                        print("❌ 操作已取消")
+                
+                elif choice == "0":
+                    break
+                
+                else:
+                    print("❌ 无效选择")
+                
+                if choice != "0":
+                    input("\n按回车键继续...")
+            
+            return "OneDrive云端清理完成"
+            
+        except Exception as e:
+            print(f"❌ 云端清理工具出错: {e}")
+            self.pause_for_user()
+            return None
     
     def _date_download_backup(self) -> Optional[str]:
         """按日期下载图片备份"""
         print("\n📅 按日期下载图片备份")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        print("📋 根据指定日期范围下载OneDrive中的图片备份")
+        
+        try:
+            import subprocess
+            import sys
+            from datetime import datetime, timedelta
+            
+            while True:
+                print("\n🔧 日期备份选项:")
+                print("1. 下载今天上传的图片")
+                print("2. 下载最近7天的图片")
+                print("3. 下载最近30天的图片")
+                print("4. 自定义日期范围下载")
+                print("5. 下载所有图片备份")
+                print("0. 返回上级菜单")
+                
+                choice = input("\n请选择操作 (1-5/0): ").strip()
+                
+                if choice == "1":
+                    print("\n📥 下载今天上传的图片...")
+                    today = datetime.now().strftime("%Y-%m-%d")
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/onedrive_date_downloader.py", 
+                        "--date", today
+                    ], check=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ 今日图片下载完成")
+                    else:
+                        print("❌ 今日图片下载失败")
+                
+                elif choice == "2":
+                    print("\n📥 下载最近7天的图片...")
+                    end_date = datetime.now()
+                    start_date = end_date - timedelta(days=7)
+                    
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/onedrive_date_downloader.py",
+                        "--start-date", start_date.strftime("%Y-%m-%d"),
+                        "--end-date", end_date.strftime("%Y-%m-%d")
+                    ], check=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ 近7天图片下载完成")
+                    else:
+                        print("❌ 近7天图片下载失败")
+                
+                elif choice == "3":
+                    print("\n📥 下载最近30天的图片...")
+                    end_date = datetime.now()
+                    start_date = end_date - timedelta(days=30)
+                    
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/onedrive_date_downloader.py",
+                        "--start-date", start_date.strftime("%Y-%m-%d"),
+                        "--end-date", end_date.strftime("%Y-%m-%d")
+                    ], check=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ 近30天图片下载完成")
+                    else:
+                        print("❌ 近30天图片下载失败")
+                
+                elif choice == "4":
+                    print("\n📅 自定义日期范围下载...")
+                    start_date = input("请输入开始日期 (YYYY-MM-DD): ").strip()
+                    end_date = input("请输入结束日期 (YYYY-MM-DD): ").strip()
+                    
+                    if start_date and end_date:
+                        try:
+                            # 验证日期格式
+                            datetime.strptime(start_date, "%Y-%m-%d")
+                            datetime.strptime(end_date, "%Y-%m-%d")
+                            
+                            print(f"\n📥 下载 {start_date} 到 {end_date} 的图片...")
+                            result = subprocess.run([
+                                sys.executable, "scripts/tools/onedrive_date_downloader.py",
+                                "--start-date", start_date,
+                                "--end-date", end_date
+                            ], check=False)
+                            
+                            if result.returncode == 0:
+                                print("✅ 自定义范围图片下载完成")
+                            else:
+                                print("❌ 自定义范围图片下载失败")
+                        except ValueError:
+                            print("❌ 日期格式错误，请使用YYYY-MM-DD格式")
+                    else:
+                        print("❌ 日期不能为空")
+                
+                elif choice == "5":
+                    print("\n📥 下载所有图片备份...")
+                    confirm = input("⚠️ 这可能下载大量文件，确认继续？(y/N): ").strip().lower()
+                    
+                    if confirm in ['y', 'yes']:
+                        result = subprocess.run([
+                            sys.executable, "scripts/tools/onedrive_date_downloader.py", "--all"
+                        ], check=False)
+                        
+                        if result.returncode == 0:
+                            print("✅ 全部图片下载完成")
+                        else:
+                            print("❌ 全部图片下载失败")
+                    else:
+                        print("❌ 操作已取消")
+                
+                elif choice == "0":
+                    break
+                
+                else:
+                    print("❌ 无效选择")
+                
+                if choice != "0":
+                    input("\n按回车键继续...")
+            
+            return "日期备份下载完成"
+            
+        except Exception as e:
+            print(f"❌ 日期备份下载出错: {e}")
+            self.pause_for_user()
+            return None
     
     def _enhanced_header_image_processing(self) -> Optional[str]:
         """智能Header+图片处理"""

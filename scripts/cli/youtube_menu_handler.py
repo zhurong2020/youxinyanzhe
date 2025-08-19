@@ -153,7 +153,7 @@ class YouTubeMenuHandler(BaseMenuHandler):
                 print("3. 批量视频生成")
                 print("4. 查看输出目录")
                 print("5. 清理输出文件")
-                print("6. 返回上级菜单")
+                print("0. 返回上级菜单")
                 
                 try:
                     choice = int(input("\n请选择操作: "))
@@ -173,11 +173,11 @@ class YouTubeMenuHandler(BaseMenuHandler):
                     elif choice == 5:  # 清理输出文件
                         generator.handle_cleanup()
                     
-                    elif choice == 6:  # 返回
+                    elif choice == 0:  # 返回
                         break
                     
                     else:
-                        print("❌ 选择无效，请输入1-6之间的数字")
+                        print("❌ 选择无效，请输入1-5或0返回")
                         
                 except ValueError:
                     print("❌ 请输入有效的数字")
