@@ -588,6 +588,20 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
         if not draft:
             self.log_action("用户取消或无草稿可处理")
             return None
+        elif isinstance(draft, str) and draft.startswith('redirect_to_'):
+            # 处理重定向 - 保持与原版本的兼容性
+            if draft == 'redirect_to_inspiration':
+                print("🎯 跳转到主题灵感生成器...")
+                # 返回None让主循环重新开始，用户可以选择对应功能
+                return None
+            elif draft == 'redirect_to_youtube':
+                print("🎬 跳转到YouTube内容处理...")
+                return None  
+            elif draft == 'redirect_to_normalization':
+                print("📝 跳转到内容规范化处理...")
+                return None
+            else:
+                return None
         return str(draft)
     
     def _republish_article(self) -> Optional[str]:
