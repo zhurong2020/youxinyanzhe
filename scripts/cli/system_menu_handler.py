@@ -302,8 +302,35 @@ class SystemMenuHandler(BaseMenuHandler):
         self.display_menu_header("🧪 测试当前引擎连接",
                                 "验证当前配置的引擎是否可用")
         
-        print("功能开发中...")
-        print("💡 该功能将集成实际的API连接测试")
+        try:
+            import subprocess
+            import sys
+            
+            print("🔍 正在测试Gemini模型连接...")
+            
+            # 调用Gemini验证工具
+            result = subprocess.run([
+                sys.executable, "scripts/tools/verify_gemini_model.py"
+            ], capture_output=True, text=True, timeout=30)
+            
+            print(result.stdout)
+            if result.stderr:
+                print(f"错误信息: {result.stderr}")
+            
+            if result.returncode == 0:
+                print("✅ AI引擎连接测试通过")
+                return "AI引擎连接正常"
+            else:
+                print("❌ AI引擎连接测试失败")
+                return None
+                
+        except subprocess.TimeoutExpired:
+            print("⏰ 连接测试超时")
+            return None
+        except Exception as e:
+            print(f"❌ 测试过程出错: {e}")
+            return None
+        
         self.pause_for_user()
         return None
     
