@@ -550,6 +550,7 @@ class MarkdownImageProcessor:
         
         if fm_match:
             front_matter_content = fm_match.group(1)
+            
             # 查找header.teaser等图片字段
             teaser_pattern = re.compile(r'^\s*teaser:\s*(.+)$', re.MULTILINE)
             teaser_match = teaser_pattern.search(front_matter_content)
@@ -560,6 +561,17 @@ class MarkdownImageProcessor:
                     # 为front matter创建特殊的匹配格式
                     full_match = f"teaser: {img_path}"
                     local_images.append((full_match, "header_teaser", img_path))
+            
+            # 查找header.overlay_image字段
+            overlay_pattern = re.compile(r'^\s*overlay_image:\s*(.+)$', re.MULTILINE)
+            overlay_match = overlay_pattern.search(front_matter_content)
+            
+            if overlay_match:
+                img_path = overlay_match.group(1).strip()
+                if self._is_local_path(img_path):
+                    # 为front matter创建特殊的匹配格式
+                    full_match = f"overlay_image: {img_path}"
+                    local_images.append((full_match, "header_overlay_image", img_path))
         
         return local_images
     
@@ -795,8 +807,19 @@ class MarkdownImageProcessor:
                         except Exception as e:
                             logger.warning(f"Failed to add image to index: {e}")
                     
-                    # 记录替换
-                    new_link = f"![{alt_text}]({embed_link})"
+                    # 记录替换 - 根据图片类型使用不同格式
+                    if alt_text.startswith("header_"):
+                        # Front matter 字段使用 YAML 格式
+                        if alt_text == "header_teaser":
+                            new_link = f"teaser: {embed_link}"
+                        elif alt_text == "header_overlay_image":
+                            new_link = f"overlay_image: {embed_link}"
+                        else:
+                            new_link = embed_link  # 其他header字段直接使用链接
+                    else:
+                        # 正文图片使用 Markdown 格式
+                        new_link = f"![{alt_text}]({embed_link})"
+                    
                     replacements[full_match] = new_link
                     processed_count += 1
                     
