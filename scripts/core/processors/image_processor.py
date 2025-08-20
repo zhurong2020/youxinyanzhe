@@ -69,6 +69,14 @@ class ImageProcessor:
                 # 检查是否是绝对路径（Jekyll不兼容）
                 elif image_path.startswith('/assets/'):
                     problematic_images.append(image_path)
+                
+                # 检查是否是临时图片路径（../temp/, ./temp/, temp/）
+                elif (not image_path.startswith('http') and 
+                      not '{{ site.baseurl }}' in image_path and
+                      ('temp/' in image_path or 
+                       image_path.startswith('../') or 
+                       image_path.startswith('./'))):
+                    problematic_images.append(image_path)
         
         return problematic_images
     
