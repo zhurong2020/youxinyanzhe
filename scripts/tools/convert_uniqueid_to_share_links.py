@@ -49,7 +49,7 @@ def convert_uniqueid_to_share_format(uniqueid_url: str, onedrive_index: Dict) ->
 
 def convert_article_links(file_path: str, dry_run: bool = False) -> bool:
     """转换文章中的链接格式"""
-    file_path = Path(file_path)
+    file_path = Path(file_path) # type: ignore
     
     if not file_path.exists():
         print(f"❌ 文件不存在: {file_path}")
