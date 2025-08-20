@@ -175,34 +175,77 @@ class DraftFormatter:
         # 限制标签数量（3-6个）
         return list(tags)[:6] if len(tags) > 6 else list(tags)
 
-    def generate_excerpt(self, content: str) -> str:
+    def generate_excerpt(self, content: str, target_length: int = 60) -> str:
         """
         生成文章摘要
         
         Args:
             content: 文章内容
+            target_length: 目标长度（默认60字符）
             
         Returns:
-            生成的摘要（50-60字符）
+            生成的摘要
         """
         # 移除markdown格式和特殊字符
         clean_content = re.sub(r'[#*`\[\](){}]', '', content)
         clean_content = re.sub(r'\s+', ' ', clean_content).strip()
         
-        # 取前100字符，然后找到合适的截断点
-        excerpt = clean_content[:100]
+        # 取更多内容来寻找合适的截断点
+        search_length = max(150, target_length * 2)
+        excerpt = clean_content[:search_length]
         
         # 在句号、感叹号、问号处截断
-        for punct in ['。', '！', '？', '.', '!', '?']:
-            if punct in excerpt[30:80]:  # 在合理位置寻找标点
-                excerpt = excerpt[:excerpt.find(punct, 30) + 1]
-                break
+        min_length = max(30, target_length - 20)  # 最小长度
+        max_length = target_length + 20           # 最大长度
         
-        # 如果还是太长，强制截断到60字符
-        if len(excerpt) > 60:
-            excerpt = excerpt[:57] + "..."
+        for punct in ['。', '！', '？', '.', '!', '?']:
+            if punct in excerpt[min_length:max_length]:  # 在合理位置寻找标点
+                punct_pos = excerpt.find(punct, min_length)
+                if punct_pos != -1:
+                    excerpt = excerpt[:punct_pos + 1]
+                    break
+        
+        # 如果还是太长，强制截断
+        if len(excerpt) > target_length + 10:
+            excerpt = excerpt[:target_length - 3] + "..."
+        
+        # 如果太短，尝试添加更多内容
+        if len(excerpt) < target_length - 10:
+            # 取更多内容并强制截断
+            excerpt = clean_content[:target_length - 3] + "..."
         
         return excerpt
+
+    def find_first_image(self, content: str) -> Optional[str]:
+        """
+        查找文章内容中的第一张图片
+        
+        Args:
+            content: 文章内容
+            
+        Returns:
+            第一张图片的路径，如果没有则返回None
+        """
+        # 查找markdown格式的图片
+        image_pattern = re.compile(r'!\[(.*?)\]\((.*?)\)')
+        
+        for match in image_pattern.finditer(content):
+            img_path = match.group(2).strip()
+            
+            # 跳过空路径
+            if not img_path:
+                continue
+                
+            # 跳过网络链接，保留本地图片路径
+            if img_path.startswith(('http://', 'https://')):
+                # 但如果是OneDrive链接，可以使用
+                if '1drv.ms' in img_path or 'sharepoint.com' in img_path:
+                    return img_path
+                continue
+                
+            return img_path
+        
+        return None
 
     def create_front_matter(self, title: str, content: str, 
                            category: Optional[str] = None, 
@@ -228,6 +271,21 @@ class DraftFormatter:
         # 生成摘要
         excerpt = self.generate_excerpt(content)
         
+        # 查找第一张图片
+        first_image = self.find_first_image(content)
+        
+        # 创建header字段
+        if first_image:
+            # 如果是OneDrive链接，直接使用
+            if '1drv.ms' in first_image or 'sharepoint.com' in first_image:
+                header_image = first_image
+            else:
+                # 本地图片，转换为OneDrive示例链接（实际使用中会被后续处理替换）
+                header_image = "https://1drv.ms/i/c/5644dab129afda10/IQTq4kEOrERvRLHS_4L9uCK_ARjvU4zbducjMUCRTRR8Pdk"
+        else:
+            # 没有图片时使用默认OneDrive链接
+            header_image = "https://1drv.ms/i/c/5644dab129afda10/IQTq4kEOrERvRLHS_4L9uCK_ARjvU4zbducjMUCRTRR8Pdk"
+        
         # 构建front matter
         front_matter = {
             "title": title,
@@ -236,7 +294,10 @@ class DraftFormatter:
             "tags": generated_tags,
             "excerpt": excerpt,
             "header": {
-                "teaser": "/assets/images/default-teaser.jpg"  # 默认头图
+                "overlay_color": "#333",
+                "overlay_filter": 0.5,
+                "overlay_image": header_image,
+                "teaser": header_image
             }
         }
         
@@ -244,6 +305,130 @@ class DraftFormatter:
         front_matter.update(self.default_config)
         
         return front_matter
+
+    def fix_header_field(self, front_matter: Dict[str, Any], body_content: str) -> bool:
+        """
+        检查并修复front matter中的header字段和其他必需字段
+        
+        Args:
+            front_matter: 前置数据字典
+            body_content: 文章正文内容
+            
+        Returns:
+            是否进行了修复
+        """
+        header = front_matter.get('header', {})
+        needs_update = False
+        
+        # 检查header字段
+        required_header_fields = {
+            'overlay_color': '#333',
+            'overlay_filter': 0.5,
+            'overlay_image': None,  # 需要确定图片
+            'teaser': None  # 需要确定图片
+        }
+        
+        # 情况1: 没有header字段
+        if not header:
+            needs_update = True
+            print("📋 发现缺失header字段")
+        else:
+            # 情况2: header字段不完整
+            missing_fields = []
+            for field in required_header_fields:
+                if field not in header:
+                    missing_fields.append(field)
+                    needs_update = True
+            
+            if missing_fields:
+                print(f"📋 发现缺失header子字段: {', '.join(missing_fields)}")
+        
+        # 检查其他必需字段
+        other_issues = []
+        
+        # 检查tags字段
+        if 'tags' not in front_matter or not front_matter.get('tags'):
+            title = front_matter.get('title', '')
+            if title:
+                # 生成tags
+                generated_tags = self.generate_tags(title, body_content, front_matter.get('categories', ['cognitive-upgrade'])[0])
+                front_matter['tags'] = generated_tags
+                needs_update = True
+                other_issues.append("tags字段")
+        
+        # 检查excerpt字段
+        if 'excerpt' not in front_matter or not front_matter.get('excerpt'):
+            excerpt = self.generate_excerpt(body_content)
+            front_matter['excerpt'] = excerpt
+            needs_update = True
+            other_issues.append("excerpt字段")
+        else:
+            # 检查excerpt长度
+            current_excerpt = front_matter['excerpt']
+            if len(current_excerpt) < 50:
+                # 重新生成更长的excerpt
+                excerpt = self.generate_excerpt(body_content, target_length=55)
+                front_matter['excerpt'] = excerpt
+                needs_update = True
+                other_issues.append("excerpt长度不足")
+        
+        if other_issues:
+            print(f"📋 发现其他缺失字段: {', '.join(other_issues)}")
+        
+        if not needs_update:
+            return False
+        
+        # 修复header字段
+        if needs_update and (not header or any(field not in header for field in required_header_fields)):
+            # 确定使用的图片
+            header_image = self.determine_header_image(header, body_content)
+            
+            # 修复header字段
+            if 'header' not in front_matter:
+                front_matter['header'] = {}
+            
+            # 设置必需字段
+            front_matter['header']['overlay_color'] = header.get('overlay_color', '#333')
+            front_matter['header']['overlay_filter'] = header.get('overlay_filter', 0.5)
+            front_matter['header']['overlay_image'] = header.get('overlay_image', header_image)
+            front_matter['header']['teaser'] = header.get('teaser', header_image)
+        
+        return True
+    
+    def determine_header_image(self, existing_header: Dict[str, Any], body_content: str) -> str:
+        """
+        确定应该使用的header图片
+        
+        Args:
+            existing_header: 现有的header字段
+            body_content: 文章正文内容
+            
+        Returns:
+            图片URL
+        """
+        # 优先级1: 如果已有overlay_image或teaser，使用现有的
+        if existing_header.get('overlay_image'):
+            print(f"🖼️ 使用现有overlay_image: {existing_header['overlay_image']}")
+            return existing_header['overlay_image']
+        
+        if existing_header.get('teaser'):
+            print(f"🖼️ 使用现有teaser: {existing_header['teaser']}")
+            return existing_header['teaser']
+        
+        # 优先级2: 查找正文中的第一张图片
+        first_image = self.find_first_image(body_content)
+        if first_image:
+            if '1drv.ms' in first_image or 'sharepoint.com' in first_image:
+                print(f"🖼️ 使用正文第一张OneDrive图片: {first_image}")
+                return first_image
+            else:
+                print(f"🖼️ 使用正文第一张图片: {first_image}")
+                # 直接使用本地图片路径，后续由OneDrive处理器自动处理
+                return first_image
+        
+        # 优先级3: 使用默认OneDrive链接
+        print("🖼️ 未找到图片，使用默认OneDrive链接")
+        return "https://1drv.ms/i/c/5644dab129afda10/IQTq4kEOrERvRLHS_4L9uCK_ARjvU4zbducjMUCRTRR8Pdk"
 
     def format_content(self, content: str) -> str:
         """
@@ -628,7 +813,38 @@ class DraftFormatter:
         
         # 检查是否已有front matter
         if raw_content.startswith('---'):
-            print("⚠️ 检测到已存在front matter，将保留现有格式")
+            print("⚠️ 检测到已存在front matter，检查header字段完整性")
+            
+            # 解析现有的front matter
+            try:
+                # 分离front matter和内容
+                parts = raw_content.split('---', 2)
+                if len(parts) >= 3:
+                    yaml_content = parts[1]
+                    body_content = parts[2].strip()
+                    
+                    import yaml
+                    front_matter = yaml.safe_load(yaml_content)
+                    
+                    # 检查并修复header字段
+                    header_updated = self.fix_header_field(front_matter, body_content)
+                    
+                    if header_updated:
+                        # 重新生成文件
+                        yaml_content = yaml.dump(front_matter, default_flow_style=False, 
+                                               allow_unicode=True, sort_keys=False)
+                        updated_content = f"---\n{yaml_content}---\n{body_content}"
+                        
+                        with open(input_file, 'w', encoding='utf-8') as f:
+                            f.write(updated_content)
+                        
+                        print("🔧 已修复header字段")
+                    else:
+                        print("✅ header字段已完整")
+                        
+            except Exception as e:
+                print(f"⚠️ 解析front matter失败: {e}")
+                
             print(f"✅ 格式化完成: {input_file}")
             return input_file
         

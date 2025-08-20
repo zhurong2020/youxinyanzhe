@@ -3,23 +3,21 @@ categories:
 - 技术赋能
 - 认知升级
 date: '2025-08-14'
-excerpt: 探索特斯拉投资生态系统：从直接持股到产业链布局，掌握多元化美股投资策略，开启财富自由之路
-header:
-  teaser: /assets/images/default-teaser.jpg
-tags:
-- 美股投资
-- 特斯拉
-- TSLA
-- 投资理财
-- 财富自由
-- 科技股
-- 新能源汽车
-- ETF投资
-- 投资策略
-- 量化分析
 title: 投资马斯克帝国：特斯拉概念股投资全景图——从单一股票到产业生态的财富布局策略
+tags:
+- 美国市场
+- 知识管理
+- 学习方法
+- 全球化
+- 软件推荐
+- 国际视野
+excerpt: 在全球科技投资的浪潮中，特斯拉已超越了电动汽车制造商的单一身份，成为一个融合新能源、人工智能与自动驾驶等前沿领域的科技巨擘。
+header:
+  overlay_color: '#333'
+  overlay_filter: 0.5
+  overlay_image: ../temp/drafting/images/fiveinvestmentpathways.png
+  teaser: ../temp/drafting/images/fiveinvestmentpathways.png
 ---
-
 在全球科技投资的浪潮中，特斯拉已超越了电动汽车制造商的单一身份，成为一个融合新能源、人工智能与自动驾驶等前沿领域的科技巨擘。
 
 <!-- more -->
