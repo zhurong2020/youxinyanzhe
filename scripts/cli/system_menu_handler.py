@@ -770,7 +770,73 @@ echo "💡 可运行 'env | grep ANTHROPIC' 查看配置"
     def _system_status_check(self) -> Optional[str]:
         """系统状态检查 (原功能7)"""
         print("\n🔍 系统状态检查")
-        print("(功能开发中...)")
+        
+        try:
+            import subprocess
+            import sys
+            from pathlib import Path
+            
+            print("🔍 正在检查系统状态...")
+            
+            # 检查WeChat发布系统状态
+            print("\n📱 微信发布系统状态:")
+            result = subprocess.run([
+                sys.executable, "scripts/tools/wechat_system_verify.py"
+            ], capture_output=True, text=True, timeout=30)
+            
+            if result.stdout:
+                print(result.stdout)
+            if result.stderr:
+                print(f"错误信息: {result.stderr}")
+            
+            # 检查核心目录状态
+            print("\n📁 核心目录状态:")
+            important_dirs = [
+                Path("_posts"),
+                Path("_drafts"), 
+                Path("config"),
+                Path("scripts"),
+                Path("assets"),
+                Path("_data")
+            ]
+            
+            for dir_path in important_dirs:
+                status = "✅ 存在" if dir_path.exists() else "❌ 缺失"
+                print(f"  {dir_path}: {status}")
+            
+            # 检查关键配置文件
+            print("\n⚙️ 关键配置文件:")
+            config_files = [
+                Path("config/onedrive_config.json"),
+                Path("config/youtube_oauth_credentials.json"),
+                Path("_config.yml"),
+                Path(".env")
+            ]
+            
+            for config_file in config_files:
+                status = "✅ 存在" if config_file.exists() else "❌ 缺失"
+                print(f"  {config_file.name}: {status}")
+            
+            # 检查虚拟环境
+            print("\n🐍 Python环境:")
+            import sys
+            print(f"  Python版本: {sys.version}")
+            virtual_env = os.environ.get('VIRTUAL_ENV')
+            if virtual_env:
+                print(f"  虚拟环境: ✅ {virtual_env}")
+            else:
+                print("  虚拟环境: ❌ 未激活")
+            
+            print("✅ 系统状态检查完成")
+            return "系统状态检查完成"
+            
+        except subprocess.TimeoutExpired:
+            print("⏰ 系统检查超时")
+            return None
+        except Exception as e:
+            print(f"❌ 系统检查出错: {e}")
+            return None
+        
         self.pause_for_user()
         return None
     
@@ -781,9 +847,93 @@ echo "💡 可运行 'env | grep ANTHROPIC' 查看配置"
     def _debug_maintenance(self) -> Optional[str]:
         """调试和维护 (原功能11)"""
         print("\n🔧 调试和维护")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        print("🛠️ 系统调试和问题诊断工具")
+        
+        try:
+            while True:
+                print("\n🔧 调试和维护选项:")
+                print("1. OAuth授权问题诊断")
+                print("2. 检查GitHub令牌状态")
+                print("3. 路径计算问题修复")
+                print("4. 功能回归测试")
+                print("5. 导入路径修复")
+                print("0. 返回上级菜单")
+                
+                choice = input("\n请选择操作 (1-5/0): ").strip()
+                
+                if choice == "1":
+                    print("\n🔍 OAuth授权问题诊断...")
+                    import subprocess
+                    import sys
+                    
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/oauth/oauth_debug.py"
+                    ], check=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ OAuth诊断完成")
+                    else:
+                        print("❌ OAuth诊断发现问题")
+                
+                elif choice == "2":
+                    print("\n🔑 检查GitHub令牌状态...")
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/checks/check_github_token.py"
+                    ], check=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ GitHub令牌检查完成")
+                    else:
+                        print("❌ GitHub令牌检查发现问题")
+                
+                elif choice == "3":
+                    print("\n📐 路径计算问题修复...")
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/checks/fix_path_calculations.py"
+                    ], check=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ 路径计算修复完成")
+                    else:
+                        print("❌ 路径计算修复失败")
+                
+                elif choice == "4":
+                    print("\n🧪 功能回归测试...")
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/testing/function_regression_test.py"
+                    ], check=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ 功能回归测试完成")
+                    else:
+                        print("❌ 功能回归测试发现问题")
+                
+                elif choice == "5":
+                    print("\n🔧 导入路径修复...")
+                    result = subprocess.run([
+                        sys.executable, "scripts/tools/checks/fix_import_paths.py"
+                    ], check=False)
+                    
+                    if result.returncode == 0:
+                        print("✅ 导入路径修复完成")
+                    else:
+                        print("❌ 导入路径修复失败")
+                
+                elif choice == "0":
+                    break
+                
+                else:
+                    print("❌ 无效选择")
+                
+                if choice != "0":
+                    input("\n按回车键继续...")
+            
+            return "调试和维护完成"
+            
+        except Exception as e:
+            print(f"❌ 调试和维护出错: {e}")
+            self.pause_for_user()
+            return None
     
     def _config_management(self) -> Optional[str]:
         """配置管理"""
