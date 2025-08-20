@@ -177,7 +177,7 @@ class FunctionStatusDetector:
                 elif in_method:
                     if line.strip() == "":
                         method_lines.append(line)
-                    elif len(line) - len(line.lstrip()) <= indent_level and line.strip():
+                    elif len(line) - len(line.lstrip()) <= indent_level and line.strip(): # type: ignore
                         # 遇到同级或更高级的代码，方法结束
                         break
                     else:
