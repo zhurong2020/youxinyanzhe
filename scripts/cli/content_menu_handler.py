@@ -365,8 +365,12 @@ class ContentMenuHandler(BaseMenuHandler):
             drafts_pattern = "_drafts/**/*.md"
             all_draft_files = glob.glob(drafts_pattern, recursive=True)
             
-            # 过滤掉archived目录下的文件
-            potential_files = [f for f in all_draft_files if '/archived/' not in f and '\\archived\\' not in f]
+            # 过滤掉archived、vip4-preparation等子目录下的文件
+            excluded_dirs = ['/archived/', '\\archived\\', '/vip4-preparation/', '\\vip4-preparation\\']
+            potential_files = []
+            for f in all_draft_files:
+                if not any(excluded_dir in f for excluded_dir in excluded_dirs):
+                    potential_files.append(f)
             
             if potential_files:
                 print(f"\n📄 发现 {len(potential_files)} 个可能的草稿文件：")

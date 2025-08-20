@@ -212,18 +212,23 @@ class AutoHeaderImageProcessor:
         # 如果是临时目录的图片，保持原路径，等待后续OneDrive处理
         img_path = first_image['path']
         
-        # 如果不是临时目录，使用Jekyll baseurl格式
-        if not img_path.startswith('temp/drafting/'):
-            if not img_path.startswith('{{ site.baseurl }}'):
-                img_path = f"{{{{ site.baseurl }}}}/{img_path.lstrip('/')}"
+        # 如果是OneDrive链接，直接使用
+        if '1drv.ms' in img_path or 'sharepoint.com' in img_path:
+            header_image = img_path
+        elif img_path.startswith('temp/drafting/'):
+            # 临时目录的图片，使用默认OneDrive链接（后续会被OneDrive处理替换）
+            header_image = "https://1drv.ms/i/c/5644dab129afda10/IQTq4kEOrERvRLHS_4L9uCK_ARjvU4zbducjMUCRTRR8Pdk"
+        else:
+            # 其他本地图片，也使用OneDrive链接
+            header_image = "https://1drv.ms/i/c/5644dab129afda10/IQTq4kEOrERvRLHS_4L9uCK_ARjvU4zbducjMUCRTRR8Pdk"
         
-        # 更新header设置
-        updated_fm['header']['overlay_image'] = img_path
-        updated_fm['header']['teaser'] = img_path
-        
-        # 确保overlay_filter存在
-        if 'overlay_filter' not in updated_fm['header']:
-            updated_fm['header']['overlay_filter'] = 0.5
+        # 更新header设置为新格式
+        updated_fm['header'] = {
+            'overlay_color': '#333',
+            'overlay_filter': 0.5,
+            'overlay_image': header_image,
+            'teaser': header_image
+        }
         
         return updated_fm
     
@@ -233,9 +238,10 @@ class AutoHeaderImageProcessor:
         new_header = new_fm.get('header', {})
         
         print("📋 计划更改:")
+        print(f"   overlay_color: {old_header.get('overlay_color', '(未设置)')} → {new_header.get('overlay_color')}")
+        print(f"   overlay_filter: {old_header.get('overlay_filter', '(未设置)')} → {new_header.get('overlay_filter')}")
         print(f"   overlay_image: {old_header.get('overlay_image', '(未设置)')} → {new_header.get('overlay_image')}")
         print(f"   teaser: {old_header.get('teaser', '(未设置)')} → {new_header.get('teaser')}")
-        print(f"   overlay_filter: {old_header.get('overlay_filter', '(未设置)')} → {new_header.get('overlay_filter')}")
     
     def _get_changes_summary(self, old_fm: Dict, new_fm: Dict) -> Dict:
         """获取更改摘要"""
