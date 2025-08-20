@@ -703,8 +703,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
             # 执行格式化
             result = formatter.process_draft(
                 input_file=selected_file,
-                output_file=output_file,
-                preview=False
+                output_file=output_file
             )
             
             if result:
@@ -901,8 +900,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
                 try:
                     if mode == 4:  # 预览模式
                         result = formatter.process_draft(
-                            input_file=draft_file,
-                            preview=True
+                            input_file=draft_file
                         )
                         if result:
                             print(f"  ✅ 预览完成 - 分类: {result.get('category', 'unknown')}")
@@ -934,8 +932,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
                         
                         result = formatter.process_draft(
                             input_file=draft_file,
-                            output_file=output_file,
-                            preview=False
+                            output_file=output_file
                         )
                         
                         if result:
