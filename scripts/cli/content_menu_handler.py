@@ -993,7 +993,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
         
         return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "1")
     
-    def _publish_new_draft(self) -> Optional[str]:
+    def _publish_new_draft(self) -> Optional[Path]:
         """发布新草稿"""
         self.log_action("智能发布：开始发布新草稿")
         draft = self.pipeline.select_draft()
@@ -1014,7 +1014,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
                 return None
             else:
                 return None
-        return str(draft)
+        return draft
     
     def _republish_article(self) -> Optional[str]:
         """重新发布已发布文章"""
