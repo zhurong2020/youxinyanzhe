@@ -1692,16 +1692,158 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
     def _update_article_direct(self) -> Optional[str]:
         """直接编辑模式更新文章"""
         print("\n✏️ 直接编辑模式")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        print("📝 调用系统编辑器直接编辑已发布的文章")
+        
+        try:
+            # 列出已发布的文章
+            from pathlib import Path
+            posts_dir = Path("_posts")
+            
+            if not posts_dir.exists():
+                print("❌ _posts目录不存在")
+                self.pause_for_user()
+                return None
+            
+            post_files = list(posts_dir.glob("*.md"))
+            if not post_files:
+                print("❌ 没有找到已发布的文章")
+                self.pause_for_user()
+                return None
+            
+            # 按修改时间排序，显示最新的文章
+            post_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+            
+            print(f"\n📄 找到 {len(post_files)} 篇已发布文章:")
+            for i, post in enumerate(post_files[:20], 1):  # 显示最新20篇
+                print(f"  {i}. {post.stem}")
+            
+            if len(post_files) > 20:
+                print(f"  ... 和其他 {len(post_files) - 20} 篇文章")
+            
+            print("  0. 手动输入文章名称")
+            
+            choice = input(f"\n请选择文章 (1-{min(len(post_files), 20)}/0): ").strip()
+            
+            if choice == "0":
+                post_name = input("请输入文章名称（不含.md扩展名）: ").strip()
+                if not post_name:
+                    print("❌ 文章名称不能为空")
+                    self.pause_for_user()
+                    return None
+            elif choice.isdigit() and 1 <= int(choice) <= min(len(post_files), 20):
+                post_name = post_files[int(choice) - 1].stem
+            else:
+                print("❌ 无效选择")
+                self.pause_for_user()
+                return None
+            
+            # 获取提交信息
+            commit_message = input("\n请输入更新说明 (默认: Update post): ").strip()
+            if not commit_message:
+                commit_message = "Update post"
+            
+            print(f"\n🔄 正在使用直接编辑模式更新文章: {post_name}")
+            
+            # 调用update_post.py工具
+            import subprocess
+            import sys
+            
+            result = subprocess.run([
+                sys.executable, "scripts/update_post.py",
+                post_name,
+                "--mode", "direct",
+                "--message", commit_message
+            ], check=False)
+            
+            if result.returncode == 0:
+                print("✅ 文章更新完成")
+                return f"文章 {post_name} 更新完成"
+            else:
+                print("❌ 文章更新失败")
+                return None
+                
+        except Exception as e:
+            print(f"❌ 直接编辑模式出错: {e}")
+            self.pause_for_user()
+            return None
     
     def _update_article_pipeline(self) -> Optional[str]:
         """流水线处理模式更新文章"""
         print("\n🔄 流水线处理模式")
-        print("(功能开发中...)")
-        self.pause_for_user()
-        return None
+        print("📝 将已发布文章恢复到草稿目录，使用完整处理流程更新")
+        
+        try:
+            # 列出已发布的文章
+            from pathlib import Path
+            posts_dir = Path("_posts")
+            
+            if not posts_dir.exists():
+                print("❌ _posts目录不存在")
+                self.pause_for_user()
+                return None
+            
+            post_files = list(posts_dir.glob("*.md"))
+            if not post_files:
+                print("❌ 没有找到已发布的文章")
+                self.pause_for_user()
+                return None
+            
+            # 按修改时间排序，显示最新的文章
+            post_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+            
+            print(f"\n📄 找到 {len(post_files)} 篇已发布文章:")
+            for i, post in enumerate(post_files[:15], 1):  # 显示最新15篇
+                print(f"  {i}. {post.stem}")
+            
+            if len(post_files) > 15:
+                print(f"  ... 和其他 {len(post_files) - 15} 篇文章")
+            
+            print("  0. 手动输入文章名称")
+            
+            choice = input(f"\n请选择文章 (1-{min(len(post_files), 15)}/0): ").strip()
+            
+            if choice == "0":
+                post_name = input("请输入文章名称（不含.md扩展名）: ").strip()
+                if not post_name:
+                    print("❌ 文章名称不能为空")
+                    self.pause_for_user()
+                    return None
+            elif choice.isdigit() and 1 <= int(choice) <= min(len(post_files), 15):
+                post_name = post_files[int(choice) - 1].stem
+            else:
+                print("❌ 无效选择")
+                self.pause_for_user()
+                return None
+            
+            print(f"\n🔄 正在使用流水线模式更新文章: {post_name}")
+            print("📋 流程说明:")
+            print("   1. 将文章复制到_drafts目录")
+            print("   2. 您可以编辑草稿文件") 
+            print("   3. 使用'2. 内容规范化处理'处理草稿")
+            print("   4. 使用'1. 智能内容发布'重新发布")
+            
+            # 调用update_post.py工具
+            import subprocess
+            import sys
+            
+            result = subprocess.run([
+                sys.executable, "scripts/update_post.py",
+                post_name,
+                "--mode", "pipeline"
+            ], check=False)
+            
+            if result.returncode == 0:
+                print("✅ 文章已恢复到草稿目录")
+                print("💡 下一步: 编辑_drafts中的文件，然后使用内容规范化处理和发布功能")
+                return f"文章 {post_name} 已恢复到草稿"
+            else:
+                print("❌ 流水线模式启动失败")
+                return None
+                
+        except Exception as e:
+            print(f"❌ 流水线处理模式出错: {e}")
+            self.pause_for_user()
+            return None
     
     def _modify_article_tier(self) -> Optional[str]:
         """修改文章会员等级"""
