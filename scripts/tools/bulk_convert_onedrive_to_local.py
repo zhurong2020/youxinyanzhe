@@ -10,7 +10,7 @@ import re
 import sys
 import json
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 
 def load_onedrive_index() -> Dict:
@@ -37,7 +37,7 @@ def find_onedrive_links(content: str) -> List[str]:
     return list(set(all_links))  # 去重
 
 
-def find_local_path_for_onedrive_link(onedrive_link: str, onedrive_index: Dict, article_file: str) -> str:
+def find_local_path_for_onedrive_link(onedrive_link: str, onedrive_index: Dict, article_file: str) -> Optional[str]:
     """根据OneDrive链接查找对应的本地路径"""
     article_name = Path(article_file).stem
     
@@ -93,9 +93,9 @@ def find_local_path_for_onedrive_link(onedrive_link: str, onedrive_index: Dict, 
 
 def convert_article_links(file_path: str, dry_run: bool = False) -> bool:
     """转换文章中的OneDrive链接回本地路径"""
-    file_path = Path(file_path)
+    file_path_obj = Path(file_path)
     
-    if not file_path.exists():
+    if not file_path_obj.exists():
         print(f"❌ 文件不存在: {file_path}")
         return False
     

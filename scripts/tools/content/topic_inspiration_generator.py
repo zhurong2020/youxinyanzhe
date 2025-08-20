@@ -2063,7 +2063,7 @@ toc_sticky: true
             # 使用Gemini生成详细规划
             if self.gemini_client:
                 try:
-                    model = genai.GenerativeModel('gemini-1.5-flash')
+                    model = genai.GenerativeModel('gemini-1.5-flash')  # type: ignore
                     response = model.generate_content(plan_prompt)
                     return response.text
                 except Exception as e:
