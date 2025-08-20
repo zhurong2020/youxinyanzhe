@@ -3,6 +3,7 @@
 统一管理所有菜单功能的路由和委托
 """
 from typing import Optional
+from pathlib import Path
 from scripts.core.content_pipeline import ContentPipeline
 
 
@@ -34,7 +35,7 @@ class MenuRouter:
         self._handlers['vip'] = VIPMenuHandler(self.pipeline)
         self._handlers['system'] = SystemMenuHandler(self.pipeline)
     
-    def route_smart_publishing(self) -> Optional[str]:
+    def route_smart_publishing(self) -> Optional[Path]:
         """路由智能内容发布功能"""
         handler = self._handlers['content']
         handler.push_menu_path("1", "智能内容发布")
