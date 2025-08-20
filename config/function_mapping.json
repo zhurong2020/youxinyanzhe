@@ -90,34 +90,40 @@
           },
           "scan_audio_files": {
             "display_name": "音频文件扫描",
-            "menu_method": "youtube_video_generator.handle_scan_audio",
+            "menu_path": "scripts/cli/youtube_menu_handler.py",
+            "menu_method": "_upload_podcast_video",
+            "sub_function": "handle_scan_audio",
             "core_implementation": "scripts/tools/youtube/youtube_video_generator.py:YouTubeVideoGenerator.scan_audio_files",
             "dependencies": ["pathlib", "os"],
             "status": "active",
             "test_command": "from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator; gen = YouTubeVideoGenerator(); gen.scan_audio_files()",
-            "last_verified": "2025-08-19",
-            "integration_commit": "1a08092"
+            "last_verified": "2025-08-20",
+            "integration_commit": "e8c1a16"
           },
           "batch_video_generation": {
             "display_name": "批量视频生成",
-            "menu_method": "youtube_video_generator.handle_batch_generation",
+            "menu_path": "scripts/cli/youtube_menu_handler.py",
+            "menu_method": "_upload_podcast_video",
+            "sub_function": "handle_batch_generation",
             "core_implementation": "scripts/tools/youtube/youtube_video_generator.py:YouTubeVideoGenerator.generate_video_for_file",
             "dependencies": ["subprocess", "ffmpeg"],
             "status": "active",
             "test_command": "from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator; gen = YouTubeVideoGenerator()",
-            "last_verified": "2025-08-19",
-            "integration_commit": "1a08092"
+            "last_verified": "2025-08-20",
+            "integration_commit": "e8c1a16"
           }
         }
       },
       "member_management": {
         "display_name": "内容变现管理",
-        "menu_path": "scripts/cli/vip_menu_handler.py",
-        "menu_class": "VIPMenuHandler",
+        "menu_path": "scripts/cli/content_menu_handler.py",
+        "menu_class": "ContentMenuHandler",
         "functions": {
           "generate_access_code": {
             "display_name": "生成访问码",
+            "menu_path": "scripts/cli/content_menu_handler.py",
             "menu_method": "_generate_access_code",
+            "menu_line": 1454,
             "core_implementation": "scripts/member_management.py:MemberManager.generate_access_code",
             "dependencies": ["random", "string", "datetime"],
             "status": "active",
@@ -127,7 +133,9 @@
           },
           "validate_access_code": {
             "display_name": "验证访问码",
+            "menu_path": "scripts/cli/content_menu_handler.py",
             "menu_method": "_validate_access_code",
+            "menu_line": 1510,
             "core_implementation": "scripts/member_management.py:MemberManager.validate_access_code",
             "dependencies": ["datetime", "re"],
             "status": "active",
@@ -137,7 +145,9 @@
           },
           "member_statistics": {
             "display_name": "会员统计",
+            "menu_path": "scripts/cli/content_menu_handler.py",
             "menu_method": "_member_statistics",
+            "menu_line": 1545,
             "core_implementation": "scripts/member_management.py:MemberManager.get_stats",
             "dependencies": ["json", "pathlib"],
             "status": "active",
@@ -147,7 +157,9 @@
           },
           "process_registrations": {
             "display_name": "处理注册申请",
+            "menu_path": "scripts/cli/content_menu_handler.py",
             "menu_method": "_process_registrations",
+            "menu_line": 1583,
             "core_implementation": "scripts/member_management.py:MemberManager.batch_process_registrations",
             "dependencies": ["smtplib", "email"],
             "status": "active",
@@ -157,7 +169,9 @@
           },
           "export_member_data": {
             "display_name": "导出会员数据",
+            "menu_path": "scripts/cli/content_menu_handler.py",
             "menu_method": "_export_member_data",
+            "menu_line": 1633,
             "core_implementation": "scripts/member_management.py:MemberManager.export_registrations_csv",
             "dependencies": ["csv", "datetime"],
             "status": "active",
@@ -174,7 +188,9 @@
         "functions": {
           "tts_voice_test": {
             "display_name": "TTS语音测试",
+            "menu_path": "scripts/cli/system_menu_handler.py",
             "menu_method": "_tts_voice_test",
+            "menu_line": 498,
             "core_implementation": "scripts/tools/elevenlabs/elevenlabs_voice_tester.py:ElevenLabsVoiceTester",
             "dependencies": ["elevenlabs", "requests"],
             "status": "active",
@@ -184,7 +200,9 @@
           },
           "log_viewer": {
             "display_name": "日志查看",
+            "menu_path": "scripts/cli/system_menu_handler.py",
             "menu_method": "_log_viewer",
+            "menu_line": 945,
             "core_implementation": "scripts/cli/system_menu_handler.py:SystemMenuHandler._log_viewer",
             "dependencies": ["pathlib", "glob"],
             "status": "active",
