@@ -2646,7 +2646,9 @@ class ContentPipeline:
                 # 解析输出找到生成的文件路径
                 output_lines = process_result.stdout.split('\n')
                 for line in output_lines:
+                    # 兼容emoji前缀的格式化完成标记
                     if '格式化完成:' in line:
+                        # 分割并清理路径字符串，去除可能的emoji等前缀
                         output_file_str = line.split('格式化完成:')[-1].strip()
                         result['output_file'] = Path(output_file_str)
                         break

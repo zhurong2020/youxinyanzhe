@@ -356,15 +356,17 @@ class ContentMenuHandler(BaseMenuHandler):
     def _process_single_content_file(self) -> None:
         """处理单个内容文件"""
         try:
-            # 列出可能的草稿文件
+            # 仅列出_drafts目录下的文件，排除archived子目录
             import glob
             from pathlib import Path
             
             potential_files = []
-            for pattern in ["*.txt", "*.md"]:
-                potential_files.extend(glob.glob(pattern))
-                potential_files.extend(glob.glob(f"_drafts/**/{pattern}", recursive=True))
-                potential_files.extend(glob.glob(f"drafts/**/{pattern}", recursive=True))
+            # 只检查_drafts目录下的.md文件，排除archived子目录
+            drafts_pattern = "_drafts/**/*.md"
+            all_draft_files = glob.glob(drafts_pattern, recursive=True)
+            
+            # 过滤掉archived目录下的文件
+            potential_files = [f for f in all_draft_files if '/archived/' not in f and '\\archived\\' not in f]
             
             if potential_files:
                 print(f"\n📄 发现 {len(potential_files)} 个可能的草稿文件：")

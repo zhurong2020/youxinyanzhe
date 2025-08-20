@@ -629,6 +629,7 @@ class DraftFormatter:
         # 检查是否已有front matter
         if raw_content.startswith('---'):
             print("⚠️ 检测到已存在front matter，将保留现有格式")
+            print(f"✅ 格式化完成: {input_file}")
             return input_file
         
         # 提取标题（如果未指定）
