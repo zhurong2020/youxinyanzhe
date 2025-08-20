@@ -185,10 +185,21 @@ def main():
                 pipeline.log("用户未选择发布平台", level="info", force=True)
             continue  # 返回主菜单
         
+        # 询问是否启用内容变现功能
+        enable_monetization = pipeline.ask_monetization_preference()
+        pipeline.log(f"内容变现功能: {'启用' if enable_monetization else '跳过'}", level="info", force=True)
+        
+        # 选择会员分级
+        member_tier = pipeline.select_member_tier() if enable_monetization else None
+        if member_tier:
+            pipeline.log(f"会员分级: {member_tier}", level="info", force=True)
+        else:
+            pipeline.log("跳过会员分级设置", level="info", force=True)
+        
         # 执行发布流程
         pipeline.log(f"开始发布到平台: {', '.join(platforms)}", level="info", force=True)
         try:
-            result = pipeline.process_draft(draft, platforms)
+            result = pipeline.process_draft(draft, platforms, enable_monetization=enable_monetization, member_tier=member_tier)
             
             # 处理返回结果（兼容字典格式）
             if isinstance(result, dict):
