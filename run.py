@@ -188,7 +188,15 @@ def main():
         # 执行发布流程
         pipeline.log(f"开始发布到平台: {', '.join(platforms)}", level="info", force=True)
         try:
-            success = pipeline.run_publishing_flow(draft, platforms)
+            result = pipeline.process_draft(draft, platforms)
+            
+            # 处理返回结果（兼容字典格式）
+            if isinstance(result, dict):
+                success = result.get('success', False)
+            else:
+                # 兼容可能的布尔值返回
+                success = bool(result)
+                
             if success:
                 pipeline.log(f"✅ 发布成功完成: {draft.name}", level="info", force=True)
             else:
