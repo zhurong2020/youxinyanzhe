@@ -68,11 +68,33 @@ class ContentMenuHandler(BaseMenuHandler):
             except ValueError:
                 count = 5
             
+            # 选择AI引擎
+            print(f"\n🤖 请选择AI引擎:")
+            print("1. 🎯 自动选择 (推荐)")
+            print("2. 🔷 Gemini 2.5 Pro (Google AI)")
+            print("3. 🔹 Claude 3.5 Sonnet (Anthropic)")
+            
+            engine_choice = input("\n请选择引擎 (1-3, 默认1): ").strip() or "1"
+            
+            engine_map = {
+                "1": "auto",
+                "2": "gemini", 
+                "3": "claude"
+            }
+            
+            selected_engine = engine_map.get(engine_choice, "auto")
+            engine_names = {
+                "auto": "自动选择",
+                "gemini": "Gemini 2.5 Pro", 
+                "claude": "Claude 3.5 Sonnet"
+            }
+            
+            print(f"✅ 已选择引擎: {engine_names[selected_engine]}")
             print(f"\n🤖 正在生成 {count} 个主题...")
             
             # 导入AI生成器  
             from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator
-            generator = TopicInspirationGenerator("auto")
+            generator = TopicInspirationGenerator(selected_engine)
             
             # 生成主题
             result = generator.generate_topics(keywords, count)
@@ -170,11 +192,34 @@ class ContentMenuHandler(BaseMenuHandler):
             self.display_operation_cancelled()
             return None
         
+        # 选择AI引擎
+        print(f"\n🤖 请选择AI引擎:")
+        print("1. 🎯 自动选择 (推荐)")
+        print("2. 🔷 Gemini 2.5 Pro (Google AI)")
+        print("3. 🔹 Claude 3.5 Sonnet (Anthropic)")
+        
+        engine_choice = input("\n请选择引擎 (1-3, 默认1): ").strip() or "1"
+        
+        engine_map = {
+            "1": "auto",
+            "2": "gemini", 
+            "3": "claude"
+        }
+        
+        selected_engine = engine_map.get(engine_choice, "auto")
+        engine_names = {
+            "auto": "自动选择",
+            "gemini": "Gemini 2.5 Pro", 
+            "claude": "Claude 3.5 Sonnet"
+        }
+        
+        print(f"✅ 已选择引擎: {engine_names[selected_engine]}")
+        
         try:
             print(f"\n🤖 正在为 {len(keywords_list)} 个关键词组生成主题...")
             
             from scripts.tools.content.topic_inspiration_generator import TopicInspirationGenerator
-            generator = TopicInspirationGenerator("auto")
+            generator = TopicInspirationGenerator(selected_engine)
             
             all_results = []
             for i, keywords in enumerate(keywords_list, 1):
