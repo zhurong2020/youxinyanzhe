@@ -2083,11 +2083,9 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
         print("\n🔍 检查OneDrive连接状态")
         
         try:
-            import subprocess
-            import sys
-            
             # 检查OneDrive配置和认证状态
             from pathlib import Path
+            import json
             config_file = Path("config/onedrive_config.json")
             token_file = Path("config/onedrive_tokens.json")
             
@@ -2105,26 +2103,52 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
                 self.pause_for_user()
                 return "认证令牌不存在"
             
-            # 尝试调用工具进行简单测试
-            result = subprocess.run([
-                sys.executable, "scripts/tools/onedrive_blog_images.py", "--help"
-            ], capture_output=True, text=True, timeout=10)
-            
-            if result.returncode == 0:
-                print("✅ OneDrive连接正常")
-                if result.stdout:
-                    print("详细信息:")
-                    print(result.stdout)
-                result_msg = "OneDrive连接正常"
-            else:
-                print("❌ OneDrive连接异常")
-                if result.stderr:
-                    print(f"错误信息: {result.stderr}")
+            # 验证配置文件内容
+            try:
+                with open(config_file, 'r', encoding='utf-8') as f:
+                    config_data = json.load(f)
+                    
+                # 检查必要的配置项 (支持嵌套结构)
+                auth_config = config_data.get('auth', {})
+                required_keys = ['client_id', 'redirect_uri']
+                missing_keys = [key for key in required_keys if key not in auth_config]
+                
+                if missing_keys:
+                    print(f"❌ 配置文件缺少必要项: {', '.join(missing_keys)}")
+                    result_msg = None
+                elif auth_config.get('client_id') == 'YOUR_CLIENT_ID':
+                    print("⚠️ OneDrive配置使用默认模板值，需要配置实际的客户端信息")
+                    print("💡 请使用 '1. 初始化OneDrive认证' 配置您的应用信息")
+                    result_msg = None
+                else:
+                    print("✅ OneDrive连接配置正常")
+                    print(f"📋 客户端ID: {auth_config['client_id'][:8]}***")
+                    print(f"📋 重定向URI: {auth_config['redirect_uri']}")
+                    
+                    # 检查令牌文件的有效性
+                    try:
+                        with open(token_file, 'r', encoding='utf-8') as tf:
+                            token_data = json.load(tf)
+                            if 'access_token' in token_data:
+                                print("🔑 访问令牌已获取")
+                                # 可以添加令牌过期检查
+                                if 'expires_at' in token_data:
+                                    import time
+                                    if token_data['expires_at'] > time.time():
+                                        print("⏰ 令牌状态: 有效")
+                                    else:
+                                        print("⚠️ 令牌状态: 已过期，需要刷新")
+                                else:
+                                    print("⏰ 令牌状态: 未知")
+                            result_msg = "OneDrive连接正常"
+                    except (json.JSONDecodeError, KeyError) as e:
+                        print(f"❌ 令牌文件格式错误: {e}")
+                        result_msg = None
+                        
+            except (json.JSONDecodeError, FileNotFoundError) as e:
+                print(f"❌ 配置文件格式错误: {e}")
                 result_msg = None
                 
-        except subprocess.TimeoutExpired:
-            print("⏰ 连接检查超时，可能存在网络问题")
-            result_msg = None
         except Exception as e:
             print(f"❌ 检查过程出错: {e}")
             result_msg = None
