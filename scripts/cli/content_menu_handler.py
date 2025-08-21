@@ -2089,7 +2089,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
             # 检查OneDrive配置和认证状态
             from pathlib import Path
             config_file = Path("config/onedrive_config.json")
-            token_file = Path("config/onedrive_token.json")
+            token_file = Path("config/onedrive_tokens.json")
             
             print("📋 检查OneDrive配置状态:")
             print(f"   配置文件: {'✅ 存在' if config_file.exists() else '❌ 不存在'}")
@@ -2097,10 +2097,12 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
             
             if not config_file.exists():
                 print("\n💡 建议: 使用 '1. 初始化OneDrive认证' 来配置OneDrive")
+                self.pause_for_user()
                 return "配置文件不存在"
             
             if not token_file.exists():
                 print("\n💡 建议: 使用 '1. 初始化OneDrive认证' 来获取访问令牌")
+                self.pause_for_user()
                 return "认证令牌不存在"
             
             # 尝试调用工具进行简单测试
@@ -2113,22 +2115,22 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
                 if result.stdout:
                     print("详细信息:")
                     print(result.stdout)
-                return "OneDrive连接正常"
+                result_msg = "OneDrive连接正常"
             else:
                 print("❌ OneDrive连接异常")
                 if result.stderr:
                     print(f"错误信息: {result.stderr}")
-                return None
+                result_msg = None
                 
         except subprocess.TimeoutExpired:
             print("⏰ 连接检查超时，可能存在网络问题")
-            return None
+            result_msg = None
         except Exception as e:
             print(f"❌ 检查过程出错: {e}")
-            return None
+            result_msg = None
         
         self.pause_for_user()
-        return None
+        return result_msg
     
     def _view_image_statistics(self) -> Optional[str]:
         """查看图片处理统计"""
