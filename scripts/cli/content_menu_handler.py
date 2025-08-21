@@ -2117,9 +2117,33 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
                     print(f"❌ 配置文件缺少必要项: {', '.join(missing_keys)}")
                     result_msg = None
                 elif auth_config.get('client_id') == 'YOUR_CLIENT_ID':
-                    print("⚠️ OneDrive配置使用默认模板值，需要配置实际的客户端信息")
-                    print("💡 请使用 '1. 初始化OneDrive认证' 配置您的应用信息")
-                    result_msg = None
+                    # 检查是否已有有效令牌（可能通过其他方式获取）
+                    try:
+                        with open(token_file, 'r', encoding='utf-8') as tf:
+                            token_data = json.load(tf)
+                            if 'access_token' in token_data and token_data.get('access_token'):
+                                print("🔍 配置文件使用模板值，但检测到有效的访问令牌")
+                                
+                                # 检查令牌是否过期
+                                if 'expires_at' in token_data:
+                                    import time
+                                    if token_data['expires_at'] > time.time():
+                                        print("✅ OneDrive功能可用（令牌有效）")
+                                        result_msg = "OneDrive连接正常"
+                                    else:
+                                        print("⚠️ 访问令牌已过期，需要重新认证")
+                                        result_msg = None
+                                else:
+                                    print("✅ OneDrive功能可用（令牌状态未知）")
+                                    result_msg = "OneDrive连接正常"
+                            else:
+                                print("⚠️ OneDrive配置使用默认模板值，需要配置实际的客户端信息")
+                                print("💡 请使用 '1. 初始化OneDrive认证' 配置您的应用信息")
+                                result_msg = None
+                    except (json.JSONDecodeError, FileNotFoundError, KeyError):
+                        print("⚠️ OneDrive配置使用默认模板值，需要配置实际的客户端信息")
+                        print("💡 请使用 '1. 初始化OneDrive认证' 配置您的应用信息")
+                        result_msg = None
                 else:
                     print("✅ OneDrive连接配置正常")
                     print(f"📋 客户端ID: {auth_config['client_id'][:8]}***")
