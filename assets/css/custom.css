@@ -499,10 +499,13 @@ audio {
     transition: box-shadow 0.3s ease;
 }
 
-/* 确保文章段落中的图片保持一致的最大宽度 */
+/* 确保文章段落中的图片保持一致的最大宽度和高度 */
 .page__content p img {
     max-width: 800px; /* 统一最大显示宽度 */
+    max-height: 600px; /* 限制最大高度，避免过高图片 */
     width: 100%;
+    height: auto;
+    object-fit: contain; /* 保持比例，不裁剪图片 */
 }
 
 /* 图片悬停效果增强 */
@@ -514,7 +517,9 @@ audio {
 @media (max-width: 768px) {
     .page__content p img {
         max-width: 100%;
+        max-height: 400px; /* 移动端降低最大高度 */
         margin: 1em auto;
+        object-fit: contain;
     }
 }
 
