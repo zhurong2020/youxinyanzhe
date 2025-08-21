@@ -6,7 +6,7 @@
 
 from scripts.cli.base_menu_handler import BaseMenuHandler
 from scripts.core.content_pipeline import ContentPipeline
-from typing import Optional
+from typing import Optional, List, Union
 from pathlib import Path
 
 
@@ -50,7 +50,7 @@ class ContentMenuHandler(BaseMenuHandler):
         
         return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "3.1")
     
-    def _quick_topic_generation(self) -> Optional[str]:
+    def _quick_topic_generation(self) -> Optional[List[str]]:
         """快速主题生成"""
         self.display_menu_header("🎯 快速主题生成", "基于关键词快速生成内容主题")
         
@@ -1038,7 +1038,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
         
         return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "1")
     
-    def _publish_new_draft(self) -> Optional[Path]:
+    def _publish_new_draft(self) -> Optional[Union[Path, str]]:
         """发布新草稿"""
         self.log_action("智能发布：开始发布新草稿")
         draft = self.pipeline.select_draft()

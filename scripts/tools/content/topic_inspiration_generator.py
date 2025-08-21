@@ -2458,7 +2458,7 @@ toc_sticky: true
             domain_scores[domain] = score
         
         # 确定主要领域
-        primary_domain = max(domain_scores, key=domain_scores.get) if any(domain_scores.values()) else "tech-empowerment"
+        primary_domain = max(domain_scores.items(), key=lambda x: x[1])[0] if any(domain_scores.values()) else "tech-empowerment"
         
         return {
             "primary_domain": primary_domain,
