@@ -80,9 +80,6 @@ toc_sticky: true
 
 特斯拉的投资价值远不止于汽车制造。作为全球市值排名前列的企业，其股价波动不仅影响着整个新能源汽车板块，更辐射至锂电池、充电设施、自动驾驶技术等相关产业链。
 
-![TESILACHANYELIAN](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EZoTs-s8KZ9Jqx-xdnFhr8EBdeBIzxKzhqMRb_D0QomJKg)
-*概念示意图*
-
 **关键数据一览**：
 -   特斯拉在全球电动车市场的占有率在2024年约为10-11%（纯电动车市场约为17.6%），尽管面临竞争，其市场地位依然显著。
 -   其超级充电网络已覆盖全球超过50个国家。
