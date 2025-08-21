@@ -485,6 +485,40 @@ audio {
 }
 
 /* ================================
+   文章图片统一显示样式
+   ================================ */
+
+/* 基于Minimal Mistakes主题的文章图片统一处理 */
+.page__content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1.5em auto;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+/* 确保文章段落中的图片保持一致的最大宽度 */
+.page__content p img {
+    max-width: 800px; /* 统一最大显示宽度 */
+    width: 100%;
+}
+
+/* 图片悬停效果增强 */
+.page__content img:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* 确保图片在不同屏幕尺寸下的响应式表现 */
+@media (max-width: 768px) {
+    .page__content p img {
+        max-width: 100%;
+        margin: 1em auto;
+    }
+}
+
+/* ================================
    会员引流组件样式
    ================================ */
 
