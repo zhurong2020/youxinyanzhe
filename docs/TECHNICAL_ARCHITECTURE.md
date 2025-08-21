@@ -7,7 +7,10 @@
 ### 核心技术
 - **Jekyll**: 静态站点生成器，GitHub Pages自动部署
 - **Python 3.8+**: 后端脚本和自动化工具
-- **Google Gemini**: AI内容生成和优化
+- **Claude + Gemini AI协同**: 智能双引擎AI内容生成系统
+  - **Claude 3.5 Sonnet**: 深度分析、专业洞察、高复杂度任务
+  - **Google Gemini 2.5 Pro**: 快速生成、免费额度优先使用
+  - **智能切换**: 基于配额状态和任务复杂度的自动引擎选择
 - **ElevenLabs**: 高质量TTS语音合成
 - **YouTube API**: 视频管理和播客生成
 
@@ -123,6 +126,15 @@
 - **processors/ai_processor.py**: AI内容处理器，统一AI服务调用接口
 - **validators/*.py**: 模块化内容验证器，支持规则扩展和自定义验证
 - **managers/publish_manager.py**: 发布状态管理器，跨平台发布状态跟踪
+
+#### Claude+Gemini智能协同系统 (新增)
+- **topic_inspiration_generator.py**: 核心AI主题生成引擎
+  - **智能引擎选择**: `_auto_select_optimal_engine()` - 基于配额和复杂度自动选择最优引擎
+  - **配额监控**: `_check_gemini_quota_status()` - 实时检测API配额状态和429错误
+  - **复杂度评估**: `_assess_current_task_complexity()` - 多因子分析任务复杂度
+  - **Claude专业引擎**: `_generate_claude_enhanced_topics()` - 深度分析和专业洞察
+  - **成本优化策略**: 优先使用免费Gemini额度，额度用尽自动切换Claude
+- **协同优势**: Claude负责高复杂度任务，Gemini处理常规任务，实现成本效益最优化
 
 #### 用户界面层
 - **run.py**: 主入口脚本，重构后的9项精简菜单系统
