@@ -286,6 +286,19 @@ toc_sticky: true
       <p class="link-description">包含完整双重评级对比、估值深度分析、投资策略框架</p>
     </div>
   </div>
+  <div class="content-progress-tracker">
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 40%"></div>
+    </div>
+    <div class="progress-labels">
+      <span class="free-label">免费内容 40%</span>
+      <span class="member-label">VIP专享 60%</span>
+    </div>
+    <p class="upgrade-hint">
+      💎 VIP2月度会员解锁SA Premium专业分析、VIP3获取ARK投资策略、VIP4享受专业咨询服务
+    </p>
+  </div>
+  
   <div class="fade-overlay">
     <div class="upgrade-prompt">
       <span class="upgrade-text">🔓 解锁完整SA Premium分析和专业投资策略</span>
@@ -294,19 +307,6 @@ toc_sticky: true
       </button>
     </div>
   </div>
-</div>
-
-<div class="content-progress-tracker">
-  <div class="progress-bar">
-    <div class="progress-fill" style="width: 40%"></div>
-  </div>
-  <div class="progress-labels">
-    <span class="free-label">免费内容 40%</span>
-    <span class="member-label">VIP专享 60%</span>
-  </div>
-  <p class="upgrade-hint">
-    💎 VIP2月度会员解锁SA Premium专业分析、VIP3获取ARK投资策略、VIP4享受专业咨询服务
-  </p>
 </div>
 
 ### 期权投资简介：高级投资者的进阶工具

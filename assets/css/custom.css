@@ -530,15 +530,17 @@ audio {
 }
 
 .fade-overlay {
-  position: absolute;
+  position: relative;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 80px;
-  background: linear-gradient(to top, rgba(248,250,252,0.98) 0%, rgba(248,250,252,0.8) 50%, transparent 100%);
+  height: auto;
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 20px;
+  border-top: 1px solid #e2e8f0;
 }
 
 .upgrade-prompt {
