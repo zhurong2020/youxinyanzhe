@@ -576,6 +576,55 @@ Looking for recent factual reporting and industry updates from established sourc
         
         return prompt
 
+    def generate_topics(self, keywords: str, count: int = 5) -> List[str]:
+        """
+        基于关键词生成主题列表
+        
+        Args:
+            keywords: 输入关键词（逗号分隔）
+            count: 生成数量（1-20）
+            
+        Returns:
+            List[str]: 生成的主题列表
+        """
+        try:
+            # 清理和处理关键词
+            keyword_list = [kw.strip() for kw in keywords.split(',') if kw.strip()]
+            if not keyword_list:
+                if self.logger:
+                    self.logger.error("关键词不能为空")
+                else:
+                    print("❌ 关键词不能为空")
+                return []
+            
+            # 限制数量范围
+            count = max(1, min(count, 20))
+            
+            # 获取有效引擎模式
+            effective_engine = self._get_effective_engine_mode()
+            
+            if self.logger:
+                self.logger.info(f"🤖 使用 {effective_engine.upper()} 引擎生成主题")
+                self.logger.info(f"📝 关键词: {', '.join(keyword_list)}")
+                self.logger.info(f"🎯 目标数量: {count}")
+            else:
+                print(f"🤖 使用 {effective_engine.upper()} 引擎生成主题")
+                print(f"📝 关键词: {', '.join(keyword_list)}")
+                print(f"🎯 目标数量: {count}")
+            
+            # 根据引擎选择生成方法
+            if effective_engine == "claude":
+                return self._generate_topics_claude(keyword_list, count)
+            else:
+                return self._generate_topics_gemini(keyword_list, count)
+                
+        except Exception as e:
+            if self.logger:
+                self.logger.error(f"主题生成失败: {str(e)}")
+            else:
+                print(f"❌ 主题生成失败: {str(e)}")
+            return []
+    
     def get_topic_inspiration(self, topic: str, category: Optional[str] = None, days: int = 7) -> List[NewsResult]:
         """
         获取主题相关的权威英文资讯灵感
@@ -2155,6 +2204,134 @@ toc_sticky: true
 
 ---
 *此大纲为AI生成的基础框架，请根据实际需求调整内容结构和重点。*"""
+
+    def _generate_topics_claude(self, keyword_list: List[str], count: int) -> List[str]:
+        """使用Claude生成主题列表"""
+        try:
+            # 构建Claude提示词
+            keywords_str = "、".join(keyword_list)
+            prompt = f"""作为一个专业的内容策划师，请基于关键词「{keywords_str}」生成{count}个有价值的文章主题。
+
+要求：
+1. 主题应该具有实用价值和吸引力
+2. 每个主题都应该独特且有深度
+3. 适合博客或专业文章写作
+4. 主题长度控制在15-50字之间
+5. 涵盖不同角度和层次
+
+请直接返回主题列表，每行一个主题，不需要编号："""
+
+            # 这里应该调用Claude API，但由于当前没有Claude集成
+            # 暂时返回基于关键词的模拟结果
+            return self._generate_fallback_topics(keyword_list, count)
+            
+        except Exception as e:
+            if self.logger:
+                self.logger.error(f"Claude主题生成失败: {str(e)}")
+            else:
+                print(f"❌ Claude主题生成失败: {str(e)}")
+            return self._generate_fallback_topics(keyword_list, count)
+    
+    def _generate_topics_gemini(self, keyword_list: List[str], count: int) -> List[str]:
+        """使用Gemini生成主题列表"""
+        try:
+            if not self.gemini_client:
+                self._init_gemini_client()
+            
+            # 构建Gemini提示词
+            keywords_str = "、".join(keyword_list)
+            prompt = f"""作为一个专业的内容策划师，请基于关键词「{keywords_str}」生成{count}个有价值的文章主题。
+
+要求：
+1. 主题应该具有实用价值和吸引力
+2. 每个主题都应该独特且有深度  
+3. 适合博客或专业文章写作
+4. 主题长度控制在15-50字之间
+5. 涵盖不同角度和层次
+
+输出格式：
+请直接返回主题列表，每行一个主题，不需要编号或其他格式："""
+
+            # 调用Gemini API
+            response = self.gemini_client.generate_content(prompt)
+            
+            if response and response.text:
+                # 解析响应，提取主题列表
+                topics = self._parse_topic_response(response.text)
+                if len(topics) >= count:
+                    return topics[:count]
+                else:
+                    # 如果生成的主题不够，补充一些
+                    additional_topics = self._generate_fallback_topics(keyword_list, count - len(topics))
+                    return topics + additional_topics
+            else:
+                if self.logger:
+                    self.logger.warning("Gemini响应为空，使用后备方案")
+                else:
+                    print("⚠️ Gemini响应为空，使用后备方案")
+                return self._generate_fallback_topics(keyword_list, count)
+                
+        except Exception as e:
+            if self.logger:
+                self.logger.error(f"Gemini主题生成失败: {str(e)}")
+            else:
+                print(f"❌ Gemini主题生成失败: {str(e)}")
+            return self._generate_fallback_topics(keyword_list, count)
+    
+    def _parse_topic_response(self, response_text: str) -> List[str]:
+        """解析AI响应，提取主题列表"""
+        topics = []
+        lines = response_text.strip().split('\n')
+        
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+                
+            # 移除可能的编号或格式符号
+            line = re.sub(r'^\d+[\.\)]\s*', '', line)  # 移除 "1. " 或 "1) "
+            line = re.sub(r'^[•\-\*]\s*', '', line)    # 移除 "• " 或 "- " 或 "* "
+            line = re.sub(r'^【.*?】\s*', '', line)      # 移除 "【标题】"
+            
+            if line and len(line) >= 10:  # 确保主题有一定长度
+                topics.append(line)
+        
+        return topics
+    
+    def _generate_fallback_topics(self, keyword_list: List[str], count: int) -> List[str]:
+        """生成后备主题（当AI生成失败时使用）"""
+        keywords_str = "、".join(keyword_list[:3])  # 使用前3个关键词
+        
+        templates = [
+            f"深度解析：{keywords_str}的发展趋势与未来机遇",
+            f"实用指南：如何有效利用{keywords_str}提升效率",
+            f"专业视角：{keywords_str}在行业中的创新应用",
+            f"案例研究：{keywords_str}成功实践的关键要素",
+            f"全面评测：{keywords_str}的优势、挑战与解决方案",
+            f"前沿观察：{keywords_str}技术发展的最新动态",
+            f"策略思考：{keywords_str}的商业价值与市场前景",
+            f"深入探讨：{keywords_str}对传统模式的颠覆与重构",
+            f"实战经验：{keywords_str}应用中的常见问题与应对策略",
+            f"趋势预测：{keywords_str}在未来5年的发展路径"
+        ]
+        
+        # 根据关键词特点调整模板
+        if any(keyword in ['AI', '人工智能', '机器学习', '深度学习'] for keyword in keyword_list):
+            templates.extend([
+                f"AI革命：{keywords_str}如何改变我们的工作方式",
+                f"智能时代：{keywords_str}驱动的产业升级路径"
+            ])
+        
+        if any(keyword in ['医疗', '教学', '教育', '健康'] for keyword in keyword_list):
+            templates.extend([
+                f"医疗创新：{keywords_str}在临床实践中的突破性进展",
+                f"教育变革：{keywords_str}重塑传统教学模式的探索"
+            ])
+        
+        # 随机选择并返回指定数量的主题
+        import random
+        selected_topics = random.sample(templates, min(count, len(templates)))
+        return selected_topics
 
 def main():
     """主函数 - 供独立运行使用"""
