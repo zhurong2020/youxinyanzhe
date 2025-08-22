@@ -72,6 +72,9 @@ _data/processed_reward_requests.json
 # 归档目录
 _drafts/archived/
 
+# VIP素材准备目录（包含敏感商业资料，不应进入版本控制）
+_drafts/archived/vip-preparation/
+
 # 测试生成的文档
 _drafts/test-article-*.md
 _drafts/*auto-test*.md
@@ -147,8 +150,7 @@ config/azure_app_info.md
 # 会员系统安全文件
 .tmp/member_data/.security_key
 
-# 研究报告和PDF文档（版权保护，避免法律风险）
-assets/research-reports/
+# PDF文档（版权保护，避免法律风险）
 *.pdf
 !docs/*.pdf
 
