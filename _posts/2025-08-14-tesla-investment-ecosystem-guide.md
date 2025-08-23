@@ -385,6 +385,17 @@ toc_sticky: true
   <h4>🔥 VIP3专享：ARK Big Ideas 2025 Robotaxi革命解读</h4>
   <p><strong>🆕 2025年8月17日重磅更新</strong> - ARK Big Ideas 2025完整核心内容深度解读：</p>
   
+  <div class="time-validation-highlight">
+    <h6>⏰ 预测验证机会（2025年8月视角）</h6>
+    <p>ARK基于2024年底数据的前瞻预测，现在正好可以通过2025年实际进展验证：</p>
+    <ul>
+      <li>✅ <strong>Tesla Robotaxi进展</strong>：ARK预测2025年推出 → 实际奥斯汀试运行已开始</li>
+      <li>🔍 <strong>FSD技术突破</strong>：预测达到10,000-100,000英里/次干预 → 可对照当前表现</li>
+      <li>📊 <strong>监管环境</strong>：预测2025年为监管突破年 → 观察实际政策进展</li>
+      <li>💡 <strong>分析价值</strong>：通过"预测vs现实"评估ARK方法论可靠性</li>
+    </ul>
+  </div>
+  
   <div class="robotaxi-market-preview">
     <h5>🚗 $34万亿Robotaxi市场机会深度分析</h5>
     
@@ -499,7 +510,7 @@ toc_sticky: true
 
 | 🏛️ 机构 | 📊 评级 | 💰 目标价 | 🎯 核心观点 | 📅 更新时间 |
 |---------|--------|----------|------------|-----------|
-| **ARK Invest** | 🚀 强烈看好 | **$2,600** | Robotaxi革命性机会，88%价值来自无人驾驶 | 2025年8月 |
+| **ARK Invest** | 🚀 强烈看好 | **$2,600** | Robotaxi革命性机会，88%价值来自无人驾驶<br>📍*基于2024年底预测，现可验证* | 2025年8月 |
 | **Seeking Alpha** | ⚖️ Hold | - | 分析师分歧：49%看空 vs 25%看涨 | 2025年8月 |
 | **华尔街平均** | ⚖️ Hold | $350 | 相对乐观：40%看涨 vs 21%看空 | 2025年8月 |
 | **Argus Research** | ⚖️ HOLD | **$273** | 关注期权策略，风险相对可控 | 2025年8月 |
@@ -658,7 +669,7 @@ toc_sticky: true
 │   └── Community_Health_Metrics.py
 ├── 📦 Integrated_Resources_Package/
 │   ├── SA_Premium_Data_Localized.zip（无需VPN）
-│   ├── ARK_Analysis_Summary.pdf
+│   ├── ARK_Analysis_Summary_with_2025_Validation.pdf
 │   └── Tesla_Investment_Toolkit.xlsx
 │   ...</span>
 ├── 🎯 Consultation_Services/
@@ -711,7 +722,7 @@ toc_sticky: true
     <div class="benefits-highlight">
       <h6>🎁 VIP4年度会员专业权益（价值¥8,000+）</h6>
       <ul>
-        <li>🔄 ARK Big Ideas 2025核心内容深度解读（持续更新中）</li>
+        <li>🔄 ARK Big Ideas 2025核心内容深度解读（含2025年实际验证对比分析）</li>
         <li>📚 马斯克2025年关键访谈完整分析（50页深度解读）</li>
         <li>🔬 特斯拉开源生态投资分析框架（独家创新方法论）</li>
         <li>📊 SA Premium专业数据完整解读（40页精华报告）</li>
