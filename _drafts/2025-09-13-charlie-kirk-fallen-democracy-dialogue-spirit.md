@@ -1,11 +1,4 @@
 
----
-title: "英年早逝：Charlie Kirk与美国民主对话精神的陨落"
-date: 2025-09-13
-author: 有心人
-header:
-  teaser: /assets/images/default-header.jpg
----
 
 # 英年早逝：Charlie Kirk与美国民主对话精神的陨落
 **——纪念一位用生命捍卫理性对话的年轻才俊**

@@ -287,24 +287,18 @@ class DraftFormatter:
             # 没有图片时使用默认OneDrive链接
             header_image = "https://1drv.ms/i/c/5644dab129afda10/IQTq4kEOrERvRLHS_4L9uCK_ARjvU4zbducjMUCRTRR8Pdk"
         
-        # 构建front matter
+        # 构建front matter - 只包含必需字段
         front_matter = {
             "title": title,
             "date": datetime.now().strftime('%Y-%m-%d'),
-            "categories": [detected_category],
-            "tags": generated_tags,
-            "excerpt": excerpt,
             "header": {
-                "overlay_color": "#333",
-                "overlay_filter": 0.5,
-                "overlay_image": header_image,
-                "teaser": header_image
+                "teaser": header_image  # 只保留teaser，其他header字段在发布时自动添加
             }
         }
-        
-        # 添加默认配置
-        front_matter.update(self.default_config)
-        
+
+        # 注意：不添加默认配置，这些会在发布时自动处理
+        # 不添加categories、tags和excerpt，这些也会在发布时生成
+
         return front_matter
 
     def fix_header_field(self, front_matter: Dict[str, Any], body_content: str) -> bool:
@@ -863,15 +857,13 @@ class DraftFormatter:
         
         # 创建front matter
         front_matter = self.create_front_matter(title, raw_content, category, tags)
-        
-        # 创建结构化内容（摘要 + <!-- more --> + 背景介绍 + 主体内容）
-        structured_content = self.create_content_structure(raw_content, title)
-        
-        # 格式化内容
-        formatted_content = self.format_basic_structure(structured_content)
-        
-        # 添加页脚
-        final_content = self.add_footer(formatted_content, front_matter['categories'][0])
+
+        # 不再自动创建结构化内容，直接使用原始内容
+        # 只进行基础格式化（修复标点、段落等）
+        formatted_content = self.format_basic_structure(raw_content)
+
+        # 不自动添加页脚，让发布时处理
+        final_content = formatted_content
         
         # 生成YAML front matter - 使用yaml库来正确格式化
         import yaml
@@ -883,10 +875,8 @@ class DraftFormatter:
         
         # 确定输出文件路径
         if not output_file:
-            today = datetime.now().strftime('%Y-%m-%d')
-            safe_title = re.sub(r'[^\w\s-]', '', title).strip()
-            safe_title = re.sub(r'[-\s]+', '-', safe_title).lower()[:50]
-            output_file = self.drafts_dir / f"{today}-{safe_title}.md"
+            # 默认就地更新原文件
+            output_file = input_file
         
         # 确保输出目录存在
         output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -898,9 +888,6 @@ class DraftFormatter:
         print(f"✅ 格式化完成: {output_file}")
         print(f"📊 统计信息:")
         print(f"   标题: {title}")
-        print(f"   分类: {front_matter['categories'][0]}")
-        print(f"   标签: {', '.join(front_matter['tags'])}")
-        print(f"   摘要: {front_matter['excerpt']}")
         print(f"   内容长度: {len(final_content)} 字符")
         
         # 执行统一的内容质量检查

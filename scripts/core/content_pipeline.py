@@ -355,8 +355,7 @@ class ContentPipeline:
         for draft in all_drafts:
             if self._is_valid_draft(draft):
                 valid_drafts.append(draft)
-            else:
-                self.log(f"⚠️ 跳过无效草稿: {draft.name}", level="warning")
+            # 不在这里输出日志，在select_draft中统一显示
 
         return valid_drafts
     
@@ -853,10 +852,13 @@ class ContentPipeline:
             
         # 显示草稿列表
         if invalid_drafts:
-            print(f"\nWARNING - ⚠️ 跳过无效草稿: {invalid_drafts[0].name}")
-            if len(invalid_drafts) > 1:
-                for draft in invalid_drafts[1:]:
-                    print(f"                          {draft.name}")
+            invalid_names = [d.name for d in invalid_drafts]
+            if len(invalid_names) == 1:
+                print(f"\nWARNING - ⚠️ 草稿缺少Front Matter，需要先格式化: {invalid_names[0]}")
+            else:
+                print(f"\nWARNING - ⚠️ 以下草稿缺少Front Matter，需要先格式化:")
+                for name in invalid_names:
+                    print(f"  - {name}")
             print("")
 
         print("可用的草稿文件：")
@@ -2374,8 +2376,8 @@ class ContentPipeline:
 
             # 检查是否有 front matter
             if not content.startswith('---'):
-                # 没有Front Matter的文件不能直接发布，但应该显示在列表中
-                self.log(f"草稿缺少Front Matter，需要先格式化: {file_path.name}", level="warning")
+                # 没有Front Matter的文件不能直接发布
+                # 不在这里记录日志，避免重复提示
                 return False
 
             # 尝试解析 front matter
