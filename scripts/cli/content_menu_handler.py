@@ -450,7 +450,7 @@ class ContentMenuHandler(BaseMenuHandler):
             if result['success']:
                 print("✅ 格式化完成！")
                 print(f"📄 输出文件: {result['output_file']}")
-                
+
                 # 显示质量检查结果
                 if result.get('check_passed', False):
                     print("✅ 内容质量检查通过")
@@ -459,15 +459,20 @@ class ContentMenuHandler(BaseMenuHandler):
                         print("🔧 自动修复的问题:")
                         for fix in result['auto_fixes_applied']:
                             print(f"   • {fix}")
-                    
+
                     if result.get('manual_fixes_needed'):
-                        print("💡 需要手动处理的问题:")
+                        manual_count = len(result['manual_fixes_needed'])
+                        print(f"WARNING - ⚠️ 需要手动处理 {manual_count} 个问题")
                         for item in result['manual_fixes_needed']:
                             print(f"   • {item['issue']}")
-                
+
                 print("💡 您可以选择 '1. 智能内容发布' 来发布格式化后的文章")
+
+                # 等待用户确认以便查看结果
+                input("\n按Enter键继续...")
             else:
                 print(f"❌ 格式化失败: {result['error']}")
+                input("\n按Enter键继续...")
                 
         except Exception as e:
             print(f"❌ 操作失败: {e}")
