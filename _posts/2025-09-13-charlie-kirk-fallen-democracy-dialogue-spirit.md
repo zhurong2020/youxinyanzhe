@@ -243,7 +243,7 @@ toc_sticky: true
 **规律**：符合特定政治叙事的事件被无限放大，不符合的则被刻意无视。
 
 
-![皮尤研究中心政治新闻来源差异图](https://7fp1fj-my.sharepoint.com/:u:/g/personal/zhurong_7fp1fj_onmicrosoft_com/ERFKcgUmEa9Isumr2V2CvPMB7lZz_utBsKGJpj1V93c_XQ)
+![皮尤研究中心政治新闻来源差异图](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=ERFKcgUmEa9Isumr2V2CvPMB7lZz_utBsKGJpj1V93c_XQ)
 
 *皮尤研究中心：美国人的新闻来源因政治立场严重分化，形成平行的信息宇宙*
 
@@ -546,7 +546,7 @@ toc_sticky: true
 他的勇气，正在唤醒更多沉睡的良知。
 
 
-![查理·科克纪念现场](https://7fp1fj-my.sharepoint.com/:u:/g/personal/zhurong_7fp1fj_onmicrosoft_com/EQ_QCCKRRBpNuG8t1X1Z8u0BXbnp9OP60CItQ1G-vCC3xQ)
+![查理·科克纪念现场](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EQ_QCCKRRBpNuG8t1X1Z8u0BXbnp9OP60CItQ1G-vCC3xQ)
 
 *校园纪念现场，鲜花与照片寄托着人们的哀思*
 

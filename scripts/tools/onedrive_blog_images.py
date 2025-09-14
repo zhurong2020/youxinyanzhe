@@ -441,29 +441,39 @@ class OneDriveUploadManager:
     
     def convert_to_direct_download_link(self, share_url: str) -> str:
         """将SharePoint预览链接转换为直接下载链接
-        
-        将形如 https://domain/:i:/g/personal/user/TOKEN?e=hash 
+
+        将形如 https://domain/:i:/g/personal/user/TOKEN?e=hash （图片文件）
+        或 https://domain/:u:/g/personal/user/TOKEN?e=hash （其他文件如webp）
         转换为 https://domain/personal/user/_layouts/15/download.aspx?share=TOKEN
         """
         try:
-            if 'sharepoint.com' in share_url and ':i:' in share_url:
+            if 'sharepoint.com' in share_url and (':i:' in share_url or ':u:' in share_url):
                 # 解析SharePoint链接
                 # 格式: https://7fp1fj-my.sharepoint.com/:i:/g/personal/zhurong_7fp1fj_onmicrosoft_com/TOKEN?e=hash
-                parts = share_url.split('/:i:/g/personal/')
+                # 或: https://7fp1fj-my.sharepoint.com/:u:/g/personal/zhurong_7fp1fj_onmicrosoft_com/TOKEN?e=hash
+
+                # 尝试两种格式
+                if ':i:' in share_url:
+                    parts = share_url.split('/:i:/g/personal/')
+                elif ':u:' in share_url:
+                    parts = share_url.split('/:u:/g/personal/')
+                else:
+                    return share_url
+
                 if len(parts) == 2:
                     base_domain = parts[0]
                     user_and_token = parts[1].split('?')[0]  # 移除查询参数
-                    
+
                     # 分离用户路径和token
                     path_parts = user_and_token.split('/')
                     if len(path_parts) >= 2:
                         user_path = path_parts[0]
                         token = path_parts[1]
-                        
+
                         # 构建直接下载链接
                         download_url = f"{base_domain}/personal/{user_path}/_layouts/15/download.aspx?share={token}"
                         return download_url
-            
+
             # 如果无法转换，返回原链接
             return share_url
             
