@@ -693,10 +693,10 @@ toc_sticky: true
 
 - **Turning Point USA 官方频道（大量校园问答与活动片段）**
 
-  查看更多视频：[Turning Point USA YouTube频道](https://www.youtube.com/@TurningPointUSA)
+  查看更多视频：[Turning Point USA YouTube频道](https://www.youtube.com/@TurningPointUSA){:target="_blank"}
 
 - **“Prove Me Wrong” 合集/精选（检索入口）**
-  https://www.youtube.com/results?search_query=Charlie+Kirk+Prove+Me+Wrong
+  [YouTube检索入口](https://www.youtube.com/results?search_query=Charlie+Kirk+Prove+Me+Wrong){:target="_blank"}
 
 ### 他留给我们的遗产
 
@@ -733,7 +733,7 @@ toc_sticky: true
 
 
 ![查理·科克在演讲台上](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=ERfdYI387qJPrgZLjiea2vkBFBP2Oa1rDoN6-ZtsiqZ4WA)
-*查理·科克在演讲活动中激情演说*
+*查理·科克在演讲活动中*
 
 **查理·科克 (1994-2025)**
 **“永远为自由市场、第一原则和有限政府而辩护”**
@@ -746,8 +746,8 @@ toc_sticky: true
 
 **查理·科克案件**
 - 事件时间地点：2025年9月10日，犹他谷大学（Orem, Utah）¹
-- 白宫降半旗公告：[Presidential Actions - Honoring the Memory of Charlie Kirk](https://www.whitehouse.gov/presidential-actions/2025/09/honoring-the-memory-of-charlie-kirk/)²
-- Wikipedia词条更新：[Charlie Kirk - Wikipedia](https://en.wikipedia.org/wiki/Charlie_Kirk)；[Killing of Charlie Kirk - Wikipedia](https://en.wikipedia.org/wiki/Killing_of_Charlie_Kirk)³
+- 白宫降半旗公告：[Presidential Actions - Honoring the Memory of Charlie Kirk](https://www.whitehouse.gov/presidential-actions/2025/09/honoring-the-memory-of-charlie-kirk/){:target="_blank"}²
+- Wikipedia词条更新：[Charlie Kirk - Wikipedia](https://en.wikipedia.org/wiki/Charlie_Kirk){:target="_blank"}；[Killing of Charlie Kirk - Wikipedia](https://en.wikipedia.org/wiki/Killing_of_Charlie_Kirk){:target="_blank"}³
 - 嫌疑人与案件进展：
   - FBI/警方公布“相关人士”影像与悬赏（综合ABC News、UPI、纽约时报）⁴
   - AP：一名22岁犹他州男子被捕并以谋杀罪起诉（9月12日），当局称其对科克观点表示轻蔑，并向家人承认负责（案情发展中）⁵
@@ -764,61 +764,56 @@ toc_sticky: true
 - 法官特蕾莎·斯托克斯的裁决：2025年1月释放，据Newsweek报道¹¹
 
 **媒体与信任度相关数据**
-- 乔治·弗洛伊德相关新闻量：[Media bias in the coverage of George Floyd（Signal AI 19/06/2020）](https://signal-ai.com/insights/media-bias-in-the-coverage-of-george-floyd/)¹²
-- 新闻信任度：31%[Gallup 2024年10月调查](https://news.gallup.com/poll/651977/americans-trust-media-remains-trend-low.aspx)¹³
+- 乔治·弗洛伊德相关新闻量：[Media bias in the coverage of George Floyd（Signal AI 19/06/2020）](https://signal-ai.com/insights/media-bias-in-the-coverage-of-george-floyd/){:target="_blank"}¹²
+- 新闻信任度：31%[Gallup 2024年10月调查](https://news.gallup.com/poll/651977/americans-trust-media-remains-trend-low.aspx){:target="_blank"}¹³
 
 ![2024年盖洛普民调](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EQy9TZMKlqZJmR0mk13qzj8BGktv1mXei6zMXGqLYYRdtA)
 
 ### 官方文件与声明
 
 1.  **白宫官方公告（2025年9月10日）**
-    -   [Honoring the Memory of Charlie Kirk - Presidential Proclamation](https://www.whitehouse.gov/presidential-actions/2025/09/honoring-the-memory-of-charlie-kirk/)
+    -   [Honoring the Memory of Charlie Kirk - Presidential Proclamation](https://www.whitehouse.gov/presidential-actions/2025/09/honoring-the-memory-of-charlie-kirk/){:target="_blank"}
     -   总统令：全美降半旗至9月14日。
 
 2.  **案件进展与执法信息（2025年9月11–13日）**
-    -   ABC News：FBI公布“相关人士”影像并宣布悬赏（9/11）— https://abcnews.go.com/US/charlie-kirk-shooting-fbi-appeals-tips-manhunt-continues/story?id=125469211
-    -   UPI：警方发布嫌疑人照片并称找到步枪（9/11）— https://www.upi.com/Top_News/US/2025/09/11/kirk-police-find-rifle-release-photo/1891757606763
-    -   NYT（Live）：关于公布影像与追捕的滚动更新（9/11）— https://www.nytimes.com/live/2025/09/11/us/charlie-kirk-shooting-news
-    -   AP：FBI局长卡什·帕特尔将就侦办失误问题接受国会听证（9/13）— https://apnews.com/article/fbi-patel-russia-epstein-c3e70633befef64b60613709c9919b0c
+    -   [ABC News：Officials release video, plead for public's help in tracking down person of interest in Charlie Kirk shooting](https://abcnews.go.com/US/charlie-kirk-shooting-fbi-appeals-tips-manhunt-continues/story?id=125469211){:target="_blank"}
+    -   [UPI：Charlie Kirk slaying: Shooter still on the run as $100K reward offered for info](https://www.upi.com/Top_News/US/2025/09/11/kirk-police-find-rifle-release-photo/1891757606763){:target="_blank"}
+    -   [NYT：Investigators Share New Video in Hunt for Charlie Kirk's Killer](https://www.nytimes.com/live/2025/09/11/us/charlie-kirk-shooting-news){:target="_blank"}
+    -   [AP：Patel faces congressional hearings after missteps in Kirk assassination probe and turmoil at FBI](https://apnews.com/article/fbi-patel-russia-epstein-c3e70633befef64b60613709c9919b0c){:target="_blank"}
 
 3.  **犹他谷大学声明**
-    -   请直接访问犹他谷大学官网（UVU.edu）查看最新信息。
+    -   请直接访问[犹他谷大学官网](https://www.uvu.edu/){:target="_blank"}查看最新信息。
 
 ### 延伸阅读：信息素养与媒体批判
 
-**作者相关文章**
+**我博客中的相关文章**
 
-1.  **《2025年的世界：避免信息茧房，从审视新闻观点开始》**
-    -   [阅读全文](https://zhurong2020.github.io/post/2025-nian-de-shi-jie-geng-jing-cai-bi-mian-xin-xi-chong-fang-cong-shen-shi-xin-wen-guan-dian-kai-shi/)
+1.  [**《2025年的世界：避免信息茧房，从审视新闻观点开始》**](https://zhurong2020.github.io/post/2025-nian-de-shi-jie-geng-jing-cai-bi-mian-xin-xi-chong-fang-cong-shen-shi-xin-wen-guan-dian-kai-shi/){:target="_blank"}
     -   深入探讨信息茧房的形成机制与破解方法。
 
-2.  **《信息迷雾中的求真之路：以武汉大学图书馆事件为例的信息核实方法论》**
-    -   [阅读全文](https://zhurong2020.github.io/post/xin-xi-mi-wu-zhong-de-qiu-zhen-zhi-lu-yi-wu-han-da-xue-tu-shu-guan-shi-jian-wei-li-de-xin-xi-he-shi-fang-fa-lun/)
+2.  [**《信息迷雾中的求真之路：以武汉大学图书馆事件为例的信息核实方法论》**](https://zhurong2020.github.io/post/xin-xi-mi-wu-zhong-de-qiu-zhen-zhi-lu-yi-wu-han-da-xue-tu-shu-guan-shi-jian-wei-li-de-xin-xi-he-shi-fang-fa-lun/){:target="_blank"}
     -   实用的信息验证技巧与案例分析。
 
 ### 媒体偏见评估工具
 
-- **AllSides Media Bias Chart**：[https://www.allsides.com/media-bias/media-bias-chart](https://www.allsides.com/media-bias/media-bias-chart)
-- **Media Bias/Fact Check**：[https://mediabiasfactcheck.com](https://mediabiasfactcheck.com)
-- **Ground News**：[https://ground.news](https://ground.news)
+- **AllSides Media Bias Chart**：[https://www.allsides.com/media-bias/media-bias-chart](https://www.allsides.com/media-bias/media-bias-chart){:target="_blank"}
+- **Media Bias/Fact Check**：[https://mediabiasfactcheck.com](https://mediabiasfactcheck.com){:target="_blank"}
+- **Ground News**：[https://ground.news](https://ground.news){:target="_blank"}
 
 ### 学术研究与报告
 
-1.  **Pew Research Center (2025)**
-    -   "Which News Sources Republicans and Democrats Use and Trust"
-    -   [完整报告](https://www.pewresearch.org/journalism/2025/06/10/the-political-gap-in-americans-news-sources/)
+1.  **Pew Research Center (2025/07/10)**
+    -   [Which News Sources Republicans and Democrats Use and Trust](https://www.pewresearch.org/journalism/2025/06/10/the-political-gap-in-americans-news-sources/){:target="_blank"}
 
-2.  **Council on Criminal Justice (2025)**
-    -   "Crime Trends in U.S. Cities: Mid-Year 2025 Update"
-    -   [美国城市犯罪趋势](https://counciloncj.org/crime-trends-in-u-s-cities-mid-year-2025-update/#offense-dashboard)
+2.  **Council on Criminal Justice (2025/07)**
+    -   [Crime Trends in U.S. Cities: Mid-Year 2025 Update](https://counciloncj.org/crime-trends-in-u-s-cities-mid-year-2025-update/#offense-dashboard){:target="_blank"}
 
-3.  **Signal AI (2020-2025)**
-    -   "Media Bias in the Coverage of George Floyd"
-    -   [188万篇文章分析数据来源](https://signal-ai.com/insights/media-bias-in-the-coverage-of-george-floyd/)
+3.  **Signal AI (2020/06/19)**
+    -   [Media Bias in the Coverage of George Floyd](https://signal-ai.com/insights/media-bias-in-the-coverage-of-george-floyd/){:target="_blank"}
 
 ### 重要提醒
 
-- 所有链接访问时间为2025年9月11日。
+- 上述引用中最新链接访问时间为2025年9月13日。
 - 部分链接可能随时间推移而失效，建议使用网络时光机（Internet Archive）查看历史版本。
 - 对于敏感内容，建议多方交叉验证。
 - 保存重要页面截图作为证据。
@@ -835,7 +830,7 @@ toc_sticky: true
 
 ### 引用说明
 
-¹⁻¹⁴ 上标数字对应具体数据来源，可在上述列表中查找（部分为更新后的来源项）。
+¹⁻¹³ 上标数字对应具体数据来源，可在上述列表中查找。
 - 官方文件优先级最高。
 - 多家媒体交叉报道次之。
 - 社交媒体声明需谨慎对待。
@@ -884,7 +879,7 @@ R.I.P. Charlie Kirk (1994-2025)
 请在评论区理性表达、互相尊重，并尽量提供可供核验的来源。您的参与，将有助于让公共讨论更接近事实与公正。
 
 
-如果你觉得我的文章对你有帮助，可以[请我喝咖啡](https://www.buymeacoffee.com/zhurong052Q)
+如果你觉得我的文章对你有帮助，可以[请我喝咖啡](https://www.buymeacoffee.com/zhurong052Q){:target="_blank"}
 
 <a href="https://www.buymeacoffee.com/zhurong052Q" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
