@@ -13,7 +13,8 @@ from typing import Dict, List, Optional, Any
 import re
 
 # 添加项目根目录到 Python 路径
-project_root = Path(__file__).parent.parent.parent
+# format_draft.py在scripts/tools/content/，需要向上四级到达项目根目录
+project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 class DraftFormatter:
@@ -872,26 +873,13 @@ class DraftFormatter:
         # 添加页脚
         final_content = self.add_footer(formatted_content, front_matter['categories'][0])
         
-        # 生成YAML front matter
-        yaml_lines = ['---']
-        for key, value in front_matter.items():
-            if isinstance(value, str):
-                yaml_lines.append(f'{key}: "{value}"')
-            elif isinstance(value, bool):
-                yaml_lines.append(f'{key}: {str(value).lower()}')
-            elif isinstance(value, list):
-                yaml_lines.append(f'{key}: {json.dumps(value, ensure_ascii=False)}')
-            elif isinstance(value, dict):
-                yaml_lines.append(f'{key}:')
-                for sub_key, sub_value in value.items():
-                    yaml_lines.append(f'  {sub_key}: "{sub_value}"')
-            else:
-                yaml_lines.append(f'{key}: {value}')
-        yaml_lines.append('---')
-        yaml_lines.append('')
-        
+        # 生成YAML front matter - 使用yaml库来正确格式化
+        import yaml
+        yaml_content = yaml.dump(front_matter, default_flow_style=False,
+                                 allow_unicode=True, sort_keys=False)
+
         # 组合最终内容
-        full_content = '\n'.join(yaml_lines) + final_content
+        full_content = f"---\n{yaml_content}---\n\n{final_content}"
         
         # 确定输出文件路径
         if not output_file:
