@@ -116,8 +116,9 @@ def main():
             is_republish = True
             pipeline.log("检测到重新发布模式，跳过质量检查", level="info", force=True)
 
-        # 草稿预检机制 - 检查是否有需要预处理的问题（仅对新草稿）
+        # 确保draft是Path类型
         draft_path = Path(draft) if isinstance(draft, str) else draft
+        draft = draft_path  # 统一使用Path类型
         draft_issues = []
 
         if not is_republish:
@@ -174,10 +175,13 @@ def main():
                 pipeline.log("✅ 草稿质量检查通过", level="info", force=True)
         
         # 处理发布流程（在while循环内）
-        
-        # 确保draft是Path类型
+
+        # 再次确保draft是Path类型（防御性编程）
         if not isinstance(draft, Path):
             pipeline.log(f"错误：无效的草稿类型 {type(draft)}", level="error", force=True)
+            print(f"\n❌ 内部错误：草稿路径类型不正确")
+            import time
+            time.sleep(2)  # 暂停让用户看到错误信息
             continue
         
         # 选择发布平台

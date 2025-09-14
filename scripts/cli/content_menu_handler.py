@@ -1092,7 +1092,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
 
             # 返回草稿路径以便后续处理
             # 注意：这里返回特殊标记，让主流程知道这是重新发布
-            return f"republish:{draft}"
+            return f"republish:{str(draft)}"
 
         except Exception as e:
             print(f"\n❌ 重新发布功能出错: {e}")
