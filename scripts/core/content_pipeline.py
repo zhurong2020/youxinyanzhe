@@ -337,19 +337,27 @@ class ContentPipeline:
         else:
             self.log("⚠️ 未找到页脚模板配置", level="warning")
     
-    def list_drafts(self) -> List[Path]:
-        """列出所有草稿文件"""
+    def list_drafts(self, filter_valid: bool = True) -> List[Path]:
+        """列出所有草稿文件
+
+        Args:
+            filter_valid: 是否只返回有效的草稿（默认True，用于发布）
+        """
         drafts_dir = Path(self.config["paths"]["drafts"])
         all_drafts = list(drafts_dir.glob("*.md"))
-        
-        # 过滤出有效的草稿文件
+
+        if not filter_valid:
+            # 返回所有草稿（用于格式化等操作）
+            return all_drafts
+
+        # 过滤出有效的草稿文件（用于发布）
         valid_drafts = []
         for draft in all_drafts:
             if self._is_valid_draft(draft):
                 valid_drafts.append(draft)
             else:
                 self.log(f"⚠️ 跳过无效草稿: {draft.name}", level="warning")
-        
+
         return valid_drafts
     
     def analyze_draft_status(self, draft_path: Path) -> str:
@@ -478,7 +486,9 @@ class ContentPipeline:
                             issues.append("🔐 VIP文章标题建议包含等级标识 (如 VIP2专享、VIP3专享)")
                 
                 except Exception as e:
-                    issues.append(f"📋 Front Matter格式错误: {str(e)}")
+                    # 只报告一次Front Matter错误，避免重复
+                    if "while parsing" not in str(e):
+                        issues.append(f"📋 Front Matter格式错误: {str(e)}")
             
             # 3. 检查内容结构
             if '<!-- more -->' not in content:
@@ -572,14 +582,14 @@ class ContentPipeline:
     def _check_summary_lengths(self, content: str) -> List[str]:
         """检查excerpt字段和<!-- more -->前内容的长度规范"""
         issues = []
-        
+
         try:
             # 1. 检查excerpt字段长度
             if content.strip().startswith('---'):
                 import frontmatter
                 post = frontmatter.loads(content)
                 excerpt = post.metadata.get('excerpt', '')
-                
+
                 if not excerpt:
                     issues.append("📝 缺少excerpt字段，将使用Gemini自动生成")
                 else:
@@ -588,7 +598,7 @@ class ContentPipeline:
                         issues.append(f"📏 excerpt过短({excerpt_len}字符)，建议50字符左右")
                     elif excerpt_len > 70:
                         issues.append(f"📏 excerpt过长({excerpt_len}字符)，建议50字符左右")
-            
+
             # 2. 检查<!-- more -->前内容长度
             more_pos = content.find('<!-- more -->')
             if more_pos != -1:
@@ -596,15 +606,16 @@ class ContentPipeline:
                 if before_more:
                     clean_content = self._clean_content_for_length_check(before_more)
                     clean_length = len(clean_content.strip())
-                    
+
                     if clean_length < 40:
                         issues.append(f"📏 <!-- more -->前内容过短({clean_length}字符)，建议50字符左右")
                     elif clean_length > 70:
                         issues.append(f"📏 <!-- more -->前内容过长({clean_length}字符)，建议50字符左右")
-        
+
         except Exception as e:
-            self.log(f"检查摘要长度时出错: {str(e)}", level="error")
-        
+            # 静默处理，避免重复报错
+            pass
+
         return issues
     
     def _auto_generate_excerpt_if_missing(self, draft_path: Path, content: str) -> bool:
@@ -800,8 +811,14 @@ class ContentPipeline:
     
     def select_draft(self) -> Optional[Path] | str:
         """让用户选择要处理的草稿"""
-        drafts = self.list_drafts()
-        if not drafts:
+        # 获取所有草稿，包括无效的
+        all_drafts = self.list_drafts(filter_valid=False)
+        valid_drafts = self.list_drafts(filter_valid=True)
+
+        # 分离有效和无效草稿
+        invalid_drafts = [d for d in all_drafts if d not in valid_drafts]
+
+        if not valid_drafts and not invalid_drafts:
             print("📝 没有找到规范化草稿文件")
             print("\n🔍 快速创作建议：")
             print("   🎯 5. 主题灵感生成器 - AI生成文章主题和大纲")
@@ -834,11 +851,22 @@ class ContentPipeline:
                 else:
                     print("请输入 5、8、4、3 或 N")
             
-        print("\n可用的草稿文件：")
-        for i, draft in enumerate(drafts, 1):
-            # 检查草稿状态和问题
-            status_info = self.analyze_draft_status(draft)
-            print(f"{i}. {draft.name}{status_info}")
+        # 显示草稿列表
+        if invalid_drafts:
+            print(f"\nWARNING - ⚠️ 跳过无效草稿: {invalid_drafts[0].name}")
+            if len(invalid_drafts) > 1:
+                for draft in invalid_drafts[1:]:
+                    print(f"                          {draft.name}")
+            print("")
+
+        print("可用的草稿文件：")
+        if valid_drafts:
+            for i, draft in enumerate(valid_drafts, 1):
+                # 检查草稿状态和问题
+                status_info = self.analyze_draft_status(draft)
+                print(f"{i}. {draft.name}{status_info}")
+        else:
+            print("（没有有效的草稿文件）")
         print("0. 退出")
             
         while True:
@@ -846,8 +874,8 @@ class ContentPipeline:
                 choice = int(input("\n请选择要处理的草稿 (输入序号，0退出): "))
                 if choice == 0:
                     return None
-                if 1 <= choice <= len(drafts):
-                    selected_draft = drafts[choice-1]
+                if 1 <= choice <= len(valid_drafts):
+                    selected_draft = valid_drafts[choice-1]
                     
                     # 检查选择的草稿是否有问题，给出预处理建议
                     issues = self.check_draft_issues(selected_draft)
@@ -2339,15 +2367,17 @@ class ContentPipeline:
         self.log(f"站点URL: {self.site_url}", level="debug")
     
     def _is_valid_draft(self, file_path: Path) -> bool:
-        """检查文件是否是有效的草稿文件"""
+        """检查文件是否是有效的草稿文件（用于发布）"""
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-            
+
             # 检查是否有 front matter
             if not content.startswith('---'):
+                # 没有Front Matter的文件不能直接发布，但应该显示在列表中
+                self.log(f"草稿缺少Front Matter，需要先格式化: {file_path.name}", level="warning")
                 return False
-            
+
             # 尝试解析 front matter
             try:
                 post = frontmatter.loads(content)
