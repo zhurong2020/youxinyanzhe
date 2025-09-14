@@ -1104,73 +1104,104 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
         """查看发布历史"""
         print("\n📋 发布历史记录")
         print("="*40)
-        
+
         try:
             from pathlib import Path
-            
+            import time
+            import datetime
+
             # 直接扫描_posts目录来获取发布历史
             posts_dir = Path("_posts")
-            
-            published_articles = []
-            
+
+            # 设置时间筛选（默认30天）
+            days_limit = 30
+            cutoff_time = time.time() - (days_limit * 24 * 60 * 60)
+
+            all_articles = []
+            recent_articles = []
+
             # 从_posts目录获取已发布文章
             if posts_dir.exists():
                 for post_file in posts_dir.glob("*.md"):
                     article_name = post_file.stem
-                    
+                    mtime = post_file.stat().st_mtime
+
                     # 检查是否有发布状态记录
                     if hasattr(self.pipeline, 'status_manager'):
                         platforms = self.pipeline.status_manager.get_published_platforms(article_name)
                         summary = self.pipeline.status_manager.get_platform_status_summary(article_name)
-                        
-                        published_articles.append({
-                            'name': article_name,
-                            'file': post_file,
-                            'platforms': platforms,
-                            'summary': summary
-                        })
                     else:
-                        published_articles.append({
-                            'name': article_name,
-                            'file': post_file,
-                            'platforms': [],
-                            'summary': {}
-                        })
-            
-            if not published_articles:
+                        platforms = []
+                        summary = {}
+
+                    article_info = {
+                        'name': article_name,
+                        'file': post_file,
+                        'platforms': platforms,
+                        'summary': summary,
+                        'mtime': mtime
+                    }
+
+                    all_articles.append(article_info)
+
+                    # 筛选最近的文章
+                    if mtime >= cutoff_time:
+                        recent_articles.append(article_info)
+
+            if not all_articles:
                 print("📄 暂无发布历史记录")
                 self.pause_for_user()
                 return None
-            
-            # 按文件修改时间排序显示最近的发布
-            published_articles.sort(key=lambda x: x['file'].stat().st_mtime, reverse=True)
-            
-            print(f"📊 共找到 {len(published_articles)} 篇已发布文章:")
-            print()
-            
-            for i, article in enumerate(published_articles[:20], 1):  # 显示最近20篇
-                print(f"{i}. {article['name']}")
-                
-                # 显示发布平台状态
-                if article['platforms']:
-                    print(f"   ✅ 已发布: {', '.join(article['platforms'])}")
-                else:
-                    print("   📝 Jekyll发布 (无平台记录)")
-                
-                # 显示文件修改时间
-                mtime = article['file'].stat().st_mtime
-                import datetime
-                formatted_time = datetime.datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M")
-                print(f"   🕒 文件时间: {formatted_time}")
-                
-                print()
-            
-            if len(published_articles) > 20:
-                print(f"... 和其他 {len(published_articles) - 20} 篇文章")
-            
+
+            # 按文件修改时间排序
+            recent_articles.sort(key=lambda x: x['mtime'], reverse=True)
+            all_articles.sort(key=lambda x: x['mtime'], reverse=True)
+
+            # 显示统计信息
+            print(f"📊 总计 {len(all_articles)} 篇已发布文章")
+            print(f"📅 最近{days_limit}天发布: {len(recent_articles)} 篇")
+
+            if len(all_articles) > len(recent_articles):
+                older_count = len(all_articles) - len(recent_articles)
+                print(f"📚 更早的文章: {older_count} 篇 (可在 _posts 目录查看)")
+
+            print("-" * 40)
+
+            # 显示最近的文章
+            if recent_articles:
+                print(f"\n🔥 最近{days_limit}天的发布:")
+                for i, article in enumerate(recent_articles[:20], 1):  # 最多显示20篇
+                    print(f"\n{i}. {article['name']}")
+
+                    # 显示发布平台状态
+                    if article['platforms']:
+                        print(f"   ✅ 已发布: {', '.join(article['platforms'])}")
+                    else:
+                        print("   📝 Jekyll发布 (无平台记录)")
+
+                    # 显示文件修改时间
+                    formatted_time = datetime.datetime.fromtimestamp(article['mtime']).strftime("%Y-%m-%d %H:%M")
+                    print(f"   🕒 发布时间: {formatted_time}")
+
+                if len(recent_articles) > 20:
+                    print(f"\n... 还有 {len(recent_articles) - 20} 篇最近的文章未显示")
+                    print("💡 提示: 可在 _posts 目录查看完整列表")
+            else:
+                print(f"\n📝 最近{days_limit}天没有发布记录")
+
+                # 显示最近的几篇历史文章
+                if all_articles:
+                    print(f"\n📚 最近的历史文章:")
+                    for i, article in enumerate(all_articles[:5], 1):
+                        formatted_time = datetime.datetime.fromtimestamp(article['mtime']).strftime("%Y-%m-%d")
+                        print(f"  {i}. {article['name'][:50]}... ({formatted_time})")
+
+            print("\n" + "="*40)
+            print("💡 查看所有文章: 请访问 _posts 目录")
+
         except Exception as e:
             print(f"❌ 查看发布历史失败: {e}")
-        
+
         self.pause_for_user()
         return None
     
