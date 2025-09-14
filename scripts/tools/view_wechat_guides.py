@@ -15,7 +15,7 @@ def view_wechat_guides():
     project_root = script_dir.parent.parent
 
     # 微信指南目录
-    guide_dir = project_root / "scripts/.tmp/output/wechat_guides"
+    guide_dir = project_root / ".tmp/output/wechat/guides"
 
     if not guide_dir.exists():
         print("❌ 微信指南目录不存在")

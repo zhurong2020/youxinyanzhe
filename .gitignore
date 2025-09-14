@@ -156,3 +156,4 @@ config/azure_app_info.md
 
 # 创作临时目录（包含临时图片和截图，不应提交）
 temp/drafting/
+scripts/.tmp.backup*/
