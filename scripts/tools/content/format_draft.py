@@ -448,16 +448,37 @@ class DraftFormatter:
             
             # 处理标题（确保标题格式正确）
             if line.startswith('#'):
-                # 确保标题后有空格
-                if not line[1:].startswith(' '):
-                    line = line[0] + ' ' + line[1:]
+                # 计算标题级别
+                level = 0
+                for char in line:
+                    if char == '#':
+                        level += 1
+                    else:
+                        break
+
+                # 获取标题文本
+                title_text = line[level:].lstrip()
+
+                # 重构标题，确保格式正确
+                line = '#' * level + ' ' + title_text
                 formatted_lines.append(line)
             
-            # 处理列表项
-            elif line.startswith('-') or line.startswith('*'):
+            # 处理列表项（排除粗体和斜体标记）
+            elif line.startswith('-'):
                 if not line[1:].startswith(' '):
                     line = line[0] + ' ' + line[1:]
                 formatted_lines.append(line)
+            elif line.startswith('*') and not line.startswith('**') and not line.startswith('***'):
+                # 检查是否是列表项（星号后跟空格或直接跟内容，且不是斜体）
+                # 如果星号后面有内容且末尾也有星号，可能是斜体
+                if len(line) > 1 and line[-1] == '*' and line.count('*') == 2:
+                    # 这是斜体文本，不处理
+                    formatted_lines.append(line)
+                else:
+                    # 这是列表项
+                    if not line[1:].startswith(' '):
+                        line = line[0] + ' ' + line[1:]
+                    formatted_lines.append(line)
             
             # 处理编号列表
             elif re.match(r'^\d+\.', line):
@@ -529,15 +550,37 @@ class DraftFormatter:
             
             # 处理标题（确保标题格式正确）
             if line.startswith('#'):
-                if not line[1:].startswith(' '):
-                    line = line[0] + ' ' + line[1:]
+                # 计算标题级别
+                level = 0
+                for char in line:
+                    if char == '#':
+                        level += 1
+                    else:
+                        break
+
+                # 获取标题文本
+                title_text = line[level:].lstrip()
+
+                # 重构标题，确保格式正确
+                line = '#' * level + ' ' + title_text
                 formatted_lines.append(line)
             
-            # 处理列表项
-            elif line.startswith('-') or line.startswith('*'):
+            # 处理列表项（排除粗体和斜体标记）
+            elif line.startswith('-'):
                 if not line[1:].startswith(' '):
                     line = line[0] + ' ' + line[1:]
                 formatted_lines.append(line)
+            elif line.startswith('*') and not line.startswith('**') and not line.startswith('***'):
+                # 检查是否是列表项（星号后跟空格或直接跟内容，且不是斜体）
+                # 如果星号后面有内容且末尾也有星号，可能是斜体
+                if len(line) > 1 and line[-1] == '*' and line.count('*') == 2:
+                    # 这是斜体文本，不处理
+                    formatted_lines.append(line)
+                else:
+                    # 这是列表项
+                    if not line[1:].startswith(' '):
+                        line = line[0] + ' ' + line[1:]
+                    formatted_lines.append(line)
             
             # 处理编号列表
             elif re.match(r'^\d+\.', line):
