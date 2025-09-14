@@ -858,8 +858,34 @@ class DraftFormatter:
         # 创建front matter
         front_matter = self.create_front_matter(title, raw_content, category, tags)
 
-        # 不再自动创建结构化内容，直接使用原始内容
-        # 只进行基础格式化（修复标点、段落等）
+        # 检查并确保有<!-- more -->标记
+        if '<!-- more -->' not in raw_content:
+            # 智能添加<!-- more -->在第一段后面或前100字符后
+            lines = raw_content.split('\n')
+            insert_position = -1
+            char_count = 0
+
+            for i, line in enumerate(lines):
+                char_count += len(line)
+                # 在第一个段落结束后插入（空行处）
+                if i > 0 and not line.strip() and lines[i-1].strip():
+                    insert_position = i
+                    break
+                # 或者在累计超过100字符后的第一个空行
+                elif char_count > 100 and not line.strip():
+                    insert_position = i
+                    break
+
+            if insert_position > 0:
+                lines.insert(insert_position, '<!-- more -->')
+                raw_content = '\n'.join(lines)
+            else:
+                # 如果没找到合适位置，在内容开头附近添加
+                if len(lines) > 2:
+                    lines.insert(2, '\n<!-- more -->\n')
+                    raw_content = '\n'.join(lines)
+
+        # 基础格式化（修复标点、段落等）
         formatted_content = self.format_basic_structure(raw_content)
 
         # 不自动添加页脚，让发布时处理

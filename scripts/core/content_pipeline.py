@@ -361,44 +361,46 @@ class ContentPipeline:
     
     def analyze_draft_status(self, draft_path: Path) -> str:
         """
-        分析草稿状态，检查是否有需要预处理的问题
-        
+        分析草稿状态，只显示严重问题（发布无法自动处理的）
+
         Args:
             draft_path: 草稿文件路径
-            
+
         Returns:
             状态信息字符串
         """
-        issues = []
-        
+        serious_issues = []
+
         try:
             # 读取草稿内容
             with open(draft_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-            
-            # 检查图片路径问题
+
+            # 只检查严重问题
+            # 1. 检查图片路径问题（需要手动处理）
             image_issues = self.check_image_paths(content)
             if image_issues:
-                issues.append("🖼️ 图片")
-            
-            # 检查Front Matter
+                serious_issues.append("🖼️ 图片")
+
+            # 2. 检查Front Matter（必须存在）
             if not content.strip().startswith('---'):
-                issues.append("📋 格式")
-            
-            # 检查<!-- more -->标签
-            if '<!-- more -->' not in content:
-                issues.append("✂️ 分页")
-            
-            # 检查内容长度
+                serious_issues.append("📋 格式")
+
+            # 3. 内容过短（小于200字符才算严重问题）
             clean_content = content.replace('---', '').replace('<!-- more -->', '')
-            if len(clean_content.strip()) < 500:
-                issues.append("📏 长度")
-                
+            if len(clean_content.strip()) < 200:
+                serious_issues.append("📏 内容过短")
+
+            # 注意：以下问题发布时可自动处理，不显示
+            # - 缺少<!-- more -->（格式化时会添加）
+            # - 缺少分类/标签（发布时会生成）
+            # - excerpt问题（发布时会处理）
+
         except Exception:
-            issues.append("❌ 读取")
-        
-        if issues:
-            return f" ⚠️ [{', '.join(issues)}]"
+            serious_issues.append("❌ 读取")
+
+        if serious_issues:
+            return f" ⚠️ [{', '.join(serious_issues)}]"
         else:
             return " ✅"
     
@@ -879,19 +881,32 @@ class ContentPipeline:
                 if 1 <= choice <= len(valid_drafts):
                     selected_draft = valid_drafts[choice-1]
                     
-                    # 检查选择的草稿是否有问题，给出预处理建议
+                    # 检查选择的草稿是否有严重问题
                     issues = self.check_draft_issues(selected_draft)
-                    if issues:
-                        print(f"\n⚠️  草稿 '{selected_draft.name}' 检测到以下问题：")
-                        for issue in issues:
+
+                    # 过滤出严重问题（发布无法自动解决的）
+                    serious_issues = []
+                    for issue in issues:
+                        # 以下问题发布时可以自动处理，不需要提示
+                        auto_fixable = [
+                            '缺少分类信息',
+                            '缺少标签信息',
+                            'excerpt过短',
+                            'excerpt过长',
+                            '缺少excerpt字段'
+                        ]
+                        if not any(fixable in issue for fixable in auto_fixable):
+                            serious_issues.append(issue)
+
+                    if serious_issues:
+                        print(f"\n⚠️  草稿 '{selected_draft.name}' 检测到需要手动处理的问题：")
+                        for issue in serious_issues:
                             print(f"   • {issue}")
-                        
+
                         print("\n🔧 建议的预处理步骤：")
-                        suggestions = self.get_preprocessing_suggestions(issues)
-                        for suggestion in suggestions:
-                            print(f"   {suggestion}")
-                        
-                        proceed = input("\n是否继续发布此草稿？(y/N): ").strip().lower()
+                        print("   📝 4. 内容规范化处理 - 修复结构问题")
+
+                        proceed = input("\n是否继续发布？系统将尝试自动处理其他问题 (y/N): ").strip().lower()
                         if proceed not in ['y', 'yes']:
                             print("💡 您可以先处理这些问题，然后再回来发布")
                             continue
