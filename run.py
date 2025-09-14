@@ -228,11 +228,26 @@ def main():
                 
             if success:
                 pipeline.log(f"✅ 发布成功完成: {draft.name}", level="info", force=True)
+                print(f"\n✅ 发布成功完成!")
+                print(f"📄 文章: {draft.name}")
+                print(f"📱 已发布到: {', '.join(platforms)}")
+
+                # 暂停让用户看到成功信息
+                import time
+                time.sleep(3)
             else:
                 pipeline.log(f"❌ 发布过程中出现问题: {draft.name}", level="warning", force=True)
+                print(f"\n⚠️ 发布过程中出现问题")
+                print(f"请检查日志了解详情")
+
+                # 暂停让用户看到错误信息
+                import time
+                time.sleep(3)
         except Exception as e:
             pipeline.log(f"❌ 发布过程中发生错误: {str(e)}", level="error", force=True)
             print(f"\n❌ 发布过程中发生错误: {str(e)}")
+            import time
+            time.sleep(3)
 
 
 def run_shell_command(cmd, description="Command", timeout=300, check_result=True):
