@@ -1,13 +1,24 @@
 ---
 date: '2025-09-13'
-excerpt: 保守派新星为对话而死，其悲剧敲响警钟：当子弹取代辩论，理性精神正在陨落。
+excerpt: '> "The Great, and even Legendary, Charlie Kirk, is dead.'
 header:
   teaser: https://1drv.ms/i/c/5644dab129afda10/IQTq4kEOrERvRLHS_4L9uCK_ARjvU4zbducjMUCRTRR8Pdk
-title: 英年早逝：Charlie Kirk与美国民主对话精神的陨落
+  overlay_color: '#333'
+  overlay_filter: 0.5
+  overlay_image: https://1drv.ms/i/c/5644dab129afda10/IQTq4kEOrERvRLHS_4L9uCK_ARjvU4zbducjMUCRTRR8Pdk
+title: 2025 09 13 Charlie Kirk Fallen Democracy Dialogue Spirit
+tags:
+- 人工智能
+- 批判思维
+- 国际视野
+- 个人成长
+- 美股投资
+- 机器学习
 ---
-
 > "The Great, and even Legendary, Charlie Kirk, is dead."  
 > ——Donald J. Trump, 2025年9月10日
+<!-- more -->
+
 
 # # 前言：当子弹代替辩论
 

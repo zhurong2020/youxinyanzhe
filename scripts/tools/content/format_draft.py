@@ -860,19 +860,44 @@ class DraftFormatter:
 
         # 检查并确保有<!-- more -->标记
         if '<!-- more -->' not in raw_content:
-            # 智能添加<!-- more -->在第一段后面或前100字符后
+            # 智能添加<!-- more -->，跳过引用块和标题
             lines = raw_content.split('\n')
             insert_position = -1
             char_count = 0
+            in_quote_block = False
+            found_content = False
 
             for i, line in enumerate(lines):
-                char_count += len(line)
-                # 在第一个段落结束后插入（空行处）
-                if i > 0 and not line.strip() and lines[i-1].strip():
-                    insert_position = i
-                    break
+                # 跟踪引用块状态
+                if line.strip().startswith('>'):
+                    in_quote_block = True
+                    continue
+                elif in_quote_block and not line.strip():
+                    # 引用块结束
+                    in_quote_block = False
+                    continue
+
+                # 跳过标题行
+                if line.strip().startswith('#'):
+                    continue
+
+                # 跳过信息状态块（以*开头）
+                if line.strip().startswith('*'):
+                    continue
+
+                # 找到实际内容段落
+                if not in_quote_block and line.strip() and not line.strip().startswith(('>', '#', '*', '-')):
+                    found_content = True
+                    char_count += len(line)
+
+                # 在内容段落后的第一个空行插入
+                if found_content and not line.strip() and i > 0 and lines[i-1].strip():
+                    # 确保上一行是实际内容，不是引用或标题
+                    if not lines[i-1].strip().startswith(('>', '#', '*', '-')):
+                        insert_position = i
+                        break
                 # 或者在累计超过100字符后的第一个空行
-                elif char_count > 100 and not line.strip():
+                elif found_content and char_count > 100 and not line.strip():
                     insert_position = i
                     break
 
@@ -880,10 +905,14 @@ class DraftFormatter:
                 lines.insert(insert_position, '<!-- more -->')
                 raw_content = '\n'.join(lines)
             else:
-                # 如果没找到合适位置，在内容开头附近添加
-                if len(lines) > 2:
-                    lines.insert(2, '\n<!-- more -->\n')
-                    raw_content = '\n'.join(lines)
+                # 如果没找到合适位置，在第一个实际内容段落后添加
+                for i, line in enumerate(lines):
+                    if line.strip() and not line.strip().startswith(('>', '#', '*', '-')):
+                        # 找到第一个内容行后的位置
+                        if i + 1 < len(lines):
+                            lines.insert(i + 1, '\n<!-- more -->\n')
+                            raw_content = '\n'.join(lines)
+                            break
 
         # 基础格式化（修复标点、段落等）
         formatted_content = self.format_basic_structure(raw_content)

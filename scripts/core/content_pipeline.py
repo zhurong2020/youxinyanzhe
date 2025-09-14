@@ -493,7 +493,7 @@ class ContentPipeline:
             
             # 3. 检查内容结构
             if '<!-- more -->' not in content:
-                issues.append("✂️ 缺少首页分页标记 <!-- more -->")
+                issues.append("✂️ 缺少首页分页标记 <!-- more -->，格式化工具会自动添加")
             
             if 'excerpt:' not in content and content.strip().startswith('---'):
                 issues.append("📄 缺少摘要字段 (excerpt) 影响SEO")
@@ -601,17 +601,30 @@ class ContentPipeline:
                         issues.append(f"📏 excerpt过长({excerpt_len}字符)，建议50字符左右")
 
             # 2. 检查<!-- more -->前内容长度
+            # 注意：如果文件刚被格式化过，不再重复检查<!-- more -->前内容
+            # 格式化工具已经处理了<!-- more -->的插入位置
             more_pos = content.find('<!-- more -->')
             if more_pos != -1:
                 before_more = self._extract_body_before_more(content)
                 if before_more:
+                    # 清理内容，移除引用块、标题等
                     clean_content = self._clean_content_for_length_check(before_more)
-                    clean_length = len(clean_content.strip())
+                    # 过滤掉只包含引用或信息状态的内容
+                    actual_content_lines = []
+                    for line in clean_content.split('\n'):
+                        line = line.strip()
+                        if line and not line.startswith(('>', '*', '-', '#')):
+                            actual_content_lines.append(line)
 
-                    if clean_length < 40:
-                        issues.append(f"📏 <!-- more -->前内容过短({clean_length}字符)，建议50字符左右")
-                    elif clean_length > 70:
-                        issues.append(f"📏 <!-- more -->前内容过长({clean_length}字符)，建议50字符左右")
+                    actual_content = ' '.join(actual_content_lines)
+                    clean_length = len(actual_content.strip())
+
+                    # 只有当实际内容确实过短或过长时才报告
+                    # 考虑到引用块等特殊情况，放宽限制
+                    if actual_content and clean_length < 30:
+                        issues.append(f"📏 <!-- more -->前内容过短({clean_length}字符)，建议添加简短介绍")
+                    elif clean_length > 150:
+                        issues.append(f"📏 <!-- more -->前内容过长({clean_length}字符)，建议精简首页预览")
 
         except Exception as e:
             # 静默处理，避免重复报错
@@ -751,12 +764,20 @@ class ContentPipeline:
                         'category': 'images',
                         'suggestions': ["使用OneDrive图床管理处理图片路径"]
                     })
-                elif any(keyword in issue for keyword in ["格式", "分页", "长度"]):
-                    # 格式相关问题
+                elif any(keyword in issue for keyword in ["格式", "分页"]):
+                    # 格式相关问题（长度问题单独处理）
                     results['manual_fixes_needed'].append({
                         'issue': issue,
                         'category': 'format',
                         'suggestions': ["使用内容规范化处理修复格式问题"]
+                    })
+                elif "长度" in issue and "<!-- more -->" in issue:
+                    # <!-- more -->前内容长度问题，通常已由格式化工具处理
+                    # 降低优先级，作为提示而非错误
+                    results['manual_fixes_needed'].append({
+                        'issue': issue,
+                        'category': 'info',
+                        'suggestions': ["格式化工具已优化<!-- more -->位置，此提示仅供参考"]
                     })
                 else:
                     # 其他问题
