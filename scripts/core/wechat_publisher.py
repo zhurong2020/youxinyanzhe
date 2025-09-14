@@ -118,9 +118,11 @@ class WechatPublisher:
     def _transform_for_wechat(self, markdown_content: str) -> str:
         """Transforms markdown content into WeChat-ready plain text."""
         self.logger.info("Starting full content transformation for WeChat...")
+        print("\n📱 正在准备微信内容...")
 
         # 1. AI-powered content summarization and rewriting
         self.logger.info("Step 1: Rewriting and summarizing content with AI...")
+        print("  1️⃣ 正在使用AI优化内容（适配移动端阅读）...")
         summarize_prompt = f"""Please rewrite and summarize the following article to be about 600-800 words, making it highly engaging for WeChat mobile reading. Focus on the core ideas and maintain the original tone.
 
 IMPORTANT FORMATTING RULES:
@@ -139,8 +141,10 @@ IMPORTANT FORMATTING RULES:
             response = self.model.generate_content(summarize_prompt)
             rewritten_content = response.text
             self.logger.info("Content successfully rewritten by AI.")
+            print("     ✅ AI内容优化完成")
         except Exception as e:
             self.logger.error(f"AI content summarization failed: {e}. Using original content.")
+            print("     ⚠️ AI优化失败，使用原始内容")
             # Fallback: convert markdown to plain text
             import html2text
             h = html2text.HTML2Text()
@@ -150,6 +154,7 @@ IMPORTANT FORMATTING RULES:
 
         # 2. AI-powered mobile optimization
         self.logger.info("Step 2: Optimizing content for mobile reading...")
+        print("  2️⃣ 正在进行移动端阅读体验优化...")
         format_prompt = f"""You are an expert in WeChat mobile reading optimization. Your task is to polish the following content for the best WeChat reading experience. Follow these strict rules:
 
 FORMATTING REQUIREMENTS:
@@ -175,14 +180,18 @@ Here is the content to optimize:
             response = self.model.generate_content(format_prompt)
             final_content = response.text
             self.logger.info("Content successfully optimized by AI.")
+            print("     ✅ 移动端优化完成")
         except Exception as e:
             self.logger.error(f"AI optimization failed: {e}. Using rewritten content.")
+            print("     ⚠️ 移动端优化失败，使用基础优化内容")
             final_content = rewritten_content
 
         # 3. Append "Read More" notice
         self.logger.info("Step 3: Appending 'Read More' notice.")
+        print("  3️⃣ 正在添加阅读原文提示...")
         read_more_notice = "\n\n💡 因篇幅限制，更多详细内容和实用资源，请点击文末的\"阅读原文\"在我的博客上查看完整版本。"
         final_content = final_content + read_more_notice
+        print("     ✅ 内容准备完成")
 
         return final_content
 
@@ -308,15 +317,29 @@ Here is the content to optimize:
 
     def _process_html_images(self, html: str, project_root: Path) -> str:
         self.logger.info("Step 4: Processing and uploading images from HTML content...")
+        print("  4️⃣ 正在处理文章中的图片...")
+
+        # 统计图片数量
+        import re
         img_pattern = re.compile(r'<img src="([^"]+)"')
+        img_matches = img_pattern.findall(html)
+        if img_matches:
+            print(f"     发现 {len(img_matches)} 张图片需要处理")
+        processed_count = [0]  # 使用列表以便在闭包中修改
+
         def replace_src(match):
             original_src = match.group(1)
-            
+            processed_count[0] += 1
+
             # 处理OneDrive链接
             if original_src.startswith("https://1drv.ms/"):
+                print(f"     [{processed_count[0]}/{len(img_matches)}] 正在上传图片到微信服务器...")
                 wechat_url = self._upload_content_image_from_url(original_src)
-                if wechat_url: 
+                if wechat_url:
+                    print(f"     [{processed_count[0]}/{len(img_matches)}] ✅ 图片上传成功")
                     return f'<img src="{wechat_url}"'
+                else:
+                    print(f"     [{processed_count[0]}/{len(img_matches)}] ❌ 图片上传失败")
                 return ""
             
             # 处理其他HTTP链接（跳过）
@@ -325,13 +348,23 @@ Here is the content to optimize:
             
             # 处理本地文件路径
             image_path = (project_root / original_src).resolve()
+            print(f"     [{processed_count[0]}/{len(img_matches)}] 正在上传本地图片...")
             wechat_url = self._upload_content_image(image_path)
-            if wechat_url: return f'<img src="{wechat_url}"'
+            if wechat_url:
+                print(f"     [{processed_count[0]}/{len(img_matches)}] ✅ 图片上传成功")
+                return f'<img src="{wechat_url}"'
+            else:
+                print(f"     [{processed_count[0]}/{len(img_matches)}] ❌ 图片上传失败")
             return ""
-        return img_pattern.sub(replace_src, html)
+
+        result = img_pattern.sub(replace_src, html)
+        if img_matches:
+            print(f"     ✅ 图片处理完成")
+        return result
 
     def publish_to_draft(self, project_root: Path, front_matter: Dict[str, Any], markdown_content: str) -> Optional[str]:
         self.logger.info(f"Starting API publish process for: {front_matter.get('title', 'Untitled')}")
+        print(f"\n🚀 开始发布到微信公众号: {front_matter.get('title', 'Untitled')}")
         
         # 尝试多种方式获取封面图片
         cover_image_path_str = None
@@ -352,18 +385,24 @@ Here is the content to optimize:
         
         # 处理本地文件路径
         if cover_image_path_str:
+            print("\n📷 正在上传封面图片...")
             cover_image_path = (project_root / cover_image_path_str).resolve()
             thumb_url = self._upload_content_image(cover_image_path)
         # 处理OneDrive URL
         elif cover_image_url and cover_image_url.startswith("https://1drv.ms/"):
+            print("\n📷 正在从OneDrive下载并上传封面图片...")
             thumb_url = self._upload_content_image_from_url(cover_image_url)
         else:
             self.logger.error(f"Unsupported cover image format: {cover_image_url}")
+            print(f"\n❌ 不支持的封面图片格式: {cover_image_url}")
             return None
             
-        if not thumb_url: 
+        if not thumb_url:
             self.logger.error("Failed to upload cover image")
+            print("❌ 封面图片上传失败")
             return None
+        else:
+            print("✅ 封面图片上传成功")
 
         final_html = self._transform_for_wechat(markdown_content)
         final_html = self._process_html_images(final_html, project_root)
@@ -379,19 +418,33 @@ Here is the content to optimize:
             "only_fans_can_comment": 0
         }
         
-        if not self.api_tracker.check_limit("draft_add", self.API_LIMITS["draft_add"]): return None
+        if not self.api_tracker.check_limit("draft_add", self.API_LIMITS["draft_add"]):
+            print("\n❌ 已达到微信API每日调用限制")
+            return None
+
+        print("\n📤 正在创建微信草稿...")
         access_token = self._get_access_token()
-        if not access_token: return None
+        if not access_token:
+            print("❌ 获取访问令牌失败")
+            return None
+
         url = f"{self.api_base_url}/draft/add?access_token={access_token}"
         payload = {"articles": [article]}
+
         try:
+            print("   正在提交到微信服务器...")
             headers = {'Content-Type': 'application/json; charset=utf-8'}
             response = requests.post(url, data=json.dumps(payload, ensure_ascii=False).encode('utf-8'), headers=headers, timeout=30)
             response.raise_for_status()
             data = response.json()
+
             if "media_id" in data:
                 self.api_tracker.increment("draft_add")
                 self.logger.info(f"✅ Successfully created draft! Media ID: {data['media_id']}")
+                print(f"\n🎉 成功创建微信草稿！")
+                print(f"   Media ID: {data['media_id']}")
+                print(f"\n📱 请登录微信公众号后台查看和发布草稿")
+                print(f"   https://mp.weixin.qq.com/")
                 return data["media_id"]
             else:
                 # 处理微信API返回的错误
@@ -399,9 +452,13 @@ Here is the content to optimize:
                 error_msg = data.get("errmsg", "Unknown error")
                 self.logger.error(f"WeChat API error: {error_code} - {error_msg}")
                 self.logger.error(f"Full response: {data}")
+                print(f"\n❌ 微信API返回错误:")
+                print(f"   错误代码: {error_code}")
+                print(f"   错误信息: {error_msg}")
                 return None
         except requests.exceptions.RequestException as e:
             self.logger.error(f"Request to create draft failed: {e}")
+            print(f"\n❌ 创建草稿请求失败: {e}")
         return None
 
     def _load_reward_footer_template(self, project_root: Path) -> str:
@@ -437,6 +494,7 @@ Here is the content to optimize:
 
     def generate_guide_file(self, project_root: Path, front_matter: Dict[str, Any], markdown_content: str) -> bool:
         self.logger.info(f"Generating manual guide file for: {front_matter.get('title', 'Untitled')}")
+        print(f"\n📝 生成微信发布指南: {front_matter.get('title', 'Untitled')}")
         guide_dir = project_root / ".tmp/output/wechat_guides"
         guide_dir.mkdir(parents=True, exist_ok=True)
         safe_title = re.sub(r'[^\w\s-]', '', front_matter.get('title', 'draft')).strip()
@@ -495,12 +553,22 @@ Here is the content to optimize:
         
         try:
             # 保存指导文件
-            with open(guide_file, 'w', encoding='utf-8') as f: f.write(guide_text)
+            print("\n📄 正在生成发布指南文件...")
+            with open(guide_file, 'w', encoding='utf-8') as f:
+                f.write(guide_text)
             self.logger.info(f"✅ Successfully generated guide file with reward footer: {guide_file}")
             self.logger.info(f"📂 微信指导文件位置: {guide_file}")
+            print(f"\n✅ 微信发布指南生成成功！")
+            print(f"📂 文件位置: {guide_file}")
+            print(f"\n💡 使用提示:")
+            print(f"   1. 打开生成的指南文件")
+            print(f"   2. 复制其中的内容到微信公众号编辑器")
+            print(f"   3. 手动上传封面图片并调整格式")
+            print(f"   4. 预览并发布")
             return True
         except IOError as e:
             self.logger.error(f"Failed to write guide file: {e}")
+            print(f"\n❌ 生成指南文件失败: {e}")
             return False
 
     def _load_image_cache(self) -> Dict[str, dict]:

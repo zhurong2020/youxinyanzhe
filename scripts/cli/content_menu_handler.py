@@ -1069,23 +1069,35 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
     def _republish_article(self) -> Optional[str]:
         """重新发布已发布文章"""
         self.log_action("智能发布：开始重新发布已发布文章")
-        
+
         try:
             # 使用ContentPipeline的内置方法
             post = self.pipeline.select_published_post()
             if not post:
                 self.log_action("用户取消或无文章可重新发布")
                 return None
-            
+
+            # 直接获取草稿路径
             draft = self.pipeline.copy_post_to_draft(post)
             if not draft:
-                print("复制文章到草稿失败")
+                print("\n❌ 复制文章到草稿失败")
                 self.log_action("复制文章到草稿失败", "error")
+                import time
+                time.sleep(2)  # 暂停2秒让用户看到错误信息
                 return None
-            
-            return str(draft)
+
+            # 直接处理重新发布，跳过质量检查
+            print(f"\n✅ 已选择文章: {post.name}")
+            print("正在准备重新发布...")
+
+            # 返回草稿路径以便后续处理
+            # 注意：这里返回特殊标记，让主流程知道这是重新发布
+            return f"republish:{draft}"
+
         except Exception as e:
-            print(f"❌ 重新发布功能出错: {e}")
+            print(f"\n❌ 重新发布功能出错: {e}")
+            import time
+            time.sleep(2)  # 暂停2秒让用户看到错误信息
             return None
     
     def _view_publish_history(self) -> Optional[str]:

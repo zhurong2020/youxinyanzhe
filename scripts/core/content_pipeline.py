@@ -937,17 +937,39 @@ class ContentPipeline:
             except ValueError:
                 print("请输入有效的数字")
     
-    def list_published_posts(self) -> List[Path]:
-        """列出已发布的文章"""
+    def list_published_posts(self, days_limit: int = 30) -> List[Path]:
+        """列出已发布的文章
+
+        Args:
+            days_limit: 只显示最近N天内的文章，默认30天
+        """
         posts_dir = Path(self.config["paths"]["posts"])
         if not posts_dir.exists():
             return []
-        
+
+        import time
+        from datetime import datetime, timedelta
+
+        # 计算时间限制
+        cutoff_time = time.time() - (days_limit * 24 * 60 * 60)
+
         posts = []
+        older_posts_count = 0
+
         for file in posts_dir.glob("*.md"):
             if file.is_file():
-                posts.append(file)
-        
+                # 检查文件修改时间
+                if file.stat().st_mtime >= cutoff_time:
+                    posts.append(file)
+                else:
+                    older_posts_count += 1
+
+        # 如果有更早的文章，提示用户
+        if older_posts_count > 0:
+            print(f"\n💡 提示：还有 {older_posts_count} 篇超过 {days_limit} 天的文章未显示")
+            print(f"   如需发布更早的文章，请手工编辑 _drafts/.publishing/ 目录下对应的yml文件")
+            print(f"   将 'published_platforms: - github_pages' 添加到文件中\n")
+
         return sorted(posts, key=lambda x: x.stat().st_mtime, reverse=True)
     
     def select_published_post(self) -> Optional[Path]:
@@ -1983,8 +2005,11 @@ class ContentPipeline:
     def _publish_to_wechat(self, content: str) -> bool:
         """发布到微信公众号，根据配置决定是API发布还是生成指南。"""
         self.log("开始处理微信公众号发布...", level="info", force=True)
+        print("\n📱 === 微信公众号发布 ===")
+
         if not self.wechat_publisher:
             self.log("微信发布器未初始化，跳过发布。", level="error", force=True)
+            print("❌ 微信发布器未初始化")
             return False
 
         try:
@@ -1993,9 +2018,11 @@ class ContentPipeline:
             publish_mode = platform_config.get("publish_mode", "guide")  # 默认为 guide 模式
 
             self.log(f"微信发布模式: {publish_mode.upper()}", level="info", force=True)
+            print(f"🔄 发布模式: {publish_mode.upper()}")
 
             if publish_mode == "api":
                 # API模式：直接发布到草稿箱
+                print("🌐 使用API模式直接发布到微信草稿箱...")
                 media_id = self.wechat_publisher.publish_to_draft(
                     project_root=self.project_root,
                     front_matter=post.metadata,
@@ -2009,6 +2036,7 @@ class ContentPipeline:
                     return False
             else:
                 # Guide模式：生成手动发布指南
+                print("📝 使用指南模式生成手动发布指南...")
                 success = self.wechat_publisher.generate_guide_file(
                     project_root=self.project_root,
                     front_matter=post.metadata,
@@ -2032,6 +2060,7 @@ class ContentPipeline:
 
         except Exception as e:
             self.log(f"发布到微信时发生未知错误: {e}", level="error", force=True)
+            print(f"❌ 发布到微信时出错: {e}")
             self.logger.debug("错误详情:", exc_info=True)
             return False
 
