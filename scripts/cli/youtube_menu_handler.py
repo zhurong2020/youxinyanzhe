@@ -38,7 +38,7 @@ class YouTubeMenuHandler(BaseMenuHandler):
         
         options = [
             "1. 🎧 YouTube播客生成器",
-            "2. 🎬 YouTube音频上传",
+            "2. 🎬 YouTube视频生成与上传",
             "3. 🔐 YouTube OAuth认证管理"
         ]
         
@@ -132,12 +132,12 @@ class YouTubeMenuHandler(BaseMenuHandler):
             return None
     
     def _upload_podcast_video(self) -> Optional[str]:
-        """上传已生成的播客视频"""
-        self.display_menu_header("🎬 上传已生成的播客视频",
-                                "将本地播客视频上传到YouTube")
-        
+        """YouTube视频生成与上传"""
+        self.display_menu_header("🎬 YouTube视频生成与上传",
+                                "将音频文件转换为视频并上传到YouTube")
+
         print("🎬 YouTube视频生成与上传工具")
-        print("支持音频转视频、批量处理和上传管理")
+        print("支持音频转视频、图片选择、音频压缩和上传管理")
         
         try:
             from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator
@@ -466,7 +466,10 @@ class YouTubeMenuHandler(BaseMenuHandler):
             # 临时返回成功消息
             upload_url = f"https://youtube.com/watch?v=example_{audio_file.stem}"
             self.display_success_message(f"上传完成: {upload_url}")
-            
+
+            # 添加暂停让用户看到结果
+            self.pause_for_user()
+
             return upload_url
             
         except Exception as e:
