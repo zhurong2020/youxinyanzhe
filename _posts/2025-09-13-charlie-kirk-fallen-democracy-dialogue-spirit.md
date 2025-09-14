@@ -6,9 +6,12 @@ categories:
 - 认知升级
 comments: true
 date: '2025-09-14'
-excerpt: 政治评论员查理柯克遇刺身亡，反思子弹取代辩论的文明悲剧。
+excerpt: 2025年9月10日，31岁的查理·科克（Charlie Kirk）在校园对话活动中遭枪击身亡。他用生命证明：选择对话需要真正的勇气，而诉诸暴力只是懦弱的表现。
 header:
-  teaser: https://7fp1fj-my.sharepoint.com/:u:/g/personal/zhurong_7fp1fj_onmicrosoft_com/EQ_QCCKRRBpNuG8t1X1Z8u0BXbnp9OP60CItQ1G-vCC3xQ
+  overlay_color: '#333'
+  overlay_filter: 0.5
+  overlay_image: https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EQ_QCCKRRBpNuG8t1X1Z8u0BXbnp9OP60CItQ1G-vCC3xQ
+  teaser: https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EQ_QCCKRRBpNuG8t1X1Z8u0BXbnp9OP60CItQ1G-vCC3xQ
 last_modified_at: '2025-09-14 13:51:50'
 layout: single
 related: true
@@ -24,8 +27,8 @@ toc_sticky: true
 
 <!-- more -->
 
-> "伟大甚至堪称传奇的查理·科克，与世长辞了。"
-> ——唐纳德·J·特朗普，2025年9月10日
+> "The Great, and even Legendary, Charlie Kirk, is dead."
+> ——Donald J. Trump, 2025年9月10日
 
 ---
 
@@ -57,7 +60,6 @@ toc_sticky: true
 ## 前言：从对话到暴力的警钟
 
 ![纪念蜡烛](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EVv6yOkFytpGhFKazhAHTeoBgomKr2klIUprY7DTWKPqdg)
-
 *为查理·科克点燃的纪念蜡烛*
 
 2025年9月10日，在犹他州奥勒姆市的犹他谷大学（Utah Valley University），31岁的查理·科克在一次校园活动中遭枪击身亡。
@@ -244,7 +246,6 @@ toc_sticky: true
 
 
 ![皮尤研究中心政治新闻来源差异图](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=ERFKcgUmEa9Isumr2V2CvPMB7lZz_utBsKGJpj1V93c_XQ)
-
 *皮尤研究中心：美国人的新闻来源因政治立场严重分化，形成平行的信息宇宙*
 
 ### 3.2 第二层面：迟到的“真相”
@@ -389,7 +390,6 @@ toc_sticky: true
 
 
 ![“来反驳我”校园活动](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EZSFGtw7g5RPhVwm2hXHn6EBaD90qLxcuxeIcWvND2Wi8w)
-
 *“Prove Me Wrong”活动现场，学生们踊跃参与辩论*
 
 ### 5.4 不同观点与反方证据
@@ -456,8 +456,6 @@ toc_sticky: true
 - 保留随时修正自己观点的能力。
 
 ## 第七章：查理·科克的遗产——用生命书写的启示录
-
-
 ![查理·科克深思的瞬间](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EQph7n_TqGJCq18-4slz6hMBiOUmn0_lSQP8YmZI4TObNQ)
 
 
@@ -547,7 +545,6 @@ toc_sticky: true
 
 
 ![查理·科克纪念现场](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EQ_QCCKRRBpNuG8t1X1Z8u0BXbnp9OP60CItQ1G-vCC3xQ)
-
 *校园纪念现场，鲜花与照片寄托着人们的哀思*
 
 现在，选择权在我们手中：
@@ -667,13 +664,36 @@ toc_sticky: true
 
 ### YouTube经典视频推荐（直达链接）
 
-注：平台内容可能更新，链接或会变动。若链接失效，请使用关键词“Charlie Kirk Prove Me Wrong / campus debate / vs students”在YouTube检索。
+注：平台内容可能更新，链接或会变动。若链接失效，请使用关键词"Charlie Kirk Prove Me Wrong / campus debate / vs students"在YouTube检索。
+
+<style>
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 ratio */
+  height: 0;
+  overflow: hidden;
+  max-width: 100%;
+  margin: 20px 0;
+}
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+</style>
 
 - **经典片段：系统性种族主义辩题**
-  https://www.youtube.com/watch?v=gZvXrb5fTzE
+
+  <div class="video-container">
+    <iframe src="https://www.youtube.com/embed/gZvXrb5fTzE" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  </div>
 
 - **Turning Point USA 官方频道（大量校园问答与活动片段）**
-  https://www.youtube.com/@TurningPointUSA
+
+  查看更多视频：[Turning Point USA YouTube频道](https://www.youtube.com/@TurningPointUSA)
 
 - **“Prove Me Wrong” 合集/精选（检索入口）**
   https://www.youtube.com/results?search_query=Charlie+Kirk+Prove+Me+Wrong
@@ -713,7 +733,6 @@ toc_sticky: true
 
 
 ![查理·科克在演讲台上](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=ERfdYI387qJPrgZLjiea2vkBFBP2Oa1rDoN6-ZtsiqZ4WA)
-
 *查理·科克在演讲活动中激情演说*
 
 **查理·科克 (1994-2025)**
@@ -738,19 +757,17 @@ toc_sticky: true
 - 21亿次观看量（据Turning Point USA 2024年春季学期统计）
 - 受众结构：18-29岁占比超过75%（据YouTube Analytics与TikTok数据）
 
-**伊琳娜·扎鲁茨卡案件**（与本文主线无直接关联，数据口径需谨慎核验）
+**伊琳娜·扎鲁茨卡案件**（与本文主线无直接关联）
 - 案发日期：2025年8月22日，夏洛特市轻轨⁸
 - 媒体延迟报道：17天后CNN首次报道（9月8日）⁹
 - 德卡洛斯·布朗犯罪记录：14次被捕，据WBTV时间线报道¹⁰
 - 法官特蕾莎·斯托克斯的裁决：2025年1月释放，据Newsweek报道¹¹
 
 **媒体与信任度相关数据**
-- 乔治·弗洛伊德相关新闻量：请以具体年度与研究报告为准（如 Signal AI 的文章计量研究），并标注统计口径（时间范围/媒体范围）¹²
-- 新闻信任度：31%（Gallup 2024年10月调查）[https://news.gallup.com/poll/651977/americans-trust-media-remains-trend-low.aspx]¹³
+- 乔治·弗洛伊德相关新闻量：[Media bias in the coverage of George Floyd（Signal AI 19/06/2020）](https://signal-ai.com/insights/media-bias-in-the-coverage-of-george-floyd/)¹²
+- 新闻信任度：31%[Gallup 2024年10月调查](https://news.gallup.com/poll/651977/americans-trust-media-remains-trend-low.aspx)¹³
 
 ![2024年盖洛普民调](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EQy9TZMKlqZJmR0mk13qzj8BGktv1mXei6zMXGqLYYRdtA)
-
-- 记者政治倾向：不同调查结果差异较大，建议引用具体年份、样本与方法说明的研究，避免使用过度绝对化的比值。
 
 ### 官方文件与声明
 
@@ -866,22 +883,6 @@ R.I.P. Charlie Kirk (1994-2025)
 
 请在评论区理性表达、互相尊重，并尽量提供可供核验的来源。您的参与，将有助于让公共讨论更接近事实与公正。
 
-
-{% assign investment_tags = 'QDII基金,指数投资,标普500,纳斯达克100,定投策略,基金投资,股票投资,投资理财,量化交易,投资策略,风险管理,资产配置,投资心理,美股投资,ETF投资' | split: ',' %}
-{% assign show_investment_disclaimer = false %}
-{% for tag in page.tags %}
-  {% if investment_tags contains tag %}
-    {% assign show_investment_disclaimer = true %}
-    {% break %}
-  {% endif %}
-{% endfor %}
-
-{% if show_investment_disclaimer %}
----
-
-**💭 学习分享声明**：这里记录的是我在投资理财学习路上的个人思考和实践心得。正如《金钱心理学》所言："每个人的情况不同"，投资决策需要结合您的具体情况、风险承受能力和投资目标。本文仅供学习交流，不构成投资建议，请保持独立思考，持续学习。
-
-{% endif %}
 
 如果你觉得我的文章对你有帮助，可以[请我喝咖啡](https://www.buymeacoffee.com/zhurong052Q)
 
