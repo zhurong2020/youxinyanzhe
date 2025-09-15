@@ -27,6 +27,22 @@ toc_sticky: true
 
 <!-- more -->
 
+## 🎧 播客收听 (YouTube版)
+
+<div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000;">
+  <iframe src='https://www.youtube.com/embed/yrHnT5lg4Do?rel=0&showinfo=0&color=white&iv_load_policy=3'
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+          frameborder='0'
+          allowfullscreen>
+  </iframe>
+</div>
+
+**视频**: [charliekirk](https://www.youtube.com/watch?v=yrHnT5lg4Do)
+**平台**: YouTube | **类型**: 音频播客 | **隐私**: 不公开（通过链接访问）
+
+> 💡 **提示**: 此视频设为"不公开"状态，只有通过本站链接才能访问。如需下载音频，请使用上方的直接播放器。
+
+
 > "The Great, and even Legendary, Charlie Kirk, is dead."
 > ——Donald J. Trump, 2025年9月10日
 

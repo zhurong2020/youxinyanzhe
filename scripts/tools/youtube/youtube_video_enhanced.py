@@ -366,26 +366,27 @@ class YouTubeVideoEnhanced:
                         post_files = list(posts_dir.glob("*.md"))
                         # 按文件名排序（因为文件名包含日期）
                         post_files.sort(reverse=True)
-                        all_posts.extend(post_files[:15])  # 获取最新的15个
+                        all_posts.extend(post_files[:5])  # 只获取最新的5个
 
-                    # 获取_drafts目录中的文件
+                    # 获取_drafts目录中的文件（可选，如果需要也可以显示最近的草稿）
                     if drafts_dir.exists():
                         draft_files = list(drafts_dir.glob("*.md"))
                         draft_files.sort(reverse=True)
-                        all_posts.extend(draft_files[:5])  # 获取最新的5个草稿
+                        # 只添加1-2个最新的草稿
+                        all_posts.extend(draft_files[:2])  # 只获取最新的2个草稿
 
                     if all_posts:
                         print("\n📄 最近的博文:")
                         # 重新排序合并后的列表
                         all_posts.sort(key=lambda x: x.name, reverse=True)
-                        # 只显示前20个
-                        for i, post in enumerate(all_posts[:20], 1):
+                        # 显示所有（最多5+2=7个）
+                        for i, post in enumerate(all_posts, 1):
                             # 标识是否为草稿
                             prefix = "[草稿] " if "_drafts" in str(post) else ""
                             print(f"  {i:2}. {prefix}{post.name}")
 
                         try:
-                            choice = int(input(f"\n选择博文 (1-{len(all_posts)}): "))
+                            choice = int(input(f"\n选择博文 (1-{min(len(all_posts), 7)}): "))
                             if 1 <= choice <= len(all_posts):
                                 post_path = all_posts[choice - 1]
                         except ValueError:
