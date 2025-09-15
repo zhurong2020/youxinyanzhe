@@ -14,8 +14,8 @@ class YouTubeVideoEnhanced:
         """初始化增强生成器"""
         self.parent = parent_generator
         self.image_dir = Path("assets/images/posts")
-        self.output_dir = Path("youtube_videos")
-        self.output_dir.mkdir(exist_ok=True)
+        self.output_dir = Path(".tmp/youtube_videos")
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def select_thumbnail_for_audio(self, audio_file: Dict[str, Any]) -> Optional[Path]:
         """让用户选择缩略图"""
@@ -27,10 +27,24 @@ class YouTubeVideoEnhanced:
         available_images = []
         image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
 
-        # 扫描图片目录
-        for image_file in self.image_dir.rglob("*"):
-            if image_file.suffix.lower() in image_extensions:
-                available_images.append(image_file)
+        # 获取当前年月目录
+        from datetime import datetime
+        current_date = datetime.now()
+        current_month_dir = self.image_dir / str(current_date.year) / f"{current_date.month:02d}"
+
+        # 优先扫描当月目录
+        if current_month_dir.exists():
+            print(f"📁 扫描当月图片目录: {current_month_dir}")
+            for image_file in current_month_dir.rglob("*"):
+                if image_file.suffix.lower() in image_extensions:
+                    available_images.append(image_file)
+
+        # 如果当月没有图片，扫描最近的图片
+        if not available_images:
+            print("⚠️ 当月没有图片，扫描最近的图片...")
+            for image_file in self.image_dir.rglob("*"):
+                if image_file.suffix.lower() in image_extensions:
+                    available_images.append(image_file)
 
         if not available_images:
             print("❌ 未找到可用的图片文件")
@@ -201,6 +215,15 @@ class YouTubeVideoEnhanced:
                     compressed_audio.unlink()
                     print("🧹 已清理临时文件")
 
+                # 询问是否上传到YouTube
+                print("\n" + "=" * 40)
+                upload_choice = input("📤 是否立即上传到YouTube？(y/N): ").strip().lower()
+
+                if upload_choice in ['y', 'yes']:
+                    self._upload_to_youtube(output_path, audio_file)
+                else:
+                    print("ℹ️ 视频已保存，稍后可通过菜单上传")
+
                 return True
             else:
                 print(f"❌ 视频生成失败: {result.stderr}")
@@ -208,6 +231,84 @@ class YouTubeVideoEnhanced:
 
         except Exception as e:
             print(f"❌ 处理失败: {e}")
+            return False
+
+    def _upload_to_youtube(self, video_path: Path, audio_file: Dict[str, Any]):
+        """上传视频到YouTube"""
+        try:
+            print("\n🚀 开始上传到YouTube...")
+            print("=" * 40)
+
+            # 检查OAuth配置
+            from pathlib import Path
+            import json
+
+            token_file = Path("config/youtube_oauth_token.json")
+            if not token_file.exists():
+                print("❌ YouTube OAuth未配置")
+                print("💡 请先通过主菜单 → 4 → 2 → 3 配置OAuth认证")
+                return False
+
+            # 导入上传工具
+            try:
+                from scripts.tools.youtube.youtube_upload_tester import YouTubeUploadTester
+
+                # 创建上传器
+                uploader = YouTubeUploadTester()
+
+                # 准备视频信息
+                video_info = {
+                    'path': video_path,
+                    'name': video_path.name,
+                    'title': audio_file.get('title', audio_file['name']),
+                    'size': video_path.stat().st_size,
+                    'format': video_path.suffix
+                }
+
+                print(f"📹 视频文件: {video_path.name}")
+                print(f"📝 标题: {video_info['title']}")
+                print(f"📊 大小: {video_info['size'] / (1024*1024):.1f}MB")
+
+                # 准备上传信息
+                title = video_info['title']
+                description = f"""🎧 音频播客
+
+📁 原始文件: {audio_file['name']}
+📊 文件大小: {audio_file['size'] / (1024*1024):.1f}MB
+🎵 格式: {audio_file['format']}
+
+---
+通过有心工坊YouTube视频生成器创建
+访问我们: https://youxinyanzhe.github.io
+"""
+
+                # 执行上传
+                result = uploader.upload_to_youtube(video_path, title, description)
+
+                if result:
+                    print("\n✅ 上传成功!")
+                    print(f"🔗 视频链接: {result}")
+
+                    # 保存上传记录
+                    upload_record_file = self.output_dir / "upload_history.txt"
+                    with open(upload_record_file, 'a', encoding='utf-8') as f:
+                        from datetime import datetime
+                        f.write(f"\n{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                        f.write(f"文件: {video_path.name}\n")
+                        f.write(f"链接: {result}\n")
+                        f.write("-" * 40 + "\n")
+                    return True
+                else:
+                    print("❌ 上传失败")
+                    return False
+
+            except ImportError:
+                print("⚠️ YouTube上传工具未安装")
+                print("💡 运行: pip install google-api-python-client google-auth-oauthlib")
+                return False
+
+        except Exception as e:
+            print(f"❌ 上传过程出错: {e}")
             return False
 
 
