@@ -107,10 +107,13 @@ temp/onedrive_snapshots/
 assets/images/posts/
 !assets/images/posts/.gitkeep
 
-# 其他临时和优化文件  
+# 音频文件目录（文件较大，不应进入版本控制）
+assets/audio/
+!assets/audio/.gitkeep
+
+# 其他临时和优化文件
 assets/images/*/optimized/
 assets/images/*/wechat_optimized/
-assets/audio/temp/
 *-temp.*
 *-test.*
 *-backup.*
