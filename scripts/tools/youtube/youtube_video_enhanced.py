@@ -360,15 +360,29 @@ class YouTubeVideoEnhanced:
                     drafts_dir = Path("_drafts")
 
                     all_posts = []
+
+                    # 获取_posts目录中的文件
                     if posts_dir.exists():
-                        all_posts.extend(list(posts_dir.glob("*.md"))[-10:])
+                        post_files = list(posts_dir.glob("*.md"))
+                        # 按文件名排序（因为文件名包含日期）
+                        post_files.sort(reverse=True)
+                        all_posts.extend(post_files[:15])  # 获取最新的15个
+
+                    # 获取_drafts目录中的文件
                     if drafts_dir.exists():
-                        all_posts.extend(list(drafts_dir.glob("*.md"))[-10:])
+                        draft_files = list(drafts_dir.glob("*.md"))
+                        draft_files.sort(reverse=True)
+                        all_posts.extend(draft_files[:5])  # 获取最新的5个草稿
 
                     if all_posts:
                         print("\n📄 最近的博文:")
-                        for i, post in enumerate(all_posts, 1):
-                            print(f"  {i}. {post.name}")
+                        # 重新排序合并后的列表
+                        all_posts.sort(key=lambda x: x.name, reverse=True)
+                        # 只显示前20个
+                        for i, post in enumerate(all_posts[:20], 1):
+                            # 标识是否为草稿
+                            prefix = "[草稿] " if "_drafts" in str(post) else ""
+                            print(f"  {i:2}. {prefix}{post.name}")
 
                         try:
                             choice = int(input(f"\n选择博文 (1-{len(all_posts)}): "))
