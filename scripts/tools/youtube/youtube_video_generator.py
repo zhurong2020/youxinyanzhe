@@ -23,8 +23,8 @@ class YouTubeVideoGenerator:
         """初始化生成器"""
         self.audio_dir = Path("assets/audio")
         self.image_dir = Path("assets/images")
-        self.output_dir = Path("youtube_videos")
-        self.output_dir.mkdir(exist_ok=True)
+        self.output_dir = Path(".tmp/youtube_videos")
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         
         print(f"📁 输出目录: {self.output_dir}")
     
@@ -37,7 +37,8 @@ class YouTubeVideoGenerator:
         audio_files = []
         supported_formats = ['.mp3', '.wav', '.m4a', '.aac']
         
-        for file_path in self.audio_dir.rglob("*"):
+        # 只扫描audio目录本身，不包括子目录
+        for file_path in self.audio_dir.glob("*"):
             if file_path.is_file() and file_path.suffix.lower() in supported_formats:
                 file_info = {
                     'path': file_path,

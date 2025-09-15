@@ -7,6 +7,7 @@ YouTube功能菜单处理器
 import json
 from pathlib import Path
 from typing import Optional, List, Dict, Any
+from datetime import datetime
 
 from scripts.cli.base_menu_handler import BaseMenuHandler
 from scripts.core.content_pipeline import ContentPipeline
@@ -138,47 +139,76 @@ class YouTubeMenuHandler(BaseMenuHandler):
 
         print("🎬 YouTube视频生成与上传工具")
         print("支持音频转视频、图片选择、音频压缩和上传管理")
-        
+
         try:
             from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator
-            
+            from scripts.tools.youtube.youtube_video_enhanced import YouTubeVideoEnhanced
+
             # 初始化视频生成器
             generator = YouTubeVideoGenerator()
-            
+            enhanced = YouTubeVideoEnhanced(generator)
+
             # 显示主菜单
             while True:
                 print("\n🔧 YouTube视频处理选项:")
                 print("1. 扫描音频文件")
-                print("2. 单个视频生成")
+                print("2. 单个视频生成（增强版，可选择图片）")
                 print("3. 批量视频生成")
                 print("4. 查看输出目录")
                 print("5. 清理输出文件")
                 print("0. 返回上级菜单")
-                
+
                 try:
                     choice = int(input("\n请选择操作: "))
-                    
+
                     if choice == 1:  # 扫描音频文件
                         generator.handle_scan_audio()
-                    
-                    elif choice == 2:  # 单个视频生成
-                        generator.handle_single_generation()
-                    
+
+                    elif choice == 2:  # 单个视频生成（增强版）
+                        # 先扫描音频文件
+                        audio_files = generator.scan_audio_files()
+                        if not audio_files:
+                            print("❌ 未找到音频文件")
+                            continue
+
+                        # 显示音频文件列表
+                        print(f"\n📁 找到 {len(audio_files)} 个音频文件:")
+                        for i, file_info in enumerate(audio_files[:20], 1):
+                            size_mb = file_info['size'] / (1024 * 1024)
+                            print(f"{i:2d}. {file_info['name']} ({size_mb:.1f}MB)")
+
+                        if len(audio_files) > 20:
+                            print(f"... 还有 {len(audio_files) - 20} 个文件未显示")
+
+                        # 选择音频文件
+                        try:
+                            file_choice = input(f"\n请选择音频文件 (1-{min(20, len(audio_files))}): ").strip()
+                            if not file_choice.isdigit() or not (1 <= int(file_choice) <= min(20, len(audio_files))):
+                                print("❌ 无效选择")
+                                continue
+
+                            selected_audio = audio_files[int(file_choice) - 1]
+                            # 使用增强版生成器
+                            enhanced.generate_video_interactive(selected_audio)
+
+                        except ValueError:
+                            print("❌ 请输入有效数字")
+
                     elif choice == 3:  # 批量视频生成
                         generator.handle_batch_generation()
-                    
+
                     elif choice == 4:  # 查看输出目录
                         generator.handle_view_output()
-                    
+
                     elif choice == 5:  # 清理输出文件
                         generator.handle_cleanup()
-                    
+
                     elif choice == 0:  # 返回
                         break
-                    
+
                     else:
                         print("❌ 选择无效，请输入1-5或0返回")
-                        
+
                 except ValueError:
                     print("❌ 请输入有效的数字")
                 except KeyboardInterrupt:
@@ -186,15 +216,15 @@ class YouTubeMenuHandler(BaseMenuHandler):
                     break
                 except Exception as e:
                     print(f"❌ 操作失败: {e}")
-                
+
                 input("\n按Enter键继续...")
-        
+
         except ImportError as e:
             print(f"❌ 无法导入YouTube视频生成器: {e}")
             print("💡 请确保scripts/tools/youtube/youtube_video_generator.py文件存在")
         except Exception as e:
             print(f"❌ YouTube视频处理时出错: {e}")
-        
+
         self.pause_for_user()
         return None
     
@@ -295,9 +325,9 @@ class YouTubeMenuHandler(BaseMenuHandler):
         return None
     
     def _handle_audio_upload(self) -> Optional[str]:
-        """处理YouTube音频上传"""
-        self.display_menu_header("🎬 YouTube音频上传",
-                                "扫描audio目录并上传到YouTube")
+        """YouTube视频生成与上传"""
+        self.display_menu_header("🎬 YouTube视频生成与上传",
+                                "将音频文件转换为视频并上传到YouTube")
         
         # 检查OAuth状态
         oauth_status = self._check_oauth_status()
@@ -439,38 +469,54 @@ class YouTubeMenuHandler(BaseMenuHandler):
     
     def _upload_single_audio(self, audio_file: Path) -> Optional[str]:
         """
-        上传单个音频文件
-        
+        上传单个音频文件（先生成视频，再上传）
+
         Args:
             audio_file: 音频文件路径
-            
+
         Returns:
             上传结果
         """
         try:
-            print(f"\n🎵 准备上传: {audio_file.name}")
-            
-            # 确认上传
-            if not self.confirm_operation(f"确认上传 {audio_file.name} 到YouTube？"):
+            print(f"\n🎵 准备处理: {audio_file.name}")
+
+            # 确认操作
+            if not self.confirm_operation(f"确认将 {audio_file.name} 生成视频并上传到YouTube？"):
                 self.display_operation_cancelled()
                 return None
-            
-            # TODO: 实际的上传逻辑
-            # 这里需要集成YouTube API上传功能
-            print(f"📤 正在上传 {audio_file.name}...")
-            
-            # 模拟上传过程
-            import time
-            time.sleep(1)
-            
-            # 临时返回成功消息
-            upload_url = f"https://youtube.com/watch?v=example_{audio_file.stem}"
-            self.display_success_message(f"上传完成: {upload_url}")
 
-            # 添加暂停让用户看到结果
-            self.pause_for_user()
+            # 使用增强版视频生成器
+            from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator
+            from scripts.tools.youtube.youtube_video_enhanced import YouTubeVideoEnhanced
 
-            return upload_url
+            # 初始化生成器
+            generator = YouTubeVideoGenerator()
+            enhanced = YouTubeVideoEnhanced(generator)
+
+            # 准备音频文件信息
+            audio_info = {
+                'path': audio_file,
+                'name': audio_file.name,
+                'title': audio_file.stem.replace('_', ' ').replace('-', ' '),
+                'size': audio_file.stat().st_size,
+                'format': audio_file.suffix,
+                'modified': datetime.now()
+            }
+
+            print("\n🎬 开始视频生成流程...")
+            print("=" * 40)
+
+            # 使用增强版生成器（包含图片选择、音频压缩、视频生成和上传）
+            result = enhanced.generate_video_interactive(audio_info)
+
+            if result:
+                self.display_success_message("视频处理完成")
+                self.pause_for_user()
+                return "视频生成并上传成功"
+            else:
+                print("❌ 视频处理失败")
+                self.pause_for_user()
+                return None
             
         except Exception as e:
             self.handle_error(e, f"上传音频文件 {audio_file.name}")
