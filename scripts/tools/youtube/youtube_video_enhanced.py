@@ -286,8 +286,24 @@ class YouTubeVideoEnhanced:
                 result = uploader.upload_to_youtube(video_path, title, description)
 
                 if result:
+                    # result 可能是视频ID或完整URL
+                    video_id = None
+                    video_url = None
+
+                    if result.startswith('http'):
+                        # 返回的是完整URL
+                        video_url = result
+                        if 'watch?v=' in result:
+                            video_id = result.split('watch?v=')[1].split('&')[0]
+                        elif 'youtu.be/' in result:
+                            video_id = result.split('youtu.be/')[1].split('?')[0]
+                    else:
+                        # 返回的是视频ID
+                        video_id = result
+                        video_url = f"https://www.youtube.com/watch?v={video_id}"
+
                     print("\n✅ 上传成功!")
-                    print(f"🔗 视频链接: {result}")
+                    print(f"🔗 视频链接: {video_url}")
 
                     # 保存上传记录
                     upload_record_file = self.output_dir / "upload_history.txt"
@@ -295,8 +311,17 @@ class YouTubeVideoEnhanced:
                         from datetime import datetime
                         f.write(f"\n{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
                         f.write(f"文件: {video_path.name}\n")
-                        f.write(f"链接: {result}\n")
+                        f.write(f"链接: {video_url}\n")
                         f.write("-" * 40 + "\n")
+
+                    if video_id:
+                        # 询问是否更新博文
+                        print("\n" + "=" * 40)
+                        update_choice = input("📝 是否将YouTube链接添加到对应的博文？(y/N): ").strip().lower()
+
+                        if update_choice in ['y', 'yes']:
+                            self._update_blog_post(audio_file, video_id, video_url, title)
+
                     return True
                 else:
                     print("❌ 上传失败")
@@ -310,6 +335,68 @@ class YouTubeVideoEnhanced:
         except Exception as e:
             print(f"❌ 上传过程出错: {e}")
             return False
+
+    def _update_blog_post(self, audio_file: Dict[str, Any], video_id: str, video_url: str, title: str):
+        """更新博文，添加YouTube链接"""
+        try:
+            print("\n🔍 查找对应的博文...")
+
+            from scripts.tools.youtube.youtube_post_updater import YouTubePostUpdater
+
+            updater = YouTubePostUpdater()
+
+            # 使用音频文件名查找博文
+            audio_name = audio_file.get('name', '')
+            post_path = updater.find_post_by_audio(audio_name)
+
+            if not post_path:
+                print(f"❌ 未找到与 {audio_name} 对应的博文")
+
+                # 提供手动选择选项
+                manual_choice = input("是否手动选择博文？(y/N): ").strip().lower()
+                if manual_choice in ['y', 'yes']:
+                    # 列出最近的博文
+                    posts_dir = Path("_posts")
+                    drafts_dir = Path("_drafts")
+
+                    all_posts = []
+                    if posts_dir.exists():
+                        all_posts.extend(list(posts_dir.glob("*.md"))[-10:])
+                    if drafts_dir.exists():
+                        all_posts.extend(list(drafts_dir.glob("*.md"))[-10:])
+
+                    if all_posts:
+                        print("\n📄 最近的博文:")
+                        for i, post in enumerate(all_posts, 1):
+                            print(f"  {i}. {post.name}")
+
+                        try:
+                            choice = int(input(f"\n选择博文 (1-{len(all_posts)}): "))
+                            if 1 <= choice <= len(all_posts):
+                                post_path = all_posts[choice - 1]
+                        except ValueError:
+                            print("❌ 无效选择")
+                            return
+
+            if post_path and post_path.exists():
+                # 添加YouTube链接到博文
+                success = updater.add_youtube_link_to_post(
+                    post_path,
+                    video_id,
+                    video_url,
+                    title,
+                    audio_name
+                )
+
+                if success:
+                    print(f"✅ 博文更新成功: {post_path.name}")
+                else:
+                    print("❌ 博文更新失败")
+            else:
+                print("⚠️ 未更新博文（未找到匹配文件）")
+
+        except Exception as e:
+            print(f"❌ 更新博文时出错: {e}")
 
 
 def main():
