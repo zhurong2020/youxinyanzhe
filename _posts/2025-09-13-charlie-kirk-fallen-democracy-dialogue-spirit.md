@@ -27,6 +27,7 @@ toc_sticky: true
 
 <!-- more -->
 
+**🎧 音频版本**：全文较长（约1.5万字），我们使用豆包生成了中文播客版本，方便您在通勤或运动时收听。
 ## 🎧 播客收听 (YouTube版)
 
 <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000;">
