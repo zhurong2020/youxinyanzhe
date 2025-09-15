@@ -35,8 +35,14 @@ class YouTubePostUpdater:
         # 提取音频文件的基本名称（去掉扩展名）
         audio_base = Path(audio_file_name).stem
 
-        # 清理名称中的特殊字符，准备匹配
-        search_terms = audio_base.replace('：', '').replace(':', '').replace('·', '').lower()
+        # 多种匹配策略
+        # 1. 对于简单文件名如 "charliekirk.wav"，尝试查找包含该词的文件
+        if audio_base.replace('_', '').replace('-', '').isalnum():
+            # 简单文件名，直接搜索
+            search_keyword = audio_base.lower()
+        else:
+            # 复杂文件名，清理特殊字符
+            search_keyword = audio_base.replace('：', '').replace(':', '').replace('·', '').replace('_', '').replace('-', '').lower()
 
         # 搜索已发布的文章
         all_posts = []
@@ -51,8 +57,27 @@ class YouTubePostUpdater:
         for post_file in all_posts:
             post_name = post_file.stem.lower()
 
-            # 检查文件名是否包含关键词
-            if any(term in post_name for term in search_terms.split()):
+            # 更智能的匹配策略
+            # 1. 对于 "charliekirk" 这样的简单名称
+            if 'charliekirk' in search_keyword or search_keyword == 'charliekirk':
+                if 'charlie' in post_name and 'kirk' in post_name:
+                    print(f"📄 找到匹配的博文: {post_file.name}")
+                    return post_file
+
+            # 2. 单独的 charlie 或 kirk
+            if search_keyword in ['charlie', 'kirk']:
+                if search_keyword in post_name:
+                    print(f"📄 找到匹配的博文: {post_file.name}")
+                    return post_file
+
+            # 3. 移除连字符后的匹配
+            clean_post_name = post_name.replace('-', '').replace('_', '')
+            if search_keyword in clean_post_name:
+                print(f"📄 找到匹配的博文: {post_file.name}")
+                return post_file
+
+            # 4. 部分匹配（前5个字符）
+            if len(search_keyword) > 5 and search_keyword[:5] in clean_post_name:
                 print(f"📄 找到匹配的博文: {post_file.name}")
                 return post_file
 
