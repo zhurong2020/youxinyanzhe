@@ -63,22 +63,20 @@ class YouTubeMenuHandler(BaseMenuHandler):
     def _handle_podcast_generation(self) -> Optional[str]:
         """处理YouTube播客生成详细菜单"""
         menu_title = "🎧 YouTube播客生成器"
-        menu_description = "🤖 将英文YouTube视频转换为中文播客"
-        
+        menu_description = "🤖 将英文YouTube视频转换为中文播客文章"
+
         options = [
             "1. 📝 生成YouTube播客学习文章",
-            "2. 🎬 上传已生成的播客视频",
-            "3. ⚙️ 查看配置状态",
-            "4. 📖 使用说明和示例"
+            "2. ⚙️ 查看配置状态",
+            "3. 📖 使用说明和示例"
         ]
-        
+
         handlers = [
             self._generate_podcast_article,
-            self._upload_podcast_video,
             self._check_podcast_config,
             self._show_podcast_usage
         ]
-        
+
         return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "4.1")
     
     def _generate_podcast_article(self) -> Optional[str]:
@@ -132,7 +130,7 @@ class YouTubeMenuHandler(BaseMenuHandler):
             self.handle_error(e, "YouTube播客文章生成")
             return None
     
-    def _upload_podcast_video(self) -> Optional[str]:
+    def _quick_generate_and_upload(self) -> Optional[str]:
         """YouTube视频生成与上传"""
         self.display_menu_header("🎬 YouTube视频生成与上传",
                                 "将音频文件转换为视频并上传到YouTube")
@@ -328,34 +326,38 @@ class YouTubeMenuHandler(BaseMenuHandler):
         """YouTube视频生成与上传"""
         self.display_menu_header("🎬 YouTube视频生成与上传",
                                 "将音频文件转换为视频并上传到YouTube")
-        
+
         # 检查OAuth状态
         oauth_status = self._check_oauth_status()
         print(f"\n🔐 OAuth认证状态: {oauth_status['message']}")
-        
+
         if not oauth_status['valid']:
             print("💡 请先完成OAuth认证配置:")
-            print("   1. 查看文档: YOUTUBE_OAUTH_SETUP.md")
+            print("   1. 通过主菜单 → 4 → 3 配置OAuth")
             print("   2. 或运行: python scripts/tools/youtube_oauth_setup.py")
             self.pause_for_user()
             return None
-        
-        # 显示上传选项
+
+        # 显示视频生成与上传选项
         upload_options = [
-            "1. 📁 扫描并选择音频文件",
-            "2. 📋 查看上传历史",
-            "3. ⚙️ 配置上传参数",
-            "4. 🔄 批量上传"
+            "1. 🚀 快速生成并上传（单个文件）",
+            "2. 🔄 批量处理音频文件",
+            "3. 📋 查看上传历史",
+            "4. ⚙️ 配置上传参数",
+            "5. 🗂️ 管理输出文件"
         ]
-        
+
         upload_handlers = [
-            self._scan_and_select_audio,
+            self._quick_generate_and_upload,
+            self._batch_process_audio,
             self._view_upload_history,
             self._configure_upload_params,
-            self._batch_upload_audio
+            self._manage_output_files
         ]
-        
-        return self.create_menu_loop_with_path("🎬 YouTube音频上传", "", upload_options, upload_handlers, "4.2")
+
+        return self.create_menu_loop_with_path("🎬 YouTube视频生成与上传",
+                                              "音频文件 → 视频 → YouTube",
+                                              upload_options, upload_handlers, "4.2")
     
     def _handle_oauth_management(self) -> Optional[str]:
         """处理OAuth认证管理"""
@@ -426,101 +428,6 @@ class YouTubeMenuHandler(BaseMenuHandler):
                 'details': str(e)
             }
     
-    def _scan_and_select_audio(self) -> Optional[str]:
-        """扫描并选择音频文件"""
-        try:
-            audio_dir = Path("assets/audio")
-            if not audio_dir.exists():
-                print(f"❌ 音频目录不存在: {audio_dir}")
-                return None
-            
-            # 扫描音频文件
-            audio_files = []
-            for ext in ['*.mp3', '*.wav', '*.m4a', '*.flac']:
-                audio_files.extend(audio_dir.glob(ext))
-            
-            if not audio_files:
-                print(f"❌ 在 {audio_dir} 中未找到音频文件")
-                return None
-            
-            print(f"\n📁 发现 {len(audio_files)} 个音频文件:")
-            for i, file in enumerate(audio_files, 1):
-                file_size = file.stat().st_size / (1024 * 1024)  # MB
-                print(f"   {i}. {file.name} ({file_size:.1f}MB)")
-            
-            # 用户选择
-            choice = input(f"\n请选择要上传的文件 (1-{len(audio_files)}): ").strip()
-            
-            try:
-                file_index = int(choice) - 1
-                if 0 <= file_index < len(audio_files):
-                    selected_file = audio_files[file_index]
-                    return self._upload_single_audio(selected_file)
-                else:
-                    print("❌ 无效选择")
-                    return None
-            except ValueError:
-                print("❌ 请输入有效数字")
-                return None
-                
-        except Exception as e:
-            self.handle_error(e, "扫描音频文件")
-            return None
-    
-    def _upload_single_audio(self, audio_file: Path) -> Optional[str]:
-        """
-        上传单个音频文件（先生成视频，再上传）
-
-        Args:
-            audio_file: 音频文件路径
-
-        Returns:
-            上传结果
-        """
-        try:
-            print(f"\n🎵 准备处理: {audio_file.name}")
-
-            # 确认操作
-            if not self.confirm_operation(f"确认将 {audio_file.name} 生成视频并上传到YouTube？"):
-                self.display_operation_cancelled()
-                return None
-
-            # 使用增强版视频生成器
-            from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator
-            from scripts.tools.youtube.youtube_video_enhanced import YouTubeVideoEnhanced
-
-            # 初始化生成器
-            generator = YouTubeVideoGenerator()
-            enhanced = YouTubeVideoEnhanced(generator)
-
-            # 准备音频文件信息
-            audio_info = {
-                'path': audio_file,
-                'name': audio_file.name,
-                'title': audio_file.stem.replace('_', ' ').replace('-', ' '),
-                'size': audio_file.stat().st_size,
-                'format': audio_file.suffix,
-                'modified': datetime.now()
-            }
-
-            print("\n🎬 开始视频生成流程...")
-            print("=" * 40)
-
-            # 使用增强版生成器（包含图片选择、音频压缩、视频生成和上传）
-            result = enhanced.generate_video_interactive(audio_info)
-
-            if result:
-                self.display_success_message("视频处理完成")
-                self.pause_for_user()
-                return "视频生成并上传成功"
-            else:
-                print("❌ 视频处理失败")
-                self.pause_for_user()
-                return None
-            
-        except Exception as e:
-            self.handle_error(e, f"上传音频文件 {audio_file.name}")
-            return None
     
     def _view_upload_history(self) -> Optional[str]:
         """查看上传历史"""
@@ -676,41 +583,58 @@ class YouTubeMenuHandler(BaseMenuHandler):
             self.handle_error(e, "配置上传参数")
             return None
     
-    def _batch_upload_audio(self) -> Optional[str]:
-        """批量上传音频"""
+    def _batch_process_audio(self) -> Optional[str]:
+        """批量处理音频文件"""
         try:
-            import subprocess
-            from pathlib import Path
-            
-            print("\n🔄 批量上传音频文件")
+            from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator
+
+            print("\n🔄 批量处理音频文件")
             print("="*40)
-            
-            # 检查OAuth状态
-            oauth_status = self._check_oauth_status()
-            if not oauth_status['valid']:
-                print(f"❌ OAuth认证状态: {oauth_status['message']}")
-                print("💡 请先配置OAuth认证")
-                self.pause_for_user()
-                return None
-            
-            print("🚀 启动YouTube批量上传工具...")
-            print("💡 提示: 工具将自动扫描assets/audio目录中的所有音频文件")
-            print()
-            
-            # 调用YouTube上传测试工具
-            result = subprocess.run([
-                "python", "scripts/tools/youtube/youtube_upload_tester.py"
-            ], check=False)
-            
-            if result.returncode == 0:
-                print("\n✅ 批量上传完成")
-                return "批量上传音频完成"
-            else:
-                print("\n⚠️ 批量上传过程中遇到问题")
-                return None
-                
+
+            generator = YouTubeVideoGenerator()
+            generator.handle_batch_generation()
+
+            self.pause_for_user()
+            return "批量处理完成"
+
         except Exception as e:
-            self.handle_error(e, "批量上传音频")
+            self.handle_error(e, "批量处理音频")
+            return None
+
+    def _manage_output_files(self) -> Optional[str]:
+        """管理输出文件"""
+        try:
+            from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator
+
+            print("\n🗂️ 管理输出文件")
+            print("="*40)
+
+            generator = YouTubeVideoGenerator()
+
+            while True:
+                print("\n选择操作:")
+                print("1. 📋 查看输出目录")
+                print("2. 🧹 清理输出文件")
+                print("0. 返回")
+
+                choice = input("\n请选择 (0-2): ").strip()
+
+                if choice == "1":
+                    generator.handle_view_output()
+                elif choice == "2":
+                    generator.handle_cleanup()
+                elif choice == "0":
+                    break
+                else:
+                    print("❌ 无效选择")
+
+                if choice != "0":
+                    input("\n按Enter键继续...")
+
+            return None
+
+        except Exception as e:
+            self.handle_error(e, "管理输出文件")
             return None
     
     def _check_oauth_detailed(self) -> Optional[str]:

@@ -79,36 +79,36 @@
           "upload_podcast_video": {
             "display_name": "YouTube视频生成与上传",
             "menu_path": "scripts/cli/youtube_menu_handler.py",
-            "menu_method": "_upload_podcast_video",
+            "menu_method": "_quick_generate_and_upload",
             "menu_line": 134,
             "core_implementation": "scripts/tools/youtube/youtube_video_generator.py:YouTubeVideoGenerator",
             "dependencies": ["subprocess", "pathlib", "PIL"],
             "status": "active",
-            "test_command": "from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator; gen = YouTubeVideoGenerator()",
+            "test_command": "from scripts.tools/youtube.youtube_video_generator import YouTubeVideoGenerator; gen = YouTubeVideoGenerator()",
             "last_verified": "2025-08-19",
             "integration_commit": "1a08092"
           },
           "scan_audio_files": {
             "display_name": "音频文件扫描",
             "menu_path": "scripts/cli/youtube_menu_handler.py",
-            "menu_method": "_upload_podcast_video",
+            "menu_method": "_quick_generate_and_upload",
             "sub_function": "handle_scan_audio",
             "core_implementation": "scripts/tools/youtube/youtube_video_generator.py:YouTubeVideoGenerator.scan_audio_files",
             "dependencies": ["pathlib", "os"],
             "status": "active",
-            "test_command": "from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator; gen = YouTubeVideoGenerator(); gen.scan_audio_files()",
+            "test_command": "from scripts/tools/youtube.youtube_video_generator import YouTubeVideoGenerator; gen = YouTubeVideoGenerator(); gen.scan_audio_files()",
             "last_verified": "2025-08-20",
             "integration_commit": "e8c1a16"
           },
           "batch_video_generation": {
             "display_name": "批量视频生成",
             "menu_path": "scripts/cli/youtube_menu_handler.py",
-            "menu_method": "_upload_podcast_video",
+            "menu_method": "_quick_generate_and_upload",
             "sub_function": "handle_batch_generation",
             "core_implementation": "scripts/tools/youtube/youtube_video_generator.py:YouTubeVideoGenerator.generate_video_for_file",
             "dependencies": ["subprocess", "ffmpeg"],
             "status": "active",
-            "test_command": "from scripts.tools.youtube.youtube_video_generator import YouTubeVideoGenerator; gen = YouTubeVideoGenerator()",
+            "test_command": "from scripts/tools/youtube.youtube_video_generator import YouTubeVideoGenerator; gen = YouTubeVideoGenerator()",
             "last_verified": "2025-08-20",
             "integration_commit": "e8c1a16"
           }
