@@ -88,7 +88,7 @@ class YouTubePostUpdater:
                     title = post.get('title', '').lower()
 
                     # 检查标题是否匹配
-                    if any(term in title for term in search_terms.split()):
+                    if any(term in title for term in search_keyword.split()):
                         print(f"📄 找到匹配的博文（通过标题）: {post_file.name}")
                         return post_file
             except Exception:
