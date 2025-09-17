@@ -3056,26 +3056,56 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
         print("🎯 为Markdown链接添加Jekyll的{:target=\"_blank\"}属性")
 
         from pathlib import Path
+        from datetime import datetime
 
         try:
+            # 获取当前年月
+            current_year = datetime.now().year
+            current_month = datetime.now().month
+            current_month_str = f"{current_year}-{current_month:02d}"
+
             # 获取文件列表
             drafts_dir = Path("_drafts")
             posts_dir = Path("_posts")
 
             all_files = []
-            if drafts_dir.exists():
-                all_files.extend(list(drafts_dir.glob("**/*.md")))
+
+            # 获取当前月份的posts（基于文件名的日期前缀）
             if posts_dir.exists():
-                all_files.extend(list(posts_dir.glob("**/*.md")))
+                for file in posts_dir.glob("**/*.md"):
+                    # Jekyll文章文件名格式: YYYY-MM-DD-title.md
+                    file_name = file.name
+                    if file_name[:7] == current_month_str:  # 检查年月部分
+                        all_files.append(file)
+
+            # 获取所有drafts（排除archived目录）
+            if drafts_dir.exists():
+                for file in drafts_dir.glob("*.md"):  # 只获取drafts根目录的文件
+                    all_files.append(file)
 
             if not all_files:
-                print("❌ 没有找到文章文件")
+                print(f"❌ 没有找到需要处理的文件")
+                print(f"   📅 当前月份 ({current_month_str}) 的已发布文章: 0")
+                print(f"   📝 当前草稿: 0")
                 self.pause_for_user()
                 return
 
-            print(f"\n📋 找到 {len(all_files)} 个文件:")
+            # 统计文件类型
+            post_count = sum(1 for f in all_files if "_posts" in str(f))
+            draft_count = sum(1 for f in all_files if "_drafts" in str(f))
+
+            print(f"\n📋 找到 {len(all_files)} 个待处理文件:")
+            print(f"   📅 本月已发布文章 ({current_month_str}): {post_count} 篇")
+            print(f"   📝 当前草稿: {draft_count} 篇")
+            print()
+
             for i, file in enumerate(all_files[:20], 1):
-                print(f"  {i}. {file}")
+                # 显示简化的路径
+                if "_posts" in str(file):
+                    display_path = f"_posts/{file.name}"
+                else:
+                    display_path = f"_drafts/{file.name}"
+                print(f"  {i}. {display_path}")
             if len(all_files) > 20:
                 print(f"  ... 还有 {len(all_files)-20} 个文件")
 
