@@ -31,7 +31,7 @@ toc_sticky: true
 
 ## 🎯 美股市场：远不止标普500这一个选择
 
-还记得我在[《为什么普通人应该现在就开始投资美股》](https://zhurong2020.github.io/post/wei-shi-me-pu-tong-ren-ying-gai-xian-zai-jiu-kai-shi-tou-zi-mei-gu-yi-ge-you-ni-zhong-nian-de-zhen-shi-zhuan-xing-ji/)中提到的观点吗？许多人误以为美股投资就是买入标普500指数，但事实远非如此。
+还记得我在[《为什么普通人应该现在就开始投资美股》](https://zhurong2020.github.io/post/wei-shi-me-pu-tong-ren-ying-gai-xian-zai-jiu-kai-shi-tou-zi-mei-gu-yi-ge-you-ni-zhong-nian-de-zhen-shi-zhuan-xing-ji/){:target="_blank"}中提到的观点吗？许多人误以为美股投资就是买入标普500指数，但事实远非如此。
 
 美股市场的机会远比你想象的丰富：
 - **优质公司股息**：可口可乐、微软、强生等公司的股息率普遍在2-4%。
@@ -72,7 +72,7 @@ toc_sticky: true
 - **入金奖励**：完成指定金额入金，最高可获价值$1,000的英伟达（NVDA）股票。
 - **推荐双赢**：通过我的专属链接开户，我们双方都能获得额外奖励。
 
-**开户链接**: [https://j.moomoo.com/0sESw6](https://j.moomoo.com/0sESw6)
+**开户链接**: [https://j.moomoo.com/0sESw6](https://j.moomoo.com/0sESw6){:target="_blank"}
 
 
 ![Moomoo开户二维码](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=Ebe9Wu8PSOBHrvTgQWyvZcwBGsV1X-3jgp-6ls1qy8nyog)
@@ -81,7 +81,7 @@ toc_sticky: true
 
 **特别福利**：使用我的推荐链接完成开户，并在本文末评论区留言的读者，我将每月从已确认开户的读者中抽取1名，提供**一小时免费投资咨询服务**（内容包括但不限于策略讨论、工具使用、个人投资规划等）。
 
-想了解更多开户细节，可以参考我的详细教程：[《智能DCA定投策略完整指南》](https://zhurong2020.github.io/youxinyanzhe/posts/2025/01/intelligent-dca/)
+想了解更多开户细节，可以参考我的详细教程：[《智能DCA定投策略完整指南》](https://zhurong2020.github.io/youxinyanzhe/posts/2025/01/intelligent-dca/){:target="_blank"}
 
 ### 另一个专业选择：Interactive Brokers（盈透证券）
 
@@ -96,7 +96,7 @@ toc_sticky: true
 
 **开户奖励**：通过我的推荐链接开户，**你最高可获得1000美元的现金奖励**（根据入金金额而定）。
 
-**IB开户链接**: [https://ibkr.com/referral/rong953](https://ibkr.com/referral/rong953)
+**IB开户链接**: [https://ibkr.com/referral/rong953](https://ibkr.com/referral/rong953){:target="_blank"}
 
 若链接无法打开，请尝试使用浏览器的无痕模式并开启科学上网。
 
@@ -249,7 +249,7 @@ Covered Call（备兑看涨期权）策略的原理类似于“将持有的股�
 
 **中国投资者请注意**：与国内企业分红依赖公司意愿不同，在美国，BDCs和REITs的分红是**受法律强制要求的**。美国政府规定，这两类资产必须将其应税利润的90%以上分配给投资者，否则将失去税收优惠资格，面临高额的税收处罚。这就是它们能提供稳定高分红的根本原因——不是企业“想分”，而是法律规定“必须分”。
 
-**什么是BDC？** BDC（Business Development Companies）是专门为中小企业提供融资的投资公司。根据美国《1940年投资公司法》，BDCs必须将至少90%的应税收入以股息形式分配给股东，才能享受税收穿透待遇，避免双重征税。[详见SEC官方说明](https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins/publicly-traded-business-development-companies-bdcs-investor-bulletin)
+**什么是BDC？** BDC（Business Development Companies）是专门为中小企业提供融资的投资公司。根据美国《1940年投资公司法》，BDCs必须将至少90%的应税收入以股息形式分配给股东，才能享受税收穿透待遇，避免双重征税。[详见SEC官方说明](https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins/publicly-traded-business-development-companies-bdcs-investor-bulletin){:target="_blank"}
 
 **推荐标的：MAIN (Main Street Capital)**
 - **分红频率**：月度分红，每月派息！
@@ -273,7 +273,7 @@ REITs（Real Estate Investment Trusts，房地产投资信托）让你无需亲�
 
 *来源：康奈尔法学院，美国税法第26编第857条关于REITs必须分配90%应税收入的法律条文*
 
-请记住：在美国，REITs的高分红不是“承诺”，而是“法律义务”。违反规定将面临重税处罚，因此其分红的可靠性极高。[查看完整法律条文](https://www.law.cornell.edu/uscode/text/26/857)
+请记住：在美国，REITs的高分红不是“承诺”，而是“法律义务”。违反规定将面临重税处罚，因此其分红的可靠性极高。[查看完整法律条文](https://www.law.cornell.edu/uscode/text/26/857){:target="_blank"}
 
 **推荐标的：Realty Income (O)**
 - **绰号**：“The Monthly Dividend Company®”（月度分红公司）。
@@ -639,22 +639,22 @@ else:
 ## 🔗 相关资源
 
 ### 我的文章
-- [为什么普通人应该现在就开始投资美股](https://zhurong2020.github.io/post/wei-shi-me-pu-tong-ren-ying-gai-xian-zai-jiu-kai-shi-tou-zi-mei-gu-yi-ge-you-ni-zhong-nian-de-zhen-shi-zhuan-xing-ji/)
-- [手把手教你用Moomoo量化工具定投美股](https://zhurong2020.github.io/youxinyanzhe/posts/2025/01/intelligent-dca/)
+- [为什么普通人应该现在就开始投资美股](https://zhurong2020.github.io/post/wei-shi-me-pu-tong-ren-ying-gai-xian-zai-jiu-kai-shi-tou-zi-mei-gu-yi-ge-you-ni-zhong-nian-de-zhen-shi-zhuan-xing-ji/){:target="_blank"}
+- [手把手教你用Moomoo量化工具定投美股](https://zhurong2020.github.io/youxinyanzhe/posts/2025/01/intelligent-dca/){:target="_blank"}
 
 ### 开户推荐（含新人奖励）
 - **Moomoo开户**: 
-  [https://j.moomoo.com/0sESw6](https://j.moomoo.com/0sESw6) 
+  [https://j.moomoo.com/0sESw6](https://j.moomoo.com/0sESw6){:target="_blank"} 
   - 享8.1% APY + 最高$1000 NVDA股票
 - **IB开户**:
-  [https://ibkr.com/referral/rong953](https://ibkr.com/referral/rong953) 
+  [https://ibkr.com/referral/rong953](https://ibkr.com/referral/rong953){:target="_blank"} 
   - 专业投资者首选，最高$1000现金奖励
 
 ### 学习资源
 - **必读经典**（点击书名可直接在京东商城购买）：
-  - [《金钱心理学》](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BASoJK1olXwABU1pUCU0SCl8IGVMcXQQKUW4ZVxNJXF9RXh5UHw0cSgYYXBcIWDoXSQVJQwYAXFddCkMSHDZNRwYlORx6HUA_QEh0Cx18ZSgdNUF4Sg08aEcbM244GFoVXgMCVVteAXsnA2g4STXN67Da8e9B3OGY1uefK1olXQAGXV5eD00eB2cOHGsSXQ8yVFxaC0sQC2gOGDVJbTYyV25aCEIDBR1JSU8TLzYyVG5eOEsWA24BG1oWWQADSF5eDU0UA3MIHV8cXQUFUlpfCUsSM20JGl8cbTbc2sopeE9hYBxdGC5zD0ZJPCA21sWDEh14G18UWxcyPDweay5PehthfB0XW3lKXR08UzFgdxZodVkdXVFbMj5UTiJUQAdqbjNwADYHZF5bCEkn) - 理解投资行为与心理
-  - [《聪明的投资者》](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BASsJK1olXQ8AUFpVC0kXAV8ME1sSXgIBVF1dAHtTXDdWRGtMGENDFlVDFhNSVzMXQA4KD1heSlpVCEwUB2wIGFsdQl9HCANteg1lHQdVZgV3ClplNDZacjNLWjEKXVcZbQcyV19dC04XAmoLEmslXQEyFTBdCUofBGgMHGsUbQYEUFddC0wfBGgAHF0lWgYLZF5fD0gXBGcPHVh7ATYyZF1tD0seF2l6WgkBW3QyZF5tC3sXAm8AGFsWWAYFUUJdC0IVCm8UG10RVAYBU1ZZDksXBF8KGloRVDYyitDJbT8SRRx6XS9rGXxGPAIKUZWZl35jYlMVXQUTZAJaSStxeAYMQidePXViAiwiCgJUYDgNYzUXAE1wVyo2CR5OehsBTVMXWVoyUW5dDksVMw) - 价值投资圣经
-  - [《巴菲特致股东的信》](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BATAJK1olXwIAUV9fDUwXBF8IGlsTWQcEV1ZUDkkWAl9MRANLAjZbERscSkAJHTdNTwcKBlMdBgABFksWA2kMGl0WVQ8EVl9cFxJSXzI4bgdKA2ICVQg-cg8SQi1TTAN0RwFyElJROEonAG4IGF4VXAMBXW5tCEwnQgEIElsSVAEFUm5cOEsRB2YIGFwdXAUBXFdtD0seM28KHFgVWg4FUl0zVHsnM2w4HFscSQBwFQxJDjknM284GGsVXAYDXV9bCE0SBHMIGlgdWwceVFhZAUsUBGYBH1scWzYAVV9ZAXsn3eK4ZC8WPAQDIgMrWhtjfW1xWYWY7RdwP15ZDVonfxx9XQ9lAFFQJx9eeEgTVjFuRRtGOXRxOlwgYyt1QmhrZQlWJFFdU1oITnsSM28OG1kl) - 投资大师的智慧
+  - [《金钱心理学》](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BASoJK1olXwABU1pUCU0SCl8IGVMcXQQKUW4ZVxNJXF9RXh5UHw0cSgYYXBcIWDoXSQVJQwYAXFddCkMSHDZNRwYlORx6HUA_QEh0Cx18ZSgdNUF4Sg08aEcbM244GFoVXgMCVVteAXsnA2g4STXN67Da8e9B3OGY1uefK1olXQAGXV5eD00eB2cOHGsSXQ8yVFxaC0sQC2gOGDVJbTYyV25aCEIDBR1JSU8TLzYyVG5eOEsWA24BG1oWWQADSF5eDU0UA3MIHV8cXQUFUlpfCUsSM20JGl8cbTbc2sopeE9hYBxdGC5zD0ZJPCA21sWDEh14G18UWxcyPDweay5PehthfB0XW3lKXR08UzFgdxZodVkdXVFbMj5UTiJUQAdqbjNwADYHZF5bCEkn){:target="_blank"} - 理解投资行为与心理
+  - [《聪明的投资者》](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BASsJK1olXQ8AUFpVC0kXAV8ME1sSXgIBVF1dAHtTXDdWRGtMGENDFlVDFhNSVzMXQA4KD1heSlpVCEwUB2wIGFsdQl9HCANteg1lHQdVZgV3ClplNDZacjNLWjEKXVcZbQcyV19dC04XAmoLEmslXQEyFTBdCUofBGgMHGsUbQYEUFddC0wfBGgAHF0lWgYLZF5fD0gXBGcPHVh7ATYyZF1tD0seF2l6WgkBW3QyZF5tC3sXAm8AGFsWWAYFUUJdC0IVCm8UG10RVAYBU1ZZDksXBF8KGloRVDYyitDJbT8SRRx6XS9rGXxGPAIKUZWZl35jYlMVXQUTZAJaSStxeAYMQidePXViAiwiCgJUYDgNYzUXAE1wVyo2CR5OehsBTVMXWVoyUW5dDksVMw){:target="_blank"} - 价值投资圣经
+  - [《巴菲特致股东的信》](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BATAJK1olXwIAUV9fDUwXBF8IGlsTWQcEV1ZUDkkWAl9MRANLAjZbERscSkAJHTdNTwcKBlMdBgABFksWA2kMGl0WVQ8EVl9cFxJSXzI4bgdKA2ICVQg-cg8SQi1TTAN0RwFyElJROEonAG4IGF4VXAMBXW5tCEwnQgEIElsSVAEFUm5cOEsRB2YIGFwdXAUBXFdtD0seM28KHFgVWg4FUl0zVHsnM2w4HFscSQBwFQxJDjknM284GGsVXAYDXV9bCE0SBHMIGlgdWwceVFhZAUsUBGYBH1scWzYAVV9ZAXsn3eK4ZC8WPAQDIgMrWhtjfW1xWYWY7RdwP15ZDVonfxx9XQ9lAFFQJx9eeEgTVjFuRRtGOXRxOlwgYyt1QmhrZQlWJFFdU1oITnsSM28OG1kl){:target="_blank"} - 投资大师的智慧
 - **免费工具**：DCA策略计算器、期权扫描工具、回测平台
 
 **读者交流群**：为了帮助大家更好地学习，我建立了投资交流群。群内会不定期分享上述书籍的读书笔记和学习心得（仅供交流学习，鼓励购买正版深入阅读）。
@@ -664,17 +664,17 @@ else:
 ## 📚 参考资源
 
 ### 主要数据来源
-- **S&P指数数据**: [S&P Dow Jones Indices](https://www.spglobal.com/spdji/)
-- **REITs数据**: [Nareit](https://www.reit.com/data-research)
-- **ETF信息**: [J.P. Morgan ETFs](https://am.jpmorgan.com/) | [Global X ETFs](https://www.globalxetfs.com/)
-- **回测工具**: [Portfolio Visualizer](https://www.portfoliovisualizer.com/backtest-portfolio)
-- **流通股本数据**: [Macrotrends](https://www.macrotrends.net/)
+- **S&P指数数据**: [S&P Dow Jones Indices](https://www.spglobal.com/spdji/){:target="_blank"}
+- **REITs数据**: [Nareit](https://www.reit.com/data-research){:target="_blank"}
+- **ETF信息**: [J.P. Morgan ETFs](https://am.jpmorgan.com/){:target="_blank"} | [Global X ETFs](https://www.globalxetfs.com/){:target="_blank"}
+- **回测工具**: [Portfolio Visualizer](https://www.portfoliovisualizer.com/backtest-portfolio){:target="_blank"}
+- **流通股本数据**: [Macrotrends](https://www.macrotrends.net/){:target="_blank"}
 
 ### 延伸阅读
 - **投资经典三部曲**（支持作者，请购买正版）：
-  - [《金钱心理学》](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BASoJK1olXwABU1pUCU0SCl8IGVMcXQQKUW4ZVxNJXF9RXh5UHw0cSgYYXBcIWDoXSQVJQwYAXFddCkMSHDZNRwYlORx6HUA_QEh0Cx18ZSgdNUF4Sg08aEcbM244GFoVXgMCVVteAXsnA2g4STXN67Da8e9B3OGY1uefK1olXQAGXV5eD00eB2cOHGsSXQ8yVFxaC0sQC2gOGDVJbTYyV25aCEIDBR1JSU8TLzYyVG5eOEsWA24BG1oWWQADSF5eDU0UA3MIHV8cXQUFUlpfCUsSM20JGl8cbTbc2sopeE9hYBxdGC5zD0ZJPCA21sWDEh14G18UWxcyPDweay5PehthfB0XW3lKXR08UzFgdxZodVkdXVFbMj5UTiJUQAdqbjNwADYHZF5bCEkn) - 理解投资行为与心理
-  - [《聪明的投资者》](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BASsJK1olXQ8AUFpVC0kXAV8ME1sSXgIBVF1dAHtTXDdWRGtMGENDFlVDFhNSVzMXQA4KD1heSlpVCEwUB2wIGFsdQl9HCANteg1lHQdVZgV3ClplNDZacjNLWjEKXVcZbQcyV19dC04XAmoLEmslXQEyFTBdCUofBGgMHGsUbQYEUFddC0wfBGgAHF0lWgYLZF5fD0gXBGcPHVh7ATYyZF1tD0seF2l6WgkBW3QyZF5tC3sXAm8AGFsWWAYFUUJdC0IVCm8UG10RVAYBU1ZZDksXBF8KGloRVDYyitDJbT8SRRx6XS9rGXxGPAIKUZWZl35jYlMVXQUTZAJaSStxeAYMQidePXViAiwiCgJUYDgNYzUXAE1wVyo2CR5OehsBTVMXWVoyUW5dDksVMw) - 价值投资圣经
-  - [《巴菲特致股东的信》](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BATAJK1olXwIAUV9fDUwXBF8IGlsTWQcEV1ZUDkkWAl9MRANLAjZbERscSkAJHTdNTwcKBlMdBgABFksWA2kMGl0WVQ8EVl9cFxJSXzI4bgdKA2ICVQg-cg8SQi1TTAN0RwFyElJROEonAG4IGF4VXAMBXW5tCEwnQgEIElsSVAEFUm5cOEsRB2YIGFwdXAUBXFdtD0seM28KHFgVWg4FUl0zVHsnM2w4HFscSQBwFQxJDjknM284GGsVXAYDXV9bCE0SBHMIGlgdWwceVFhZAUsUBGYBH1scWzYAVV9ZAXsn3eK4ZC8WPAQDIgMrWhtjfW1xWYWY7RdwP15ZDVonfxx9XQ9lAFFQJx9eeEgTVjFuRRtGOXRxOlwgYyt1QmhrZQlWJFFdU1oITnsSM28OG1kl) - 投资大师的智慧
+  - [《金钱心理学》](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BASoJK1olXwABU1pUCU0SCl8IGVMcXQQKUW4ZVxNJXF9RXh5UHw0cSgYYXBcIWDoXSQVJQwYAXFddCkMSHDZNRwYlORx6HUA_QEh0Cx18ZSgdNUF4Sg08aEcbM244GFoVXgMCVVteAXsnA2g4STXN67Da8e9B3OGY1uefK1olXQAGXV5eD00eB2cOHGsSXQ8yVFxaC0sQC2gOGDVJbTYyV25aCEIDBR1JSU8TLzYyVG5eOEsWA24BG1oWWQADSF5eDU0UA3MIHV8cXQUFUlpfCUsSM20JGl8cbTbc2sopeE9hYBxdGC5zD0ZJPCA21sWDEh14G18UWxcyPDweay5PehthfB0XW3lKXR08UzFgdxZodVkdXVFbMj5UTiJUQAdqbjNwADYHZF5bCEkn){:target="_blank"} - 理解投资行为与心理
+  - [《聪明的投资者》](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BASsJK1olXQ8AUFpVC0kXAV8ME1sSXgIBVF1dAHtTXDdWRGtMGENDFlVDFhNSVzMXQA4KD1heSlpVCEwUB2wIGFsdQl9HCANteg1lHQdVZgV3ClplNDZacjNLWjEKXVcZbQcyV19dC04XAmoLEmslXQEyFTBdCUofBGgMHGsUbQYEUFddC0wfBGgAHF0lWgYLZF5fD0gXBGcPHVh7ATYyZF1tD0seF2l6WgkBW3QyZF5tC3sXAm8AGFsWWAYFUUJdC0IVCm8UG10RVAYBU1ZZDksXBF8KGloRVDYyitDJbT8SRRx6XS9rGXxGPAIKUZWZl35jYlMVXQUTZAJaSStxeAYMQidePXViAiwiCgJUYDgNYzUXAE1wVyo2CR5OehsBTVMXWVoyUW5dDksVMw){:target="_blank"} - 价值投资圣经
+  - [《巴菲特致股东的信》](https://union-click.jd.com/jdc?e=618%7Cpc%7C&p=JF8BATAJK1olXwIAUV9fDUwXBF8IGlsTWQcEV1ZUDkkWAl9MRANLAjZbERscSkAJHTdNTwcKBlMdBgABFksWA2kMGl0WVQ8EVl9cFxJSXzI4bgdKA2ICVQg-cg8SQi1TTAN0RwFyElJROEonAG4IGF4VXAMBXW5tCEwnQgEIElsSVAEFUm5cOEsRB2YIGFwdXAUBXFdtD0seM28KHFgVWg4FUl0zVHsnM2w4HFscSQBwFQxJDjknM284GGsVXAYDXV9bCE0SBHMIGlgdWwceVFhZAUsUBGYBH1scWzYAVV9ZAXsn3eK4ZC8WPAQDIgMrWhtjfW1xWYWY7RdwP15ZDVonfxx9XQ9lAFFQJx9eeEgTVjFuRRtGOXRxOlwgYyt1QmhrZQlWJFFdU1oITnsSM28OG1kl){:target="_blank"} - 投资大师的智慧
 - **即将发布的系列文章**：
   - 《股票回购+分红双重策略投资指南》
   - 《美股DCA定投实战指南》
@@ -713,7 +713,7 @@ else:
 
 {% endif %}
 
-如果你觉得我的文章对你有帮助，可以[请我喝咖啡](https://www.buymeacoffee.com/zhurong052Q)
+如果你觉得我的文章对你有帮助，可以[请我喝咖啡](https://www.buymeacoffee.com/zhurong052Q){:target="_blank"}
 
 <a href="https://www.buymeacoffee.com/zhurong052Q" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
