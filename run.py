@@ -137,21 +137,37 @@ def main():
                 draft_issues = pipeline.check_draft_issues(draft_path)
                 print("🔄 已重新检查草稿质量...")
         
-        if draft_issues and not is_republish:
+        # 过滤掉可以自动处理的问题
+        auto_fixable_keywords = [
+            '缺少分类信息',  # 发布时会自动添加
+            '缺少标签信息',  # 发布时会自动添加
+            'excerpt过短',   # 发布时会自动生成
+            'excerpt过长',   # 发布时会自动调整
+            '缺少excerpt字段',  # 发布时会自动生成
+            '缺少摘要字段'  # 发布时会自动生成
+        ]
+
+        # 只保留严重问题（不能自动修复的）
+        serious_issues = []
+        for issue in draft_issues:
+            if not any(keyword in issue for keyword in auto_fixable_keywords):
+                serious_issues.append(issue)
+
+        if serious_issues and not is_republish:
             print(f"\n⚠️ 发现草稿质量问题：")
-            for issue in draft_issues:
+            for issue in serious_issues:
                 print(f"   • {issue}")
 
             print(f"\n🔧 建议的处理方案：")
-            if any("图片" in issue for issue in draft_issues):
+            if any("图片" in issue for issue in serious_issues):
                 print(f"   1. 使用 '5. OneDrive图床管理' → '处理单个草稿' 来处理图片")
                 print(f"   2. 或使用 '2. 内容规范化处理' 来完善内容格式")
 
-            if any("格式" in issue or "分页" in issue or "长度" in issue for issue in draft_issues):
+            if any("格式" in issue or "分页" in issue or "长度" in issue for issue in serious_issues):
                 print(f"   3. 使用 '2. 内容规范化处理' 来修复格式问题")
 
-            # 添加摘要相关建议
-            summary_issues = [issue for issue in draft_issues if any(keyword in issue for keyword in ["excerpt", "more", "摘要"])]
+            # 添加摘要相关建议（摘要问题已被过滤，这部分不会执行）
+            summary_issues = [issue for issue in serious_issues if any(keyword in issue for keyword in ["excerpt", "more", "摘要"])]
             if summary_issues:
                 summary_suggestions = pipeline._get_summary_fix_suggestions(summary_issues)
                 for suggestion in summary_suggestions:
