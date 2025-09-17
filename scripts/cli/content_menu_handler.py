@@ -380,20 +380,22 @@ class ContentMenuHandler(BaseMenuHandler):
         
         options = [
             "2.1 处理单个内容文件",
-            "2.2 批量处理多个文件", 
+            "2.2 批量处理多个文件",
             "2.3 查看使用示例",
             "2.4 查看分类关键词",
             "2.5 内容质量检查",
-            "2.6 YouTube内容规范化"
+            "2.6 YouTube内容规范化",
+            "2.7 Jekyll文件名规范化"
         ]
-        
+
         handlers = [
             self._process_single_content_file,
             self._batch_process_content_files,
             self._show_usage_examples,
             self._show_classification_keywords,
             self._content_quality_check,
-            self._youtube_content_normalization
+            self._youtube_content_normalization,
+            self._jekyll_filename_normalization
         ]
         
         return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "2")
@@ -2930,3 +2932,117 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
         
         self.pause_for_user()
         return None
+    def _jekyll_filename_normalization(self) -> None:
+        """Jekyll文件名规范化"""
+        print("\n📋 Jekyll文件名规范化")
+        print("="*40)
+        print("🎯 将草稿文件名转换为Jekyll要求的格式：YYYY-MM-DD-title.md")
+
+        from pathlib import Path
+        from datetime import datetime
+
+        try:
+            drafts_dir = Path("_drafts")
+            if not drafts_dir.exists():
+                print("❌ 草稿目录不存在")
+                self.pause_for_user()
+                return
+
+            # 扫描需要规范化的文件
+            files_to_normalize = []
+            for file in drafts_dir.glob("*.md"):
+                # 跳过已经符合规范的文件
+                filename = file.name
+                if len(filename) > 10 and filename[0:4].isdigit() and filename[4] == "-":
+                    continue
+                # 跳过临时文件和格式化后的文件
+                if "_formatted" in filename or filename.startswith("."):
+                    continue
+                files_to_normalize.append(file)
+
+            if not files_to_normalize:
+                print("✅ 所有文件名已符合Jekyll规范")
+                self.pause_for_user()
+                return
+
+            print(f"\n📋 发现 {len(files_to_normalize)} 个需要规范化的文件:")
+            for i, file in enumerate(files_to_normalize, 1):
+                print(f"  {i}. {file.name}")
+
+            print("\n选择操作:")
+            print("  1. 规范化单个文件")
+            print("  2. 批量规范化所有文件")
+            print("  0. 返回")
+
+            choice = input("\n请选择 (0-2): ").strip()
+
+            if choice == "0":
+                return
+            elif choice == "1":
+                # 选择单个文件
+                try:
+                    file_choice = int(input("\n请选择要规范化的文件编号: "))
+                    if 1 <= file_choice <= len(files_to_normalize):
+                        selected_file = files_to_normalize[file_choice-1]
+                        self._normalize_jekyll_filename(selected_file)
+                    else:
+                        print("❌ 选择无效")
+                except ValueError:
+                    print("❌ 请输入有效的数字")
+            elif choice == "2":
+                # 批量规范化
+                confirm = input(f"\n确定要规范化所有 {len(files_to_normalize)} 个文件吗？(y/N): ").strip().lower()
+                if confirm in ["y", "yes"]:
+                    success_count = 0
+                    for file in files_to_normalize:
+                        if self._normalize_jekyll_filename(file):
+                            success_count += 1
+                    print(f"\n✅ 完成！成功规范化 {success_count} 个文件")
+                else:
+                    print("❌ 取消操作")
+            else:
+                print("❌ 无效选择")
+
+        except Exception as e:
+            print(f"❌ 操作失败: {e}")
+
+        self.pause_for_user()
+
+    def _normalize_jekyll_filename(self, file_path: Path) -> bool:
+        """规范化单个文件名"""
+        try:
+            from datetime import datetime
+
+            # 生成新文件名
+            today = datetime.now().strftime("%Y-%m-%d")
+            # 将文件名转换为小写并替换特殊字符
+            clean_name = file_path.stem.lower()
+            # 替换空格和下划线为连字符
+            clean_name = clean_name.replace(" ", "-").replace("_", "-")
+            # 移除其他特殊字符
+            import re
+            clean_name = re.sub(r"[^a-z0-9-]", "", clean_name)
+            # 移除连续的连字符
+            while "--" in clean_name:
+                clean_name = clean_name.replace("--", "-")
+            # 去掉首尾的连字符
+            clean_name = clean_name.strip("-")
+
+            new_filename = f"{today}-{clean_name}.md"
+            new_path = file_path.parent / new_filename
+
+            # 检查新文件是否已存在
+            if new_path.exists():
+                print(f"⚠️ 文件已存在: {new_filename}")
+                overwrite = input("是否覆盖？(y/N): ").strip().lower()
+                if overwrite not in ["y", "yes"]:
+                    return False
+
+            # 重命名文件
+            file_path.rename(new_path)
+            print(f"✅ 已规范化: {file_path.name} → {new_filename}")
+            return True
+
+        except Exception as e:
+            print(f"❌ 规范化失败 {file_path.name}: {e}")
+            return False

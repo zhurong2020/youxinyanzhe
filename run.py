@@ -219,16 +219,16 @@ def main():
                 pipeline.log("用户未选择发布平台", level="info", force=True)
             continue  # 返回主菜单
         
-        # 询问是否启用内容变现功能
-        enable_monetization = pipeline.ask_monetization_preference()
-        pipeline.log(f"内容变现功能: {'启用' if enable_monetization else '跳过'}", level="info", force=True)
-        
-        # 选择会员分级
-        member_tier = pipeline.select_member_tier() if enable_monetization else None
+        # 选择会员分级（始终询问，与内容变现无关）
+        member_tier = pipeline.select_member_tier()
         if member_tier:
             pipeline.log(f"会员分级: {member_tier}", level="info", force=True)
         else:
             pipeline.log("跳过会员分级设置", level="info", force=True)
+
+        # 询问是否启用内容变现功能（生成资料包和GitHub Release）
+        enable_monetization = pipeline.ask_monetization_preference()
+        pipeline.log(f"内容变现功能: {'启用' if enable_monetization else '跳过'}", level="info", force=True)
         
         # 执行发布流程
         pipeline.log(f"开始发布到平台: {', '.join(platforms)}", level="info", force=True)
@@ -249,8 +249,7 @@ def main():
                 print(f"📱 已发布到: {', '.join(platforms)}")
 
                 # 暂停让用户看到成功信息
-                import time
-                time.sleep(3)
+                input("\n按Enter键继续...")
             else:
                 pipeline.log(f"❌ 发布过程中出现问题: {draft.name}", level="warning", force=True)
                 print(f"\n⚠️ 发布过程中出现问题")

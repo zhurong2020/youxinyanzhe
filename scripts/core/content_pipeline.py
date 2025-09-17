@@ -1879,7 +1879,21 @@ class ContentPipeline:
     def _publish_to_github_pages(self, draft_path: Path, content: str) -> bool:
         """发布到GitHub Pages，返回是否成功"""
         try:
-            publish_path = Path(self.config["paths"]["posts"]) / draft_path.name
+            # 确保文件名符合Jekyll规范 (YYYY-MM-DD-title.md)
+            filename = draft_path.name
+            if not filename[0:4].isdigit() or filename[4] != '-':
+                # 文件名不符合Jekyll规范，需要添加日期前缀
+                from datetime import datetime
+                today = datetime.now().strftime("%Y-%m-%d")
+                # 将文件名转换为小写并替换空格为连字符
+                clean_name = draft_path.stem.lower().replace(' ', '-').replace('_', '-')
+                # 移除连续的连字符
+                while '--' in clean_name:
+                    clean_name = clean_name.replace('--', '-')
+                filename = f"{today}-{clean_name}.md"
+                self.log(f"规范化Jekyll文件名: {draft_path.name} → {filename}", level="info")
+
+            publish_path = Path(self.config["paths"]["posts"]) / filename
             
             # 始终解析并重新格式化frontmatter，确保layout字段在最前面
             try:
@@ -1974,12 +1988,14 @@ class ContentPipeline:
                     self.log("没有需要提交的更改", level="warning")
                     return False
                 
-                # 提交更改
-                subprocess.run(["git", "commit", "-m", f"发布: {draft_path.name}"], check=True)
+                # 提交更改（重定向输出以避免干扰发布进度显示）
+                subprocess.run(["git", "commit", "-m", f"发布: {draft_path.name}"],
+                             check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 
-                # 推送（如果无上游分支，自动设置）
+                # 推送（如果无上游分支，自动设置）- 重定向输出
                 if has_upstream:
-                    subprocess.run(["git", "push"], check=True)
+                    subprocess.run(["git", "push"], check=True,
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 else:
                     # 获取当前分支名
                     current_branch = subprocess.run(
@@ -1988,9 +2004,10 @@ class ContentPipeline:
                         text=True,
                         check=True
                     ).stdout.strip()
-                    
+
                     # 设置上游分支并推送
-                    subprocess.run(["git", "push", "--set-upstream", "origin", current_branch], check=True)
+                    subprocess.run(["git", "push", "--set-upstream", "origin", current_branch],
+                                 check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 self.log("✅ 已推送到 GitHub", force=True)
                 return True
                 
