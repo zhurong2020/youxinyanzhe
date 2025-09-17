@@ -72,7 +72,7 @@ toc_sticky: true
 - **入金奖励**：完成指定金额入金，最高可获价值$1,000的英伟达（NVDA）股票。
 - **推荐双赢**：通过我的专属链接开户，我们双方都能获得额外奖励。
 
-**开户链接**: [https://j.moomoo.com/0sESw6](https://j.moomoo.com/0sESw6){:target="_blank"}
+**开户链接**: [Moomoo开户](https://j.moomoo.com/0sESw6){:target="_blank"}
 
 
 ![Moomoo开户二维码](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=Ebe9Wu8PSOBHrvTgQWyvZcwBGsV1X-3jgp-6ls1qy8nyog)
@@ -96,7 +96,7 @@ toc_sticky: true
 
 **开户奖励**：通过我的推荐链接开户，**你最高可获得1000美元的现金奖励**（根据入金金额而定）。
 
-**IB开户链接**: [https://ibkr.com/referral/rong953](https://ibkr.com/referral/rong953){:target="_blank"}
+**IB开户链接**: [IB开户](https://ibkr.com/referral/rong953){:target="_blank"}
 
 若链接无法打开，请尝试使用浏览器的无痕模式并开启科学上网。
 
@@ -644,10 +644,10 @@ else:
 
 ### 开户推荐（含新人奖励）
 - **Moomoo开户**: 
-  [https://j.moomoo.com/0sESw6](https://j.moomoo.com/0sESw6){:target="_blank"} 
+  [富途Moomoo开户](https://j.moomoo.com/0sESw6){:target="_blank"} 
   - 享8.1% APY + 最高$1000 NVDA股票
 - **IB开户**:
-  [https://ibkr.com/referral/rong953](https://ibkr.com/referral/rong953){:target="_blank"} 
+  [IB开户](https://ibkr.com/referral/rong953){:target="_blank"} 
   - 专业投资者首选，最高$1000现金奖励
 
 ### 学习资源
