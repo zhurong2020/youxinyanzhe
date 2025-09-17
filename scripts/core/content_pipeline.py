@@ -1528,6 +1528,46 @@ class ContentPipeline:
     def _polish_content(self, content: str) -> Optional[str]:
         """使用AI润色文章内容"""
         return self.ai_processor.polish_content(content)
+
+    def _add_target_blank_to_links(self, content: str) -> str:
+        """为所有外部链接添加target="_blank"属性
+
+        Args:
+            content: 文章内容
+
+        Returns:
+            str: 处理后的内容
+        """
+        import re
+
+        # 处理Markdown链接 [text](url)
+        # 排除已经有{:target="_blank"}的链接
+        # 排除内部锚点链接（以#开头的）
+        # 排除图片链接
+        def add_target_blank(match):
+            full_match = match.group(0)
+            link_text = match.group(1)
+            url = match.group(2)
+
+            # 跳过内部锚点
+            if url.startswith('#'):
+                return full_match
+
+            # 跳过已经有target="_blank"的
+            if '{:target="_blank"}' in full_match:
+                return full_match
+
+            # 为外部链接添加target="_blank"
+            return f'[{link_text}]({url}){{:target="_blank"}}'
+
+        # 匹配Markdown链接，但不匹配图片
+        # 负向前瞻确保不是图片链接 ![]()
+        pattern = r'(?<!\!)\[([^\]]+)\]\(([^)]+)\)(?!\{:target="_blank"\})'
+        content = re.sub(pattern, add_target_blank, content)
+
+        self.log("✅ 已为外部链接添加新窗口打开属性", level="info")
+
+        return content
     
     def _validate_required_fields(self, post: frontmatter.Post) -> Tuple[bool, List[str]]:
         """验证必需字段是否存在
@@ -1648,7 +1688,11 @@ class ContentPipeline:
                 polished_content = self._polish_content(content_text)
                 if polished_content:
                     content_text = polished_content
-            
+
+            # 为链接添加新窗口打开属性
+            if platform == 'github_pages':  # 只对GitHub Pages平台处理
+                content_text = self._add_target_blank_to_links(content_text)
+
             # 添加页脚（如果需要）
             append_footer = platform_config.get('append_footer', False)
             self.log(f"平台 {platform} append_footer 配置: {append_footer}", level="info", force=True)
