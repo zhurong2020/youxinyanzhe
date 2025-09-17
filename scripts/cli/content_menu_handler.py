@@ -385,7 +385,8 @@ class ContentMenuHandler(BaseMenuHandler):
             "2.4 查看分类关键词",
             "2.5 内容质量检查",
             "2.6 YouTube内容规范化",
-            "2.7 Jekyll文件名规范化"
+            "2.7 Jekyll文件名规范化",
+            "2.8 链接新窗口打开处理"
         ]
 
         handlers = [
@@ -395,7 +396,8 @@ class ContentMenuHandler(BaseMenuHandler):
             self._show_classification_keywords,
             self._content_quality_check,
             self._youtube_content_normalization,
-            self._jekyll_filename_normalization
+            self._jekyll_filename_normalization,
+            self._process_links_target_blank
         ]
         
         return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "2")
@@ -3045,4 +3047,121 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
 
         except Exception as e:
             print(f"❌ 规范化失败 {file_path.name}: {e}")
+            return False
+
+    def _process_links_target_blank(self) -> None:
+        """为文章链接添加新窗口打开属性"""
+        print("\n🔗 链接新窗口打开处理")
+        print("="*40)
+        print("🎯 为Markdown链接添加Jekyll的{:target=\"_blank\"}属性")
+
+        from pathlib import Path
+
+        try:
+            # 获取文件列表
+            drafts_dir = Path("_drafts")
+            posts_dir = Path("_posts")
+
+            all_files = []
+            if drafts_dir.exists():
+                all_files.extend(list(drafts_dir.glob("**/*.md")))
+            if posts_dir.exists():
+                all_files.extend(list(posts_dir.glob("**/*.md")))
+
+            if not all_files:
+                print("❌ 没有找到文章文件")
+                self.pause_for_user()
+                return
+
+            print(f"\n📋 找到 {len(all_files)} 个文件:")
+            for i, file in enumerate(all_files[:20], 1):
+                print(f"  {i}. {file}")
+            if len(all_files) > 20:
+                print(f"  ... 还有 {len(all_files)-20} 个文件")
+
+            print("\n选择操作:")
+            print("  1. 处理单个文件")
+            print("  2. 批量处理所有文件")
+            print("  0. 返回")
+
+            choice = input("\n请选择 (0-2): ").strip()
+
+            if choice == "0":
+                return
+            elif choice == "1":
+                # 选择单个文件
+                try:
+                    file_choice = int(input("\n请选择文件编号: "))
+                    if 1 <= file_choice <= min(len(all_files), 20):
+                        selected_file = all_files[file_choice-1]
+                        self._add_target_blank_to_file(selected_file)
+                    else:
+                        print("❌ 选择无效")
+                except ValueError:
+                    print("❌ 请输入有效的数字")
+            elif choice == "2":
+                # 批量处理
+                confirm = input(f"\n确定要处理所有 {len(all_files)} 个文件吗？(y/N): ").strip().lower()
+                if confirm in ["y", "yes"]:
+                    success_count = 0
+                    for file in all_files:
+                        if self._add_target_blank_to_file(file):
+                            success_count += 1
+                    print(f"\n✅ 完成！成功处理 {success_count} 个文件")
+                else:
+                    print("❌ 取消操作")
+            else:
+                print("❌ 无效选择")
+
+        except Exception as e:
+            print(f"❌ 操作失败: {e}")
+
+        self.pause_for_user()
+
+    def _add_target_blank_to_file(self, file_path: Path) -> bool:
+        """为单个文件的链接添加新窗口打开属性"""
+        try:
+            import re
+
+            # 读取文件内容
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            # 统计需要处理的链接数
+            pattern = r"(?<!\!)\[([^\]]+)\]\(([^)]+)\)(?!\{:target=\"_blank\"\})"
+            matches = re.findall(pattern, content)
+
+            # 过滤掉内部锚点链接
+            external_links = [m for m in matches if not m[1].startswith("#")]
+
+            if not external_links:
+                print(f"✅ {file_path.name} - 没有需要处理的链接")
+                return True
+
+            print(f"📝 {file_path.name} - 发现 {len(external_links)} 个链接需要处理")
+
+            # 处理链接
+            def add_target_blank(match):
+                full_match = match.group(0)
+                link_text = match.group(1)
+                url = match.group(2)
+
+                # 跳过内部锚点
+                if url.startswith("#"):
+                    return full_match
+
+                # 为外部链接添加target="_blank"
+                return f"[{link_text}]({url}){{:target=\"_blank\"}}"
+
+            new_content = re.sub(pattern, add_target_blank, content)
+
+            # 写回文件
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+
+            print(f"✅ 已处理: {file_path.name}")
+            return True
+
+        except Exception as e:
+            print(f"❌ 处理失败 {file_path.name}: {e}")
             return False

@@ -6,7 +6,7 @@ categories:
 - 认知升级
 comments: true
 date: '2025-09-17'
-excerpt: 美股投资不只买指数，掌握五种经过验证的被动收入策略，为你的投资组合打造稳健增长的高收益引擎。
+excerpt: 从股息贵族到高收益ETF，从股票回购到期权策略——五种被动收入方法，让你的美股投资告别“买入等涨”，实现每月现金流。
 header:
   overlay_color: '#333'
   overlay_filter: 0.5
@@ -643,8 +643,12 @@ else:
 - [手把手教你用Moomoo量化工具定投美股](https://zhurong2020.github.io/youxinyanzhe/posts/2025/01/intelligent-dca/)
 
 ### 开户推荐（含新人奖励）
-- **Moomoo开户**: [https://j.moomoo.com/0sESw6](https://j.moomoo.com/0sESw6) - 享8.1% APY + 最高$1000 NVDA股票
-- **IB开户**: [https://ibkr.com/referral/rong953](https://ibkr.com/referral/rong953) - 专业投资者首选，最高$1000现金奖励
+- **Moomoo开户**: 
+  [https://j.moomoo.com/0sESw6](https://j.moomoo.com/0sESw6) 
+  - 享8.1% APY + 最高$1000 NVDA股票
+- **IB开户**:
+  [https://ibkr.com/referral/rong953](https://ibkr.com/referral/rong953) 
+  - 专业投资者首选，最高$1000现金奖励
 
 ### 学习资源
 - **必读经典**（点击书名可直接在京东商城购买）：
