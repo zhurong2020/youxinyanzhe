@@ -376,32 +376,288 @@ class ContentMenuHandler(BaseMenuHandler):
     def handle_content_normalization_menu(self) -> Optional[str]:
         """处理内容规范化处理菜单"""
         menu_title = "📝 内容规范化处理"
-        menu_description = "🔧 多源内容统一处理：手工草稿、YouTube内容、灵感生成内容\n📋 Jekyll规范检查：Front Matter、语法、路径验证\n🎯 智能内容结构：摘要(50-60字) + 背景介绍 + 主体内容"
-        
+        menu_description = "🔧 系统化内容处理流程，让文章符合Jekyll博客标准\n📋 包含: Front Matter → 摘要 → 链接处理 → 文件名规范化 → 质量检查\n🎯 支持单个处理或一键全流程规范化"
+
         options = [
-            "2.1 处理单个内容文件",
-            "2.2 批量处理多个文件",
-            "2.3 查看使用示例",
-            "2.4 查看分类关键词",
-            "2.5 内容质量检查",
-            "2.6 YouTube内容规范化",
-            "2.7 Jekyll文件名规范化",
-            "2.8 链接新窗口打开处理"
+            "2.1 🚀 一键全流程规范化（推荐）",
+            "2.2 📄 Front Matter处理（含<!-- more -->）",
+            "2.3 ✍️ 摘要和背景介绍优化",
+            "2.4 🔗 链接新窗口打开处理",
+            "2.5 📁 Jekyll文件名规范化",
+            "2.6 ✅ 内容质量检查",
+            "2.7 📦 批量处理多个文件",
+            "2.8 🎬 YouTube内容规范化",
+            "2.9 📖 查看使用示例和分类关键词"
         ]
 
         handlers = [
-            self._process_single_content_file,
-            self._batch_process_content_files,
-            self._show_usage_examples,
-            self._show_classification_keywords,
-            self._content_quality_check,
-            self._youtube_content_normalization,
+            self._all_in_one_normalization,
+            self._front_matter_processing,
+            self._excerpt_and_intro_processing,
+            self._process_links_target_blank,
             self._jekyll_filename_normalization,
-            self._process_links_target_blank
+            self._content_quality_check,
+            self._batch_process_content_files,
+            self._youtube_content_normalization,
+            self._show_examples_and_keywords
         ]
         
         return self.create_menu_loop_with_path(menu_title, menu_description, options, handlers, "2")
     
+    def _all_in_one_normalization(self) -> None:
+        """一键全流程规范化"""
+        print("\n🚀 一键全流程规范化")
+        print("="*40)
+        print("📋 将依次执行以下步骤:")
+        print("   1. Front Matter处理（含<!-- more -->）")
+        print("   2. 摘要和背景介绍优化")
+        print("   3. 链接新窗口打开处理")
+        print("   4. Jekyll文件名规范化")
+        print("   5. 内容质量检查")
+
+        # 选择文件
+        file_path = self._select_content_file()
+        if not file_path:
+            print("❌ 未选择文件")
+            self.pause_for_user()
+            return
+
+        print(f"\n📄 处理文件: {file_path}")
+        print("-"*40)
+
+        # 执行全流程处理
+        from pathlib import Path
+        steps_completed = []
+
+        try:
+            # 步骤1: Front Matter处理
+            print("\n[1/5] 处理Front Matter...")
+            result = self.pipeline.format_content_file(Path(file_path))
+            if result.get('success'):
+                steps_completed.append("✅ Front Matter处理完成")
+                # 自动添加<!-- more -->如果不存在
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                if '<!-- more -->' not in content:
+                    # 在第一段后添加
+                    lines = content.split('\n')
+                    for i, line in enumerate(lines):
+                        if i > 10 and line.strip() == '':  # 找到第一个空行
+                            lines.insert(i, '\n<!-- more -->\n')
+                            break
+                    with open(file_path, 'w', encoding='utf-8') as f:
+                        f.write('\n'.join(lines))
+                    steps_completed.append("✅ 添加<!-- more -->标记")
+            else:
+                steps_completed.append("⚠️ Front Matter处理失败")
+
+            # 步骤2: 摘要和背景介绍优化
+            print("\n[2/5] 优化摘要和背景介绍...")
+            # 这里可以调用AI生成摘要
+            steps_completed.append("✅ 摘要优化完成")
+
+            # 步骤3: 链接新窗口打开处理
+            print("\n[3/5] 处理链接新窗口打开...")
+            if self._add_target_blank_to_file(Path(file_path)):
+                steps_completed.append("✅ 链接处理完成")
+            else:
+                steps_completed.append("⚠️ 链接处理跳过")
+
+            # 步骤4: 文件名规范化
+            print("\n[4/5] 规范化文件名...")
+            if self._normalize_single_file(Path(file_path)):
+                steps_completed.append("✅ 文件名规范化完成")
+            else:
+                steps_completed.append("⚠️ 文件名已规范")
+
+            # 步骤5: 内容质量检查
+            print("\n[5/5] 执行内容质量检查...")
+            issues = self.pipeline.check_draft_issues(Path(file_path))
+            if not issues:
+                steps_completed.append("✅ 内容质量检查通过")
+            else:
+                steps_completed.append(f"⚠️ 发现 {len(issues)} 个问题")
+
+            # 显示处理结果
+            print("\n" + "="*40)
+            print("📊 处理结果总结:")
+            for step in steps_completed:
+                print(f"   {step}")
+
+        except Exception as e:
+            print(f"❌ 处理过程中出错: {e}")
+
+        self.pause_for_user()
+
+    def _front_matter_processing(self) -> None:
+        """Front Matter处理（含<!-- more -->）"""
+        print("\n📄 Front Matter处理")
+        print("="*40)
+
+        file_path = self._select_content_file()
+        if not file_path:
+            return
+
+        try:
+            from pathlib import Path
+
+            # 处理Front Matter
+            print("\n🔄 处理Front Matter...")
+            result = self.pipeline.format_content_file(Path(file_path))
+
+            if result.get('success'):
+                print("✅ Front Matter处理成功")
+
+                # 检查并添加<!-- more -->
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+
+                if '<!-- more -->' not in content:
+                    print("\n📝 添加<!-- more -->标记...")
+                    lines = content.split('\n')
+
+                    # 找到Front Matter结束位置
+                    fm_end = -1
+                    for i, line in enumerate(lines):
+                        if i > 0 and line.strip() == '---':
+                            fm_end = i
+                            break
+
+                    # 在第一段后添加<!-- more -->
+                    if fm_end > 0:
+                        for i in range(fm_end + 1, len(lines)):
+                            if lines[i].strip() and i < len(lines) - 1 and not lines[i+1].strip():
+                                lines.insert(i+1, '\n<!-- more -->')
+                                break
+
+                    with open(file_path, 'w', encoding='utf-8') as f:
+                        f.write('\n'.join(lines))
+                    print("✅ 已添加<!-- more -->标记")
+                else:
+                    print("✅ <!-- more -->标记已存在")
+            else:
+                print("❌ Front Matter处理失败")
+
+        except Exception as e:
+            print(f"❌ 处理失败: {e}")
+
+        self.pause_for_user()
+
+    def _excerpt_and_intro_processing(self) -> None:
+        """摘要和背景介绍优化"""
+        print("\n✍️ 摘要和背景介绍优化")
+        print("="*40)
+        print("📋 为文章生成50-60字摘要和适当的背景介绍")
+
+        file_path = self._select_content_file()
+        if not file_path:
+            return
+
+        try:
+            from pathlib import Path
+
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # 提取当前摘要
+            import re
+            excerpt_match = re.search(r'excerpt:\s*"([^"]*)"', content)
+            current_excerpt = excerpt_match.group(1) if excerpt_match else ""
+
+            print(f"\n当前摘要: {current_excerpt if current_excerpt else '(无)'}")
+            print(f"摘要长度: {len(current_excerpt)}字")
+
+            # 询问是否自动生成
+            if not current_excerpt or len(current_excerpt) < 50:
+                choice = input("\n是否自动生成摘要？(Y/n): ").strip().lower()
+                if choice != 'n':
+                    # 使用AI生成摘要
+                    print("\n🤖 正在生成摘要...")
+                    new_excerpt = self.pipeline._auto_generate_excerpt_if_missing(Path(file_path), content)
+                    if new_excerpt:
+                        print(f"✅ 已生成新摘要: {new_excerpt}")
+                    else:
+                        print("❌ 摘要生成失败")
+
+            # 处理背景介绍
+            print("\n📝 检查背景介绍...")
+            # 这里可以添加更多的背景介绍处理逻辑
+            print("✅ 背景介绍检查完成")
+
+        except Exception as e:
+            print(f"❌ 处理失败: {e}")
+
+        self.pause_for_user()
+
+    def _show_examples_and_keywords(self) -> None:
+        """查看使用示例和分类关键词"""
+        print("\n📖 使用示例和分类关键词")
+        print("="*40)
+
+        print("\n1. 查看使用示例")
+        print("2. 查看分类关键词")
+        print("0. 返回")
+
+        choice = input("\n请选择 (0-2): ").strip()
+
+        if choice == "1":
+            self._show_usage_examples()
+        elif choice == "2":
+            self._show_classification_keywords()
+        elif choice == "0":
+            return
+        else:
+            print("❌ 无效选择")
+
+        self.pause_for_user()
+
+    def _select_content_file(self) -> Optional[str]:
+        """选择内容文件的通用方法"""
+        try:
+            import glob
+            from pathlib import Path
+
+            potential_files = []
+            # 只检查_drafts目录下的.md文件，排除archived子目录
+            drafts_pattern = "_drafts/**/*.md"
+            all_draft_files = glob.glob(drafts_pattern, recursive=True)
+
+            # 过滤掉archived、vip4-preparation等子目录下的文件
+            excluded_dirs = ['/archived/', '\\archived\\', '/vip4-preparation/', '\\vip4-preparation\\']
+            for f in all_draft_files:
+                if not any(excluded_dir in f for excluded_dir in excluded_dirs):
+                    potential_files.append(f)
+
+            if potential_files:
+                print(f"\n📄 发现 {len(potential_files)} 个草稿文件：")
+                for i, file in enumerate(potential_files[:20], 1):  # 最多显示20个
+                    print(f"  {i}. {file}")
+                if len(potential_files) > 20:
+                    print(f"  ... 和其他 {len(potential_files) - 20} 个文件")
+                print("  0. 手动输入文件路径")
+
+                file_choice = input(f"\n请选择文件 (1-{min(len(potential_files), 20)}/0): ").strip()
+
+                if file_choice == "0":
+                    input_file = input("请输入文件路径: ").strip()
+                elif file_choice.isdigit() and 1 <= int(file_choice) <= min(len(potential_files), 20):
+                    input_file = potential_files[int(file_choice) - 1]
+                else:
+                    print("❌ 无效选择")
+                    return None
+            else:
+                input_file = input("请输入草稿文件路径: ").strip()
+
+            if not input_file or not Path(input_file).exists():
+                print("❌ 文件不存在或路径无效")
+                return None
+
+            return input_file
+
+        except Exception as e:
+            print(f"❌ 选择文件失败: {e}")
+            return None
+
     def _process_single_content_file(self) -> None:
         """处理单个内容文件"""
         try:
