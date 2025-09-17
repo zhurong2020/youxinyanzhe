@@ -79,11 +79,12 @@ class WechatPublisher:
         if not self.app_id or not self.app_secret:
             raise ValueError("WECHAT_APPID and WECHAT_APPSECRET must be set in .env file.")
 
-        project_root = Path(__file__).parent.parent
+        # Get the actual project root (not relative to scripts)
+        project_root = Path(__file__).parent.parent.parent  # Go up 3 levels from scripts/core/
         self.api_base_url = "https://api.weixin.qq.com/cgi-bin"
         self.access_token: Optional[str] = None
         self.token_expires_at: int = 0
-        
+
         cache_dir = project_root / ".tmp/cache/wechat/images"
         cache_dir.mkdir(parents=True, exist_ok=True)
         self.cache_file = cache_dir / "image_cache.json"
@@ -115,10 +116,30 @@ class WechatPublisher:
             self.logger.error(f"Request for access_token failed: {e}")
             return None
 
-    def _transform_for_wechat(self, markdown_content: str) -> str:
-        """Transforms markdown content into WeChat-ready plain text."""
-        self.logger.info("Starting full content transformation for WeChat...")
+    def _transform_for_wechat(self, markdown_content: str, is_guide_mode: bool = False) -> str:
+        """Transforms markdown content into WeChat-ready plain text.
+
+        Args:
+            markdown_content: The original markdown content
+            is_guide_mode: If True, optimize for guide mode (skip images, remove resource sections)
+        """
+        self.logger.info(f"Starting content transformation for WeChat (Guide mode: {is_guide_mode})...")
         print("\n📱 正在准备微信内容...")
+
+        # Remove resource sections if in guide mode
+        if is_guide_mode:
+            # Remove common resource sections (音频资源、英文资源、相关链接等)
+            import re
+            # Remove sections that typically contain external resources
+            patterns_to_remove = [
+                r'\n##?\s*🎧.*?(?=\n##?|\Z)',  # Audio resources
+                r'\n##?\s*🌍.*?(?=\n##?|\Z)',  # English resources
+                r'\n##?\s*📚.*?(?=\n##?|\Z)',  # Reference resources
+                r'\n##?\s*🔗.*?(?=\n##?|\Z)',  # Related links
+                r'\n##?\s*💡\s*获取完整.*?(?=\n##?|\Z)',  # Full version notices
+            ]
+            for pattern in patterns_to_remove:
+                markdown_content = re.sub(pattern, '', markdown_content, flags=re.DOTALL)
 
         # 1. AI-powered content summarization and rewriting
         self.logger.info("Step 1: Rewriting and summarizing content with AI...")
@@ -133,6 +154,7 @@ IMPORTANT FORMATTING RULES:
 5. Use natural transitions between paragraphs - no "---" or special separators
 6. Keep the content concise and punchy for WeChat's fast-paced reading style
 7. Use conversational tone with direct address to readers
+8. {'SKIP all images, links, and external resources - focus only on text content' if is_guide_mode else 'Include relevant images if present'}
 
 ---
 
@@ -404,7 +426,8 @@ Here is the content to optimize:
         else:
             print("✅ 封面图片上传成功")
 
-        final_html = self._transform_for_wechat(markdown_content)
+        # For API mode, don't skip images
+        final_html = self._transform_for_wechat(markdown_content, is_guide_mode=False)
         final_html = self._process_html_images(final_html, project_root)
 
         article = {
@@ -495,14 +518,18 @@ Here is the content to optimize:
     def generate_guide_file(self, project_root: Path, front_matter: Dict[str, Any], markdown_content: str) -> bool:
         self.logger.info(f"Generating manual guide file for: {front_matter.get('title', 'Untitled')}")
         print(f"\n📝 生成微信发布指南: {front_matter.get('title', 'Untitled')}")
-        guide_dir = project_root / ".tmp/output/wechat/guides"
+
+        # Fix: Use project_root directly, not relative to scripts
+        guide_dir = Path(project_root).resolve() / ".tmp/output/wechat/guides"
         guide_dir.mkdir(parents=True, exist_ok=True)
+
         safe_title = re.sub(r'[^\w\s-]', '', front_matter.get('title', 'draft')).strip()
         safe_title = re.sub(r'[-\s]+', '-', safe_title)
         timestamp = time.strftime("%Y%m%d_%H%M%S")
         guide_file = guide_dir / f"{safe_title}_{timestamp}_guide.md"
 
-        final_content = self._transform_for_wechat(markdown_content)
+        # Pass is_guide_mode=True to skip images and resources
+        final_content = self._transform_for_wechat(markdown_content, is_guide_mode=True)
         
         # 添加奖励页脚到内容末尾
         reward_footer = self._load_reward_footer_template(project_root)
