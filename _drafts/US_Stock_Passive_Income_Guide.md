@@ -1,4 +1,17 @@
-# 美股投资进阶：五大经过验证的长期盈利策略
+---
+date: '2025-09-17'
+excerpt: 美股投资不只买指数，掌握五种经过验证的被动收入策略，为你的投资组合打造稳健增长的高收益引擎。
+header:
+  overlay_color: '#333'
+  overlay_filter: 0.5
+  overlay_image: https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EXaqCcBRsA1Cg30DU3685R0B0g3g7bmgJzlT_ojnRtElfw
+  teaser: https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EXaqCcBRsA1Cg30DU3685R0B0g3g7bmgJzlT_ojnRtElfw
+title: 美股被动收入指南：从股息到期权的五重财富密码
+---
+
+从股息贵族到高收益ETF，从股票回购到期权策略，五种被动收入方法让你的美股投资不再只是'买入等涨'，而是每月都有现金流入账。
+
+<!-- more -->
 
 > **写在前面**：如果你已经迈出了美股投资的第一步，恭喜你！这篇文章将帮助你从"简单买入持有"升级到"多策略组合配置"，通过5种经过时间验证的投资策略，构建更稳健的财富增长体系。
 
@@ -20,7 +33,7 @@
 
 本篇分享我在美股投资中验证有效的五种策略，希望能帮你找到适合自己的投资风格。后续系列文章中，我会继续分享普通人投资美股的关键经验：如何降低成本、管理风险、保持纪律等实战心得。记住，这些都是我的个人经验分享，不构成投资建议，投资决策请独立思考，风险自负。
 
-![us investment](../assets/images/posts/2025/09/us-investment.png)
+![us investment](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EXaqCcBRsA1Cg30DU3685R0B0g3g7bmgJzlT_ojnRtElfw)
 *图片说明：美股多元化投资选择示意图（AI生成）*
 
 ## 🏦 开始之前：你需要一个美股账户
@@ -45,10 +58,10 @@
 
 **开户链接**: [https://j.moomoo.com/0sESw6](https://j.moomoo.com/0sESw6)
 
-![Moomoo开户二维码](../assets/images/posts/2025/09/moomoo-inviteqr.jpg)
+![Moomoo开户二维码](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=Ebe9Wu8PSOBHrvTgQWyvZcwBGsV1X-3jgp-6ls1qy8nyog)
 *扫码或点击链接，开启美股投资之旅*
 
-**特别福利**：使用我的推荐链接完成开户，并在本文末评论区留言确认的读者，每月将抽取1名获得**免费一小时投资咨询服务**（包括但不限于：策略讨论、工具使用、个人投资规划等）。
+**特别福利**：使用我的推荐链接完成开户，并在本文末评论区留言的读者，每月会在确认开户完成的读者中抽取1名获得**免费一小时投资咨询服务**（包括但不限于：策略讨论、工具使用、个人投资规划等）。
 
 想了解更多开户细节？可以参考我的详细教程：[《智能DCA定投策略完整指南》](https://zhurong2020.github.io/youxinyanzhe/posts/2025/01/intelligent-dca/)
 
@@ -67,6 +80,8 @@
 
 **IB开户链接**: [https://ibkr.com/referral/rong953](https://ibkr.com/referral/rong953)
 
+上述链接如果不能打开，可以试试使用无痕浏览并科学上网。
+
 选择建议：
 - **新手/中文需求强**：推荐Moomoo，界面友好
 - **专业/全球投资**：推荐IB，功能强大
@@ -81,12 +96,6 @@
 - **严格退市制度**：不符合标准立即退市，没有ST保护期
 - **做空机制完善**：浑水等做空机构帮助发现问题公司，保护投资者利益
 
-**但也要注意风险**：
-- **外汇管制**：中国居民每年有5万美元购汇额度，投资需遵守外汇管理规定
-- **平台选择**：务必选择正规持牌券商，避免黑平台无法出金
-- **税务问题**：美股分红需缴纳30%预扣税（中国投资者适用10%协定税率需申请）
-- **时差影响**：美股正常交易时间为北京时间晚9:30-次日凌晨4:00（夏令时）
-
 **美股交易时间优势**：
 与A股每天只有4小时交易不同，美股通过盘前盘后交易可实现**16小时超长交易时段**（Moomoo等券商支持）：
 - **盘前交易**：北京时间16:00-21:30
@@ -94,6 +103,12 @@
 - **盘后交易**：北京时间次日4:00-8:00
 
 这意味着即使你白天上班，晚上也有充足时间进行交易。重要财报通常在盘前或盘后发布，延长交易让你能第一时间把握机会。
+
+**但也要注意风险**：
+- **外汇管制**：中国居民每年有5万美元购汇额度，投资需遵守外汇管理规定
+- **平台选择**：务必选择正规持牌券商，避免黑平台无法出金
+- **税务问题**：美股分红需缴纳30%预扣税（中国投资者适用10%协定税率需申请）
+- **时差影响**：美股正常交易时间为北京时间晚9:30-次日凌晨4:00（夏令时）
 
 记住：美股市场法治健全是优势，但跨境投资的复杂性也需要谨慎对待。
 
@@ -109,14 +124,14 @@
 
 **科技巨头的持续回购**
 - **微软(MSFT)**：多年执行大额回购授权（历史上有$600亿规模的授权）；同时稳定派息，回购+分红双轮驱动。
-![MSFT 股票回购授权历史](../assets/images/posts/2025/09/msft-repurchase.png)
+![MSFT 股票回购授权历史](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EaB1BUA9C0FDnTV-1ydxWcEB7Z6109n_6dS5NeUqazRong)
 
 - **苹果(AAPL)**：近年频繁追加回购授权，单年新增授权常见$900亿—$1100亿量级，长期位居美股回购"榜首"。也是巴菲特的"心头好"。
-![AAPL 股票回购授权历史](../assets/images/posts/2025/09/apple-repurchase.png)
+![AAPL 股票回购授权历史](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EX76bGwic25HgXToTEx1mfoBDCsQ_1ugUTJZNcP5MP27bQ)
 
 **金融股的"节奏感"**
 - **摩根大通(JPM)**：通过美联储年度CCAR压力测试后，常见提升分红并恢复/扩大回购；银行业的回购节奏受监管与资本充足率约束，通常更"看周期"。
-![JPM 股票回购与分红历史](../assets/images/posts/2025/09/jpm-repurchase.png)
+![JPM 股票回购与分红历史](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EYnKzIgSMcJHqNd2j7gi5SMBT-mdKKNZzBoQO15IelFQSA)
 
 **长期表现速描（示意+验证路径）**
 - 回购的底层逻辑是“每股指标提升”：持续减少流通股本，使得在营收/利润增长相同的前提下，每股收益（EPS）增速更快，长期利多估值与股价。
@@ -124,14 +139,14 @@
   - 看“回购是否持续”：Macrotrends 的“Shares Outstanding”历史曲线（MSFT/AAPL）。
   - 看“长期总回报”：使用 Portfolio Visualizer 的回测工具（含分红再投）对比标普。
 
-![MSFT 流通股本长期趋势（回购可视化）](../assets/images/posts/2025/09/msft-share-outstanding.png)
-![AAPL 流通股本长期趋势（回购可视化）](../assets/images/posts/2025/09/aapl-share-outstanding.png)
+![MSFT 流通股本长期趋势（回购可视化）](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EbxDA_AYXqJLl6ui3N4LIZABCA8cm_L8s5uFK6kboazRLw)
+![AAPL 流通股本长期趋势（回购可视化）](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EcA-VwqbYydPkIU1mrBWoggB9LRsOLZV5jHEsQisX9riuA)
 *数据来源：Macrotrends，展示持续回购带来的流通股本下降趋势*
 
   - 对照官方披露：公司新闻稿/年报中的“Capital Return/Share Repurchases”。
   提示：回报由多因素驱动（盈利、估值、利率、回购幅度），回购不是魔法棒，但与高质量基本面叠加，长期往往锦上添花。
 
-**深入解读预告**：关于股票回购与分红的系统化做法与标的筛选，我将在近期发布《股票回购+分红双重策略投资指南》专题文章，敬请关注。
+**深入解读**：关于股票回购与分红的系统化做法与标的筛选，后续会有更详细的分享。
 
 ### 为什么回购这么重要？
 
@@ -144,9 +159,9 @@
 
 下面三张周线图清晰展示了"回购+业绩"如何推动股价长期上涨：
 
-![JPM 周线图 - 稳健增长态势](../assets/images/posts/2025/09/jpm-week.png)
-![AAPL 周线图 - 长期上升趋势](../assets/images/posts/2025/09/aapl-week.png)
-![MSFT 周线图 - 强劲上涨走势](../assets/images/posts/2025/09/msft-week.png)
+![JPM 周线图 - 稳健增长态势](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EUqjC-RKT-5LqVlozesONyQBRWmRyS0JvpYeh-gEQAvTAw)
+![AAPL 周线图 - 长期上升趋势](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EbIZVLl1vtpOmbk2BVL8IDcBeNFax1OPl26-v9M5c7jLhQ)
+![MSFT 周线图 - 强劲上涨走势](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=Edo-0pfXCBdDgZANoxD4H_wBVuc4QAbm1iUwCJ9d8egqyw)
 *图表来源：Moomoo，展示三家公司的长期股价表现（周线级别）*
 
 看到了吗？这不是短期炒作，而是以年为单位的持续上涨。即使经历了2020年疫情、2022年加息，这些优质公司依然创出新高。回购就像复利，短期看似平淡，长期威力惊人。
@@ -155,11 +170,8 @@
 
 很多读者会问：看好这些股票，但资金有限怎么办？股价这么高，该如何下手？
 
-别急，我将在后续文章中详细介绍**DCA（美元成本平均法）定投策略**，教你如何根据不同资金量（$1000、$5000、$10000+）制定分批入场计划。无论是每周定投$50，还是每月投入$500，都有适合你的方案。
+别急，关于**DCA（美元成本平均法）定投策略**，如何根据不同资金量（$1000、$5000、$10000+）制定分批入场计划，无论是每周定投$50还是每月投入$500，都值得深入探讨。
 
-**预告两篇实操文章**：
-- 《股票回购+分红双重策略投资指南》- 深入解析回购股的估值与选股要点
-- 《美股DCA定投实战指南》- 手把手教你分批建仓，降低择时风险
 
 ## 💰 策略二：月月收租的高分红策略
 
@@ -181,7 +193,7 @@ Covered Call策略就像"股票出租收租金"——持有股票的同时卖出
 
 让数据说话，我以JEPI为例（三个产品中最稳定的），展示实际分红记录：
 
-![JEPI月度分红历史数据](../assets/images/posts/2025/09/jepi-dividend.png)
+![JEPI月度分红历史数据](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EUmQzrjqpKJOss6QscatlUwBaNdCy93Zlco1AtUgB6H-Ng)
 *数据来源：Moomoo，展示JEPI历史月度分红金额*
 
 从上图可以看到，JEPI确实实现了"月月发钱"的承诺，每月分红金额虽有波动，但始终保持稳定的现金流。
@@ -195,7 +207,7 @@ Covered Call策略就像"股票出租收租金"——持有股票的同时卖出
 - 分红再投资效应：每年可多买入3-5股，实现复利增长
 ```
 
-**想自己操作期权策略？** 其实你完全可以自己实施Covered Call策略，甚至使用更高级的Wheel滚轮策略（卖Put收权利金，被行权后持股，再卖Call继续收权利金）。我将在后续文章《期权Wheel滚轮策略实战指南》中详细介绍如何自动化执行这个"收租"系统。
+**想自己操作期权策略？** 其实你完全可以自己实施Covered Call策略，甚至使用更高级的Wheel滚轮策略（卖Put收权利金，被行权后持股，再卖Call继续收权利金）来构建自动化的"收租"系统。
 
 ### 方式二：高分红资产 - BDCs与REITs的稳定现金流
 
@@ -209,7 +221,7 @@ Covered Call策略就像"股票出租收租金"——持有股票的同时卖出
 - 长期稳定派息与增配“特别分红”的历史记录
 - 投资$1,000，若按7%估算，税前每月约$5.8（示意）
 
-![MAIN成本收益率与分红历史](../assets/images/posts/2025/09/main-yoc-dyh.png)
+![MAIN成本收益率与分红历史](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=Ed3J-gtLBdtLirbIGmKk4qQBgxV2z-qIXI9BVZbA9n8hFw)
 *数据来源：Seeking Alpha，展示MAIN的YOC（成本收益率）增长和稳定的分红历史*
 
 从上图可以看到，MAIN不仅保持了稳定的月度分红，还经常发放特别股息。长期持有者的成本收益率（Yield on Cost）随着分红增长而不断提升，充分体现了复利的威力。
@@ -218,7 +230,7 @@ Covered Call策略就像"股票出租收租金"——持有股票的同时卖出
 
 REITs（Real Estate Investment Trusts，房地产投资信托）让你不用买房就能收租金。与BDCs一样，美国《国内税收法典》第857条强制规定：REITs必须将至少90%的应税收入分配给股东，否则失去REIT资格，需缴纳高额企业税。
 
-![美国税法第857条关于REITs分红要求](../assets/images/posts/2025/09/cornelllawschool-26uscode857.png)
+![美国税法第857条关于REITs分红要求](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EUTekZZgf5JKroFYa6MmkukBsi7eyMJTXTcrQEDZJfFFMg)
 *来源：Cornell Law School，美国税法第26编第857条关于REITs必须分配90%应税收入的法律条文*
 
 记住：在美国，REITs的高分红不是"承诺"，而是"法律义务"。违反就要被重税处罚，所以分红比什么都可靠。[查看完整条文](https://www.law.cornell.edu/uscode/text/26/857)
@@ -237,7 +249,7 @@ REITs（Real Estate Investment Trusts，房地产投资信托）让你不用买�
 
 滚轮策略（The Wheel Strategy）是一个经典的期权收益策略，通过不断循环卖出Put和Call期权来产生稳定现金流：
 
-![Wheel滚轮策略运作示意图](../assets/images/posts/2025/09/wheelstrategy.png)
+![Wheel滚轮策略运作示意图](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EYGAwBQTBB9GlXpwN4IUC9kBk8VZuPxsnZMtTXsOWpXL0A)
 *图说：滚轮策略的循环运作机制（AI生成示意图）*
 
 **策略运作流程**：
@@ -274,7 +286,7 @@ REITs（Real Estate Investment Trusts，房地产投资信托）让你不用买�
 - 智能参数优化
 - 风险管理功能
 
-![Moomoo量化滚轮策略实盘运行界面](../assets/images/posts/2025/09/wheel-pypl-vip.png)
+![Moomoo量化滚轮策略实盘运行界面](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=Ecn5hvC3IkVNkknMY5jNg4ABxU2Gy9ZfVDNvckGr0sbFWg)
 实盘截图：我在Moomoo平台上运行的PYPL滚轮策略，展示策略的实际执行界面
 
 **重要风险提示**：
@@ -283,7 +295,7 @@ REITs（Real Estate Investment Trusts，房地产投资信托）让你不用买�
 3. **服务风险**：付费策略可能因个人原因停止更新，购买前请充分考虑
 4. **免责声明**：所有策略仅供学习参考，不构成投资建议，盈亏自负
 
-建议先使用免费版充分学习，理解策略原理后再考虑是否升级。更多细节将在后续文章《Moomoo量化滚轮策略实战教程》中详细介绍。
+建议先使用免费版充分学习，理解策略原理后再考虑是否升级。
 
 ## 📊 策略四：股息贵族的复利魔法
 
@@ -299,10 +311,10 @@ REITs（Real Estate Investment Trusts，房地产投资信托）让你不用买�
 
 让我们深入看看宝洁（PG）作为股息贵族的典范表现：
 
-![PG股息贵族评级与68年连续增长记录](../assets/images/posts/2025/09/pg-dividend1.png)
+![PG股息贵族评级与68年连续增长记录](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EbWt891_oCFAtdIo2m2TSCwBG7-Z2vl6fb1Guwig3O1v1Q)
 *数据来源：Seeking Alpha，展示PG获得A+评级的68年连续分红增长记录*
 
-![PG历年分红金额详细记录](../assets/images/posts/2025/09/pg-dividend2.png)
+![PG历年分红金额详细记录](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EZrU0RnlD-FHszV5FNqtws0BVPBk7He4VkWe7Uf2V86vWQ)
 *数据来源：Seeking Alpha，展示PG稳定增长的季度分红金额*
 
 从数据可以看到，PG不仅保持了68年的连续增长记录，而且分红金额稳步上升：从2021年的$0.79-0.87，到2024年的$1.0065，充分体现了股息贵族的"稳定+增长"特性。
@@ -331,7 +343,7 @@ $3,000投资股息贵族组合（示意，不含税费）：
 
 基于我开发的DCA定投策略，让我们看看TQQQ的实际表现：
 
-![TQQQ每周定投策略实盘回测](../assets/images/posts/2025/09/tqqq-dca-strategy.png)
+![TQQQ每周定投策略实盘回测](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=Ecx7gdaC9BVMgTEzmc2vdgUBo5jskyc0g2fw3KFK6WHLsg)
 *回测数据：2025年1月1日-8月31日，初始$5000，每周定投，收益率+12.34%*
 
 **关键发现**（基于5年历史数据回测）：
@@ -389,9 +401,9 @@ $3,000投资股息贵族组合（示意，不含税费）：
 
 我用Portfolio Visualizer对前三个核心组合进行了长期回测，结果令人鼓舞：
 
-![组合增长曲线（2016-2025）](../assets/images/posts/2025/09/p-growth.png)
-![年度收益分布（2016-2025）](../assets/images/posts/2025/09/p-annual-returns.png)
-![收益与回撤摘要](../assets/images/posts/2025/09/p-summary.png)
+![组合增长曲线（2016-2025）](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EbLw3sTIej5Pr5L5lb1hXNMBL0mQJ-YgLw6k0JfXPa9QIA)
+![年度收益分布（2016-2025）](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=ESZDwqQsFqpAuQb-plWXXy0B4h9S75H-sp_4o_hXF6F71A)
+![收益与回撤摘要](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EUC1E8ie5dZDqtd8hZWrPQoBr6ERtDKm3FviyzsiJEkBAg)
 
 **实证数据（非未来承诺）**
 | 策略组合 | 年化收益率 | 最大回撤 | 夏普比率 | 上行捕获 |
@@ -408,7 +420,6 @@ $3,000投资股息贵族组合（示意，不含税费）：
 
 💡 **重点**：这不是理论，是9.7年真实数据！即使包含2022年熊市，三个组合平均年化仍达18.7%。想要完整回测报告？关注后续更新。
 
-**完整回测报告预告**：关于这9.7年回测的详细数据（资产配置、参数设置、图表与表格），我将在近期发布《组合回测结果分析(2016-2025)》专题文章，敬请关注。
 
 ### 目标收益区间（基于历史数据校准）
 
@@ -461,6 +472,8 @@ $3,000投资股息贵族组合（示意，不含税费）：
 - 保留20%现金应对机会
 - 设置止损线（-15%个股，-10%组合）
 
+**汇率风险提示**：本文仅讨论美股投资策略本身的收益，暂不考虑美元兑人民币汇率波动的影响。实际投资中，汇率变化可能增加或减少您的实际收益。建议将美股投资作为全球资产配置的一部分，而非全部资产。
+
 ### 3. 心态建设
 
 记住巴菲特的话："股市短期是投票机，长期是称重机。"
@@ -493,7 +506,9 @@ $3,000投资股息贵族组合（示意，不含税费）：
 
 想和志同道合的投资者一起学习交流？扫码加入**美股被动收入研习社**：
 
-![美股被动收入研习社微信群二维码](../assets/images/posts/2025/09/wechat-meigugroup.png)
+**友情提示**：这是一个免费交流群，供对美股投资感兴趣的朋友互相学习讨论。群内不提供个股推荐和投资建议。如需专业分析、一对一咨询或深度内容服务，欢迎了解VIP会员计划或付费咨询服务（详情请咨询管理员）。
+
+![美股被动收入研习社微信群二维码](https://7fp1fj-my.sharepoint.com/personal/zhurong_7fp1fj_onmicrosoft_com/_layouts/15/download.aspx?share=EWIybuwFhNNKjmR8VxIRMI0B_7P76d_7HKt2i9uCIn90Aw)
 *扫码加入微信群，与更多读者共同学习美股投资*
 
 **群内讨论话题**：
@@ -519,7 +534,7 @@ $3,000投资股息贵族组合（示意，不含税费）：
 - **REITs收益**：Nareit网站有详细的历史回报数据
 - **回测验证**：使用Portfolio Visualizer自己动手测试
 
-**我的建议**：不要轻信任何人给出的收益数字（包括我的），自己去验证。花一个周末学会使用这些工具，比看100篇分析文章更有价值。具体的数据分析和对比，我会在后续专题文章中详细展开。
+**我的建议**：不要轻信任何人给出的收益数字（包括我的），自己去验证。花一个周末学会使用这些工具，比看100篇分析文章更有价值。
 
 ## 💭 写在最后：投资是一场马拉松
 
@@ -533,7 +548,6 @@ $3,000投资股息贵族组合（示意，不含税费）：
 
 最终实现财务自由的真实路径。
 
-**系列钩子：下一篇聊点“能立刻上手的工具”**
 
 你刚把“策略地图”装进脑子里，别放下锤子：
 - 我们将把定投做成“发动机”：自研 DCA（自动定投）工具，支持波动增强与回撤加码的可视化规则（提供免费版）。
@@ -608,7 +622,7 @@ $3,000投资股息贵族组合（示意，不含税费）：
 - 分散投资，不要把鸡蛋放在一个篮子里
 - 持续学习，投资自己的认知是最好的投资
 
----
+- --
 
 *作者：有心言者（写文不摆烂，买入不追高）*
 *更新：2025年9月*
