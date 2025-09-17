@@ -2063,6 +2063,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
                         print("⚠️ 仍有部分图片问题需要手动处理:")
                         for issue in result['issues'][:3]:  # 显示前3个问题
                             print(f"   • {issue}")
+                    self.pause_for_user()  # 添加暂停，让用户看到结果
                     return f"处理了 {result['processed_images']} 张图片"
                 else:
                     print(f"❌ 图片处理失败: {result['error']}")
