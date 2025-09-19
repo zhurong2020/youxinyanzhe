@@ -78,6 +78,6 @@ author_profile: false
 如果您对这些使用条款有任何疑问或顾虑，请通过以下方式联系我们：
 
 - 电子邮件：zhurong0525@gmail.com
-- 网站：https://arong.eu.org/youxinyanzhe
+- 网站：https://zhurong2020.github.io/youxinyanzhe
 
 感谢您阅读我们的使用条款。通过继续使用本网站，您表示同意受这些条款的约束。 
