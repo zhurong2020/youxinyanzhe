@@ -3,7 +3,7 @@ platforms:
   github_pages:
     enabled: true
     name: github_pages
-    domain: "arong.eu.org/youxinyanzhe"  # 添加域名配置
+    domain: "zhurong2020.github.io/youxinyanzhe"  # 添加域名配置
     author: Rong Zhu
     polish_content: false      # 不需要润色
     analyze_content: true      # 需要分析分类和标签

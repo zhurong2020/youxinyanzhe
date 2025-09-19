@@ -22,7 +22,7 @@ title_separator          : "-"
 subtitle                 : "探索技术与思维的交汇点"
 name                     : "Rong Zhu"
 description              : "分享技术，记录生活"
-url                      : "https://arong.eu.org"  # 使用主域名
+url                      : "https://zhurong2020.github.io"  # 使用主域名
 baseurl                  : "/youxinyanzhe"    # 添加子路径
 repository               : "zhurong2020/youxinyanzhe"  # 更新为正确的仓库名
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"

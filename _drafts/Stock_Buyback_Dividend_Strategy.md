@@ -1,23 +1,10 @@
 ---
 title: 股票回购+分红双重策略深度指南：30+优质标的全景分析
 date: 2025-09-19
-categories:
-  - 投资理财
-tags:
-  - 美股投资
-  - 股票回购
-  - 分红策略
-  - 价值投资
-  - 资产配置
-excerpt: 深度解析30+优质回购分红标的，涵盖科技、金融、消费等多个板块，配套$1,000-$10,000月度定投方案，助你构建稳健增长的被动收入体系。
 header:
   teaser: /assets/images/default/stock-buyback.jpg
   overlay_image: /assets/images/default/stock-buyback-banner.jpg
   overlay_filter: 0.5
-toc: true
-toc_label: "本页内容"
-toc_icon: "list"
-toc_sticky: true
 ---
 
 深度解析30+优质回购分红标的，涵盖科技、金融、消费等多个板块，配套三档月度定投方案，助你构建稳健增长的被动收入体系。

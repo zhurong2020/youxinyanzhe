@@ -257,8 +257,8 @@ Phase 4 (v5.0):
 ## 📞 项目信息
 
 - **项目地址**: https://github.com/zhurong2020/youxinyanzhe
-- **文档中心**: https://arong.eu.org/youxinyanzhe/docs/
-- **技术博客**: https://arong.eu.org/youxinyanzhe/
+- **文档中心**: https://zhurong2020.github.io/youxinyanzhe/docs/
+- **技术博客**: https://zhurong2020.github.io/youxinyanzhe/
 - **联系方式**: 通过GitHub Issues或项目讨论区
 
 ---
