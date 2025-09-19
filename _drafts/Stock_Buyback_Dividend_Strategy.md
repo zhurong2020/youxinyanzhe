@@ -115,9 +115,13 @@ toc_sticky: true
 
 ## 📊 2025年最佳标的分析
 
+![回购与分红的双轮驱动示意](/assets/images/posts/2025/09/buyback-dividend-bull-bear.png)
+
 > **数据说明**：以下每个标的都包含来自Seeking Alpha Premium的独家评级数据，这些专业指标能帮助您更全面地评估投资价值。建议结合SA数据与公司基本面进行综合分析。
 
 ### Top Picks 速览（核心+卫星） {#top-picks}
+
+![30+优质标的与回购/分红平衡](/assets/images/posts/2025/09/premium-stocks-balance-scale.png)
 
 数据口径：FWD股息率、派息率、连续增长年数与SA分析师评级均据2025-09-19的SA摘选。
 
@@ -270,6 +274,8 @@ toc_sticky: true
 ```
 
 ### 三、消费防御组（稳定分红）
+
+![股息王：PG/KO/JNJ示意](/assets/images/posts/2025/09/dividend-kings-crown.png)
 
 #### Procter & Gamble (PG) ⭐⭐⭐⭐⭐
 💎 **SA独家评级**: 股息安全A | 成长A+ | 一致性A+ | SA 2.90 Hold vs 华尔街 3.95 Buy | **68年连增（股息王）**
@@ -642,6 +648,8 @@ toc_sticky: true
 
 ### 🎯 Alpha vs Beta：找到适合你的策略
 
+![主动Alpha vs 被动Beta 对比](/assets/images/posts/2025/09/alpha-beta-beach-vs-screens.png)
+
 在开始具体选股之前，让我们先明确一个重要概念：**每个人都需要找到适合自己的投资策略**。
 
 **追求Alpha（超额收益）的投资者**：
@@ -690,6 +698,8 @@ toc_sticky: true
 
 ### 定投方案（大中小资金示例） {#dingtou}
 
+![每月资金档位定投示意：$1K/$5K/$10K](/assets/images/posts/2025/09/dca-1k-5k-10k-bars.png)
+
 说明：以下为“回购+分红”导向的长期定投模型组合，按权重比例每月投入；可使用零股/碎股以贴近目标权重，或按最接近整股买入并保留剩余现金累计到下月。再平衡建议：每季度检查，偏离±5%时校正。
 
 如果你只想精选少量个股进行定投，请直接参考前文的[Top Picks 速览](#top-picks)，选择5–10只作为你的起步组合。
@@ -728,6 +738,8 @@ Satellite（40%）：
 - 再平衡：季度检查；单一仓位超配/低配±5%时调整。
 
 ## ⚠️ 风险管理
+
+![风险与收益的权衡天平](/assets/images/posts/2025/09/risk-vs-return-scale.png)
 
 ### 主要风险
 1. **利率风险**：影响金融股盈利能力
