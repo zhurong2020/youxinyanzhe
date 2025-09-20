@@ -205,40 +205,11 @@ Option Scanner  Scanner     分析结果    Wheel Strategy  持续监控
 
 ## 📊 完整工作流程
 
-### 流程图
+### 解套策略完整流程
 
-```mermaid
-graph TB
-    Start([开始: 检测到套牢持仓]) --> Scan[Option Scanner扫描]
+![期权解套策略流程图]({{ site.baseurl }}/assets/images/posts/2025/10/options-repair-workflow.png)
 
-    Scan --> Check{检测套牢深度}
-    Check -->|浮亏 < 10%| Normal[正常Wheel策略]
-    Check -->|浮亏 10-15%| Light[轻度解套模式]
-    Check -->|浮亏 15-25%| Medium[中度解套模式]
-    Check -->|浮亏 > 25%| Deep[深度解套模式]
-
-    Light --> Params1[Delta: 0.35<br/>DTE: 20-45天<br/>止盈: 40%]
-    Medium --> Params2[Delta: 0.30<br/>DTE: 14-35天<br/>止盈: 35%]
-    Deep --> Params3[Delta: 0.25<br/>DTE: 7-21天<br/>止盈: 30%]
-
-    Params1 --> Strategy{策略选择}
-    Params2 --> Strategy
-    Params3 --> Strategy
-
-    Strategy -->|保守| CC[纯Covered Call]
-    Strategy -->|平衡| Wheel[双向轮动]
-    Strategy -->|激进| Add[加仓摊薄]
-
-    CC --> Execute[Wheel Strategy执行]
-    Wheel --> Execute
-    Add --> Execute
-
-    Execute --> Monitor[监控进度]
-    Monitor --> Progress{解套进度}
-
-    Progress -->|未完成| Execute
-    Progress -->|完成| End([解套成功])
-```
+*图：期权解套策略的完整执行流程，从持仓检测到最终解套*
 
 ### 快速决策树
 
