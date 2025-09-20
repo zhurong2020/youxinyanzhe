@@ -1,0 +1,4 @@
+# 传统图片存储目录 (已废弃)
+# 新的图片管理系统使用 OneDrive 云存储
+# 此目录保留用于兼容性，但已不推荐使用
+# 详细说明请参考: docs/IMAGE_MANAGEMENT_BEST_PRACTICES.md
