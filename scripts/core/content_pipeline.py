@@ -584,25 +584,43 @@ class ContentPipeline:
         """检查excerpt字段和<!-- more -->前内容的长度规范"""
         issues = []
 
+        # 导入配置
         try:
-            # 1. 检查excerpt字段长度
+            import sys
+            from pathlib import Path
+            sys.path.insert(0, str(Path(__file__).parent.parent))
+            from config.excerpt_config import EXCERPT_TYPES, validate_excerpt_length
+        except ImportError:
+            # 如果配置文件不存在，使用默认值
+            EXCERPT_TYPES = {
+                'front_matter_excerpt': {'字数要求': {'min': 50, 'max': 160, 'optimal': 80}},
+                'content_excerpt': {'字数要求': {'min': 80, 'max': 150, 'optimal': 120}}
+            }
+            def validate_excerpt_length(text, excerpt_type):
+                req = EXCERPT_TYPES[excerpt_type]['字数要求']
+                length = len(text.strip())
+                if length < req['min']:
+                    return False, f"过短({length}字符)，建议{req['optimal']}字符"
+                elif length > req['max']:
+                    return False, f"过长({length}字符)，建议{req['optimal']}字符"
+                else:
+                    return True, f"长度合适({length}字符)"
+
+        try:
+            # 1. 检查excerpt字段长度（SEO用）
             if content.strip().startswith('---'):
                 import frontmatter
                 post = frontmatter.loads(content)
                 excerpt = post.metadata.get('excerpt', '')
 
                 if not excerpt:
-                    issues.append("📝 缺少excerpt字段，将使用Gemini自动生成")
+                    issues.append("📝 缺少SEO摘要(excerpt字段)，将使用Gemini自动生成")
                 else:
-                    excerpt_len = len(excerpt.strip())
-                    if excerpt_len < 40:
-                        issues.append(f"📏 excerpt过短({excerpt_len}字符)，建议50字符左右")
-                    elif excerpt_len > 70:
-                        issues.append(f"📏 excerpt过长({excerpt_len}字符)，建议50字符左右")
+                    is_valid, message = validate_excerpt_length(excerpt, 'front_matter_excerpt')
+                    if not is_valid:
+                        issues.append(f"📏 SEO摘要{message}")
 
-            # 2. 检查<!-- more -->前内容长度
-            # 注意：如果文件刚被格式化过，不再重复检查<!-- more -->前内容
-            # 格式化工具已经处理了<!-- more -->的插入位置
+            # 2. 检查<!-- more -->前内容长度（主页显示用）
             more_pos = content.find('<!-- more -->')
             if more_pos != -1:
                 before_more = self._extract_body_before_more(content)
@@ -619,12 +637,12 @@ class ContentPipeline:
                     actual_content = ' '.join(actual_content_lines)
                     clean_length = len(actual_content.strip())
 
-                    # 只有当实际内容确实过短或过长时才报告
-                    # 考虑到引用块等特殊情况，放宽限制
-                    if actual_content and clean_length < 30:
-                        issues.append(f"📏 <!-- more -->前内容过短({clean_length}字符)，建议添加简短介绍")
-                    elif clean_length > 150:
-                        issues.append(f"📏 <!-- more -->前内容过长({clean_length}字符)，建议精简首页预览")
+                    # 使用配置验证
+                    req = EXCERPT_TYPES['content_excerpt']['字数要求']
+                    if actual_content and clean_length < req['min']:
+                        issues.append(f"📏 主页摘要过短({clean_length}字符)，建议{req['optimal']}字符")
+                    elif clean_length > req['max']:
+                        issues.append(f"📏 主页摘要过长({clean_length}字符)，建议{req['optimal']}字符")
 
         except Exception as e:
             # 静默处理，避免重复报错
@@ -681,18 +699,18 @@ class ContentPipeline:
     def _get_summary_fix_suggestions(self, issues: List[str]) -> List[str]:
         """根据摘要问题提供修复建议"""
         suggestions = []
-        
+
         for issue in issues:
-            if "excerpt过短" in issue:
-                suggestions.append("💡 建议: 丰富excerpt描述，或使用Gemini重新生成")
-            elif "excerpt过长" in issue:
-                suggestions.append("💡 建议: 精简excerpt内容，保留核心要点")
-            elif "<!-- more -->前内容过短" in issue:
-                suggestions.append("💡 建议: 在<!-- more -->前添加背景说明或引言")
-            elif "<!-- more -->前内容过长" in issue:
+            if "SEO摘要过短" in issue:
+                suggestions.append("💡 建议: 丰富SEO摘要描述，包含关键词，或使用Gemini重新生成")
+            elif "SEO摘要过长" in issue:
+                suggestions.append("💡 建议: 精简SEO摘要内容，保留核心要点和关键词")
+            elif "主页摘要过短" in issue:
+                suggestions.append("💡 建议: 在<!-- more -->前添加引人入胜的开头段落")
+            elif "主页摘要过长" in issue:
                 suggestions.append("💡 建议: 将部分内容移至<!-- more -->后，保留精华开头")
-            elif "缺少excerpt" in issue:
-                suggestions.append("💡 系统将自动调用Gemini生成excerpt")
+            elif "缺少SEO摘要" in issue:
+                suggestions.append("💡 系统将自动调用Gemini生成SEO摘要（excerpt字段）")
         
         return suggestions
     
@@ -733,10 +751,10 @@ class ContentPipeline:
                     content = f.read()
                 
                 # 自动修复excerpt缺失
-                excerpt_issues = [issue for issue in issues if "缺少excerpt字段" in issue]
+                excerpt_issues = [issue for issue in issues if "缺少SEO摘要" in issue or "缺少excerpt字段" in issue]
                 if excerpt_issues:
                     if self._auto_generate_excerpt_if_missing(file_path, content):
-                        results['auto_fixes_applied'].append("自动生成excerpt字段")
+                        results['auto_fixes_applied'].append("自动生成SEO摘要(excerpt字段)")
                         # 重新读取更新后的内容
                         with open(file_path, 'r', encoding='utf-8') as f:
                             content = f.read()
@@ -912,8 +930,9 @@ class ContentPipeline:
                         auto_fixable = [
                             '缺少分类信息',
                             '缺少标签信息',
-                            'excerpt过短',
-                            'excerpt过长',
+                            'SEO摘要过短',
+                            'SEO摘要过长',
+                            '缺少SEO摘要',
                             '缺少excerpt字段'
                         ]
                         if not any(fixable in issue for fixable in auto_fixable):
