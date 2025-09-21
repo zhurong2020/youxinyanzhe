@@ -9,14 +9,16 @@ header:
   teaser: /assets/images/posts/2025/10/options-header-call-put.png
   overlay_image: /assets/images/posts/2025/10/options-header-call-put.png
   overlay_filter: 0.5
-excerpt: "当你的股票被深套时，是死扛等反弹，还是割肉止损？本文将为你揭示华尔街验证多年的期权解套策略，通过Wheel轮动和智能参数调整，把套牢变成稳定收入的机会。"
+excerpt: "股票被深套23.9%怎么办？期权Wheel策略智能解套，6-10个月变盈利，华尔街50年验证成熟方法"
 ---
+
+股票被套23.9%？期权轮动法6个月解套还能赚钱，你相信吗？
 
 <!-- more -->
 
 # 期权解套完全指南：从套牢到解放的智能策略
 
-![期权解套策略主题图]({{ site.baseurl }}/assets/images/posts/2025/10/options-header-call-put.png)
+![从套牢到自由的转变](../assets/images/posts/2025/10/trapped-to-freedom.png)
 
 > 📌 **插图说明**：本文配图均由AI工具生成，旨在提升阅读体验，帮助读者更好地理解投资概念。图片仅供示意参考。
 
@@ -29,9 +31,6 @@ excerpt: "当你的股票被深套时，是死扛等反弹，还是割肉止损�
 "等等，"我说，"让我教你一个华尔街的老方法。"
 
 10个月后，老张不仅完全解套，还额外赚了$1,850的期权费。他是怎么做到的？答案就是今天要分享的**期权轮动解套策略**。
-
-![从套牢到自由的转变]({{ site.baseurl }}/assets/images/posts/2025/10/trapped-to-freedom.png)
-*图：从被套牢的困境到财务自由的转变*
 
 今天，我要分享的不是什么新发明，而是华尔街验证了50年、被巴菲特等投资大师采用、在Reddit的r/thetagang社区被10万+投资者实践的成熟策略——**期权轮动解套法**。
 
@@ -64,6 +63,8 @@ excerpt: "当你的股票被深套时，是死扛等反弹，还是割肉止损�
 ### 两种身份
 - **买期权**：付权利金，获得权利（像买保险）
 - **卖期权**：收权利金，承担义务（像卖保险）
+
+![期权解套策略主题图](../assets/images/posts/2025/10/options-header-call-put.png)
 
 ### 关键术语
 - **行权价（Strike）**：约定的买卖价格
@@ -98,7 +99,7 @@ excerpt: "当你的股票被深套时，是死扛等反弹，还是割肉止损�
 - **验证**: TastyTrade研究显示，5年回测平均年化收益16-24%
 - **核心原理**: "Sell Put → 被行权接货 → Sell Call → 被行权出货" 的循环
 
-![Wheel策略循环图]({{ site.baseurl }}/assets/images/posts/2025/10/wheel-strategy-cycle.png)
+![Wheel策略循环图](../assets/images/posts/2025/10/wheel-strategy-cycle.png)
 *图：Wheel策略的完整循环流程*
 
 - **成功要素**:
@@ -183,7 +184,7 @@ excerpt: "当你的股票被深套时，是死扛等反弹，还是割肉止损�
 
 这四大策略可以独立使用，也可以组合使用。本文重点介绍的解套系统，正是Option Scanner和Wheel Strategy的完美结合。
 
-![Option Scanner与Wheel Strategy协同工作]({{ site.baseurl }}/assets/images/posts/2025/10/option-scanner-wheel-tools.png)
+![Option Scanner与Wheel Strategy协同工作](../assets/images/posts/2025/10/option-scanner-wheel-tools.png)
 *图：两大工具协同实现智能解套*
 
 ---
@@ -241,7 +242,7 @@ Option Scanner  Scanner     分析结果    Wheel Strategy  持续监控
 
 ### 解套策略完整流程
 
-![期权解套策略流程图]({{ site.baseurl }}/assets/images/posts/2025/10/options-repair-workflow.png)
+![期权解套策略流程图](../assets/images/posts/2025/10/options-repair-workflow.png)
 
 *图：期权解套策略的完整执行流程，从持仓检测到最终解套*
 
@@ -296,7 +297,7 @@ Option Scanner  Scanner     分析结果    Wheel Strategy  持续监控
 - **优点**: 快速降低成本基础
 - **缺点**: 需要额外资金，风险加大
 
-![三种策略对比示意图]({{ site.baseurl }}/assets/images/posts/2025/10/three-strategies-comparison.png)
+![三种策略对比示意图](../assets/images/posts/2025/10/three-strategies-comparison.png)
 *图：保守、平衡、激进三种策略的风险收益对比*
 
 ---
@@ -550,7 +551,7 @@ PUT收入 = $0.38 × 1张 × 100股 = $38
 
 ### 时间轴示例
 
-![10个月解套时间轴]({{ site.baseurl }}/assets/images/posts/2025/10/timeline-recovery-journey.png)
+![10个月解套时间轴](../assets/images/posts/2025/10/timeline-recovery-journey.png)
 *图：从-24%到盈亏平衡的10个月历程*
 
 ```
@@ -796,22 +797,22 @@ A: 建议每个标的独立部署一个策略实例，便于个性化管理。
    - Wheel Strategy：自动执行轮动策略
    - 加入社区获取最新策略更新
 
-![选择你的道路]({{ site.baseurl }}/assets/images/posts/2025/10/decision-crossroads.png)
+![选择你的道路](../assets/images/posts/2025/10/decision-crossroads.png)
 *图：被动等待还是主动管理？选择决定结果*
 
 ### 📚 系列文章预告
 
 这是我们**投资策略系列**的第一篇，专注于解决"套牢"这个最普遍的投资痛点。接下来，我们将系统性地介绍更多实战策略：
 
-- **第2篇**：[《TQQQ定投实战：从-60%到盈利的逆袭之路》](即将发布)（10月4日）
+- **第2篇**：[《TQQQ定投实战：从-60%到盈利的逆袭之路》](即将发布)
   - 如果期权对你来说太复杂，定投是更简单的选择
   - 真实回测数据展示定投的威力
 
-- **第3篇**：[《定投的数学原理：为什么能在下跌中赚钱》](即将发布)（10月8日）
+- **第3篇**：[《定投的数学原理：为什么能在下跌中赚钱》](即将发布)
   - 深入理解定投背后的数学逻辑
   - 为什么下跌反而是机会
 
-- **第4篇**：[《30+回购分红标的深度分析》](即将发布)（10月11日）
+- **第4篇**：[《30+回购分红标的深度分析》](即将发布)
   - 如何选择适合长期持有的标的
   - 回购+分红的双轮驱动策略
 
