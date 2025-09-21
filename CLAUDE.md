@@ -152,9 +152,17 @@
 
 #### 内容标准
 - **Front Matter**: 必需字段 `title`(25-35字符), `date`, `header`
-- **摘要**: 50-60字符，用于首页预览
+- **摘要**: 60-80字符用于首页预览，80-120字符用于SEO
 - **结构**: 开头钩子 + `<!-- more -->` + 主要内容 + 🎧播客 + 🌍英文资源
 - **风格**: 客观事实导向，科普语调，数据驱动，鼓励思考
+
+#### 📎 内容钩子管理（重要）
+**创作时必须执行的SOP**：
+1. **创作前**：检查 `_drafts/todos/00-CONTENT-PROMISES-TRACKER.md` 是否有需要兑现的预告
+2. **添加钩子时**：立即更新预告追踪表和发布路线图
+3. **创作后**：确认所有钩子都已记录，更新兑现状态
+
+**详细流程**: 查看 `_drafts/todos/00-CONTENT-HOOKS-SOP.md` 获取完整操作指南
 
 ### VIP会员系统
 #### 技术字段映射
@@ -177,6 +185,9 @@
 - `docs/CHANGELOG_DETAILED.md` - 完整更新历史
 - `docs/MEMBER_CONTENT_RULES_AND_STANDARDS.md` - 会员内容管理规范（已合并）
 - `docs/VIP_CONTENT_CREATION_GUIDE.md` - VIP内容创作指南（已合并）
+- **`_drafts/todos/00-CONTENT-HOOKS-SOP.md`** - 📎 内容钩子管理流程（必读）
+- **`_drafts/todos/00-CONTENT-PROMISES-TRACKER.md`** - 📌 文章预告追踪表
+- **`_drafts/todos/00-CONTENT-PUBLISHING-ROADMAP.md`** - 📚 发布路线图
 - `docs/CONTENT_SERIES_INTEGRATION_STRATEGY.md` - 内容系列集成策略
 - `docs/IMAGE_MANAGEMENT_WORKFLOW.md` - 图片管理完整工作流程（已合并）
 - `docs/SYSTEM_MENU_ARCHITECTURE.md` - 系统菜单架构设计
