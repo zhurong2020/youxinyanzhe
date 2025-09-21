@@ -733,21 +733,32 @@ class DraftFormatter:
 
     def add_more_tag(self, content: str) -> str:
         """
-        保持原有的more标签添加逻辑（作为备选方案）
+        根据配置添加<!-- more -->标签
         """
+        # 导入配置
+        try:
+            import sys
+            from pathlib import Path
+            sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+            from config.excerpt_config import EXCERPT_TYPES
+            content_req = EXCERPT_TYPES['content_excerpt']['字数要求']
+        except ImportError:
+            # 默认值
+            content_req = {'min': 80, 'max': 150, 'optimal': 120}
+
         lines = content.split('\n')
-        
-        # 寻找第一个合适的段落结束位置（大约200-400字符处）
+
+        # 寻找第一个合适的段落结束位置
         char_count = 0
         for i, line in enumerate(lines):
             char_count += len(line)
-            
-            # 在200-400字符之间寻找段落结束
-            if 200 <= char_count <= 400 and line.strip() == '':
+
+            # 在最佳长度附近寻找段落结束
+            if content_req['min'] <= char_count <= content_req['max'] and line.strip() == '':
                 lines.insert(i + 1, '<!-- more -->')
                 break
-            # 如果超过400字符，强制插入
-            elif char_count > 400 and line.strip() == '':
+            # 如果超过最大长度，强制插入
+            elif char_count > content_req['max'] and line.strip() == '':
                 lines.insert(i + 1, '<!-- more -->')
                 break
         else:
