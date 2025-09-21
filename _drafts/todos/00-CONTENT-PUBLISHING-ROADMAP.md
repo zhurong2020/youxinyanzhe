@@ -116,7 +116,7 @@ todos/
 | 05 | 系列框架 | series-wheel.md | Wheel策略完整体系 | 11/15 | 体系总结 |
 | 06 | 系列框架 | series-5-strategies.md | 五大策略协同作战 | 11/19 | 策略整合 |
 | 07 | 工具评测 | tools-portfolio-vis.md | Portfolio Visualizer深度评测 | 11/22 | 回测工具 |
-| 08 | VIP专题 | **新建** | VIP策略精选：月入$1000 | 11/26 | 商业化探索 |
+| 08 | 期权进阶 | **新建** | 小资金大收益：Poor Man's Covered Call完全指南 | 11/26 | 小资金期权策略 |
 | 09 | 月度总结 | monthly-review.md | 11月策略收益复盘 | 11/29 | 实盘验证 |
 
 ---
@@ -129,6 +129,7 @@ todos/
 - ✅ `01-options-repair-guide.md` - 期权解套指南(24K字)
 - 📚 `series-wheel-strategy-plan.md` - Wheel完整框架
 - 📝 `draft-mara-wheel-demo.md` - MARA实盘案例
+- 📌 **待创建** `pmcc-complete-guide.md` - Poor Man's Covered Call完全指南（预告于期权解套文章，计划11/26发布）
 
 #### DCA定投策略
 - ✅ `02-tqqq-investment-2025.md` - TQQQ实战(12K字)
@@ -241,6 +242,12 @@ todos/
 ---
 
 ## 📝 更新记录
+
+### 2025-09-20 更新内容
+1. **新增预告追踪**: 《小资金大收益：Poor Man's Covered Call完全指南》
+   - 来源：期权解套文章中的预告
+   - 计划发布：11月26日
+   - 内容定位：小资金投资者的期权收入策略
 
 ### 2025-09-19 更新内容
 1. **文件整合**: 从`_drafts`主目录移入3个更新版本文件
