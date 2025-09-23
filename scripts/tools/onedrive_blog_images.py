@@ -708,7 +708,7 @@ class MarkdownImageProcessor:
                 full_path = article_dir / img_path
             elif img_path.startswith('/'):
                 # 绝对路径
-                full_path = Path(img_path[1:])  # 去掉开头的斜杠
+                full_path = Path(img_path)  # 保持完整的绝对路径
             else:
                 # 相对路径 - 先尝试相对于项目根目录
                 full_path = Path(img_path)
