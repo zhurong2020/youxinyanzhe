@@ -3,8 +3,8 @@ date: 2025-09-22 10:30:00
 excerpt: TQQQ暴跌60%如何逆袭？回测揭秘智能定投如何化恐慌为财富机遇。
 header:
     overlay_filter: 0.5
-    overlay_image: /assets/images/posts/2025/09/tqqq-2025-price-chart.png
-    teaser: /assets/images/posts/2025/09/tqqq-2025-price-chart.png
+    overlay_image: /home/wuxia/projects/youxinyanzhe/assets/images/posts/2025/09/tqqq-2025-price-chart.png
+    teaser: /home/wuxia/projects/youxinyanzhe/assets/images/posts/2025/09/tqqq-2025-price-chart.png
 
 title: 2025年TQQQ定投回测分析：从-60%回撤到盈利的逆袭之路
 ---
