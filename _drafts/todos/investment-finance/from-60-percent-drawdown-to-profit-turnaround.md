@@ -34,7 +34,7 @@ header:
 
 2025年2-4月，科技股经历了两波惨烈的调整。纳斯达克指数连续下跌，作为3倍杠杆ETF的TQQQ更是雪上加霜，从$90暴跌至最低$35，跌幅超过60%。
 
-![TQQQ 2025年走势图]({{ site.baseurl }}/assets/images/2025/tqqq-dca/tqqq-2025-price-chart.png)
+![TQQQ 2025年走势图]({{ site.baseurl }}/assets/images/posts/2025/09/tqqq-2025-price-chart.png)
 
 特别是4月3-4日连续两天分别暴跌16%和18%，社交媒体上充斥着"杠杆ETF归零"的恐慌言论，许多投资者在极度恐惧中选择了止损离场。
 
@@ -69,11 +69,11 @@ header:
 
 本文重点展示回测数据，策略及参数的详细对比将在第2篇文章中详述。下面是证券软件Moomoo客户端量化功能示意，如果对Moomoo软件不熟悉的，可以先参考[这里](#建议先查看以下内容)，简单说就是找到下图所示的Moomoo功能。
 
-![Moomoo中的量化功能]({{ site.baseurl }}/assets/images/2025/tqqq-dca/moomoo-quant-features.png)
+![Moomoo中的量化功能]({{ site.baseurl }}/assets/images/posts/2025/09/moomoo-quant-features.png)
 
 并熟悉如下图所示的，完成回测后显示的三个部分：
 
-![Moomoo回测结果三部分]({{ site.baseurl }}/assets/images/2025/tqqq-dca/moomoo-backtest-results.png)
+![Moomoo回测结果三部分]({{ site.baseurl }}/assets/images/posts/2025/09/moomoo-backtest-results.png)
 
 > 📢 **实盘验证进行中**：
 > - 我们已开始运行多策略实盘账户，请保持关注
@@ -90,7 +90,7 @@ header:
 - 持仓数量：60股
 - 平均成本：$72.92（当前价$100.98）
 
-![5k free dca]({{ site.baseurl }}/assets/images/2025/tqqq-dca/dca-free-5k-weekly.png)
+![5k free dca]({{ site.baseurl }}/assets/images/posts/2025/09/dca-free-5k-weekly.png)
 
 **$20,000中等资金定投**
 - 基础定投量：5股/周
@@ -99,7 +99,7 @@ header:
 - 持仓数量：256股
 - 平均成本：$72.52
 - 
-![20k free dca]({{ site.baseurl }}/assets/images/2025/tqqq-dca/dca-free-20k-weekly.png)
+![20k free dca]({{ site.baseurl }}/assets/images/posts/2025/09/dca-free-20k-weekly.png)
 
 > ⚠️ **风险提醒**：16.8%回撤 = $3,360损失
 > - 这可能是你两个月的房租
@@ -112,7 +112,7 @@ header:
 - 持仓数量：509股
 - 平均成本：$72.51
 - 
-![40k free dca]({{ site.baseurl }}/assets/images/2025/tqqq-dca/dca-free-40k-weekly.png)
+![40k free dca]({{ site.baseurl }}/assets/images/posts/2025/09/dca-free-40k-weekly.png)
 
 ### 1.3 完整版智能定投表现
 
@@ -123,7 +123,7 @@ header:
 - 激进乘数：1.0-2.0x动态调节
 - 关键特点：4月暴跌触发深度加仓
 - 
-![40k vip dca]({{ site.baseurl }}/assets/images/2025/tqqq-dca/dca-vip-40k-weekly.png)
+![40k vip dca]({{ site.baseurl }}/assets/images/posts/2025/09/dca-vip-40k-weekly.png)
 
 > 🔴 **中等资金也不轻松**：18.65%回撤 = $7,460账面损失
 > - 想象早上起来发现账户少了一个月工资
@@ -135,7 +135,7 @@ header:
 - 最大回撤：17.61%
 - 持仓数量：11,760股
 
-![800k vip dca]({{ site.baseurl }}/assets/images/2025/tqqq-dca/dca-vip-800k-daily.png)
+![800k vip dca]({{ site.baseurl }}/assets/images/posts/2025/09/dca-vip-800k-daily.png)
 
 > ⚠️ **巨额资金风险警示**：
 > - **17.61%回撤 = $140,880的账面损失**！
@@ -174,7 +174,7 @@ header:
 
 **累计跌幅**：从$90到$35，最大回撤61.1%
 
-![tqqq 2025 down]({{ site.baseurl }}/assets/images/2025/tqqq-dca/tqqq-crash-chart.png)
+![tqqq 2025 down]({{ site.baseurl }}/assets/images/posts/2025/09/tqqq-crash-chart.png)
 
 ### 2.2 真实的心理煎熬
 
@@ -200,7 +200,7 @@ header:
 - 在$30-35区间持续买入
 - 平均成本大幅降低至$72
   
-![Moomoo logs]({{ site.baseurl }}/assets/images/2025/tqqq-dca/moomoo-trading-logs.png)
+![Moomoo logs]({{ site.baseurl }}/assets/images/posts/2025/09/moomoo-trading-logs.png)
 
 **完整版表现**：
 - 自动触发深度回撤加仓
@@ -221,7 +221,7 @@ header:
 
 当时TQQQ的日K线如下图，你还能坚持吗？
 
-![TQQQ日K线图]({{ site.baseurl }}/assets/images/2025/tqqq-dca/tqqq-daily-candles.png)
+![TQQQ日K线图]({{ site.baseurl }}/assets/images/posts/2025/09/tqqq-daily-candles.png)
 
 > 💡 **最重要的教训**：你永远无法预测底部。定投的意义在于，你不需要预测，只需要坚持。
 
