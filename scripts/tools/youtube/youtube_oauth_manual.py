@@ -31,8 +31,8 @@ def manual_oauth_flow():
             'https://www.googleapis.com/auth/youtube.upload'
         ]
         
-        credentials_file = project_root / "config" / "youtube_oauth_credentials.json"
-        token_file = project_root / "config" / "youtube_oauth_token.json"
+        credentials_file = project_root.parent / "config" / "youtube_oauth_credentials.json"
+        token_file = project_root.parent / "config" / "youtube_oauth_token.json"
         
         if not credentials_file.exists():
             print(f"❌ 凭据文件不存在: {credentials_file}")
