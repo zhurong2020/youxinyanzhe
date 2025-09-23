@@ -520,7 +520,7 @@ Here is the content to optimize:
         print(f"\n📝 生成微信发布指南: {front_matter.get('title', 'Untitled')}")
 
         # Fix: Use project_root directly, not relative to scripts
-        guide_dir = Path(project_root).resolve() / "tmp/output/wechat/guides"
+        guide_dir = Path(project_root).resolve() / ".tmp/output/wechat/guides"
         guide_dir.mkdir(parents=True, exist_ok=True)
 
         safe_title = re.sub(r'[^\w\s-]', '', front_matter.get('title', 'draft')).strip()
