@@ -2125,7 +2125,7 @@ class ContentPipeline:
                 if success:
                     # Find the latest guide file
                     import time
-                    guide_dir = self.project_root / ".tmp/output/wechat/guides"
+                    guide_dir = self.project_root / "tmp/output/wechat/guides"
                     if guide_dir.exists():
                         latest_files = sorted(guide_dir.glob("*_guide.md"), key=lambda p: p.stat().st_mtime, reverse=True)
                         if latest_files:
