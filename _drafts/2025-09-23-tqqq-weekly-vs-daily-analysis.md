@@ -30,7 +30,7 @@ excerpt: 基于1438天真实数据回测，揭秘3倍杠杆ETF定投的最优频
 - **费用率**：0.86%/年
 - **关键特性**：每日重置机制，长期表现因波动衰减偏离3倍
 
-![TQQQ10年走势](tqqq-summary-sa.png)
+![TQQQ10年走势]({{ site.baseurl }}/assets/images/posts/2025/09/tqqq-summary-sa.png)
 > 数据来源：Seeking Alpha
 
 ### 核心风险提示
@@ -56,7 +56,7 @@ excerpt: 基于1438天真实数据回测，揭秘3倍杠杆ETF定投的最优频
 
 > 💡 **关键洞察**：按年度收益累乘计算，TQQQ的5年累计收益约为QQQ的1.9倍（而非理论3倍）。根据ProShares官方数据，5年年化收益率为18.25%，这种偏离正是波动性衰减的体现，也是需要智能定投策略的原因。
 
-![TQQQ总回报](tqqq-return-official.png)
+![TQQQ总回报]({{ site.baseurl }}/assets/images/posts/2025/09/tqqq-return-official.png)
 > 数据来源：ProShares官网Market Price总回报率
 
 **关键数据**（2020-2025.09）：
@@ -94,7 +94,7 @@ excerpt: 基于1438天真实数据回测，揭秘3倍杠杆ETF定投的最优频
 
 > 💡 **关键发现**：周投在低价区间的买入占比几乎是日投的2倍！
 
-![TQQQ 2025年价格分布图](tqqq_price_distribution_2025.png)
+![TQQQ 2025年价格分布图]({{ site.baseurl }}/assets/images/posts/2025/09/tqqq_price_distribution_2025.png)
 > 📊 **数据说明**：基于2025年1-9月共147个交易日的收盘价数据。
 
 ### 2.4 不同标的的结果
