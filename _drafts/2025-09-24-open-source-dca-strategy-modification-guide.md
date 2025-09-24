@@ -82,11 +82,17 @@ toc_sticky: true
 > - 📄 《Moomoo量化功能常用API函数及其用法》完整版
 > - 包含46个API函数的详细说明和示例代码
 
+> ⚠️ **重要版本提示**：
+> - 本策略已在**Moomoo Windows版本**下测试通过
+> - 下载Moomoo时请选择**Legacy版本**（传统版本）
+> - Legacy版本拥有更稳定的量化功能支持
+> - 下载地址：在Moomoo官网下载页面选择"Previous versions"
+
 Moomoo量化策略基于Python，采用标准化的三层框架设计：
 
 ```python
 # Moomoo策略的标准框架（必须遵循）
-class Strategy_1(StrategyBase):
+class Strategy(StrategyBase):  # 类名必须是Strategy
     def initialize(self):  # 初始化，仅在策略启动时运行一次
         self.trigger_symbols()  # 约定函数1：定义运行标的
         self.custom_indicator()  # 约定函数2：注册指标
@@ -131,6 +137,7 @@ class Strategy_1(StrategyBase):
    - 风控函数：如止损、仓位控制等
 
 > ⚠️ **重要提示**：
+> - **类名必须是`Strategy`**，不能使用其他名称
 > - 不要在`initialize()`内增加过多逻辑，会导致策略启动缓慢
 > - Python标准库支持，但禁用了读写硬盘、网络请求等功能
 > - 自定义变量名不能与内置API函数重名
@@ -586,7 +593,7 @@ Moomoo量化定投策略示例
 符合官方框架要求，可直接在量化平台运行
 """
 
-class DCA_Strategy(StrategyBase):
+class Strategy(StrategyBase):  # 注意：类名必须是Strategy
     def initialize(self):
         """初始化函数，策略启动时运行一次"""
         self.trigger_symbols()    # 定义运行标的
@@ -849,6 +856,7 @@ quit_strategy()  # 退出策略（止损清仓后使用）
 > - 关闭软件后策略会停止运行
 > - 建议设置开盘提醒，养成启动习惯
 > - 可同时运行多个策略
+> - **推荐使用Moomoo Windows Legacy版本**（传统版本）
 
 ---
 
