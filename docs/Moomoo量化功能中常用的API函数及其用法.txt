@@ -1,0 +1,803 @@
+## Moomoo量化功能中常用的API函数及其用法：
+1. current_price
+获取指定标的的最新价格
+current_price(symbol, price_type=THType.FTH)
+其中symbol类型为Contract（Contract定义见下文），price_type类型为THType，枚举值，RTH和FTH分别表示盘中和全时段，返回类型：float。
+示例-获取美股苹果的最新价格：
+```
+current_price(symbol=Contract("US.AAPL") , price_type=THType.FTH)
+```
+示例返回值：150.82
+
+2. Contract
+将字符串转换成系统可识别的证券代码
+Contract(symbol_str)
+其中symbol_str类型为str，字符串格式：市场代码.证券代码。例：苹果是'US.AAPL'，返回类型：Contract。
+示例-将 aapl 定义为苹果的股票代码，然后请求其最新的股价：
+```
+aapl = Contract('US.AAPL')  
+last_price(aapl) 
+```
+示例返回值：150.82
+
+3. bid
+获取指定标的第 n 档的买盘委托价。
+bid(symbol, level=1)
+其中symbol类型为Contract，level类型为int，对应第几档，返回类型：float。
+示例-获取美股苹果的第一档买盘委托价：
+```
+bid(symbol=Contract("US.AAPL"), level=1)
+```
+示例返回值：150.82
+
+4. ask
+获取指定标的第 n 档的卖盘委托价。
+ask(symbol, level=1)
+其中symbol类型为Contract，level类型为int，对应第几档，返回类型：float。
+示例-获取美股苹果的第一档卖盘委托价：
+```
+ask(symbol=Contract("US.AAPL"), level=1)
+```
+示例返回值：145.99
+
+5. device_time
+获取当前设备时间
+device_time(TimeZone.DEVICE_TIME_ZONE)
+其中TimeZone类型为TimeZone，枚举值，DEVICE_TIME_ZONE表示本机时区，ET, CT, PST, CCT分别表示美国东部时间、美国中部时间、太平洋时间、北京时间。⚠️ 注意：不支持MARKET_TIME_ZONE。返回类型：datetime。
+示例-获取本设备的当前时间：
+```
+devicetime = device_time(TimeZone.DEVICE_TIME_ZONE)
+print(devicetime)
+print(devicetime.strftime("%Y-%m-%d %H:%M:%S"))  # 格式化日期和时间
+print(devicetime.hour)  # 打印小时
+print(devicetime.minute)  # 打印分钟
+print(devicetime.second)  # 打印秒
+```
+示例返回值：
+```
+2023-07-31 09:30:00-04:00
+2023-07-31 09:30:00
+9
+30
+0
+```
+
+6. total_cash
+当前账户（以某个币种计价）的总现金
+total_cash(currency=Currency.HKD)
+其中currency类型为Currency，表示计价货币。枚举值，HKD表示港元，USD表示美元。返回类型：float。
+示例-获取当前账户（以HKD计价）的总现金：
+```
+total_cash(currency=Currency.HKD)
+```
+示例返回值：20380
+
+7. position_holding_qty
+获取指定标的的持有数量
+position_holding_qty(symbol)
+其中symbol类型为Contract，对应标的。返回类型：float。
+示例-获取美股苹果的持有数量：
+```
+position_holding_qty(symbol=Contract("US.AAPL"))
+```
+示例返回值：100
+
+8. position_cost
+获取指定标的持仓的摊薄成本价/平均成本价，默认为平均成本价。
+摊薄成本价 = (持有期内买入总金额-持有期内卖出总金额) ÷ 持有数量
+摊薄成本价不支持期货。摊薄成本价考虑了持有期内每次交易的盈亏（暂不包含现金派息、供股等情况）。既考虑买入，也考虑卖出的变化。卖出股票所对应的盈亏会摊高或摊低成本价，甚至会出现成本价为负数的情况。
+平均成本价 = （买入前的平均成本价×数量 + 此次买入的价格×数量）÷ 买入后持有数量
+平均成本价支持股票、期货。平均成本价是指当前持仓的平均成本（不包含佣金及费用）。只考虑买入，不考虑卖出的变化。卖出股票所对应的盈亏不摊薄成本价，而转为已实现盈亏。
+position_cost(symbol,cost_price_model=CostPriceModel.AVG)
+其中symbol类型为Contract，对应标的，cost_price_model类型为CostPriceModel，表示成本价模型。枚举值，AVG表示平均成本价，DILUTED表示摊薄成本价。返回类型：float。
+示例-获取苹果的摊薄成本价：
+```python
+position_cost(symbol=Contract("US.AAPL"),cost_price_model=CostPriceModel.DILUTED)
+```
+示例返回值：150
+
+示例-获取苹果的平均成本价：
+```python
+position_cost(symbol=Contract("US.AAPL"),cost_price_model=CostPriceModel.AVG)
+```
+示例返回值：145
+
+9. request_orderid
+查询订单ID
+request_orderid(symbol=Contract(""), status=[], start="", end="")
+其中symbol类型为Contract，对应标的，status类型为list，表示订单状态，枚举值，SUBBMITTING表示提交中，SUBMITTED表示已提交，等待成交，FILLED_PART表示部分成交，FILLED_ALL表示全部已成交，FAILED表示下单失败。start和end类型为str，表示订单查询的起止时间。
+示例-查询苹果的已全部成交订单ID：
+```python
+request_orderid(symbol=Contract("US.AAPL"), status=["FILLED_ALL"], start="2023-01-03", end="2023-02-01")
+```
+示例返回值：["FT6644468615272262086","FT6644468615272262087"]
+
+
+10. request_executionid
+查询成交ID
+request_executionid(symbol=Contract(""), start="", end="")
+其中symbol类型为Contract，对应标的，start和end类型为str，表示成交查询的起止时间。若start和end为空，则查询最近31天的数据。
+示例-查询苹果的成交ID：
+```python
+request_executionid(symbol=Contract("US.AAPL"), start="2023-01-03", end="2023-02-01")
+```
+示例返回值：["4665291631090960915", "4665291631090960916"]
+
+11. execution_status
+查询成交状态
+execution_status(executionid)
+其中executionid类型为str，表示成交ID。返回类型：枚举型的DealStatus，枚举值和枚举说明如下：
+OK	正常
+CANCELLED	成交被取消
+CHANGED	成交被更改
+示例-查询成交ID为"4665291631090960915"的成交状态：
+```python
+execution_status(executionid="4665291631090960915")
+```
+示例返回值：OK
+
+12. execution_price
+查询成交价格
+execution_price(executionid)
+其中executionid类型为str，表示成交ID。返回类型：float，表示成交价格。
+示例-查询成交ID为"4665291631090960915"的成交价格：
+```python
+execution_price(executionid="4665291631090960915")
+```
+示例返回值：150
+
+13. place_limit
+下限价单
+place_limit(symbol, price, qty, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+其中symbol类型为Contract，price类型为float，表示限价单价格，qty类型为float，表示限价单数量，side类型为OrderSide，表示交易方向，枚举值，BUY表示买入，SELL表示卖出。time_in_force类型为TimeInForce，表示订单期限，枚举值，DAY表示当日有效，GTC表示撤单前有效。返回类型：str，表示订单ID。
+示例-下苹果的限价单：
+```python
+place_limit(symbol=Contract("US.AAPL"), price=mid_price(symbol=Contract("US.AAPL")), qty=(1*lot_size(symbol=Contract("US.AAPL"))), side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+```
+示例返回值：FT6644468615272262086
+
+
+14. place_stop_limit
+下止损限价单
+place_stop_limit(symbol, aux_price, price, qty, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+其中symbol类型为Contract，aux_price类型为float，表示触发价格，price类型为float，表示限价单价格，qty类型为float，表示限价单数量，side类型为OrderSide，表示交易方向，枚举值，BUY表示买入，SELL表示卖出。time_in_force类型为TimeInForce，表示订单期限，枚举值，DAY表示当日有效，GTC表示撤单前有效。返回类型：str，表示订单ID。
+示例-下苹果的止损限价单：
+```python
+place_stop_limit(symbol=Contract("US.AAPL"), aux_price=140, price=150, qty=100, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+```
+示例返回值：FT6644468615272262086
+
+15. cancel_order_by_symbol
+撤单
+cancel_order_by_symbol(symbol, side=TradeSide.ALL)
+其中symbol类型为Contract，side类型为TradeSide，表示交易方向，枚举值，ALL表示全部撤单，BUY表示撤买单，SELL表示撤卖单。
+示例-撤销苹果的全部订单：
+```python
+cancel_order_by_symbol(symbol=Contract("US.AAPL"), side=TradeSide.ALL)
+```
+
+16. round
+四舍五入
+round(value)
+其中value类型为float，表示需要四舍五入的数值。返回类型：float，表示四舍五入后的数值，注意这个函数只支持取整，如果需要小数点后1位的，需要适当的数学运算。
+示例：
+```python
+round(2.5)
+```
+示例返回：3
+
+16.1 abs
+取绝对值
+abs(value)
+其中value类型为float，表示需要取绝对值的数值。返回类型：float，表示数值的绝对值。
+⚠️ 注意：参数必须是float类型，如果传入其他类型需要先转换为float。
+示例-取-2.5的绝对值：
+```python
+abs(-2.5)
+```
+示例返回值：2.5
+
+示例-处理期权持仓数量（可能为负数）：
+```python
+qty = position_holding_qty(symbol=Contract("US.PYPL251017P65000"))  # 可能返回-1.0
+display_qty = abs(float(qty))  # 确保转换为float再取绝对值
+```
+示例返回值：1.0
+
+17. min
+最小值
+min(arg1,arg2,*args)
+其中arg1,arg2,*args类型为float，表示需要比较的数值。返回类型：float，表示最小值，注意这个函数不支持类似lamba表达式的使用，只能传入具体的数值。
+示例：
+```python
+min(2,3,4)
+```
+示例返回：2
+
+
+18. max
+最大值
+max(arg1,arg2,*args)
+其中arg1,arg2,*args类型为float，表示需要比较的数值。返回类型：float，表示最大值，注意这个函数不支持类似lamba表达式的使用，只能传入具体的数值。
+示例：
+```python
+max(2,3,4)
+```
+示例返回：4
+```
+
+19. execution_qty
+查询成交数量
+execution_qty(executionid)
+其中executionid类型为str，表示成交ID。返回类型：float，表示成交数量。
+示例-查询成交 ID 为"4665291631090960915"的成交数量：
+```python
+execution_qty(executionid="4665291631090960915")
+```
+示例返回值：100
+
+20. execution_time
+查询成交时间
+execution_time(excecutionid,time_zone=TimeZone.DEVICE_TIME_ZONE)
+其中executionid类型为str，表示成交ID。time_zone类型为TimeZone，表示时区。⚠️ 注意：不支持MARKET_TIME_ZONE，应使用DEVICE_TIME_ZONE。
+返回类型：datetime，表示成交时间。
+示例-查询成交 ID 为"10000000000000001"的成交时间：
+```python
+executiontime = execution_time(excecutionid="10000000000000001",time_zone=TimeZone.DEVICE_TIME_ZONE)
+print(executiontime)
+print(executiontime.strftime("%Y-%m-%d %H:%M:%S"))  # 格式化日期和时间
+print(executiontime.hour)  # 打印小时
+print(executiontime.minute)  # 打印分钟
+print(executiontime.second)  # 打印秒
+```
+示例返回值：
+2023-07-31 09:30:00-04:00
+2023-07-31 09:30:00
+9
+30
+0
+
+21. execution_side
+查询成交方向
+execution_side(executionid)
+其中executionid类型为str，表示成交ID。返回类型：OrderSide，返回枚举值的订单方向，其中：BUY为买入，SELL为卖出，SELL_SHORT为卖空，BUY_BACK为买回。
+示例-查询成交 ID 为"4665291631090960915"的交易方向：
+```python
+execution_side(executionid="4665291631090960915")
+```
+示例返回值：BUY
+
+22. order_status
+通过订单 ID 查询订单状态。你可以通过以下 2 个函数获得订单 ID ：下单（place_limit），查询订单 ID（request_orderid）。
+order_status(order_id)
+其中order_id类型为str，表示订单ID。返回类型：OrderStatus，返回枚举值的订单状态，枚举值和枚举说明如下：
+WAITING_SUBMIT	等待提交
+SUBMITTING	提交中
+SUBMITTED	已提交，等待成交
+FILLED_PART	部分成交
+FILLED_ALL	全部已成交
+CANCELLED_PART	部分成交，剩余部分已撤单
+CANCELLED_ALL	全部已撤单，无成交
+FAILED	下单失败，服务拒绝
+DISABLED	已失效
+DELETED	已删除，无成交的订单才能删除
+示例-查询 ID 为“FH123456789”的订单状态：
+```python
+order_status(orderid="FH123456789")
+```
+示例返回值：FILLED_ALL
+
+23. order_filled_qty
+通过订单 ID 查询指定订单的成交数量。你可以通过以下 2 个函数获得订单 ID ：下单（place_limit），查询订单 ID（request_orderid）。
+order_filled_qty(orderid)
+其中order_id类型为str，表示订单ID。返回类型：float，表示订单的成交数量。
+示例
+查询 ID 为“FH123456789”的订单的成交数量
+order_filled_qty(orderid="FH123456789")
+示例返回值
+100
+
+24.bar_high
+获取指定标的指定周期的 K 线最高价。
+bar_high(symbol, bar_type=BarType.H1, select=1)
+其中参数名为symbol，类型为Contract，bar_type指定BarType	K 线周期，比如BarType.H1，select	int为选取倒数第几根 K 线数据，比如1，范围1-500。返回类型： float。
+示例
+获取苹果的最新 1 根 1 小时 K 线的最高价。
+bar_high(symbol=Contract("US.AAPL"), bar_type=BarType.H1, select=1)
+示例返回值
+142.43
+
+25.bar_custom
+将指定周期的多根 K 线聚合成 1 根 K 线，例如：自定义“8 小时 K”周期，是指每 8 根 1 小时 K 线聚合成 1 根 “8 小时 K”。
+bar_custom(symbol, data_type=BarDataType.HIGH, custom_num=4, custom_type=CustomType.H1, select=1)
+其中参数名为symbol，类型为Contract，data_type指定BarDataType数据类型，比如BarDataType.CLOSE，custom_num为自定义根数，比如4，范围1-200，custom_type为CustomType自定义周期，比如CustomType.H1，select	int为选取倒数第几根 K 线数据，比如1，范围1-5。返回类型： float。
+示例
+获取苹果近 8 日的最高价。
+bar_custom(symbol=Contract("US.AAPL"), data_type=BarDataType.HIGH, custom_num=8, custom_type=CustomType.D1, select=1)
+示例返回值
+181.55
+
+26. place_market
+提交市价单
+place_market(symbol, qty, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+place_limit(symbol, price, qty, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+其中symbol类型为Contract，qty类型为float，表示市价单数量，side类型为OrderSide，表示交易方向，枚举值，BUY表示买入，SELL表示卖出。time_in_force类型为TimeInForce，表示订单期限，枚举值，DAY表示当日有效，GTC表示撤单前有效，数量自动向下调整到可交易数量
+。返回类型：str，表示订单ID。
+示例-下苹果的市价单：
+提交市价单，以市价为价格买 100 股苹果，该订单当日有效
+place_market(symbol=Contract("US.AAPL"), qty=100, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+示例返回值
+"FT6644468615272262086"
+
+27. order_side
+接口说明
+查询订单交易方向。
+你可以通过以下 2 个函数获得订单 ID ：
+下单
+查询订单 ID
+order_side(orderid)
+参数
+参数名	类型	说明	默认值	范围
+orderid	string	订单 ID	--	--
+返回
+返回类型： OrderSide
+
+示例说明
+查询 ID 为“FH123456789”的订单的交易方向。
+order_side(orderid="FH123456789")
+示例返回值
+BUY
+
+28. position_side
+接口说明
+获取指定标的的持仓方向。
+适用市场
+香港市场：股票、ETFs、窝轮、牛熊证、界内证、期权、期货
+美国市场：股票、ETFs、期权、期货
+A股市场：股票、ETFs
+新加坡市场：期货
+日本市场：期货
+position_side(symbol)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+返回
+返回类型：PositionSide
+
+示例说明
+获取苹果的持仓方向。
+position_side(symbol=Contract("US.AAPL"))
+示例返回值
+LONG
+
+29. market_value_security
+接口说明
+获取当前账户的证券市值。
+证券市值：账户持仓中股票与证券衍生品的市值总和。
+market_value_security(currency=Currency.HKD)
+参数
+参数名	类型	说明	默认值	范围
+currency	Currency	计价货币	Currency.HKD	--
+返回
+返回类型： float
+
+示例说明
+获取当前账户的证券市值
+market_value_security(currency=Currency.HKD)
+示例返回值
+20000
+
+30. available_fund
+接口说明
+获取当前账户（以某个币种计价）的可用资金。
+可用资金 = 现金 + 未实现盈亏 - 持仓占用的初始保证金 - 冻结资金。
+available_fund(currency=Currency.HKD)
+参数
+参数名	类型	说明	默认值	范围
+currency	Currency	计价货币	Currency.HKD	--
+返回
+返回类型： float
+
+示例说明
+获取当前账户（以 HKD 计价）的可用资金。
+available_fund(currency=Currency.HKD)
+示例返回值
+10000
+
+---
+
+### **期权相关函数**
+
+31. option_screener
+接口说明
+对标的证券的多条期权链进行筛选。
+适用市场
+香港市场：指数、股票、ETFs
+美国市场：股票、ETFs、指数
+option_screener(underlying_symbol, index_option_type=IndexOptionType.NORMAL, option_type=OptionType.CALL, moneyness=Moneyness.ITM, time_to_exp_start=0, time_to_exp_end=7, strike_to_spot_start=-0.1, strike_to_spot_end=0.1)
+参数
+参数名	类型	说明	默认值	范围
+underlying_symbol	Contract	标的证券	--	--
+index_option_type	IndexOptionType	指数期权类型	IndexOptionType.NORMAL	--
+option_type	OptionType	期权看涨/看跌类型	OptionType.CALL	--
+moneyness	Moneyness	期权价内/价外类型	Moneyness.ITM	仅支持ITM/OTM，不支持ATM
+time_to_exp_start	int	距到期日剩余天数（范围起点）	0	--
+time_to_exp_end	int	距到期日剩余天数（范围终点）	7	--
+strike_to_spot_start	float	行权价距现价比例（范围下界）	-0.1	-0.8~1.2
+strike_to_spot_end	float	行权价距现价比例（范围上界）	0.1	-0.8~1.2
+返回
+返回类型： Contract
+
+示例说明
+筛选恒生指数的看涨价内期权（剩余期限为 0-7 天；行权价为 [标的现价的 -10.0% 到标的现价的 10%]）。
+option_screener(underlying_symbol=Contract("HK.800000"), index_option_type=IndexOptionType.NORMAL, option_type=OptionType.CALL, moneyness=Moneyness.ITM, time_to_exp_start=0, time_to_exp_end=7, strike_to_spot_start=-0.1, strike_to_spot_end=0.1)
+示例返回值
+Contract("HK.HSI230210C21200000")
+
+32. option_screener_by_date
+接口说明
+对标的证券指定到期日的期权链进行筛选。
+option_screener_by_date(underlying_symbol, index_option_type, option_type, moneyness, exp_date, strike_to_spot_start=-0.1, strike_to_spot_end=0.1)
+参数
+参数名	类型	说明	默认值	范围
+underlying_symbol	Contract	标的证券	--	--
+index_option_type	IndexOptionType	指数期权类型	--	--
+option_type	OptionType	期权看涨/看跌类型	--	--
+moneyness	Moneyness	期权价内/价外类型	--	仅支持ITM/OTM，不支持ATM
+exp_date	string	到期日（YYYY-MM-DD）	--	--
+strike_to_spot_start	float	行权价距现价比例（范围下界）	-0.1	-0.8~1.2
+strike_to_spot_end	float	行权价距现价比例（范围上界）	0.1	-0.8~1.2
+返回
+返回类型： Contract
+
+示例说明
+筛选恒生指数的看涨价内期权（剩余期限：2023/02/10(3天)；行权价为 [标的现价的 -10.0% 到标的现价的 10%]）。
+option_screener_by_date(underlying_symbol=Contract("HK.800000"), index_option_type=IndexOptionType.NORMAL, option_type=OptionType.CALL, moneyness=Moneyness.ITM, exp_date="2023-02-10", strike_to_spot_start=-0.1, strike_to_spot_end=0.1)
+示例返回值
+Contract("HK.HSI230210C21200000")
+
+33. option_strike_price
+接口说明
+获取期权行权价。
+适用市场
+香港市场：期权
+美国市场：期权
+option_strike_price(symbol)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+返回
+返回类型： float
+
+示例说明
+获取特斯拉的期权行权价。
+option_strike_price(symbol=Contract("US.TSLA230728C230000") )
+示例返回值
+262.5
+
+34. option_days_to_expiry
+接口说明
+获取期权距离到期日天数。
+适用市场
+香港市场：期权
+美国市场：期权
+option_days_to_expiry(symbol)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+返回
+返回类型： float
+
+示例说明
+获取特斯拉期权的距离到期日天数。
+option_days_to_expiry(symbol=Contract("US.TSLA230728C230000") )
+示例返回值
+2
+
+35. option_class
+接口说明
+获取期权类型。
+适用市场
+香港市场：期权
+美国市场：期权
+option_class(symbol,option_class=OptionClass.Moneyness)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+option_class	OptionClass	分类方式	OptionClass.Moneyness	--
+返回
+返回类型： OptionCategory
+
+示例说明
+获取特斯拉的期权类型。
+option_class(symbol=Contract("US.TSLA230728C230000"),option_class=OptionClass.Moneyness)
+示例返回值
+OptionCategory.ITM
+
+获取特斯拉的期权类型。
+option_class(symbol=Contract("US.TSLA230728C230000"),option_class=OptionClass.Type)
+示例返回值
+OptionCategory.CALL
+
+获取特斯拉的期权类型。
+option_class(symbol=Contract("US.TSLA230728C230000"),option_class=OptionClass.Style)
+示例返回值
+OptionCategory.AMERICAN
+
+36. option_implied_volatility
+接口说明
+获取期权隐含波动率。
+适用市场
+香港市场：期权
+美国市场：期权
+option_implied_volatility(symbol)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+返回
+返回类型： float
+
+示例说明
+获取特斯拉的期权隐含波动率。
+option_implied_volatility(symbol=Contract("US.TSLA230728C230000") )
+示例返回值
+0.924915057
+
+37. option_delta
+接口说明
+获取 期权希腊值 Delta。
+适用市场
+香港市场：期权
+美国市场：期权
+option_delta(symbol)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+返回
+返回类型： float
+
+示例说明
+获取特斯拉的期权希腊值：Delta。
+option_delta(symbol=Contract("US.TSLA230728C230000") )
+示例返回值
+0.96723981
+
+38. option_gamma
+接口说明
+获取 期权希腊值 Gamma。
+适用市场
+香港市场：期权
+美国市场：期权
+option_gamma(symbol)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+返回
+返回类型： float
+
+示例说明
+获取特斯拉的期权希腊值：Gamma。
+option_gamma(symbol=Contract("US.TSLA230728C230000") )
+示例返回值
+0.003473574
+
+39. option_vega
+接口说明
+获取 期权希腊值 vega。
+适用市场
+香港市场：期权
+美国市场：期权
+option_vega(symbol)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+返回
+返回类型： float
+
+示例说明
+获取特斯拉的期权希腊值：vega。
+option_vega(symbol=Contract("US.TSLA230728C230000") )
+示例返回值
+0.016668531
+
+40. option_theta
+接口说明
+获取 期权希腊值 theta。
+适用市场
+香港市场：期权
+美国市场：期权
+option_theta(symbol)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+返回
+返回类型： float
+
+示例说明
+获取特斯拉的期权希腊值：theta。
+option_theta(symbol=Contract("US.TSLA230728C230000") )
+示例返回值
+-0.250493102
+
+41. option_rho
+接口说明
+获取 期权希腊值 rho。
+适用市场
+香港市场：期权
+美国市场：期权
+option_rho(symbol)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+返回
+返回类型： float
+
+示例说明
+获取特斯拉的期权希腊值：rho。
+option_rho(symbol=Contract("US.TSLA230728C230000") )
+示例返回值
+0.016288324
+
+42. mid_price
+接口说明
+获取指定标的 bid 和 ask 的中间价。
+适用市场
+香港市场：股票、ETFs、窝轮、牛熊证、界内证、期权、期货
+美国市场：股票、ETFs、期权、期货
+A股市场：股票、ETFs
+新加坡市场：期货
+日本市场：期货
+mid_price(symbol)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+返回
+返回类型： float
+
+示例说明
+获取苹果的买卖盘中间价。
+mid_price(symbol=Contract("US.AAPL"))
+示例返回值
+151.945
+
+43. option_position
+接口说明
+获取期权未平仓合约数。
+⚠️ 重要说明：此函数返回的是该期权合约在市场上的总未平仓量（Open Interest），而不是您的个人持仓数量。
+适用市场
+香港市场：期权
+美国市场：期权
+option_position(symbol)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+返回
+返回类型： float（市场总未平仓量）
+
+示例说明
+获取特斯拉的期权未平仓合约数。
+option_position(symbol=Contract("US.TSLA230728C20000"))
+示例返回值
+93.0
+
+44. historical_volatility
+接口说明
+获取指定标的指定K线周期下的历史波动率（VOLAT）。
+适用市场
+香港市场：股票、ETFs、窝轮、牛熊证、界内证、指数、板块、期权、期货
+美国市场：股票、ETFs、指数、板块、期权、期货
+A股市场：股票、ETFs、指数、板块
+新加坡市场：期货
+日本市场：期货
+外汇市场：外汇
+historical_volatility(symbol, period=20, bar_type=BarType.H1, select=1)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+period	int	移动平均周期	20	1-500
+bar_type	BarType	K线周期	BarType.H1	--
+select	int	选取倒数第几根K线数据	1	1-500
+返回
+返回类型： float
+
+示例说明
+获取苹果1小时K线的历史波动率。
+historical_volatility(symbol=Contract("US.AAPL"), period=20, bar_type=BarType.H1, select=1)
+示例返回值
+84.10564
+
+45. option_exercise_probability
+接口说明
+获取期权行权概率。
+适用市场
+香港市场：期权
+美国市场：期权
+option_exercise_probability(symbol)
+参数
+参数名	类型	说明	默认值	范围
+symbol	Contract	标的	--	--
+返回
+返回类型： float
+
+示例说明
+获取特斯拉的期权行权概率。
+option_exercise_probability(symbol=Contract("US.TSLA230728C230000"))
+示例返回值
+0.95088
+
+---
+## 🔥 期权持仓检测的重要发现
+
+### position_holding_qty vs option_position 的关键区别
+
+经过深入测试，发现这两个API返回完全不同的数据：
+
+**position_holding_qty()** - 用于检测个人期权持仓（推荐）
+- 返回您的实际持仓数量
+- 负数表示卖出期权（sell put/call）
+- 正数表示买入期权（buy put/call）
+- 0表示无持仓
+- 适用于股票和期权
+
+**option_position()** - 用于查询市场数据（不是个人持仓）
+- 返回该期权合约的市场总未平仓量（Open Interest）
+- 永远是正数
+- 不能用于检测个人持仓
+
+### 最佳实践 - 检测期权持仓
+```python
+# ✅ 正确方式 - 使用position_holding_qty
+symbol = Contract("US.PYPL251017P65000")
+qty = position_holding_qty(symbol=symbol)
+
+if qty < 0:
+    print(f"卖出 {abs(float(qty))} 张PUT期权")
+elif qty > 0:
+    print(f"买入 {qty} 张PUT期权")
+else:
+    print("无持仓")
+
+# ❌ 错误方式 - option_position返回市场数据
+open_interest = option_position(symbol=symbol)  # 返回5057.0（市场总量）
+```
+
+### 实际测试数据对比
+| 期权合约 | position_holding_qty | option_position | 说明 |
+|---------|---------------------|-----------------|------|
+| PYPL 251017 P65000 | -1.0 | 5057.0 | 卖出1张 vs 市场5057张 |
+| MARA 251010 C15000 | -2.0 | 59.0 | 卖出2张 vs 市场59张 |
+| OXY 251017 P45000 | -1.0 | 2535.0 | 卖出1张 vs 市场2535张 |
+
+---
+
+## 策略控制函数
+
+46. quit_strategy
+退出策略
+quit_strategy()
+接口说明：退出策略，整个策略会退出不再执行，常用于止损清仓之后。
+参数：无
+返回：无返回值
+
+示例说明 - 在达到止损条件后退出策略：
+```python
+# 检查账户总盈亏
+total_pnl = market_value_security() - initial_capital
+if total_pnl < -max_loss_amount:
+    print("触发止损，清仓并退出策略")
+    # 清仓所有持仓
+    cancel_order_by_symbol(symbol=Contract("US.AAPL"), side=TradeSide.ALL)
+    # 退出策略
+    quit_strategy()
+```
+
+使用场景：
+1. 止损清仓后完全退出
+2. 达到盈利目标后退出
+3. 检测到异常情况需要终止策略
+4. 特定时间点结束策略运行
+
+注意事项：
+- 调用后策略立即停止，不会再执行handle_data
+- 通常在清仓或平仓操作后调用
+- 退出前应确保已处理好所有持仓和订单
