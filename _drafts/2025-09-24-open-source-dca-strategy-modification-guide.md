@@ -49,9 +49,26 @@ title: 开源定投策略改造指南：从使用者到创造者
 - [智能投资指南：手把手教你用量化工具定投美股](https://zhurong2020.github.io/post/zhi-neng-tou-zi-zhi-nan-shou-ba-shou-jiao-ni-yong-liang-hua-gong-ju-ding-tou-mei-gu/){:target="_blank"}
 - [打造你的第一个量化交易机器人-Moomoo平台环境搭建指南](https://zhurong2020.github.io/post/da-zao-ni-de-di-yi-ge-liang-hua-jiao-yi-ji-qi-ren-moomoo-ping-tai-huan-jing-da-jian-zhi-nan/){:target="_blank"}
 
-## 1. 理解Moomoo量化框架
+## 1. 为什么选择Moomoo平台
 
-### 1.1 平台准备与框架理解
+### 1.1 Moomoo量化功能介绍
+
+**为什么是Moomoo？**
+- 📱 **自定义策略支持**：Moomoo提供完整的量化功能模块
+- 💻 **代码导入能力**：可直接导入自己编写的Python策略代码
+- 🆓 **免费使用**：量化功能完全免费，无需额外付费
+- 🎯 **实盘执行**：策略可直接用于实盘交易，自动执行定投
+
+**工作原理**：
+1. 在Moomoo软件中打开"量化"功能
+2. 选择"自定义策略"
+3. 将免费版代码（或自己改造的代码）粘贴进去
+4. 启动策略，即可实现自动定投等功能
+5. 无需编程基础，复制粘贴即可使用
+
+> 💡 **核心价值**：本系列分享的免费版策略就是基于Moomoo量化框架开发的，可以直接在Moomoo中运行。
+
+### 1.2 平台准备与框架理解
 
 > ⚠️ **开户提醒**：
 > - 目前Moomoo等券商已收紧新用户开户要求
@@ -571,7 +588,7 @@ AI负责：代码实现、bug修复
 **10分钟快速开始（入门版）**：
 
 1. **打开浏览器**，访问AI工具
-   - 国外：claude.ai 或 chat.openai.com
+   - 国外：claude.ai 或 chatgpt.com
    - 国内：文心一言、通义千问、Kimi等
 2. **复制免费版代码**，粘贴到对话框
 3. **询问AI**："请解释这个策略的工作原理"
