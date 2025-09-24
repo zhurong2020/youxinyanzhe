@@ -185,8 +185,20 @@
 **详细规范**: 查看 `docs/MEMBER_CONTENT_RULES_AND_STANDARDS.md` 获取完整的会员内容管理规则
 
 ### 关键技术要求
-- **Jekyll资源路径**: 必须使用 `{{ site.baseurl }}/assets/...`，禁用绝对路径
+
+#### 📸 图片处理约定（重要）
+**博文图片使用OneDrive图床**：
+- ✅ **使用相对路径**：`assets/images/posts/年/月/图片名.png`
+- ❌ **不要使用**：`{{ site.baseurl }}/assets/...` 或 `/assets/...`
+- **处理流程**：
+  1. 将图片文件放在 `assets/images/posts/年/月/` 目录
+  2. 文章中使用相对路径引用（如：`![说明](assets/images/posts/2025/09/example.png)`）
+  3. 运行脚本自动上传到OneDrive并替换为CDN链接
+- **重要说明**：使用相对路径格式让脚本能识别并自动处理图片上传
+
+#### 其他技术要求
 - **安全管理**: 敏感数据使用`.env`文件，API密钥不提交到仓库
+- **文件路径**: 使用绝对路径而非相对路径（脚本执行时）
 
 ---
 
