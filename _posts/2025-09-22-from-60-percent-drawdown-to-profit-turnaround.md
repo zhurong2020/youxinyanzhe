@@ -53,8 +53,8 @@ toc_sticky: true
 
 本文是TQQQ定投策略系列的第1篇，整个系列包括：
 - **第1篇：回测分析——从-60%回撤到盈利**（本文）
-- 第2篇：TQQQ定投深度剖析：为什么周投能赢日投？（即将发布）
-- 第3篇：开源定投策略改造指南：从使用者到创造者（即将发布）
+- 第2篇：[TQQQ定投深度剖析：为什么周投能赢日投？](https://zhurong2020.github.io/youxinyanzhe/posts/2025/09/tqqq-weekly-vs-daily-analysis/){:target="_blank"}
+- 第3篇：[开源定投策略改造指南：从使用者到创造者](https://zhurong2020.github.io/youxinyanzhe/posts/2025/09/open-source-dca-strategy-modification-guide/){:target="_blank"}
 
 ---
 
