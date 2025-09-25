@@ -17,9 +17,15 @@ title: 开源定投策略改造指南：从使用者到创造者
 
 如果您更喜欢收听而非阅读，我们提供了本文的音频版本：
 
-📹 **YouTube播客**：[点击收听](https://youtu.be/example){:target="_blank"}
-⏱️ **时长**：约20分钟
-🎯 **适合场景**：通勤路上、运动时、做家务时
+<div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000;">
+  <iframe src='https://www.youtube.com/embed/ZPZcNALqwek?rel=0&showinfo=0&color=white&iv_load_policy=3'
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+          frameborder='0'
+          allowfullscreen>
+  </iframe>
+</div>
+
+> 💡 **提示**: 音频版本包含了文章的核心内容，配合数据图表阅读效果更佳。音频内容为AI生成，请注意辨别。
 
 ---
 
