@@ -18,7 +18,7 @@ class YouTubeLinkMapper:
     """YouTube链接映射管理器"""
     
     def __init__(self):
-        self.project_root = Path(__file__).parent.parent
+        self.project_root = Path(__file__).parent.parent.parent  # 从 scripts/utils/ 往上3层到项目根目录
         self.mapping_file = self.project_root / ".tmp" / "youtube_mappings.json"
         self.mapping_file.parent.mkdir(exist_ok=True)
         self._load_mappings()
