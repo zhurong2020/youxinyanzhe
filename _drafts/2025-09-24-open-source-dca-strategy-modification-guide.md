@@ -66,6 +66,8 @@ title: 开源定投策略改造指南：从使用者到创造者
 4. 启动策略，即可实现自动定投等功能
 5. 无需编程基础，复制粘贴即可使用
 
+![Moomoo量化功能](../assets/images/posts/2025/09/moomoo-algo.png)
+
 > 💡 **核心价值**：本系列分享的免费版策略就是基于Moomoo量化框架开发的，可以直接在Moomoo(Legacy版本)中运行。
 
 ### 1.2 平台准备与框架理解
@@ -81,25 +83,28 @@ title: 开源定投策略改造指南：从使用者到创造者
 
 **理解框架结构**
 
-打开Moomoo量化功能（通过新手功能引导后），点击右上角"查看量化文档"，了解一些约定。
+打开Moomoo量化功能（通过新手功能引导后），点击右上角"查看量化文档"，了解一些约定。如果对下载及操作不熟悉的，可以先查看[Moomoo平台环境搭建指南](https://zhurong2020.github.io/post/da-zao-ni-de-di-yi-ge-liang-hua-jiao-yi-ji-qi-ren-moomoo-ping-tai-huan-jing-da-jian-zhi-nan/){:target="_blank"}
 
 **AI修改策略代码的入门方法（最简单）**：
 
 *国外AI工具*：
-- [Claude.ai](https://claude.ai) - Anthropic的AI助手
-- [ChatGPT](https://chat.openai.com) - OpenAI的对话AI
+- [Claude.ai](https://claude.ai){:target="_blank"} - Anthropic的AI助手
+- [ChatGPT](https://chat.openai.com){:target="_blank"} - OpenAI的对话AI
 
 *国内AI工具*：
-- [文心一言](https://yiyan.baidu.com) - 百度，中文理解能力强
-- [通义千问](https://tongyi.aliyun.com) - 阿里云，支持多种智能体
-- [讯飞星火](https://xinghuo.xfyun.cn) - 科大讯飞，语音交互强
-- [Kimi](https://kimi.moonshot.cn) - 长文本处理能力优秀
-- [智谱清言](https://chatglm.cn) - 清华背景，数据分析能力强
+- [文心一言](https://yiyan.baidu.com){:target="_blank"} - 百度，中文理解能力强
+- [通义千问](https://tongyi.aliyun.com){:target="_blank"} - 阿里云，支持多种智能体
+- [讯飞星火](https://xinghuo.xfyun.cn){:target="_blank"} - 科大讯飞，语音交互强
+- [Kimi](https://kimi.moonshot.cn){:target="_blank"} - 长文本处理能力优秀
+- [智谱清言](https://chatglm.cn) {:target="_blank"}- 清华背景，数据分析能力强
 
 使用步骤：
 1. 选择任一AI工具
 2. 复制免费版代码给AI
 3. 通过对话了解代码
+ 
+![与Kimi对话](../assets/images/posts/2025/09/kimi-diag.png)
+上图为和Kimi讨论量化策略
 
 **推荐的进阶方法（更专业）**：
 1. 使用VS Code打开已下载的策略代码（扩展名为quant文件）
@@ -110,25 +115,18 @@ title: 开源定投策略改造指南：从使用者到创造者
 ```
 你："请解释这个Moomoo策略的整体结构"
 AI："这个策略包含三个层面：基础框架函数（initialize和handle_data）..."
-```
 
-### 1.3 AI辅助理解核心概念
-
-**高效学习方法**：
-
-1. **复制关键函数给AI分析**：
-```
 你："根据Moomoo文档，trigger_symbols()函数是做什么的？最多可以设置几个？"
 提示：将文档中trigger_symbols部分一起发给AI
 AI："这个函数定义运行标的，最多可以设置8个..."
-```
 
-2. **让AI生成注释版代码**：
-```
 你："请为这段代码添加详细的中文注释"
 提示：把策略代码粘贴给AI
 AI："好的，我来为每个函数添加注释说明..."
 ```
+
+![VS Code中的LLM集成](../assets/images/posts/2025/09/vscode-llm.png)
+当你使用Vs Code时可以直接和Codex（OpenAI）和Claude Code对话
 
 > 💎 **完整版福利**：
 > 购买完整版的用户将获得：
@@ -151,6 +149,8 @@ AI："好的，我来为每个函数添加注释说明..."
 - 😵 **情绪干扰**："跌了20%，太可怕了，先停停吧"
 - 🤔 **决策疲劳**："到底该投多少？要不要加仓？"
 
+![为什么使用量化策略](../assets/images/posts/2025/09/why-use-algo.png)
+
 **量化策略的优势**：
 - ✅ **零纠结**：策略自动判断，无需思考
 - ✅ **100%执行**：只要启动，绝不缺席（完整版支持"断点续投"）
@@ -168,7 +168,7 @@ AI："好的，我来为每个函数添加注释说明..."
 
 更重要的是，Moomoo支持**同时运行多个策略**：
 
-![多策略同时运行示例](moomoo-algo-multistrategies.png)
+![多策略同时运行示例](../assets/images/posts/2025/09/moomoo-algo-multistrategies.png)
 *图：在Moomoo中同时运行网格交易（2个实例）、滚轮和期权扫描共4个策略*
 
 **可同时运行的策略组合**：
@@ -201,8 +201,9 @@ AI："好的，我来为每个函数添加注释说明..."
 > - **强烈建议**：新建测试策略或使用Git版本管理
 > - **切记**：先备份，再改造！
 
-### 3.1 选择适合你的AI工具
+![AI辅助设计](../assets/images/posts/2025/09/ai-assisted-design.png)
 
+### 3.1 选择适合你的AI工具
 **Web端AI**（推荐入门）：
 - 国外：Claude、ChatGPT
 - 国内：文心一言、通义千问、Kimi等
@@ -228,6 +229,8 @@ AI："修改interval_days和MAX_SHARES..."
 
 > 🎯 **核心**：让AI成为你的策略顾问，而不只是代码生成器。
 
+![AI顾问](../assets/images/posts/2025/09/ai-advisor.png)
+
 ## 4. 回测验证：改造后必做的事
 
 ### 4.1 简单有效的验证步骤
@@ -252,6 +255,8 @@ AI："修改interval_days和MAX_SHARES..."
 - 📈 **策略验证**：先本地测试，再到Moomoo实盘验证
 - 🔬 **风险分析**：模拟极端行情下的策略表现
 
+![AI参数优化](../assets/images/posts/2025/09/ai-optimize-para.png)
+
 **本地模型选择**：
 - 使用云端AI：Claude、ChatGPT等（需付费）
 - 使用本地模型：Ollama等开源方案（免费但需要硬件）
@@ -271,6 +276,8 @@ AI："修改interval_days和MAX_SHARES..."
 - 📱 评论区留言即可加群
 
 ### 6.2 群内约定
+
+![群组学习](../assets/images/posts/2025/09/group-study.png)
 
 **❌ 请避免**：
 - 伸手党："代码发我"、"怎么改？"
@@ -295,6 +302,8 @@ AI："修改interval_days和MAX_SHARES..."
 ### 第2个月：创新探索
 - 目标：开发独特功能
 - 成果：成为策略创造者
+  
+![从复制到创造](../assets/images/posts/2025/09/copying-to-creating.png)
 
 ## 8. 资源获取
 
@@ -314,7 +323,7 @@ AI："修改interval_days和MAX_SHARES..."
 - 🎯 一对一指导服务
 - ♻️ 永久免费升级
 
-> 获取方式：评论区留言"策略获取"
+> 免费版获取方式：评论区留言"策略获取"
 
 ### 学习资源
 
@@ -323,9 +332,7 @@ AI："修改interval_days和MAX_SHARES..."
 - ✅ Moomoo软件（Legacy版本）
 - ✅ 探索的好奇心
 
-**可选进阶**：
-- 技术博客：zhurong2020.github.io
-- 更多策略分享和经验总结
+![想法转化为成功](../assets/images/posts/2025/09/idea-trans-success.png)
 
 > 💡 **记住**：在AI时代，你不需要成为程序员。让AI处理技术细节，你专注于策略思路！
 
@@ -348,6 +355,8 @@ AI："修改interval_days和MAX_SHARES..."
 > - **版本选择**：使用Legacy版本
 > - **工具准备**：Web端AI即可（进阶用户可用VS Code）
 > - **策略运行**：每天手动启动（完整版支持断点续投）
+
+![从初学者到创造者](../assets/images/posts/2025/09/beginner-to-creator.png)
 
 ### 立即行动：你的第一个AI辅助改造
 
@@ -372,11 +381,13 @@ AI："修改interval_days和MAX_SHARES..."
 
 **记住**：AI是你的编程助手，你是策略的设计师！
 
+![AI巅峰](../assets/images/posts/2025/09/ai-peak.png)
+
 ---
 
 ## 系列总结
 
-通过这个系列，我们完成了：
+通过这个系列的三篇文章，我们完成了：
 1. **数据验证**：-60%回撤后仍能盈利的真实案例
 2. **原理剖析**：周投vs日投的数学逻辑
 3. **能力培养**：从使用者到创造者的路径
