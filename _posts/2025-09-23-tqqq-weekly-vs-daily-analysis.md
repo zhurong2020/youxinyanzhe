@@ -26,6 +26,22 @@ toc_sticky: true
 
 <!-- more -->
 
+## 🎧 音频版本
+
+如果您更喜欢收听而非阅读，我们提供了本文的音频版本：
+
+## 🎧 播客收听 (YouTube版)
+
+<div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000;">
+  <iframe src='https://www.youtube.com/embed/gmmXIagXKAU?rel=0&showinfo=0&color=white&iv_load_policy=3'
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+          frameborder='0'
+          allowfullscreen>
+  </iframe>
+</div>
+
+> 💡 **提示**: 音频版本包含了文章的核心内容，配合数据图表阅读效果更佳。
+
 ## 快速导航
 
 📊 **核心发现**：对于TQQQ，周投相较于日投可获得3-8%的超额收益。
