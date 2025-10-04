@@ -91,30 +91,88 @@ class ArticleDeduplicator:
         normalized = re.sub(r'[^\w\u4e00-\u9fff]+', '', title.lower())
         return normalized
 
+    def extract_title_core(self, title):
+        """提取标题核心内容用于模糊匹配"""
+        # 去除常见前缀和序号
+        title = re.sub(r'^(投资马斯克帝国：|马斯克帝国解密[①②③④⑤➀➁➂➃➄]?：?)', '', title)
+        # 去除副标题（冒号或问号之后的内容）
+        title = re.sub(r'[：？].+$', '', title)
+        # 统一用词
+        title = re.sub(r'为什么', '为何', title)
+        title = re.sub(r'量化工具', 'moomoo量化工具', title, flags=re.IGNORECASE)
+        # 标准化
+        core = re.sub(r'[^\w\u4e00-\u9fff]+', '', title.lower())
+        return core
+
+    def similarity_score(self, title1, title2):
+        """计算两个标题的相似度（0-1）"""
+        # 方法1: 精确匹配
+        norm1 = self.normalize_title(title1)
+        norm2 = self.normalize_title(title2)
+        if norm1 == norm2:
+            return 1.0
+
+        # 方法2: 核心内容匹配
+        core1 = self.extract_title_core(title1)
+        core2 = self.extract_title_core(title2)
+
+        if core1 == core2:
+            return 0.95
+
+        # 方法3: 包含关系
+        if core1 and core2:
+            if core1 in core2 or core2 in core1:
+                shorter = min(len(core1), len(core2))
+                longer = max(len(core1), len(core2))
+                ratio = shorter / longer
+                if ratio >= 0.85:  # 85%以上重叠视为同一篇
+                    return 0.9 * ratio
+
+        # 方法4: 字符重叠率
+        set1 = set(norm1)
+        set2 = set(norm2)
+        if set1 and set2:
+            intersection = len(set1 & set2)
+            union = len(set1 | set2)
+            overlap = intersection / union
+            if overlap >= 0.7:
+                return overlap
+
+        return 0.0
+
     def find_duplicates(self):
-        """查找重复文章"""
-        # 创建Jekyll文章标题索引
-        jekyll_title_map = {}
-        for article in self.jekyll_articles:
-            normalized = self.normalize_title(article['title'])
-            jekyll_title_map[normalized] = article
+        """查找重复文章（使用模糊匹配）"""
+        print(f"\n🔍 开始去重匹配（智能模糊算法）...")
 
-        print(f"\n🔍 开始去重匹配...")
-        print(f"Jekyll文章标题索引: {len(jekyll_title_map)} 条")
-
-        # 匹配Gridea文章
         duplicates = []
         unique_gridea = []
+        matched_jekyll = set()
 
         for gridea_article in self.gridea_articles:
-            normalized = self.normalize_title(gridea_article['title'])
+            best_match = None
+            best_score = 0.0
 
-            if normalized in jekyll_title_map:
-                jekyll_match = jekyll_title_map[normalized]
+            for jekyll_article in self.jekyll_articles:
+                if jekyll_article['title'] in matched_jekyll:
+                    continue
+
+                score = self.similarity_score(
+                    gridea_article['title'],
+                    jekyll_article['title']
+                )
+
+                if score > best_score:
+                    best_score = score
+                    best_match = jekyll_article
+
+            # 阈值设为0.85（85%相似度视为重复）
+            if best_score >= 0.85:
                 duplicates.append({
                     'gridea': gridea_article,
-                    'jekyll': jekyll_match
+                    'jekyll': best_match,
+                    'similarity': best_score
                 })
+                matched_jekyll.add(best_match['title'])
             else:
                 unique_gridea.append(gridea_article)
 
@@ -186,7 +244,10 @@ class ArticleDeduplicator:
                 for dup in items:
                     gridea = dup['gridea']
                     jekyll = dup['jekyll']
-                    f.write(f"- **{gridea['title']}**\n")
+                    similarity = dup.get('similarity', 1.0)
+                    f.write(f"- **Gridea标题**: {gridea['title']}\n")
+                    f.write(f"  **Jekyll标题**: {jekyll['title']}\n")
+                    f.write(f"  **相似度**: {similarity*100:.1f}%\n")
                     f.write(f"  - Gridea: {gridea['date']} ({gridea['word_count']:,}字)\n")
                     f.write(f"  - Jekyll: `{Path(jekyll['file_path']).name}` ({jekyll['date']})\n\n")
 
