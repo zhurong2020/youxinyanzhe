@@ -11,6 +11,15 @@
 - **Azure集成规划**: 详见 `docs/AZURE_INTEGRATION_ROADMAP.md`
 - **更新历史**: 详见 `docs/CHANGELOG_DETAILED.md`
 
+### 博客资源路径配置
+- **旧博客(Gridea)本地路径**: `/mnt/c/onedrive/wuxiami/OneDrive/Documents/Gridea/posts/`
+  - 包含80篇历史文章，格式为Markdown with YAML front matter
+  - 在线地址: https://zhurong2020.github.io
+- **新博客(Jekyll)本地路径**: `/home/wuxia/projects/youxinyanzhe/_posts/`
+  - 当前已发布30篇文章
+  - 其中11篇为从Gridea迁移过来的文章
+- **文章去重与迁移分析**: 详见 `_drafts/todos/DEDUPLICATED-ARTICLES-REGISTRY.md`
+
 ## 当前状态 (2025-08-22更新)
 - **系统状态**: 🎯 **VIP分级服务体系优化完成** - 基于Tesla案例验证的服务模式
 - **核心成就**: **企业级AI协同系统** + **标准化VIP分级服务** + **专业投资内容创作流程**
