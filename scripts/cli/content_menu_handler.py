@@ -435,6 +435,11 @@ class ContentMenuHandler(BaseMenuHandler):
             result = self.pipeline.format_content_file(Path(file_path))
             if result.get('success'):
                 steps_completed.append("✅ Front Matter处理完成")
+                # 显示需要手动处理的问题
+                if result.get('manual_fixes_needed'):
+                    print(f"⚠️ 需要手动处理 {len(result['manual_fixes_needed'])} 个问题:")
+                    for issue in result['manual_fixes_needed']:
+                        print(f"   • {issue}")
                 # 自动添加<!-- more -->如果不存在
                 with open(file_path, 'r', encoding='utf-8') as f:
                     content = f.read()
@@ -476,6 +481,9 @@ class ContentMenuHandler(BaseMenuHandler):
             if not issues:
                 steps_completed.append("✅ 内容质量检查通过")
             else:
+                print(f"⚠️ 发现 {len(issues)} 个问题:")
+                for issue in issues:
+                    print(f"   • {issue}")
                 steps_completed.append(f"⚠️ 发现 {len(issues)} 个问题")
 
             # 显示处理结果
@@ -3264,27 +3272,42 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
         """规范化单个文件名"""
         try:
             from datetime import datetime
-
-            # 生成新文件名
-            today = datetime.now().strftime("%Y-%m-%d")
-            # 将文件名转换为小写并替换特殊字符
-            clean_name = file_path.stem.lower()
-            # 替换空格和下划线为连字符
-            clean_name = clean_name.replace(" ", "-").replace("_", "-")
-            # 移除其他特殊字符
             import re
-            clean_name = re.sub(r"[^a-z0-9-]", "", clean_name)
-            # 移除连续的连字符
-            while "--" in clean_name:
-                clean_name = clean_name.replace("--", "-")
-            # 去掉首尾的连字符
-            clean_name = clean_name.strip("-")
 
-            new_filename = f"{today}-{clean_name}.md"
+            # 检查文件名是否已经符合Jekyll格式 (YYYY-MM-DD-title.md)
+            filename = file_path.stem
+            jekyll_pattern = r'^\d{4}-\d{2}-\d{2}-.+$'
+
+            if re.match(jekyll_pattern, filename):
+                # 文件名已经符合格式，检查是否需要清理特殊字符
+                clean_name = filename.lower()
+                clean_name = clean_name.replace(" ", "-").replace("_", "-")
+                clean_name = re.sub(r"[^a-z0-9-]", "", clean_name)
+                while "--" in clean_name:
+                    clean_name = clean_name.replace("--", "-")
+                clean_name = clean_name.strip("-")
+
+                if clean_name == filename.lower():
+                    print(f"✓ 文件名已规范: {file_path.name}")
+                    return False  # 返回False表示没有进行修改
+
+                # 需要清理特殊字符
+                new_filename = f"{clean_name}.md"
+            else:
+                # 文件名不符合格式，需要添加日期前缀
+                today = datetime.now().strftime("%Y-%m-%d")
+                clean_name = filename.lower()
+                clean_name = clean_name.replace(" ", "-").replace("_", "-")
+                clean_name = re.sub(r"[^a-z0-9-]", "", clean_name)
+                while "--" in clean_name:
+                    clean_name = clean_name.replace("--", "-")
+                clean_name = clean_name.strip("-")
+                new_filename = f"{today}-{clean_name}.md"
+
             new_path = file_path.parent / new_filename
 
-            # 检查新文件是否已存在
-            if new_path.exists():
+            # 检查新文件是否已存在（且不是同一个文件）
+            if new_path.exists() and new_path != file_path:
                 print(f"⚠️ 文件已存在: {new_filename}")
                 overwrite = input("是否覆盖？(y/N): ").strip().lower()
                 if overwrite not in ["y", "yes"]:
