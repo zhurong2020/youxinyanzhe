@@ -465,7 +465,7 @@ class ContentMenuHandler(BaseMenuHandler):
 
             # 步骤4: 文件名规范化
             print("\n[4/5] 规范化文件名...")
-            if self._normalize_single_file(Path(file_path)):
+            if self._normalize_jekyll_filename(Path(file_path)):
                 steps_completed.append("✅ 文件名规范化完成")
             else:
                 steps_completed.append("⚠️ 文件名已规范")
