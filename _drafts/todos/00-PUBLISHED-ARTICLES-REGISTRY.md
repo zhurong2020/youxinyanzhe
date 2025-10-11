@@ -60,11 +60,12 @@
 |---------|---------|--------|---------|------|
 | 2025-09-17 | 美股被动收入指南 | `us_stock_passive_income_guide.md` | 综合策略概览 | ✅ 已发布 |
 | 2025-07-10 | QDII基金投资指南 | `qdii-fund-guide.md` | 基金定投 | ✅ 已发布 |
-| 待查证 | 为何普通人应该现在就开始投资美股？ | 待确认 | 认知启蒙 | ✅ 已发布？ |
+| 2025-06-16 | 为何普通人应该现在就开始投资美股？从生活成本到财务自由的必经之路 | `putongrentouzimeigu.md` | 认知启蒙 | ✅ 已发布 |
+| 2025-01-21 | 当政治大咖遇上加密江湖：$TRUMP背后的币圈故事 | `trump-crypto-meme-coin-story.md` | 加密货币 | ✅ 已发布 |
 
 **延续规划**:
 - 10/08: 《30+回购分红标的深度分析》（选股方法）
-- 10/29: 《为什么普通人应该现在就开始投资美股》（TO_CONTENT第1篇，认知启蒙）
+- ~~10/29: 《为什么普通人应该现在就开始投资美股》~~ ✅ **已于2025-06-16发布**
 
 #### 智能投资工具
 | 发布日期 | 文章标题 | 文件名 | 系列位置 | 状态 |
@@ -104,8 +105,9 @@
 #### 自托管与云服务
 | 发布日期 | 文章标题 | 文件名 | 主题 | 状态 |
 |---------|---------|--------|------|------|
-| 2024-03-23 | 自托管指南 | `Selfhosted.md` | GitHub自托管 | ✅ 已发布 |
-| 2024-04-18 | 云端启航：VPS购买指南 | `Purchase-VPS.md` | VPS入门 | ✅ 已发布 |
+| 2024-04-27 | VPS管理指南：掌握PuTTY与WinSCP的协同魔法 | `PuttyWinscp.md` | VPS工具 | ✅ 已发布 |
+| 2024-04-18 | 云端启航：轻松拥有自己的VPS，开启你的云端之旅 | `Purchase-VPS.md` | VPS入门 | ✅ 已发布 |
+| 2024-03-23 | 轻松上手：用GitHub开源项目自托管，打造属于你的数字王国 | `Selfhosted.md` | GitHub自托管 | ✅ 已发布 |
 
 **延续规划**:
 - 12/17: 《从Moomoo到独立App：量化投资的终极进化》（TO_CONTENT第24篇，VPS应用）
@@ -117,9 +119,10 @@
 #### 学习方法与信息素养
 | 发布日期 | 文章标题 | 文件名 | 主题 | 状态 |
 |---------|---------|--------|------|------|
-| 2025-02-18 | 信息迷雾中的求真之路 | `shenshi-newspoint.md` | 信息核实 | ✅ 已发布 |
-| 2025-01-21 | 2025年的世界更精彩 | 待确认 | 信息茧房 | ✅ 已发布 |
-| 待查证 | 为什么意志力总是失败？ | 待确认 | 行为改变 | ✅ 已发布 |
+| 2025-08-08 | 信息迷雾中的求真之路：以武汉大学图书馆事件为例的信息核实方法论 | `information-verification-methodology.md` | 信息核实 | ✅ 已发布 |
+| 2025-07-14 | 为什么意志力总是失败？一个40年烟民的"无痛戒烟"秘密 | `self-talk-unconscious-magic.md` | 行为改变 | ✅ 已发布 |
+| 2025-02-18 | 2025年的世界更精彩，避免信息茧房从审视新闻观点开始 | `shenshi-newspoint.md` | 信息茧房 | ✅ 已发布 |
+| 2024-03-06 | 聊天机器人小秘诀：掌握Prompt工程让AI更懂你的需求 | `qiao-qiao-hua.md` | AI工具 | ✅ 已发布 |
 
 **延续规划**:
 - 12/24: 《量化投资的本质：用系统战胜人性》（TO_CONTENT第29篇，投资哲学）
@@ -127,8 +130,7 @@
 #### 政治与社会观察
 | 发布日期 | 文章标题 | 文件名 | 主题 | 状态 |
 |---------|---------|--------|------|------|
-| 2025-09-13 | Charlie Kirk堕落的民主对话精神 | `charlie-kirk-fallen-democracy-dialogue-spirit.md` | 政治对话 | ✅ 已发布 |
-| 2025-01-21 | 当政治大咖遇上加密江湖 | `trump-crypto-meme-coin-story.md` | 加密货币 | ✅ 已发布 |
+| 2025-09-13 | Prove Me Wrong：一个用生命捍卫对话权利的美国青年 | `charlie-kirk-fallen-democracy-dialogue-spirit.md` | 政治对话 | ✅ 已发布 |
 
 ---
 
@@ -142,9 +144,10 @@
 #### 英语学习系列
 | 发布日期 | 文章标题 | 文件名 | 主题 | 状态 |
 |---------|---------|--------|------|------|
-| 2025-08-06 | 【英语学习】企业裁员与贸易政策 | `youtube-auto-supplier-to-cut-jobs-close-warehouse-citing-t.md` | CNN新闻 | ✅ 已发布 |
-| 2025-08-06 | 【英语学习】Fort Stewart枪击案 | `youtube-shooting-at-fort-stewart-casualties-reported.md` | 突发新闻 | ✅ 已发布 |
-| 待统计 | 其他英语学习文章 | - | - | - |
+| 2025-08-06 | 【英语学习】企业裁员与贸易政策：CNN报道解析 | `youtube-auto-supplier-to-cut-jobs-close-warehouse-citing-t.md` | CNN新闻 | ✅ 已发布 |
+| 2025-08-06 | 【英语学习】突发：Fort Stewart枪击案新闻英语 | `youtube-shooting-at-fort-stewart-casualties-reported.md` | 突发新闻 | ✅ 已发布 |
+| 2025-08-04 | 【英语学习】Russiagate: A 'Broad Criminal Conspiracy'? | `youtube-russiagate-looks-like-a-broad-criminal-conspiracy.md` | 政治分析 | ✅ 已发布 |
+| 2025-07-30 | 【英语学习】特朗普参观美联储 | `youtube-president-trump-tours-the-federal-reserve.md` | 经济新闻 | ✅ 已发布 |
 
 ---
 
