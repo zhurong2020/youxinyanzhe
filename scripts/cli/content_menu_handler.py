@@ -445,6 +445,10 @@ class ContentMenuHandler(BaseMenuHandler):
                         else:
                             issue_text = str(issue)
                         print(f"   • {issue_text}")
+                
+                # 🔧 自动修复categories
+                print("\n   🔍 检查分类信息...")
+                self._auto_fix_categories(Path(file_path))
                 # 自动添加<!-- more -->如果不存在
                 with open(file_path, 'r', encoding='utf-8') as f:
                     content = f.read()
@@ -3487,3 +3491,137 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
         except Exception as e:
             print(f"❌ 处理失败 {file_path.name}: {e}")
             return False
+
+    # ===================== 自动规范化引擎 =====================
+    
+    def _auto_fix_excerpt(self, file_path: Path) -> bool:
+        """自动修复excerpt字段"""
+        try:
+            import frontmatter
+            
+            with open(file_path, 'r', encoding='utf-8') as f:
+                post = frontmatter.loads(f.read())
+            
+            excerpt = post.metadata.get('excerpt', '')
+            
+            if not excerpt:
+                print("   ⚠️ 未找到excerpt字段，需要手动添加")
+                return False
+            
+            excerpt_len = len(excerpt)
+            
+            if 60 <= excerpt_len <= 80:
+                print(f"   ✓ 摘要长度符合规范 ({excerpt_len}字符)")
+                return False
+            
+            if excerpt_len > 80:
+                print(f"   🔧 摘要过长({excerpt_len}字符)，自动截断至80字符...")
+                # 智能截断
+                truncated = self._智能截断摘要(excerpt, 80)
+                post.metadata['excerpt'] = truncated
+                
+                # 写回文件
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.write(frontmatter.dumps(post))
+                
+                print(f"   ✅ 已截断至 {len(truncated)} 字符")
+                return True
+            
+            if excerpt_len < 60:
+                print(f"   ⚠️ 摘要过短({excerpt_len}字符)，建议扩展至60-80字符")
+                return False
+                
+        except Exception as e:
+            print(f"   ❌ 处理excerpt失败: {e}")
+            return False
+    
+    def _智能截断摘要(self, text: str, max_len: int) -> str:
+        """智能截断文本到指定长度"""
+        if len(text) <= max_len:
+            return text
+        
+        truncated = text[:max_len]
+        
+        # 在句子边界截断
+        for delimiter in ['。', '！', '？', '.', '!', '?']:
+            last_pos = truncated.rfind(delimiter)
+            if last_pos > max_len * 0.7:
+                return truncated[:last_pos + 1]
+        
+        # 在逗号处截断
+        for delimiter in ['，', ',']:
+            last_pos = truncated.rfind(delimiter)
+            if last_pos > max_len * 0.7:
+                return truncated[:last_pos] + '...'
+        
+        return truncated + '...'
+    
+    def _auto_fix_categories(self, file_path: Path) -> bool:
+        """自动修复categories字段"""
+        try:
+            import frontmatter
+            
+            with open(file_path, 'r', encoding='utf-8') as f:
+                post = frontmatter.loads(f.read())
+            
+            # 检查是否已有categories
+            if 'categories' in post.metadata and post.metadata['categories']:
+                print(f"   ✓ 已有分类: {post.metadata['categories']}")
+                return False
+            
+            # 基于tags和title推断分类
+            title = post.metadata.get('title', '')
+            tags = post.metadata.get('tags', [])
+            
+            category = self._推断分类(title, tags, post.content[:500])
+            
+            if category:
+                post.metadata['categories'] = [category]
+                
+                # 写回文件
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.write(frontmatter.dumps(post))
+                
+                print(f"   ✅ 已自动添加分类: {category}")
+                return True
+            else:
+                print("   ⚠️ 无法自动推断分类，需要手动指定")
+                return False
+                
+        except Exception as e:
+            print(f"   ❌ 处理categories失败: {e}")
+            return False
+    
+    def _推断分类(self, title: str, tags: list, content: str) -> str:
+        """基于标题、标签和内容推断分类"""
+        # 四大分类映射
+        categories_map = {
+            'cognitive-upgrade': ['认知', '思维', '学习', '心理', '成长', '模型', '方法论', '效率', '提升'],
+            'tech-empowerment': ['技术', '工具', '自动化', '编程', '代码', 'AI', '人工智能', '软件', '应用', '教程'],
+            'global-perspective': ['全球', '国际', '文化', '趋势', '视野', '世界', '跨文化', '差异'],
+            'investment-finance': ['投资', '理财', '金融', '股票', '基金', '量化', '财富', '资产', '收益', '策略', '美股', '定投', '暴跌', '市场']
+        }
+        
+        # 合并所有文本
+        all_text = f"{title} {' '.join(tags)} {content}".lower()
+        
+        # 计算每个分类的匹配分数
+        scores = {}
+        for category, keywords in categories_map.items():
+            score = 0
+            for keyword in keywords:
+                if keyword in title.lower():
+                    score += 3  # 标题权重最高
+                if any(keyword in str(tag).lower() for tag in tags):
+                    score += 2  # 标签权重中等
+                if keyword in all_text:
+                    score += 1  # 内容权重较低
+            scores[category] = score
+        
+        # 返回得分最高的分类
+        if scores:
+            best_category = max(scores.items(), key=lambda x: x[1])
+            if best_category[1] > 0:
+                return best_category[0]
+        
+        return ''
