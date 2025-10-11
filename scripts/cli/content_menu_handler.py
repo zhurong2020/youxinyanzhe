@@ -3497,17 +3497,18 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
     def _auto_fix_excerpt(self, file_path: Path) -> bool:
         """自动修复excerpt字段"""
         try:
-            import frontmatter
-            
             with open(file_path, 'r', encoding='utf-8') as f:
-                post = frontmatter.loads(f.read())
+                file_content = f.read()
             
-            excerpt = post.metadata.get('excerpt', '')
+            # 使用正则提取excerpt
+            import re
+            excerpt_match = re.search(r'^excerpt:\s*(.+)$', file_content, re.MULTILINE)
             
-            if not excerpt:
+            if not excerpt_match:
                 print("   ⚠️ 未找到excerpt字段，需要手动添加")
                 return False
             
+            excerpt = excerpt_match.group(1).strip()
             excerpt_len = len(excerpt)
             
             if 60 <= excerpt_len <= 80:
@@ -3518,11 +3519,17 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
                 print(f"   🔧 摘要过长({excerpt_len}字符)，自动截断至80字符...")
                 # 智能截断
                 truncated = self._智能截断摘要(excerpt, 80)
-                post.metadata['excerpt'] = truncated
                 
-                # 写回文件
+                # 替换文件中的excerpt
+                new_content = re.sub(
+                    r'^excerpt:\s*.+$',
+                    f'excerpt: {truncated}',
+                    file_content,
+                    flags=re.MULTILINE
+                )
+                
                 with open(file_path, 'w', encoding='utf-8') as f:
-                    f.write(frontmatter.dumps(post))
+                    f.write(new_content)
                 
                 print(f"   ✅ 已截断至 {len(truncated)} 字符")
                 return True
@@ -3559,28 +3566,53 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
     def _auto_fix_categories(self, file_path: Path) -> bool:
         """自动修复categories字段"""
         try:
-            import frontmatter
+            import re
             
             with open(file_path, 'r', encoding='utf-8') as f:
-                post = frontmatter.loads(f.read())
+                file_content = f.read()
             
             # 检查是否已有categories
-            if 'categories' in post.metadata and post.metadata['categories']:
-                print(f"   ✓ 已有分类: {post.metadata['categories']}")
-                return False
+            if re.search(r'^categories:\s*
+\s*-\s+\w', file_content, re.MULTILINE):
+                categories_match = re.search(r'^categories:\s*
+\s*-\s+(.+)$', file_content, re.MULTILINE)
+                if categories_match:
+                    print(f"   ✓ 已有分类: {categories_match.group(1).strip()}")
+                    return False
             
-            # 基于tags和title推断分类
-            title = post.metadata.get('title', '')
-            tags = post.metadata.get('tags', [])
+            # 提取title和tags
+            title_match = re.search(r'^title:\s*(.+)$', file_content, re.MULTILINE)
+            title = title_match.group(1).strip() if title_match else ''
             
-            category = self._推断分类(title, tags, post.content[:500])
+            # 提取所有tags
+            tags = []
+            in_tags = False
+            for line in file_content.split('\n'):
+                if line.startswith('tags:'):
+                    in_tags = True
+                    continue
+                if in_tags:
+                    if line.startswith('- '):
+                        tags.append(line[2:].strip())
+                    elif not line.startswith(' ') and line.strip():
+                        break
+            
+            # 提取正文开头
+            content_start = file_content.find('---', 3)
+            main_content = file_content[content_start+3:content_start+503] if content_start > 0 else ''
+            
+            category = self._推断分类(title, tags, main_content)
             
             if category:
-                post.metadata['categories'] = [category]
+                # 在Front Matter开头插入categories
+                new_content = file_content.replace(
+                    '---\n',
+                    f'---\ncategories:\n- {category}\n',
+                    1
+                )
                 
-                # 写回文件
                 with open(file_path, 'w', encoding='utf-8') as f:
-                    f.write(frontmatter.dumps(post))
+                    f.write(new_content)
                 
                 print(f"   ✅ 已自动添加分类: {category}")
                 return True
