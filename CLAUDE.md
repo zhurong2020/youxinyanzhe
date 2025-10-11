@@ -196,6 +196,7 @@
 ### 关键技术要求
 
 #### 📸 图片处理约定（重要）
+
 **博文图片使用OneDrive图床**：
 - ✅ **使用相对路径**：`assets/images/posts/年/月/图片名.png`
 - ❌ **不要使用**：`{{ site.baseurl }}/assets/...` 或 `/assets/...`
@@ -204,6 +205,16 @@
   2. 文章中使用相对路径引用（如：`![说明](assets/images/posts/2025/09/example.png)`）
   3. 运行脚本自动上传到OneDrive并替换为CDN链接
 - **重要说明**：使用相对路径格式让脚本能识别并自动处理图片上传
+
+**⚠️ 图片生成规范（必须遵守）**：
+- **禁止使用中文文本**：所有使用Python/matplotlib生成的图片，**必须只使用英文文本**
+- **原因**：中文字体在matplotlib中显示不稳定，会产生大量字体缺失警告，且可能无法正确渲染
+- **执行标准**：
+  - ✅ 标题、标签、注释、图例等所有文本使用英文
+  - ✅ 移除中文字体配置（`plt.rcParams['font.sans-serif']`）
+  - ✅ 数据、数值可以保留中文单位符号（如%）
+  - ❌ 禁止在图表中使用任何中文字符
+- **示例脚本**：参考 `scripts/generate_crash_history_chart.py` 和 `scripts/generate_trading_hours_chart.py`
 
 #### 其他技术要求
 - **安全管理**: 敏感数据使用`.env`文件，API密钥不提交到仓库
