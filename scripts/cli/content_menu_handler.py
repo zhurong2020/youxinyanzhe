@@ -435,11 +435,16 @@ class ContentMenuHandler(BaseMenuHandler):
             result = self.pipeline.format_content_file(Path(file_path))
             if result.get('success'):
                 steps_completed.append("✅ Front Matter处理完成")
-                # 显示需要手动处理的问题
+                # 显示需要手动处理的问题（格式化输出）
                 if result.get('manual_fixes_needed'):
                     print(f"⚠️ 需要手动处理 {len(result['manual_fixes_needed'])} 个问题:")
                     for issue in result['manual_fixes_needed']:
-                        print(f"   • {issue}")
+                        # issue可能是字典，提取实际的问题描述
+                        if isinstance(issue, dict):
+                            issue_text = issue.get('issue', str(issue))
+                        else:
+                            issue_text = str(issue)
+                        print(f"   • {issue_text}")
                 # 自动添加<!-- more -->如果不存在
                 with open(file_path, 'r', encoding='utf-8') as f:
                     content = f.read()
@@ -458,22 +463,36 @@ class ContentMenuHandler(BaseMenuHandler):
 
             # 步骤2: 摘要和背景介绍优化
             print("\n[2/5] 优化摘要和背景介绍...")
-            # 这里可以调用AI生成摘要
-            steps_completed.append("✅ 摘要优化完成")
+            # 检查摘要长度（excerpt字段应该在60-80字符）
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            import re
+            excerpt_match = re.search(r'^excerpt:\s*["\'](.+?)["\']', content, re.MULTILINE)
+            if excerpt_match:
+                excerpt_length = len(excerpt_match.group(1))
+                if 60 <= excerpt_length <= 80:
+                    print("✓ 摘要长度符合规范 (60-80字符)")
+                    steps_completed.append("✅ 摘要已规范")
+                else:
+                    print(f"⚠️ 摘要长度 {excerpt_length} 字符，建议调整至60-80字符")
+                    steps_completed.append("⚠️ 摘要需调整")
+            else:
+                print("⚠️ 未找到excerpt字段")
+                steps_completed.append("⚠️ 缺少摘要")
 
             # 步骤3: 链接新窗口打开处理
             print("\n[3/5] 处理链接新窗口打开...")
             if self._add_target_blank_to_file(Path(file_path)):
                 steps_completed.append("✅ 链接处理完成")
             else:
-                steps_completed.append("⚠️ 链接处理跳过")
+                steps_completed.append("✅ 无需处理链接")
 
             # 步骤4: 文件名规范化
             print("\n[4/5] 规范化文件名...")
             if self._normalize_jekyll_filename(Path(file_path)):
                 steps_completed.append("✅ 文件名规范化完成")
             else:
-                steps_completed.append("⚠️ 文件名已规范")
+                steps_completed.append("✅ 文件名已符合规范")
 
             # 步骤5: 内容质量检查
             print("\n[5/5] 执行内容质量检查...")
@@ -3288,7 +3307,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
                 clean_name = clean_name.strip("-")
 
                 if clean_name == filename.lower():
-                    print(f"✓ 文件名已规范: {file_path.name}")
+                    print(f"✓ 文件名已符合规范")
                     return False  # 返回False表示没有进行修改
 
                 # 需要清理特殊字符
@@ -3438,10 +3457,10 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
             external_links = [m for m in matches if not m[1].startswith("#")]
 
             if not external_links:
-                print(f"✅ {file_path.name} - 没有需要处理的链接")
-                return True
+                print(f"✓ 没有需要处理的链接")
+                return False  # 返回False表示没有进行处理
 
-            print(f"📝 {file_path.name} - 发现 {len(external_links)} 个链接需要处理")
+            print(f"📝 发现 {len(external_links)} 个链接需要处理")
 
             # 处理链接
             def add_target_blank(match):
@@ -3462,7 +3481,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(new_content)
 
-            print(f"✅ 已处理: {file_path.name}")
+            print(f"✅ 已处理 {len(external_links)} 个链接")
             return True
 
         except Exception as e:
