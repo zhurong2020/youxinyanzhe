@@ -618,15 +618,9 @@ class ContentMenuHandler(BaseMenuHandler):
             from pathlib import Path
 
             potential_files = []
-            # 只检查_drafts目录下的.md文件，排除archived子目录
-            drafts_pattern = "_drafts/**/*.md"
-            all_draft_files = glob.glob(drafts_pattern, recursive=True)
-
-            # 过滤掉archived、vip4-preparation等子目录下的文件
-            excluded_dirs = ['/archived/', '\\archived\\', '/vip4-preparation/', '\\vip4-preparation\\']
-            for f in all_draft_files:
-                if not any(excluded_dir in f for excluded_dir in excluded_dirs):
-                    potential_files.append(f)
+            # 只检查_drafts根目录下的.md文件，不包括子目录
+            drafts_pattern = "_drafts/*.md"
+            potential_files = glob.glob(drafts_pattern, recursive=False)
 
             if potential_files:
                 print(f"\n📄 发现 {len(potential_files)} 个草稿文件：")
