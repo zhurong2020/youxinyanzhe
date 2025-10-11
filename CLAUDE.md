@@ -218,12 +218,14 @@
 
 #### 其他技术要求
 - **安全管理**: 敏感数据使用`.env`文件，API密钥不提交到仓库
+- **API密钥管理**: 所有API密钥信息记录在 `docs/API_KEYS_REGISTRY.md`
 - **文件路径**: 使用绝对路径而非相对路径（脚本执行时）
 
 ---
 
 **相关文档**:
 - `docs/TECHNICAL_ARCHITECTURE.md` - 详细技术架构说明
+- `docs/API_KEYS_REGISTRY.md` - API密钥注册表和配额管理
 - `docs/CHANGELOG_DETAILED.md` - 完整更新历史
 - `docs/MEMBER_CONTENT_RULES_AND_STANDARDS.md` - 会员内容管理规范（已合并）
 - `docs/VIP_CONTENT_CREATION_GUIDE.md` - VIP内容创作指南（已合并）
