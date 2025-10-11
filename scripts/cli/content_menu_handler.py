@@ -467,22 +467,11 @@ class ContentMenuHandler(BaseMenuHandler):
 
             # 步骤2: 摘要和背景介绍优化
             print("\n[2/5] 优化摘要和背景介绍...")
-            # 检查摘要长度（excerpt字段应该在60-80字符）
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            import re
-            excerpt_match = re.search(r'^excerpt:\s*["\'](.+?)["\']', content, re.MULTILINE)
-            if excerpt_match:
-                excerpt_length = len(excerpt_match.group(1))
-                if 60 <= excerpt_length <= 80:
-                    print("✓ 摘要长度符合规范 (60-80字符)")
-                    steps_completed.append("✅ 摘要已规范")
-                else:
-                    print(f"⚠️ 摘要长度 {excerpt_length} 字符，建议调整至60-80字符")
-                    steps_completed.append("⚠️ 摘要需调整")
+            excerpt_fixed = self._auto_fix_excerpt(Path(file_path))
+            if excerpt_fixed:
+                steps_completed.append("✅ 摘要已自动规范")
             else:
-                print("⚠️ 未找到excerpt字段")
-                steps_completed.append("⚠️ 缺少摘要")
+                steps_completed.append("✓ 摘要无需调整")
 
             # 步骤3: 链接新窗口打开处理
             print("\n[3/5] 处理链接新窗口打开...")
@@ -3499,13 +3488,13 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 file_content = f.read()
-            
+
             # 使用正则提取excerpt
             import re
             excerpt_match = re.search(r'^excerpt:\s*(.+)$', file_content, re.MULTILINE)
-            
+
             if not excerpt_match:
-                print("   ⚠️ 未找到excerpt字段，需要手动添加")
+                print("   ⚠️ 未找到excerpt字段")
                 return False
             
             excerpt = excerpt_match.group(1).strip()
@@ -3546,21 +3535,22 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
         """智能截断文本到指定长度"""
         if len(text) <= max_len:
             return text
-        
+
         truncated = text[:max_len]
-        
-        # 在句子边界截断
+
+        # 优先在句子边界截断（降低阈值到0.5，即40字符以上即可）
         for delimiter in ['。', '！', '？', '.', '!', '?']:
             last_pos = truncated.rfind(delimiter)
-            if last_pos > max_len * 0.7:
+            if last_pos > max_len * 0.5:
                 return truncated[:last_pos + 1]
-        
-        # 在逗号处截断
+
+        # 其次在逗号处截断
         for delimiter in ['，', ',']:
             last_pos = truncated.rfind(delimiter)
-            if last_pos > max_len * 0.7:
+            if last_pos > max_len * 0.5:
                 return truncated[:last_pos] + '...'
-        
+
+        # 最后强制截断
         return truncated + '...'
     
     def _auto_fix_categories(self, file_path: Path) -> bool:
@@ -3572,10 +3562,8 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
                 file_content = f.read()
             
             # 检查是否已有categories
-            if re.search(r'^categories:\s*
-\s*-\s+\w', file_content, re.MULTILINE):
-                categories_match = re.search(r'^categories:\s*
-\s*-\s+(.+)$', file_content, re.MULTILINE)
+            if re.search(r'^categories:\s*\n\s*-\s+\w', file_content, re.MULTILINE):
+                categories_match = re.search(r'^categories:\s*\n\s*-\s+(.+)$', file_content, re.MULTILINE)
                 if categories_match:
                     print(f"   ✓ 已有分类: {categories_match.group(1).strip()}")
                     return False
