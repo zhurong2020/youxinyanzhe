@@ -71,6 +71,7 @@ _data/processed_reward_requests.json
 
 # 归档目录
 _drafts/archived/
+scripts/archived/
 
 # VIP素材准备目录（包含敏感商业资料，不应进入版本控制）
 _drafts/archived/vip-preparation/
