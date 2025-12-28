@@ -482,8 +482,10 @@ class ContentMenuHandler(BaseMenuHandler):
 
             # 步骤4: 文件名规范化
             print("\n[4/5] 规范化文件名...")
-            if self._normalize_jekyll_filename(Path(file_path)):
+            new_file_path = self._normalize_jekyll_filename(Path(file_path))
+            if new_file_path != Path(file_path):
                 steps_completed.append("✅ 文件名规范化完成")
+                file_path = str(new_file_path)  # 更新文件路径为新路径
             else:
                 steps_completed.append("✅ 文件名已符合规范")
 
@@ -3280,8 +3282,8 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
 
         self.pause_for_user()
 
-    def _normalize_jekyll_filename(self, file_path: Path) -> bool:
-        """规范化单个文件名"""
+    def _normalize_jekyll_filename(self, file_path: Path) -> Path:
+        """规范化单个文件名，返回新的文件路径"""
         try:
             from datetime import datetime
             import re
@@ -3301,7 +3303,7 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
 
                 if clean_name == filename.lower():
                     print(f"✓ 文件名已符合规范")
-                    return False  # 返回False表示没有进行修改
+                    return file_path  # 返回原路径
 
                 # 需要清理特殊字符
                 new_filename = f"{clean_name}.md"
@@ -3323,16 +3325,16 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
                 print(f"⚠️ 文件已存在: {new_filename}")
                 overwrite = input("是否覆盖？(y/N): ").strip().lower()
                 if overwrite not in ["y", "yes"]:
-                    return False
+                    return file_path  # 返回原路径
 
             # 重命名文件
             file_path.rename(new_path)
             print(f"✅ 已规范化: {file_path.name} → {new_filename}")
-            return True
+            return new_path  # 返回新路径
 
         except Exception as e:
             print(f"❌ 规范化失败 {file_path.name}: {e}")
-            return False
+            return file_path  # 出错时返回原路径
 
     def _process_links_target_blank(self) -> None:
         """为文章链接添加新窗口打开属性"""

@@ -289,7 +289,11 @@ class ContentPipeline:
                 # 不抛出异常，允许程序继续运行，但标记API不可用
                 self.api_available = False
             except Exception as e:
-                self.log(f"❌ Gemini API 连接测试失败: {str(e)}", level="error", force=True)
+                # 只在debug模式下显示详细错误，否则只显示简单提示
+                if self.verbose:
+                    self.log(f"⚠️ Gemini API 暂时不可用: {str(e)}", level="warning")
+                else:
+                    self.log("ℹ️ Gemini API 未配置，部分AI功能将不可用", level="info")
                 self.api_available = False
         except Exception as e:
             self.log(f"❌ 设置API失败: {str(e)}", level="error", force=True)
