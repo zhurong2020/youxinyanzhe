@@ -454,3 +454,26 @@ pyobfus your_script.py -o protected_script.py
 *记住：保护代码，从今天开始。行动，从现在开始。*
 
 *我们下期见！👋*
+
+
+{% assign investment_tags = 'QDII基金,指数投资,标普500,纳斯达克100,定投策略,基金投资,股票投资,投资理财,量化交易,投资策略,风险管理,资产配置,投资心理,美股投资,ETF投资' | split: ',' %}
+{% assign show_investment_disclaimer = false %}
+{% for tag in page.tags %}
+  {% if investment_tags contains tag %}
+    {% assign show_investment_disclaimer = true %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% if show_investment_disclaimer %}
+---
+
+**💭 学习分享声明**：这里记录的是我在投资理财学习路上的个人思考和实践心得。正如《金钱心理学》所言："每个人的情况不同"，投资决策需要结合您的具体情况、风险承受能力和投资目标。本文仅供学习交流，不构成投资建议，请保持独立思考，持续学习。
+
+{% endif %}
+
+如果你觉得我的文章对你有帮助，可以[请我喝咖啡](https://www.buymeacoffee.com/zhurong052Q)
+
+<a href="https://www.buymeacoffee.com/zhurong052Q" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+> 💬 **发表评论**: 您需要有一个 GitHub 账号来发表评论。
