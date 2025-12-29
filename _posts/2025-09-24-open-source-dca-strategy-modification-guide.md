@@ -32,8 +32,8 @@ title: 开源定投策略改造指南：从使用者到创造者
 ## 系列文章导航
 
 本文是TQQQ定投策略系列的第3篇（完结篇）：
-- 第1篇：[回测分析——从-60%回撤到盈利](https://zhurong2020.github.io/youxinyanzhe/posts/2025/09/from-60-percent-drawdown-to-profit-turnaround/){:target="_blank"}
-- 第2篇：[TQQQ定投深度剖析：为什么周投能赢日投？](https://zhurong2020.github.io/youxinyanzhe/posts/2025/09/tqqq-weekly-vs-daily-analysis/){:target="_blank"}
+- 第1篇：[回测分析——从-60%回撤到盈利](https://zhurong2020.github.io/workshop/posts/2025/09/from-60-percent-drawdown-to-profit-turnaround/){:target="_blank"}
+- 第2篇：[TQQQ定投深度剖析：为什么周投能赢日投？](https://zhurong2020.github.io/workshop/posts/2025/09/tqqq-weekly-vs-daily-analysis/){:target="_blank"}
 - **第3篇：开源定投策略改造指南**（本文）
 
 ---

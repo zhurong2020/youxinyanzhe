@@ -33,13 +33,13 @@ classes: wide
 
 ## 📊 量化投资系列
 
-- [系列介绍](/youxinyanzhe/categories/投资理财/#量化投资系列)
-- [量化投资入门理念](/youxinyanzhe/posts/2024/01/quant-investment-basics/)
-- [数据获取与处理](/youxinyanzhe/posts/2024/02/data-acquisition-processing/)
-- [策略开发框架](/youxinyanzhe/posts/2024/03/strategy-development-framework/)
-- [回测系统搭建](/youxinyanzhe/posts/2024/04/backtesting-system/)
-- [实盘交易部署](/youxinyanzhe/posts/2024/05/live-trading-deployment/)
-- [风险管理实践](/youxinyanzhe/posts/2024/06/risk-management-practices/)
+- [系列介绍](/workshop/categories/投资理财/#量化投资系列)
+- [量化投资入门理念](/workshop/posts/2024/01/quant-investment-basics/)
+- [数据获取与处理](/workshop/posts/2024/02/data-acquisition-processing/)
+- [策略开发框架](/workshop/posts/2024/03/strategy-development-framework/)
+- [回测系统搭建](/workshop/posts/2024/04/backtesting-system/)
+- [实盘交易部署](/workshop/posts/2024/05/live-trading-deployment/)
+- [风险管理实践](/workshop/posts/2024/06/risk-management-practices/)
 
 </div>
 </div>

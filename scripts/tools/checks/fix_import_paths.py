@@ -27,7 +27,7 @@ def find_project_root():
     relative_path = Path(__file__).resolve()
     try:
         # 尝试基于当前工作目录计算
-        if Path.cwd().name == 'youxinyanzhe':
+        if Path.cwd().name == 'workshop':
             return Path.cwd()
         relative_to_cwd = relative_path.relative_to(Path.cwd())
         return Path.cwd()

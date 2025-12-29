@@ -55,6 +55,6 @@
 - 重要变更要更新`CHANGELOG_DETAILED.md`
 
 ## 快速项目识别
-- 📁 当前路径：`/home/wuxia/projects/youxinyanzhe`
+- 📁 当前路径：`/home/wuxia/projects/workshop`
 - 🔗 家庭项目路径：`/home/wuxia/projects/family_management_hub`
 - 🚀 切换命令：`cd ../family_management_hub`

@@ -500,7 +500,7 @@ class YouTubeMenuHandler(BaseMenuHandler):
             # 默认配置
             default_config = {
                 "title_template": "{filename} - 有心工坊音频",
-                "description_template": "来自有心工坊的优质音频内容\n\n访问我们: https://youxinyanzhe.github.io",
+                "description_template": "来自有心工坊的优质音频内容\n\n访问我们: https://zhurong2020.github.io/workshop",
                 "tags": ["教育", "学习", "有心工坊"],
                 "privacy": "public",
                 "category": "22",  # People & Blogs

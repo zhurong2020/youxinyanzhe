@@ -79,9 +79,9 @@ classes: wide
 
 ## 🔗 相关系列
 
-- [🚀 马斯克帝国系列](/youxinyanzhe/series/musk-empire/) - 深度解析马斯克商业帝国
-- [💰 投资理财系列](/youxinyanzhe/categories/investment-finance/) - 投资策略与财务规划
-- [🧠 认知升级系列](/youxinyanzhe/categories/cognitive-upgrade/) - 思维模型与决策科学
+- [🚀 马斯克帝国系列](/workshop/series/musk-empire/) - 深度解析马斯克商业帝国
+- [💰 投资理财系列](/workshop/categories/investment-finance/) - 投资策略与财务规划
+- [🧠 认知升级系列](/workshop/categories/cognitive-upgrade/) - 思维模型与决策科学
 
 ---
 

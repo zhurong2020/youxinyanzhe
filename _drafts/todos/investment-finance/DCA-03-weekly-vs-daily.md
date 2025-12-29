@@ -17,7 +17,7 @@ date: 2025-09-23 11:00:00
 ## 系列文章导航
 
 本文是TQQQ定投策略系列的第2篇：
-- [第1篇：从-60%回撤到盈利的逆袭之路]([./DCA-02-7layer-drawdown-system.md](https://zhurong2020.github.io/youxinyanzhe/posts/2025/09/from-60-percent-drawdown-to-profit-turnaround/))
+- [第1篇：从-60%回撤到盈利的逆袭之路]([./DCA-02-7layer-drawdown-system.md](https://zhurong2020.github.io/workshop/posts/2025/09/from-60-percent-drawdown-to-profit-turnaround/))
 - **第2篇：TQQQ定投深度剖析：周投还是日投**（本文）
 - 第3篇：开源定投策略改造指南（即将发布）
 

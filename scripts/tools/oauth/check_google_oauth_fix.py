@@ -29,10 +29,10 @@ def diagnose_oauth_issue():
         print(f"   Project ID: {project_id}")
         print(f"   Client ID: {client_id}")
         
-        if project_id == "youxinyanzhe-youtube-uploader":
+        if project_id == "workshop-youtube-uploader":
             print("✅ 项目ID配置正确")
         else:
-            print(f"⚠️  项目ID不匹配，期望: youxinyanzhe-youtube-uploader")
+            print(f"⚠️  项目ID不匹配，期望: workshop-youtube-uploader")
             
     except Exception as e:
         print(f"❌ 读取凭据文件失败: {e}")
@@ -73,7 +73,7 @@ def show_manual_steps():
     print("\n📋 详细手动操作步骤:")
     print("1. 浏览器打开: https://console.cloud.google.com/")
     print("2. 登录你的 Google 账号 (zhurong0525@gmail.com)")
-    print("3. 选择项目: youxinyanzhe-youtube-uploader")
+    print("3. 选择项目: workshop-youtube-uploader")
     print("4. 左侧菜单 > APIs & Services > OAuth consent screen")
     print("5. 滚动到底部找到 'Test users' 部分")
     print("6. 点击 '+ ADD USERS' 按钮")

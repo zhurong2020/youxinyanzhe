@@ -42,9 +42,9 @@ classes: wide
 
 ## 🔗 相关系列
 
-- [🧠 认知升级系列](/youxinyanzhe/categories/认知升级/) - 思维模型与决策科学
-- [💰 投资理财系列](/youxinyanzhe/categories/投资理财/) - 投资策略与财务规划
-- [🛠️ 技术赋能系列](/youxinyanzhe/categories/技术赋能/) - 实用工具与技术教程
+- [🧠 认知升级系列](/workshop/categories/认知升级/) - 思维模型与决策科学
+- [💰 投资理财系列](/workshop/categories/投资理财/) - 投资策略与财务规划
+- [🛠️ 技术赋能系列](/workshop/categories/技术赋能/) - 实用工具与技术教程
 
 ---
 

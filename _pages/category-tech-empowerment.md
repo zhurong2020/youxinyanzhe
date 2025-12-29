@@ -31,12 +31,12 @@ classes: wide
 
 基于开源项目，在VPS服务器上部署免费应用，提升生活质量和工作效率。
 
-- [系列介绍](/youxinyanzhe/categories/技术赋能/#云生活系列)
-- [VPS服务器选购指南](/youxinyanzhe/posts/2024/01/vps-selection-guide/)
-- [域名注册与DNS配置](/youxinyanzhe/posts/2024/02/domain-dns-setup/)
-- [个人网站快速搭建](/youxinyanzhe/posts/2024/03/personal-website-setup/)
-- [开源应用部署实战](/youxinyanzhe/posts/2024/04/opensource-apps-deployment/)
-- [数据备份与安全防护](/youxinyanzhe/posts/2024/05/data-backup-security/)
+- [系列介绍](/workshop/categories/技术赋能/#云生活系列)
+- [VPS服务器选购指南](/workshop/posts/2024/01/vps-selection-guide/)
+- [域名注册与DNS配置](/workshop/posts/2024/02/domain-dns-setup/)
+- [个人网站快速搭建](/workshop/posts/2024/03/personal-website-setup/)
+- [开源应用部署实战](/workshop/posts/2024/04/opensource-apps-deployment/)
+- [数据备份与安全防护](/workshop/posts/2024/05/data-backup-security/)
 
 </div>
 </div>

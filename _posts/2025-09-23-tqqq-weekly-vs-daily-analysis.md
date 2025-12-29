@@ -51,9 +51,9 @@ toc_sticky: true
 ## 系列文章导航
 
 本文是TQQQ定投策略系列的第2篇：
-- 第1篇：[回测分析——从-60%回撤到盈利](https://zhurong2020.github.io/youxinyanzhe/posts/2025/09/from-60-percent-drawdown-to-profit-turnaround/){:target="_blank"}
+- 第1篇：[回测分析——从-60%回撤到盈利](https://zhurong2020.github.io/workshop/posts/2025/09/from-60-percent-drawdown-to-profit-turnaround/){:target="_blank"}
 - **第2篇：周投 vs. 日投深度剖析**（本文）
-- 第3篇：[开源定投策略改造指南](https://zhurong2020.github.io/youxinyanzhe/posts/2025/09/open-source-dca-strategy-modification-guide/){:target="_blank"}
+- 第3篇：[开源定投策略改造指南](https://zhurong2020.github.io/workshop/posts/2025/09/open-source-dca-strategy-modification-guide/){:target="_blank"}
 
 ---
 

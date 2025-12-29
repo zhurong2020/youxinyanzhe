@@ -100,7 +100,7 @@ toc_sticky: true
 
 **特别福利**：使用我的推荐链接完成开户，并在本文末评论区留言的读者，我将每月从已确认开户的读者中抽取1名，提供**一小时免费投资咨询服务**（内容包括但不限于策略讨论、工具使用、个人投资规划等）。
 
-想了解更多开户细节，可以参考我的详细教程：[《智能DCA定投策略完整指南》](https://zhurong2020.github.io/youxinyanzhe/posts/2025/01/intelligent-dca/){:target="_blank"}
+想了解更多开户细节，可以参考我的详细教程：[《智能DCA定投策略完整指南》](https://zhurong2020.github.io/workshop/posts/2025/01/intelligent-dca/){:target="_blank"}
 
 ### 另一个专业选择：Interactive Brokers（盈透证券）
 
@@ -659,7 +659,7 @@ else:
 
 ### 我的文章
 - [为什么普通人应该现在就开始投资美股](https://zhurong2020.github.io/post/wei-shi-me-pu-tong-ren-ying-gai-xian-zai-jiu-kai-shi-tou-zi-mei-gu-yi-ge-you-ni-zhong-nian-de-zhen-shi-zhuan-xing-ji/){:target="_blank"}
-- [手把手教你用Moomoo量化工具定投美股](https://zhurong2020.github.io/youxinyanzhe/posts/2025/01/intelligent-dca/){:target="_blank"}
+- [手把手教你用Moomoo量化工具定投美股](https://zhurong2020.github.io/workshop/posts/2025/01/intelligent-dca/){:target="_blank"}
 
 ### 开户推荐（含新人奖励）
 - **Moomoo开户**: 

@@ -2,7 +2,7 @@
 
 **生成日期**: 2025-09-19
 **素材位置**: `/home/wuxia/projects/moomoo_custom_strategies/docs/`
-**目标目录**: `../youxinyanzhe/`
+**目标目录**: `../workshop/`
 
 ---
 
@@ -16,7 +16,7 @@ bash copy_to_blog_directory.sh
 
 ### 第二步：进入创作目录
 ```bash
-cd ../../youxinyanzhe/
+cd ../../workshop/
 ls -la
 ```
 
@@ -26,9 +26,9 @@ ls -la
 
 | 文件名 | 当前位置 | 目标位置 | 状态 |
 |--------|---------|----------|------|
-| 期权解套完全指南 | 已移至创作目录 | youxinyanzhe/00_待发布/01_期权解套完全指南.md | ✅ |
-| 2025-tqqq-investment-guide.md | docs/blog_insights/ | youxinyanzhe/00_待发布/02_TQQQ定投实战指南.md | 待移动 |
-| Stock_Buyback_Dividend_Strategy.md | docs/investment_strategy/ | youxinyanzhe/00_待发布/03_股票回购分红策略.md | 待移动 |
+| 期权解套完全指南 | 已移至创作目录 | workshop/00_待发布/01_期权解套完全指南.md | ✅ |
+| 2025-tqqq-investment-guide.md | docs/blog_insights/ | workshop/00_待发布/02_TQQQ定投实战指南.md | 待移动 |
+| Stock_Buyback_Dividend_Strategy.md | docs/investment_strategy/ | workshop/00_待发布/03_股票回购分红策略.md | 待移动 |
 
 ---
 
@@ -167,7 +167,7 @@ ls -la
 
 - 总计划：`BLOG_PUBLISHING_MASTER_PLAN.md`
 - 执行脚本：`copy_to_blog_directory.sh`
-- 创作目录：`../../youxinyanzhe/`
+- 创作目录：`../../workshop/`
 
 ---
 

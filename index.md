@@ -236,7 +236,7 @@ intro:
             <i class="fas fa-envelope"></i> 订阅邮件
           </button>
           <input type="hidden" name="_subject" value="新订阅 - 有心言者">
-          <input type="hidden" name="_next" value="https://zhurong2020.github.io/youxinyanzhe/thanks/">
+          <input type="hidden" name="_next" value="https://zhurong2020.github.io/workshop/thanks/">
         </form>
         <p style="font-size: 0.7em; color: #6c757d; margin-top: 0.8em;">
           隐私保护，仅重要更新

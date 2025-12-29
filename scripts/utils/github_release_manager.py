@@ -475,7 +475,7 @@ def create_github_manager() -> GitHubReleaseManager:
     
     token = os.getenv("GITHUB_TOKEN")
     username = os.getenv("GITHUB_USERNAME", "zhurong2020")
-    repo = os.getenv("GITHUB_REPO", "youxinyanzhe")
+    repo = os.getenv("GITHUB_REPO", "workshop")
     
     if not token or token == "your_github_token":
         raise ValueError("请在.env文件中设置有效的GITHUB_TOKEN")

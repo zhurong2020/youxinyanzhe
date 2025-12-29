@@ -70,8 +70,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/zhurong2020/youxinyanzhe.git
-cd youxinyanzhe
+git clone https://github.com/zhurong2020/workshop.git
+cd workshop
 
 # 安装依赖
 pip install -r requirements.txt
@@ -129,7 +129,7 @@ python run.py
 ## 🏗️ 项目结构 (重构后v2.0)
 
 ```
-youxinyanzhe/
+workshop/
 ├── 📁 _posts/                   # Jekyll发布文章
 ├── 📁 _drafts/                  # 草稿文件
 ├── 📁 _data/                    # Jekyll数据文件(图片索引等)

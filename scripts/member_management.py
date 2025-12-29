@@ -223,7 +223,7 @@ class MemberManager:
 📅 有效期至：{expiry_date} (剩余{days_remaining}天)
 
 🌐 使用方法：
-1. 访问会员专区：https://youxinyanzhe.github.io/members/
+1. 访问会员专区：https://zhurong2020.github.io/workshop/members/
 2. 在验证框中输入上述访问码
 3. 点击"验证访问"即可查看专享内容
 

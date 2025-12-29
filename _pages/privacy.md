@@ -75,6 +75,6 @@ author_profile: false
 如果您对本隐私政策有任何疑问或顾虑，请通过以下方式联系我们：
 
 - 电子邮件：zhurong0525@gmail.com
-- 网站：https://zhurong2020.github.io/youxinyanzhe
+- 网站：https://zhurong2020.github.io/workshop
 
 感谢您阅读我们的隐私政策。通过继续使用本网站，您表示同意本隐私政策中描述的做法。 

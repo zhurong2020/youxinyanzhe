@@ -10,7 +10,7 @@ import logging
 
 # 添加项目根目录到Python路径
 import sys
-sys.path.append('/home/wuxia/projects/youxinyanzhe')
+sys.path.append('/home/wuxia/projects/workshop')
 
 from scripts.core.workflows.integrated_workflow import IntegratedContentWorkflow
 from scripts.core.workflows.content_workflow import WorkflowResult, WorkflowStepStatus

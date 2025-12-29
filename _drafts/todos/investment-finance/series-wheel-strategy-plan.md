@@ -22,7 +22,7 @@
 
 ### ⚠️ **第1篇: 风险提示与准备工作**
 **标题**: 《滚轮策略入门必读：风险评估、账户准备与资金门槛》
-**URL**: `/youxinyanzhe/series/wheel-strategy/01-prerequisites`
+**URL**: `/workshop/series/wheel-strategy/01-prerequisites`
 
 **⚠️ 核心风险提示**:
 1. **投资有风险，入市需谨慎**
@@ -65,7 +65,7 @@
 
 ### 📖 **第2篇: 终身学习者的四维成长地图**
 **标题**: 《从马斯克粉丝到量化交易者：我的四维学习成长地图》  
-**URL**: `/youxinyanzhe/series/wheel-strategy/02-four-dimension-growth`
+**URL**: `/workshop/series/wheel-strategy/02-four-dimension-growth`
 
 **内容框架**:
 - **"有心言者"的四个探索维度**:
@@ -111,7 +111,7 @@
 
 ### 📊 **第3篇: 策略科普扫盲文**
 **标题**: 《什么是滚轮策略？华尔街机构都在用的现金流秘密》
-**URL**: `/youxinyanzhe/series/wheel-strategy/03-basics`
+**URL**: `/workshop/series/wheel-strategy/03-basics`
 
 **内容框架**:
 - 滚轮策略定义：PUT → 股票 → CALL → 现金的循环
@@ -130,7 +130,7 @@
 
 ### 🎯 **第4篇: 云端生活赋能投资工具开发**
 **标题**: 《从免费域名到期权扫描器：云端工具如何助力投资决策》
-**URL**: `/youxinyanzhe/series/wheel-strategy/04-cloud-empowered-investing`
+**URL**: `/workshop/series/wheel-strategy/04-cloud-empowered-investing`
 
 **内容框架**:
 - **云端生活的投资应用**: 用我在"零成本云端生活"系列学到的技能
@@ -177,7 +177,7 @@ Premium收入：$1.50 x 100 = $150
 
 ### 📈 **第5篇: 认知升级助力投资突破** 
 **标题**: 《克服期权交易恐惧：用"自我对话"重写投资程序》
-**URL**: `/youxinyanzhe/series/wheel-strategy/05-mindset-breakthrough`
+**URL**: `/workshop/series/wheel-strategy/05-mindset-breakthrough`
 
 **内容框架**:
 - **投资中的潜意识陷阱**: 借鉴"40年烟民无痛戒烟"的认知方法
@@ -231,7 +231,7 @@ Premium收入：$1.20 x 100 = $120
 
 ### 🔬 **第6篇: 技术深度解析文**
 **标题**: 《Delta匹配的数学魔法：为什么-0.30是滚轮策略的黄金比例》
-**URL**: `/youxinyanzhe/series/wheel-strategy/06-delta-magic`
+**URL**: `/workshop/series/wheel-strategy/06-delta-magic`
 
 **内容框架**:
 - Delta的本质：价格变动敏感度与概率预测
@@ -256,7 +256,7 @@ Premium收入：$1.20 x 100 = $120
 
 ### 💎 **第7篇: 特斯拉投资生态思维的期权应用**
 **标题**: 《从特斯拉生态投资到期权组合：构建科技股滚轮策略矩阵》
-**URL**: `/youxinyanzhe/series/wheel-strategy/07-tech-ecosystem-wheel`
+**URL**: `/workshop/series/wheel-strategy/07-tech-ecosystem-wheel`
 
 **内容框架**:
 - **特斯拉生态投资思维的启发**: 回顾《特斯拉概念股投资全景图》的核心观点
@@ -302,7 +302,7 @@ Premium收入：$1.20 x 100 = $120
 
 ### 🛡️ **第8篇: 风险管理与极端情况**
 **标题**: 《滚轮策略的阿喀琉斯之踵：如何应对黑天鹅事件》
-**URL**: `/youxinyanzhe/series/wheel-strategy/08-risk-management`
+**URL**: `/workshop/series/wheel-strategy/08-risk-management`
 
 **内容框架**:
 - 滚轮策略四大风险详解：
@@ -343,7 +343,7 @@ Premium收入：$1.20 x 100 = $120
 
 ### 🚀 **第9篇: "有心言者"完整学习生态展示**
 **标题**: 《四大系列协同进化：构建终身学习者的知识与财富双轮驱动》
-**URL**: `/youxinyanzhe/series/wheel-strategy/09-youxinyanzhe-ecosystem`
+**URL**: `/workshop/series/wheel-strategy/09-workshop-ecosystem`
 
 **内容框架**:
 - **"有心言者"四大系列的协同效应**:
@@ -400,7 +400,7 @@ Premium收入：$1.20 x 100 = $120
 - **开源工具**: GitHub上的DCA、期权扫描器等量化策略代码
 - **学习记录**: 我的每一步学习过程、试错经历和改进思路
 
-**💎 高质量付费内容** (youxinyanzhe博客):
+**💎 高质量付费内容** (workshop博客):
 - **深度分析文章**: ¥35/月起，包含专业投资分析和全球视野内容
 - **认知升级专题**: 四大领域(投资理财、全球视野、技术赋能、认知升级)
 - **个人投资洞察**: 基于我真实经验的深度思考和策略解读
@@ -423,7 +423,7 @@ Premium收入：$1.20 x 100 = $120
 - "通过《智能投资指南》掌握的DCA基础，借助《AI助力量化交易》开发期权策略"  
 - "用《零成本云端生活》系列的技术能力，支撑量化工具的开发和部署"
 - "运用《无痛戒烟的自我对话》认知方法，克服期权交易中的心理障碍"
-- "最终在youxinyanzhe博客形成四维并进的完整知识生态和服务体系"
+- "最终在workshop博客形成四维并进的完整知识生态和服务体系"
 
 ---
 

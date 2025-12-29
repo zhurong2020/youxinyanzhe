@@ -2510,10 +2510,10 @@ class ContentPipeline:
         """设置站点URL"""
         # 从平台配置中获取域名
         if 'platforms' in self.config and 'github_pages' in self.config['platforms']:
-            self.site_url = self.config['platforms']['github_pages'].get('domain', 'zhurong2020.github.io/youxinyanzhe')
+            self.site_url = self.config['platforms']['github_pages'].get('domain', 'zhurong2020.github.io/workshop')
         else:
             # 默认值
-            self.site_url = 'zhurong2020.github.io/youxinyanzhe'
+            self.site_url = 'zhurong2020.github.io/workshop'
         
         self.log(f"站点URL: {self.site_url}", level="debug")
     

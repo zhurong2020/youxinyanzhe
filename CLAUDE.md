@@ -15,7 +15,7 @@
 - **旧博客(Gridea)本地路径**: `/mnt/c/onedrive/wuxiami/OneDrive/Documents/Gridea/posts/`
   - 包含80篇历史文章，格式为Markdown with YAML front matter
   - 在线地址: https://zhurong2020.github.io
-- **新博客(Jekyll)本地路径**: `/home/wuxia/projects/youxinyanzhe/_posts/`
+- **新博客(Jekyll)本地路径**: `/home/wuxia/projects/workshop/_posts/`
   - 当前已发布30篇文章
   - 其中11篇为从Gridea迁移过来的文章
 - **文章去重与迁移分析**: 详见 `_drafts/todos/DEDUPLICATED-ARTICLES-REGISTRY.md`

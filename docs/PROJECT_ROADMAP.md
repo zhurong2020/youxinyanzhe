@@ -34,7 +34,7 @@
 #### 🎯 2.1 项目结构重组
 - [ ] **博客项目独立化**
   ```
-  youxinyanzhe-blog/          # 纯Jekyll博客
+  workshop-blog/              # 纯Jekyll博客
   ├── _posts/, _pages/        # 博客内容
   ├── _config.yml             # Jekyll配置
   ├── assets/                 # 静态资源
@@ -256,9 +256,9 @@ Phase 4 (v5.0):
 
 ## 📞 项目信息
 
-- **项目地址**: https://github.com/zhurong2020/youxinyanzhe
-- **文档中心**: https://zhurong2020.github.io/youxinyanzhe/docs/
-- **技术博客**: https://zhurong2020.github.io/youxinyanzhe/
+- **项目地址**: https://github.com/zhurong2020/workshop
+- **文档中心**: https://zhurong2020.github.io/workshop/docs/
+- **技术博客**: https://zhurong2020.github.io/workshop/
 - **联系方式**: 通过GitHub Issues或项目讨论区
 
 ---

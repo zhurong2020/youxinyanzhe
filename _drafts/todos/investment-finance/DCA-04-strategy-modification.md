@@ -14,8 +14,8 @@ feature: /post-images/strategy-modification-guide.png
 ## 系列文章导航
 
 本文是TQQQ定投策略系列的第3篇：
-- [第1篇：从-60%回撤到盈利的逆袭之路](https://zhurong2020.github.io/youxinyanzhe/posts/2025/09/from-60-percent-drawdown-to-profit-turnaround/)
-- [第2篇：TQQQ定投深度剖析](https://zhurong2020.github.io/youxinyanzhe/posts/2025/09/tqqq-weekly-vs-daily-analysis/)
+- [第1篇：从-60%回撤到盈利的逆袭之路](https://zhurong2020.github.io/workshop/posts/2025/09/from-60-percent-drawdown-to-profit-turnaround/)
+- [第2篇：TQQQ定投深度剖析](https://zhurong2020.github.io/workshop/posts/2025/09/tqqq-weekly-vs-daily-analysis/)
 - **第3篇：开源定投策略改造指南**（本文）
 
 ---

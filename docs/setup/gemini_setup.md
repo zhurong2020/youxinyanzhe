@@ -1,6 +1,6 @@
 # Gemini Agent Project Configuration
 
-This document outlines my understanding of the `youxinyanzhe` project structure, conventions, and objectives to ensure my contributions are aligned with the existing framework.
+This document outlines my understanding of the `workshop` project structure, conventions, and objectives to ensure my contributions are aligned with the existing framework.
 
 ## 1. Project Overview
 

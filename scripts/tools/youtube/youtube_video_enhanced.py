@@ -279,7 +279,7 @@ class YouTubeVideoEnhanced:
 
 ---
 通过有心工坊YouTube视频生成器创建
-访问我们: https://youxinyanzhe.github.io
+访问我们: https://zhurong2020.github.io/workshop
 """
 
                 # 执行上传

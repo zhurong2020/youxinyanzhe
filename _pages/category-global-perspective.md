@@ -29,12 +29,12 @@ classes: wide
 
 ## 📖 精选系列专题
 
-### 🚀 [马斯克帝国系列](/youxinyanzhe/series/musk-empire/)
+### 🚀 [马斯克帝国系列](/workshop/series/musk-empire/)
 深度解析马斯克商业帝国的战略布局与颠覆性创新
 - 已发布：4篇文章
 - 涵盖：特斯拉AI帝国、Robotaxi扩张、Optimus机器人、未来工厂
 
-### 🎙️ [名人访谈系列](/youxinyanzhe/series/celebrity-interviews/)
+### 🎙️ [名人访谈系列](/workshop/series/celebrity-interviews/)
 国际知名人士观点、行业领袖见解、跨文化对话
 - 筹备中：Joe Rogan × Elon Musk、美国国会经典辩论、Cathie Wood投资哲学
 
