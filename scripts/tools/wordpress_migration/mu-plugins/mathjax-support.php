@@ -130,6 +130,23 @@ function youxin_math_styles() {
             background-color: #f5f5f5;
             font-weight: 600;
         }
+
+        /* Blockquote styling - reduce font size */
+        .wp-block-quote,
+        blockquote {
+            font-size: 1em !important;
+            line-height: 1.6 !important;
+            padding: 1em 1.5em !important;
+            margin: 1.5em 0 !important;
+            border-left: 4px solid #0073aa !important;
+            background: #f9f9f9 !important;
+        }
+
+        .wp-block-quote p,
+        blockquote p {
+            font-size: 1em !important;
+            margin-bottom: 0.5em !important;
+        }
         </style>
         <?php
     }
