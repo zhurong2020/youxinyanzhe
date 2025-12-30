@@ -2,6 +2,105 @@
 
 本文档记录项目的详细更新历史，包括已完成的功能实现和重要技术决策。
 
+## 2025-12-29: WordPress网站优化与Google AdSense集成 🎯
+
+### 🎯 核心成就
+- **Google AdSense集成**: 完成AdSense验证代码部署和ads.txt配置
+- **网站合规性**: 创建隐私政策和服务条款页面，满足AdSense申请要求
+- **内容迁移优化**: 修复Jekyll到WordPress迁移后的链接问题
+
+### 📝 内容管理优化
+
+#### 重复文章清理
+- 删除重复文章 `trump-crypto-meme-coin-story-2` (ID: 349)
+- 保留唯一版本 `dca-math-principle-why-profit-in-falling-market-2` (ID: 336)
+
+#### 新文章迁移
+- `from-60-percent-drawdown-to-profit-turnaround` (ID: 359) - TQQQ定投回测分析
+- `open-source-dca-strategy-modification-guide` (ID: 360) - 开源定投策略改造指南
+
+#### 旧链接修复
+修复了7篇文章中指向 `zhurong2020.github.io` 的旧链接，更新为新WordPress URL：
+- Post 336, 345, 360, 344, 359 - 共修复14个内部链接
+- 剩余16个链接指向尚未迁移的Gridea历史文章
+
+### 🔐 合规页面创建
+
+| 页面 | URL | 用途 |
+|------|-----|------|
+| 隐私政策 | `/privacy-policy/` (ID: 366) | AdSense必需，数据收集说明 |
+| 服务条款 | `/terms-of-service/` (ID: 367) | 用户协议，免责声明 |
+
+### 💰 Google AdSense配置
+
+#### 已部署组件
+```
+/wp-content/mu-plugins/
+├── adsense-verification.php    # AdSense验证代码 (ca-pub-3677908378517538)
+└── footer-policy-links.php     # 页脚政策链接
+
+/ads.txt                        # 广告授权声明
+```
+
+#### ads.txt内容
+```
+google.com, pub-3677908378517538, DIRECT, f08c47fec0942fa0
+```
+
+### 🛠️ 技术实现
+
+- **mu-plugins方式**: 使用WordPress Must-Use Plugins确保代码始终加载
+- **验证代码位置**: 通过`wp_head`钩子注入到所有页面`<head>`
+- **页脚链接**: 通过`wp_footer`钩子添加，带CSS样式
+
+### 📊 当前状态
+- AdSense审核状态: **正在准备**
+- ads.txt状态: **已创建** (等待Google检测，约24-48小时)
+- 网站文章数: 21篇
+- SSL证书: ✅ 已启用
+
+### 🎨 网站布局优化
+
+#### Elementor安装
+- 安装Elementor页面构建器 v3.34.0
+- 支持拖拽式页面设计
+
+#### 单篇文章侧边栏
+部署 `sidebar-for-posts.php` mu-plugin，为单篇文章页面添加右侧边栏：
+
+```
+桌面端布局 (>900px):
+┌────────────────────────────────────┐
+│           文章内容                  │  侧边栏
+│                                    │  📚 最新文章
+│                                    │  📂 文章分类
+└────────────────────────────────────┘
+```
+
+**侧边栏功能**:
+- 📚 最新文章 - 显示最新5篇文章（排除当前文章）
+- 📂 文章分类 - 显示文章数最多的6个分类
+- 响应式设计 - 移动端(<900px)自动变为单列布局
+- Sticky定位 - 滚动时侧边栏保持可见
+
+### 📁 相关文件
+- WordPress迁移工具: `scripts/tools/wordpress_migration/`
+- 迁移日志: `migration.log`
+- 迁移结果: `migration_results.json`
+
+### 🔌 已部署mu-plugins完整列表
+```
+/wp-content/mu-plugins/
+├── adsense-verification.php    # Google AdSense验证代码
+├── footer-policy-links.php     # 页脚隐私政策链接
+├── pagination-scroll-fix.php   # 分页滚动修复
+├── sidebar-for-posts.php       # 单篇文章侧边栏 ✨新增
+├── custom-functions.php        # 自定义功能
+└── security-enhancements.php   # 安全增强
+```
+
+---
+
 ## 2025-08-21: Claude+Gemini智能协同策略完整实现 🚀
 
 ### 🎯 核心成就
