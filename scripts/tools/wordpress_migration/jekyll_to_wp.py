@@ -24,6 +24,9 @@ import requests
 import frontmatter
 import markdown
 
+# Import Gutenberg converter
+from .gutenberg_converter import convert_html_to_gutenberg, ConversionOptions
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -392,10 +395,11 @@ class JekyllToWordPress:
         )
 
         # Configure markdown with extensions
+        # Note: Do NOT use 'codehilite' - it renders code with complex HTML and loses language info
+        # Use 'fenced_code' to preserve language classes (e.g., <code class="language-python">)
         md = markdown.Markdown(extensions=[
             'tables',
-            'fenced_code',
-            'codehilite',
+            'fenced_code',  # Preserves language info as class="language-xxx"
             'toc',
         ])
 
@@ -508,8 +512,21 @@ if (!window.MathJax) {
         if post.header_image:
             featured_media_id = self.upload_media(post.header_image, post.title)
 
-        # Convert content to HTML
+        # Convert content to HTML, then to Gutenberg format
         html_content = self.convert_markdown_to_html(post.content)
+
+        # Convert HTML to Gutenberg block format for proper editor support
+        gutenberg_options = ConversionOptions(
+            preserve_inline_styles=True,
+            add_wp_classes=True,
+            wrap_images_in_figure=True,
+            preserve_code_language=True,
+            convert_codehilite=True,
+            handle_mathjax=True,
+            preserve_more_tag=True
+        )
+        html_content = convert_html_to_gutenberg(html_content, gutenberg_options)
+        logger.info(f"  Converted to Gutenberg format")
 
         # Extract slug from Jekyll filename (remove date prefix and extension)
         # Format: YYYY-MM-DD-slug-name.md -> slug-name
