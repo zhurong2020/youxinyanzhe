@@ -161,3 +161,7 @@ config/azure_app_info.md
 # 创作临时目录（包含临时图片和截图，不应提交）
 temp/drafting/
 scripts/.tmp.backup*/
+
+# WordPress migration results
+migration_results.json
+gridea_migration_results.json
