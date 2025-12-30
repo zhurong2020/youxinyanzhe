@@ -22,7 +22,7 @@ from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 import html2text
 
 # Configure logging
@@ -135,8 +135,10 @@ class GrideaHtmlToWordPress:
             # Extract excerpt from meta description
             excerpt = ""
             meta_desc = soup.find('meta', attrs={'name': 'description'})
-            if meta_desc and meta_desc.get('content'):
-                excerpt = meta_desc['content'][:300]
+            if meta_desc and isinstance(meta_desc, Tag):
+                content = meta_desc.get('content')
+                if content and isinstance(content, str):
+                    excerpt = content[:300]
 
             # Extract tags
             tags = self.extract_tags(soup)
@@ -144,8 +146,10 @@ class GrideaHtmlToWordPress:
             # Extract feature image
             feature_image = ""
             og_image = soup.find('meta', attrs={'property': 'og:image'})
-            if og_image and og_image.get('content'):
-                feature_image = og_image['content']
+            if og_image and isinstance(og_image, Tag):
+                img_content = og_image.get('content')
+                if img_content and isinstance(img_content, str):
+                    feature_image = img_content
 
             return GrideaPost(
                 folder_name=html_path.parent.name,
@@ -166,11 +170,13 @@ class GrideaHtmlToWordPress:
         """Extract publication date from HTML or folder name"""
         # Try to find date in meta tags
         date_meta = soup.find('meta', attrs={'property': 'article:published_time'})
-        if date_meta and date_meta.get('content'):
-            try:
-                return datetime.fromisoformat(date_meta['content'].replace('Z', '+00:00'))
-            except ValueError:
-                pass
+        if date_meta and isinstance(date_meta, Tag):
+            date_content = date_meta.get('content')
+            if date_content and isinstance(date_content, str):
+                try:
+                    return datetime.fromisoformat(date_content.replace('Z', '+00:00'))
+                except ValueError:
+                    pass
 
         # Try to extract from folder name (some Gridea posts have date prefix)
         # Pattern: 2025-nian-..., 2024-..., etc.
@@ -206,8 +212,10 @@ class GrideaHtmlToWordPress:
 
         # Try meta keywords
         keywords = soup.find('meta', attrs={'name': 'keywords'})
-        if keywords and keywords.get('content'):
-            tags.extend([t.strip() for t in keywords['content'].split(',') if t.strip()])
+        if keywords and isinstance(keywords, Tag):
+            kw_content = keywords.get('content')
+            if kw_content and isinstance(kw_content, str):
+                tags.extend([t.strip() for t in kw_content.split(',') if t.strip()])
 
         # Try tag links
         tag_links = soup.find_all('a', href=re.compile(r'/tag/'))

@@ -128,15 +128,19 @@ class JekyllToWordPress:
             categories_raw = post.get('categories', [])
             if isinstance(categories_raw, str):
                 categories = [categories_raw]
+            elif isinstance(categories_raw, list):
+                categories = [str(c) for c in categories_raw]
             else:
-                categories = list(categories_raw) if categories_raw else []
+                categories = []
 
             # Handle tags
             tags_raw = post.get('tags', [])
             if isinstance(tags_raw, str):
                 tags = [tags_raw]
+            elif isinstance(tags_raw, list):
+                tags = [str(t) for t in tags_raw]
             else:
-                tags = list(tags_raw) if tags_raw else []
+                tags = []
 
             # Handle header images
             header = post.get('header', {})
@@ -161,20 +165,31 @@ class JekyllToWordPress:
                 elif isinstance(last_mod_raw, datetime):
                     last_modified = last_mod_raw
 
+            # Extract and validate string fields
+            title_str = str(title) if title else file_path.stem
+            excerpt_raw = post.get('excerpt', '')
+            excerpt_str = str(excerpt_raw) if excerpt_raw else ''
+            member_tier_raw = post.get('member_tier', '')
+            member_tier_str = str(member_tier_raw) if member_tier_raw else ''
+            layout_raw = post.get('layout', 'single')
+            layout_str = str(layout_raw) if layout_raw else 'single'
+            reading_time_raw = post.get('estimated_reading_time', '')
+            reading_time_str = str(reading_time_raw) if reading_time_raw else ''
+
             return JekyllPost(
                 file_path=file_path,
-                title=title,
-                date=post_date,
+                title=title_str,
+                date=post_date if isinstance(post_date, datetime) else datetime.now(),
                 content=post.content,
-                excerpt=post.get('excerpt', ''),
+                excerpt=excerpt_str,
                 categories=categories,
                 tags=tags,
                 header_image=header_image,
                 teaser_image=teaser_image,
-                member_tier=post.get('member_tier', ''),
-                layout=post.get('layout', 'single'),
+                member_tier=member_tier_str,
+                layout=layout_str,
                 last_modified=last_modified,
-                estimated_reading_time=post.get('estimated_reading_time', ''),
+                estimated_reading_time=reading_time_str,
                 raw_front_matter=dict(post.metadata)
             )
 
