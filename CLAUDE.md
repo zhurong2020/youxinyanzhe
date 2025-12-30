@@ -18,11 +18,32 @@
 - **新博客(Jekyll)本地路径**: `/home/wuxia/projects/workshop/_posts/`
   - 当前已发布30篇文章
   - 其中11篇为从Gridea迁移过来的文章
+- **WordPress博客**: https://www.arong.eu.org
+  - VPS服务器: `arong-vps` (SSH别名)
+  - 网站根目录: `/var/www/arong.eu.org/public_html/`
+  - 当前文章数: 21篇
+  - 迁移工具: `scripts/tools/wordpress_migration/`
 - **文章去重与迁移分析**: 详见 `_drafts/todos/DEDUPLICATED-ARTICLES-REGISTRY.md`
 
-## 当前状态 (2025-08-22更新)
-- **系统状态**: 🎯 **VIP分级服务体系优化完成** - 基于Tesla案例验证的服务模式
-- **核心成就**: **企业级AI协同系统** + **标准化VIP分级服务** + **专业投资内容创作流程**
+### WordPress网站配置 (arong.eu.org)
+- **VPS连接**: `ssh arong-vps`
+- **WP-CLI**: `sudo -u www-data wp --path=/var/www/arong.eu.org/public_html`
+- **mu-plugins目录**: `/var/www/arong.eu.org/public_html/wp-content/mu-plugins/`
+- **已部署mu-plugins**:
+  - `adsense-verification.php` - Google AdSense验证代码
+  - `footer-policy-links.php` - 页脚隐私政策链接
+  - `pagination-scroll-fix.php` - 分页滚动修复
+  - `sidebar-for-posts.php` - 单篇文章侧边栏（最新文章+分类）
+  - `custom-functions.php` - 自定义功能
+  - `security-enhancements.php` - 安全增强
+- **已安装插件**: Elementor v3.34.0（拖拽式页面构建器）
+- **AdSense状态**: 已提交审核 (pub-3677908378517538)
+- **ads.txt**: 已配置在网站根目录
+
+## 当前状态 (2025-12-29更新)
+- **系统状态**: 🎯 **WordPress网站优化与AdSense集成** - 多平台内容分发进行中
+- **核心成就**: **企业级AI协同系统** + **WordPress迁移工具** + **Google AdSense集成**
+- **最新进展**: WordPress站点(arong.eu.org)完成AdSense验证代码部署，等待审核
 - **服务分级**: VIP2专业解读 + VIP3翻译服务 + VIP4定制服务，明确差异化价值
 - **内容标准**: Tesla VIP2文章作为标杆，建立8,000-15,000字专业分析标准
 - **文件组织**: vip-preparation目录统一管理素材，规范化命名体系
