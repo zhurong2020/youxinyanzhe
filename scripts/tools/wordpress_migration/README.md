@@ -261,6 +261,80 @@ Add `-v` for verbose logging:
 python jekyll_to_wp.py --source _posts/ --dry-run -v
 ```
 
+## Post-Migration Tasks
+
+### Fix Old Jekyll Links
+
+After migration, posts may contain links to the old Jekyll site. Use the WordPress REST API to scan and fix:
+
+```python
+# Scan for old links
+import requests
+from requests.auth import HTTPBasicAuth
+import re
+
+auth = HTTPBasicAuth('username', 'app_password')
+resp = requests.get("https://www.arong.eu.org/wp-json/wp/v2/posts?per_page=100", auth=auth)
+for post in resp.json():
+    content = post['content']['rendered']
+    old_links = re.findall(r'https?://zhurong2020\.github\.io[^\s"<>)]*', content)
+    if old_links:
+        print(f"Post {post['id']}: {len(old_links)} old links found")
+```
+
+**Link Mapping Examples:**
+| Old Jekyll URL | New WordPress URL |
+|----------------|-------------------|
+| `zhurong2020.github.io/posts/2025/09/xxx/` | `arong.eu.org/xxx/` |
+| `zhurong2020.github.io/post/xxx/` | `arong.eu.org/xxx/` |
+
+### Google AdSense Setup
+
+#### 1. Create Required Pages
+
+AdSense requires privacy policy and terms pages:
+
+```python
+# Create via REST API
+requests.post(
+    "https://www.arong.eu.org/wp-json/wp/v2/pages",
+    auth=auth,
+    json={'title': '隐私政策', 'slug': 'privacy-policy', 'content': '...', 'status': 'publish'}
+)
+```
+
+#### 2. Add AdSense Verification Code
+
+Create mu-plugin on VPS:
+
+```bash
+ssh arong-vps 'cat > /var/www/arong.eu.org/public_html/wp-content/mu-plugins/adsense-verification.php << EOF
+<?php
+add_action("wp_head", function() {
+    echo '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXX" crossorigin="anonymous"></script>';
+}, 1);
+EOF'
+```
+
+#### 3. Create ads.txt
+
+```bash
+ssh arong-vps 'echo "google.com, pub-XXXXXXXX, DIRECT, f08c47fec0942fa0" > /var/www/arong.eu.org/public_html/ads.txt'
+```
+
+### Deployed mu-plugins
+
+Current mu-plugins on VPS (`/wp-content/mu-plugins/`):
+
+| File | Purpose |
+|------|---------|
+| `adsense-verification.php` | Google AdSense head code |
+| `footer-policy-links.php` | Privacy/Terms links in footer |
+| `pagination-scroll-fix.php` | Fix pagination scroll |
+| `sidebar-for-posts.php` | Sidebar for single post pages |
+| `custom-functions.php` | Custom theme functions |
+| `security-enhancements.php` | Security hardening |
+
 ## File Locations
 
 - Scripts: `/home/wuxia/projects/workshop/scripts/tools/wordpress_migration/`
@@ -268,3 +342,4 @@ python jekyll_to_wp.py --source _posts/ --dry-run -v
 - Gridea Posts: `/home/wuxia/projects/zhurong2020.github.io/post/`
 - WordPress Root: `/var/www/arong.eu.org/public_html/`
 - Results: Working directory (where you run the script)
+- mu-plugins: `/var/www/arong.eu.org/public_html/wp-content/mu-plugins/`
