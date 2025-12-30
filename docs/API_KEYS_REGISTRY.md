@@ -77,10 +77,24 @@
 - **凭据文件**: `client_secrets.json` (已加入 `.gitignore`)
 - **用途**: YouTube视频上传和管理
 
-### OneDrive API
+### OneDrive API (Workshop 图床)
 - **配置位置**: OAuth 2.0认证
 - **凭据文件**: `onedrive_credentials.json` (已加入 `.gitignore`)
 - **用途**: 图床文件管理
+
+### OneDrive API (VPS 服务器)
+- **Azure 应用名称**: onedrive-msft
+- **Client ID**: `dede9e56-xxxx-xxxx-xxxx-xxxxxxxxxxxx` (完整信息见 vpsserver 仓库)
+- **Client Secret 名称**: `rclone20251230`
+- **Client Secret 创建日期**: 2025-12-30
+- **Client Secret 到期日期**: ⚠️ **2027-12-30** (请在到期前续期)
+- **配置位置**: VPS 服务器 (详见 vpsserver 仓库文档)
+- **用途**: VPS 备份 (Trilium)、论文周报存储
+- **相关服务**:
+  - Trilium 每日备份 (03:00)
+  - 论文周报存储 (每周一 08:00)
+- **续期提醒**: 建议在 2027-11-30 前更新 Client Secret
+- **详细配置**: 见 `vpsserver/docs/ONEDRIVE_CONFIG.md` (private 仓库)
 
 ## 密钥安全管理
 
@@ -97,6 +111,7 @@
 
 ## 更新历史
 
+- **2025-12-30**: 添加 VPS OneDrive API (Azure) 密钥信息，记录到期日期 (2027-12-30)
 - **2025-10-11**: 创建文档，记录两个Gemini API密钥
 - **2025-10-11**: 添加Google One AI Pro订阅说明
 - **2025-10-11**: 添加配额管理和升级指南
