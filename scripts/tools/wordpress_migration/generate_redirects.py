@@ -88,7 +88,8 @@ class RedirectGenerator:
                 # Read front matter for title
                 with open(md_file, 'r', encoding='utf-8') as f:
                     post = frontmatter.load(f)
-                    title = post.get('title', slug)
+                    title_raw = post.get('title', slug)
+                    title = str(title_raw) if title_raw else slug
 
                 # Jekyll URL format (based on _config.yml permalink setting)
                 # Current: /posts/:year/:month/:title/

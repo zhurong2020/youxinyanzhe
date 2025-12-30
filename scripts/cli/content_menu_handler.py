@@ -3528,7 +3528,9 @@ GPT-4和Claude等模型在理解能力、推理能力方面有了显著提升...
             if excerpt_len < 60:
                 print(f"   ⚠️ 摘要过短({excerpt_len}字符)，建议扩展至60-80字符")
                 return False
-                
+
+            return False  # Default fallback
+
         except Exception as e:
             print(f"   ❌ 处理excerpt失败: {e}")
             return False
