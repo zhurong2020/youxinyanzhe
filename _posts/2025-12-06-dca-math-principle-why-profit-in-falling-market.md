@@ -59,9 +59,9 @@ toc_sticky: true
 
 | 周次 | 股价 | 投资金额 | 买入股数 |
 |------|------|----------|----------|
-| 第1周 | $10 | $100 | 10股 |
-| 第2周 | $5 | $100 | 20股 |
-| 第3周 | $10 | $100 | 10股 |
+| 第1周 | &#36;10 | &#36;100 | 10股 |
+| 第2周 | &#36;5 | &#36;100 | 20股 |
+| 第3周 | &#36;10 | &#36;100 | 10股 |
 
 **问**：3周后，你是赚了还是亏了？
 
@@ -129,24 +129,24 @@ $$\text{调和平均} = \frac{n}{\sum_{i=1}^{n}\frac{1}{P_i}} \leq \frac{\sum_{i
 
 | 周次 | 股价 | 买入股数 |
 |------|------|----------|
-| 1 | $10 | 10股 |
-| 2 | $9 | 11.1股 |
-| 3 | $10 | 10股 |
+| 1 | &#36;10 | 10股 |
+| 2 | &#36;9 | 11.1股 |
+| 3 | &#36;10 | 10股 |
 
 - 总股数：31.1股
-- 平均成本：$9.65
+- 平均成本：&#36;9.65
 - 收益率：+3.6%
 
 **情况B：高波动**
 
 | 周次 | 股价 | 买入股数 |
 |------|------|----------|
-| 1 | $10 | 10股 |
-| 2 | $5 | 20股 |
-| 3 | $10 | 10股 |
+| 1 | &#36;10 | 10股 |
+| 2 | &#36;5 | 20股 |
+| 3 | &#36;10 | 10股 |
 
 - 总股数：40股
-- 平均成本：$7.50
+- 平均成本：&#36;7.50
 - 收益率：+33.3%
 
 **同样是"回到原点"，高波动情况下收益率是低波动的9倍！**
@@ -314,22 +314,31 @@ $$\text{调和平均} = \frac{n}{\sum_{i=1}^{n}\frac{1}{P_i}} \leq \frac{\sum_{i
 
 我同时运行五种投资策略，每个组合初始资金$3,000，总计$15,000：
 
-```
-         低风险                    高风险
-         ├────────────┼────────────┤
-    被动 │  组合A     │   组合B    │
-    投资 │ ETF定投    │  科技ETF   │
-         │  SPY/VOO   │  QQQ/SOXX  │
-         ├────────────┼────────────┤
-    主动 │  组合D     │   组合C    │
-    投资 │ 回购价值股  │ 期权+杠杆  │
-         │ JPM/MSFT   │ TQQQ/PUT   │
-         ├────────────┼────────────┤
-    收益 │         组合E          │
-    优先 │     现金流策略         │
-         │    JEPI/MAIN/O         │
-         └────────────────────────┘
-```
+<table style="width: 100%; border-collapse: collapse; text-align: center; margin: 1.5em 0;">
+  <thead>
+    <tr style="background: #f5f5f5;">
+      <th style="border: 1px solid #ddd; padding: 12px;"></th>
+      <th style="border: 1px solid #ddd; padding: 12px;">低风险</th>
+      <th style="border: 1px solid #ddd; padding: 12px;">高风险</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border: 1px solid #ddd; padding: 12px; font-weight: bold; background: #f9f9f9;">被动投资</td>
+      <td style="border: 1px solid #ddd; padding: 12px;"><strong>组合A</strong><br/>ETF定投<br/><em>SPY/VOO</em></td>
+      <td style="border: 1px solid #ddd; padding: 12px;"><strong>组合B</strong><br/>科技ETF<br/><em>QQQ/SOXX</em></td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #ddd; padding: 12px; font-weight: bold; background: #f9f9f9;">主动投资</td>
+      <td style="border: 1px solid #ddd; padding: 12px;"><strong>组合D</strong><br/>回购价值股<br/><em>JPM/MSFT</em></td>
+      <td style="border: 1px solid #ddd; padding: 12px;"><strong>组合C</strong><br/>期权+杠杆<br/><em>TQQQ/PUT</em></td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #ddd; padding: 12px; font-weight: bold; background: #f9f9f9;">收益优先</td>
+      <td colspan="2" style="border: 1px solid #ddd; padding: 12px;"><strong>组合E</strong><br/>现金流策略<br/><em>JEPI/MAIN/O</em></td>
+    </tr>
+  </tbody>
+</table>
 
 ### 7.2 各组合详细配置
 
