@@ -20,7 +20,8 @@ import logging
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass, field
 
-from bs4 import BeautifulSoup, Tag, NavigableString
+from bs4 import BeautifulSoup, Tag
+from bs4.element import NavigableString
 
 logger = logging.getLogger(__name__)
 
@@ -192,10 +193,10 @@ class GutenbergConverter:
         if tag_name == 'pre':
             return self._convert_code_block(element)
         if tag_name == 'div':
-            classes = element.get('class', [])
+            classes = element.get('class') or []
             if isinstance(classes, str):
-                classes = classes.split()
-            if 'codehilite' in classes:
+                classes = [classes]
+            if classes and 'codehilite' in classes:
                 return self._convert_codehilite(element)
             return self._convert_generic_div(element)
 
@@ -287,10 +288,10 @@ class GutenbergConverter:
             # Get raw text, preserving whitespace
             code_content = code_element.get_text()
             # Detect language from class (supports both 'language-xxx' and 'xxx')
-            classes = code_element.get('class', [])
+            classes = code_element.get('class') or []
             if isinstance(classes, str):
-                classes = classes.split()
-            for cls in classes:
+                classes = [classes]
+            for cls in (classes if classes else []):
                 if cls.startswith('language-'):
                     language = cls.replace('language-', '')
                     break
@@ -304,10 +305,10 @@ class GutenbergConverter:
 
         # Also check pre element for language class
         if not language:
-            pre_classes = element.get('class', [])
+            pre_classes = element.get('class') or []
             if isinstance(pre_classes, str):
-                pre_classes = pre_classes.split()
-            for cls in pre_classes:
+                pre_classes = [pre_classes]
+            for cls in (pre_classes if pre_classes else []):
                 if cls.startswith('language-'):
                     language = cls.replace('language-', '')
                     break
@@ -367,7 +368,7 @@ class GutenbergConverter:
         # Remove inline styles from table elements to avoid Gutenberg conflicts
         # WordPress Gutenberg has its own table styling
         for tag in element.find_all(['table', 'th', 'td', 'tr', 'thead', 'tbody']):
-            if tag.has_attr('style'):
+            if isinstance(tag, Tag) and tag.has_attr('style'):
                 del tag['style']
 
         table_html = str(element)
@@ -442,17 +443,17 @@ class GutenbergConverter:
 
     def _convert_generic_div(self, element: Tag) -> Optional[str]:
         """Handle generic div elements"""
-        classes = element.get('class', [])
+        classes = element.get('class') or []
         if isinstance(classes, str):
-            classes = classes.split()
+            classes = [classes]
 
         # Video containers
-        if 'video-container' in classes:
+        if classes and 'video-container' in classes:
             return self._convert_html_block(element)
 
         # ASCII art or monospace content
-        style = element.get('style', '')
-        if 'monospace' in style or 'pre' in style:
+        style = element.get('style') or ''
+        if style and ('monospace' in style or 'pre' in style):
             return self._convert_html_block(element)
 
         # Default: process children as separate blocks
