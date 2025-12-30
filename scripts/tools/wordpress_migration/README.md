@@ -28,7 +28,7 @@ scp arong-vps:/home/backup/wp_backup_* /path/to/local/backup/
 
 ```bash
 # On VPS
-cd /var/www/html
+cd /var/www/arong.eu.org/public_html
 
 # Backup files
 sudo tar -czf ~/wp_files_backup.tar.gz .
@@ -98,6 +98,9 @@ python jekyll_to_wp.py --source _posts/ --batch-size 10
 - Handles VIP member_tier field (via ACF)
 - Preserves OneDrive image URLs
 - Converts Markdown to HTML
+- Cleans Liquid/Jekyll template syntax ({% assign %}, {% for %}, etc.)
+- Protects LaTeX math formulas during conversion
+- Handles Kramdown link attributes ({:target="_blank"})
 
 ### 2. Gridea HTML to WordPress (`gridea_html_to_wp.py`)
 
@@ -155,6 +158,26 @@ python generate_redirects.py \
 - `nginx_redirects.conf` - Nginx rewrite rules
 - `htaccess_redirects.txt` - Apache .htaccess rules
 - `jekyll_redirect_instructions.md` - Jekyll redirect-from guide
+
+### 4. Pagination Scroll Fix (`deploy_pagination_fix.sh`)
+
+Fix WordPress pagination jump to page top issue. After deployment, paginated pages (`/page/2/`, `/page/3/`, etc.) will auto-scroll to the posts list section.
+
+**Deploy:**
+```bash
+./deploy_pagination_fix.sh
+```
+
+**How it works:**
+- Deploys a mu-plugin to WordPress
+- Detects paginated URLs (`/page/N/`)
+- Auto-scrolls to `.wp-block-post-template` container
+- Smooth scroll animation with 80px header offset
+
+**Remove:**
+```bash
+ssh arong-vps 'sudo rm /var/www/arong.eu.org/public_html/wp-content/mu-plugins/pagination-scroll-fix.php'
+```
 
 ## Migration Workflow
 
@@ -243,4 +266,5 @@ python jekyll_to_wp.py --source _posts/ --dry-run -v
 - Scripts: `/home/wuxia/projects/workshop/scripts/tools/wordpress_migration/`
 - Jekyll Posts: `/home/wuxia/projects/workshop/_posts/`
 - Gridea Posts: `/home/wuxia/projects/zhurong2020.github.io/post/`
+- WordPress Root: `/var/www/arong.eu.org/public_html/`
 - Results: Working directory (where you run the script)
