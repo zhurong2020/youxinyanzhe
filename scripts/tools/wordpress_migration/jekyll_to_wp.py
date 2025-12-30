@@ -15,7 +15,7 @@ import sys
 import json
 import argparse
 import logging
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
@@ -106,20 +106,23 @@ class JekyllToWordPress:
             # Extract basic fields
             title = post.get('title', file_path.stem)
 
-            # Handle date - can be string or datetime
+            # Handle date - can be string, date, or datetime
             date_raw = post.get('date', datetime.now())
             if isinstance(date_raw, str):
                 # Try parsing common formats
                 for fmt in ['%Y-%m-%d %H:%M:%S %z', '%Y-%m-%d %H:%M:%S', '%Y-%m-%d']:
                     try:
-                        date = datetime.strptime(date_raw.split('+')[0].strip(), fmt.split(' %z')[0])
+                        post_date = datetime.strptime(date_raw.split('+')[0].strip(), fmt.split(' %z')[0])
                         break
                     except ValueError:
                         continue
                 else:
-                    date = datetime.now()
+                    post_date = datetime.now()
+            elif isinstance(date_raw, date) and not isinstance(date_raw, datetime):
+                # Convert date to datetime (midnight)
+                post_date = datetime.combine(date_raw, datetime.min.time())
             else:
-                date = date_raw
+                post_date = date_raw
 
             # Handle categories (can be string or list)
             categories_raw = post.get('categories', [])
@@ -161,7 +164,7 @@ class JekyllToWordPress:
             return JekyllPost(
                 file_path=file_path,
                 title=title,
-                date=date,
+                date=post_date,
                 content=post.content,
                 excerpt=post.get('excerpt', ''),
                 categories=categories,
@@ -318,20 +321,152 @@ class JekyllToWordPress:
 
     def convert_markdown_to_html(self, content: str) -> str:
         """Convert Markdown content to HTML for WordPress"""
+        import re
+
+        # === Pre-processing: Clean Jekyll/Liquid specific syntax ===
+
+        # 1. Remove Liquid template blocks - more aggressive pattern
+        # First, remove entire investment disclaimer block (common pattern)
+        content = re.sub(
+            r'\{%\s*assign\s+investment_tags.*?\{%\s*endif\s*%\}',
+            '', content, flags=re.DOTALL
+        )
+        # Remove any {% assign ... %}
+        content = re.sub(r'\{%\s*assign\s+[^%]*%\}', '', content)
+        # Remove {% for ... %} ... {% endfor %} blocks
+        content = re.sub(r'\{%\s*for\s+[^%]*%\}.*?\{%\s*endfor\s*%\}', '', content, flags=re.DOTALL)
+        # Remove {% if ... %} ... {% endif %} blocks
+        content = re.sub(r'\{%\s*if\s+[^%]*%\}.*?\{%\s*endif\s*%\}', '', content, flags=re.DOTALL)
+        # Remove any remaining single Liquid tags
+        content = re.sub(r'\{%[^%]*%\}', '', content)
+        # Remove Liquid variables like {{ site.baseurl }}
+        content = re.sub(r'\{\{[^}]*\}\}', '', content)
+
+        # 2. Convert Kramdown link attributes {:target="_blank"} to proper markdown
+        kramdown_links = re.findall(r'\[([^\]]+)\]\(([^)]+)\)\{:target=["\']_blank["\']\}', content)
+        content = re.sub(r'\{:target=["\']_blank["\']\}', '', content)
+
+        # 3. Protect LaTeX math formulas before markdown conversion
+        # Store math blocks temporarily
+        math_blocks = []
+        def save_math(match):
+            math_blocks.append(match.group(0))
+            return f'%%MATH_BLOCK_{len(math_blocks)-1}%%'
+
+        # Protect display math $$...$$
+        content = re.sub(r'\$\$[^$]+\$\$', save_math, content, flags=re.DOTALL)
+        # Protect inline math $...$
+        content = re.sub(r'\$[^$\n]+\$', save_math, content)
+
+        # 4. Protect ASCII art / preformatted text blocks
+        # Detect blocks with box-drawing characters
+        ascii_art_blocks = []
+        def save_ascii_art(match):
+            ascii_art_blocks.append(match.group(0))
+            return f'\n%%ASCII_ART_{len(ascii_art_blocks)-1}%%\n'
+
+        # Match fenced code blocks with ASCII art
+        content = re.sub(
+            r'```[^\n]*\n((?:[^\n]*[├─│└┘┐┌┬┴┼╔╗╚╝║═]+[^\n]*\n)+)```',
+            save_ascii_art, content
+        )
+        # Also match non-fenced ASCII art blocks (consecutive lines with box chars)
+        content = re.sub(
+            r'((?:^[^\n]*[├─│└┘┐┌┬┴┼╔╗╚╝║═]+[^\n]*$\n?){3,})',
+            save_ascii_art, content, flags=re.MULTILINE
+        )
+
         # Configure markdown with extensions
         md = markdown.Markdown(extensions=[
             'tables',
             'fenced_code',
             'codehilite',
             'toc',
-            'nl2br'
         ])
 
         html = md.convert(content)
 
-        # Clean up some common issues
-        # Remove <!-- more --> marker (WordPress uses its own)
+        # === Post-processing: Clean up HTML ===
+
+        # 5. Restore LaTeX math blocks with proper delimiters for MathJax
+        for i, math in enumerate(math_blocks):
+            html = html.replace(f'%%MATH_BLOCK_{i}%%', math)
+
+        # 6. Restore ASCII art blocks with <pre> tag
+        for i, art in enumerate(ascii_art_blocks):
+            # Wrap in <pre> with CJK-compatible monospace font for proper alignment
+            # Use font stack that supports equal-width CJK characters
+            pre_block = f'''<pre style="font-family: 'Sarasa Mono SC', 'Noto Sans Mono CJK SC', 'Source Han Mono SC', 'Microsoft YaHei Mono', 'Consolas', 'Monaco', monospace; white-space: pre; overflow-x: auto; background: #f5f5f5; padding: 1em; border-radius: 4px; line-height: 1.4; font-size: 14px;">{art}</pre>'''
+            html = html.replace(f'<p>%%ASCII_ART_{i}%%</p>', pre_block)
+            html = html.replace(f'%%ASCII_ART_{i}%%', pre_block)
+
+        # 7. Remove <!-- more --> marker (WordPress uses its own)
         html = html.replace('<!-- more -->', '<!--more-->')
+
+        # 8. Add target="_blank" to external links that had {:target="_blank"}
+        for link_text, link_url in kramdown_links:
+            old_link = f'<a href="{link_url}">{link_text}</a>'
+            new_link = f'<a href="{link_url}" target="_blank" rel="noopener noreferrer">{link_text}</a>'
+            html = html.replace(old_link, new_link)
+
+        # 9. Make images responsive
+        html = re.sub(
+            r'<img\s+([^>]*?)(/?)>',
+            r'<img \1 style="max-width: 100%; height: auto;" \2>',
+            html
+        )
+
+        # 10. Style tables for better display
+        html = re.sub(
+            r'<table>',
+            '<table style="border-collapse: collapse; width: 100%; margin: 1em 0;">',
+            html
+        )
+        html = re.sub(
+            r'<th>',
+            '<th style="border: 1px solid #ddd; padding: 10px 12px; background-color: #f2f2f2; text-align: center; font-weight: 600;">',
+            html
+        )
+        html = re.sub(
+            r'<td>',
+            '<td style="border: 1px solid #ddd; padding: 10px 12px; text-align: center;">',
+            html
+        )
+
+        # 11. Fix video container width (limit to content width and center)
+        # Replace max-width: 100% with a reasonable max-width and center
+        html = re.sub(
+            r'(<div[^>]*class="video-container"[^>]*style="[^"]*)(max-width:\s*100%)',
+            r'\1max-width: 800px; margin: 0 auto',
+            html
+        )
+        # Also handle video containers without explicit max-width
+        html = re.sub(
+            r'<div class="video-container" style="position: relative; padding-bottom: 56\.25%; height: 0; overflow: hidden; max-width: 100%; background: #000;">',
+            '<div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 800px; margin: 0 auto; background: #000;">',
+            html
+        )
+
+        # 12. Clean up empty paragraphs
+        html = re.sub(r'<p>\s*</p>', '', html)
+        html = re.sub(r'\n\s*\n\s*\n', '\n\n', html)
+
+        # 12. Add MathJax script if math formulas exist
+        if math_blocks:
+            mathjax_script = '''
+<script>
+if (!window.MathJax) {
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\\\(', '\\\\)']], displayMath: [['$$', '$$'], ['\\\\[', '\\\\]']] }
+  };
+  var script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+  script.async = true;
+  document.head.appendChild(script);
+}
+</script>
+'''
+            html = mathjax_script + html
 
         return html
 
@@ -361,9 +496,17 @@ class JekyllToWordPress:
         # Convert content to HTML
         html_content = self.convert_markdown_to_html(post.content)
 
+        # Extract slug from Jekyll filename (remove date prefix and extension)
+        # Format: YYYY-MM-DD-slug-name.md -> slug-name
+        filename = post.file_path.stem  # Remove .md
+        import re
+        slug_match = re.match(r'\d{4}-\d{2}-\d{2}-(.+)', filename)
+        slug = slug_match.group(1) if slug_match else filename
+
         # Prepare post data
         post_data = {
             'title': post.title,
+            'slug': slug,  # Use English slug from filename
             'content': html_content,
             'excerpt': post.excerpt,
             'status': 'publish',
@@ -462,14 +605,19 @@ class JekyllToWordPress:
             logger.warning(f"  Failed to update ACF fields: {e}")
 
     def find_posts(self, source_dir: str) -> List[Path]:
-        """Find all Jekyll markdown posts in the source directory"""
+        """Find all Jekyll markdown posts in the source directory or a single file"""
         source_path = Path(source_dir)
 
         if not source_path.exists():
-            logger.error(f"Source directory not found: {source_dir}")
+            logger.error(f"Source path not found: {source_dir}")
             return []
 
-        # Find all .md files
+        # Support single file
+        if source_path.is_file() and source_path.suffix == '.md':
+            logger.info(f"Single file mode: {source_path.name}")
+            return [source_path]
+
+        # Find all .md files in directory
         posts = list(source_path.glob('*.md'))
 
         # Sort by date (filename starts with YYYY-MM-DD)
