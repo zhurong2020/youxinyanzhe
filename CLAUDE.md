@@ -26,8 +26,9 @@
 - **WordPress博客**: https://www.arong.eu.org
   - VPS服务器: `arong-vps` (SSH别名)
   - 网站根目录: `/var/www/arong.eu.org/public_html/`
-  - 当前文章数: 21篇
+  - 当前文章数: **115篇** (2025-12-31批量迁移完成)
   - 迁移工具: `scripts/tools/wordpress_migration/`
+  - 迁移状态: ✅ Gridea 80篇文章已全部迁移完成
 - **文章去重与迁移分析**: 详见 `_drafts/todos/DEDUPLICATED-ARTICLES-REGISTRY.md`
 
 ### WordPress网站配置 (arong.eu.org)
@@ -41,14 +42,17 @@
   - `sidebar-for-posts.php` - 单篇文章侧边栏（最新文章+分类）
   - `custom-functions.php` - 自定义功能
   - `security-enhancements.php` - 安全增强
+  - `image-width-fix.php` - 图片宽度自适应修复
+  - `category-header-images.php` - 分类页面头图
+  - `mathjax-support.php` - MathJax数学公式支持
 - **已安装插件**: Elementor v3.34.0（拖拽式页面构建器）
 - **AdSense状态**: 已提交审核 (pub-3677908378517538)
 - **ads.txt**: 已配置在网站根目录
 
-## 当前状态 (2025-12-30更新)
-- **系统状态**: 🟡 **2025年Q4收官** - 准备2026年Q1规划
-- **核心成就**: **WordPress迁移工具** + **Google AdSense集成** + **Gutenberg转换器**
-- **最新进展**: 完成代码质量优化（Pylance类型检查），更新项目文档，Q4工作总结完成
+## 当前状态 (2025-12-31更新)
+- **系统状态**: 🟢 **Gridea迁移完成** - WordPress成为主站
+- **核心成就**: **批量迁移76篇文章** + **7分类体系** + **图片样式优化**
+- **最新进展**: 完成Gridea到WordPress的批量迁移，115篇文章，7大分类体系建立
 - **AdSense状态**: 等待Google审核中 (pub-3677908378517538)
 - **服务分级**: VIP2专业解读 + VIP3翻译服务 + VIP4定制服务，明确差异化价值
 - **内容标准**: Tesla VIP2文章作为标杆，建立8,000-15,000字专业分析标准
