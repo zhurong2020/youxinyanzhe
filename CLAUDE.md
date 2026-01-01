@@ -48,7 +48,9 @@
   - `category-header-images.php` - 分类页面头图
   - `mathjax-support.php` - MathJax数学公式支持
   - `exclude-paper-weekly.php` - 首页排除论文周报分类
-- **已安装插件**: Elementor v3.34.0（拖拽式页面构建器）
+  - `paper-downloads.php` - VIP会员论文下载功能 (2025-12-31)
+- **已安装插件**: Elementor, Members (会员角色管理), WPS Hide Login (隐藏登录)
+- **会员页面**: /login/ (登录), /register/ (注册), /paper-library/ (论文资源库)
 - **AdSense状态**: 已提交审核 (pub-3677908378517538)
 - **ads.txt**: 已配置在网站根目录
 - **微信验证文件**: `007baaf0c958cc01acabdcbef3e017ea.txt` (2025-12-31部署，用于恢复微信内访问)
