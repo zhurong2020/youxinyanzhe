@@ -35,6 +35,7 @@
 ### WordPress网站配置 (arong.eu.org)
 - **VPS连接**: `ssh arong-vps`
 - **WP-CLI**: `sudo -u www-data wp --path=/var/www/arong.eu.org/public_html`
+- **🔐 管理员登录**: `https://www.arong.eu.org/youxin-admin` (原/wp-admin已禁用，防机器人)
 - **mu-plugins目录**: `/var/www/arong.eu.org/public_html/wp-content/mu-plugins/`
 - **已部署mu-plugins**:
   - `adsense-verification.php` - Google AdSense验证代码
