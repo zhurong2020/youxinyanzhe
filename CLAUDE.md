@@ -226,12 +226,22 @@
 **详细流程**: 查看 `_drafts/todos/00-CONTENT-HOOKS-SOP.md` 获取完整操作指南
 
 ### VIP会员系统
-#### 技术字段映射
-- **VIP2** → `member_tier: monthly` (¥108/月)
-- **VIP3** → `member_tier: quarterly` (¥288/季)  
-- **VIP4** → `member_tier: yearly` (¥720/年)
 
-**重要**: Front Matter中使用技术字段值，用户界面显示VIP2/VIP3/VIP4
+#### WordPress会员系统 (arong.eu.org) - 2025-12-31配置
+- **登录页面**: https://www.arong.eu.org/login/
+- **注册页面**: https://www.arong.eu.org/register/
+- **会员角色**:
+  - `vip1_member` - VIP1体验会员 (¥35/7天)
+  - `vip2_member` - VIP2专业会员 (¥108/月)
+  - `vip3_member` - VIP3翻译会员 (¥288/季)
+  - `vip4_member` - VIP4定制会员 (¥720/年)
+- **权限控制**: Members插件 + 自定义capabilities (view_vip1/2/3/4_content)
+- **管理方式**: 手动管理（用户付款后在后台分配角色）
+
+#### Jekyll会员系统 (已废弃)
+- **VIP2** → `member_tier: monthly` (¥108/月)
+- **VIP3** → `member_tier: quarterly` (¥288/季)
+- **VIP4** → `member_tier: yearly` (¥720/年)
 
 **详细规范**: 查看 `docs/MEMBER_CONTENT_RULES_AND_STANDARDS.md` 获取完整的会员内容管理规则
 
